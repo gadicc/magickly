@@ -108,6 +108,12 @@ export function disagreements(
     note("presidingDays", asPrinted.join(", "), asDerived.join(", "));
 
   const printed = scanned.invocationFrom;
+  // An hour of 0:00 with no part of the day is the extraction's way of saying
+  // the entry gives none (genii 8, 38 and 44): it is not midnight, which
+  // Lenain writes as "minuit". The hour used still comes from the tables, so
+  // it is still a note, but one that says nothing is printed.
+  const absent =
+    printed.hour === 0 && printed.minute === 0 && !printed.partOfDay.trim();
   const asMinutes = (printed.hour * 60 + printed.minute) % (24 * 60);
   // Lenain writes "du matin" or "du soir"; where he writes neither, which half
   // of the day he means cannot be read off the page, so both are accepted.
@@ -116,10 +122,12 @@ export function disagreements(
     ? [evening && printed.hour < 12 ? asMinutes + 12 * 60 : asMinutes]
     : [asMinutes, (asMinutes + 12 * 60) % (24 * 60)];
   const invocation = invocationOf(no);
-  if (!readings.includes(invocation.from))
+  if (absent || !readings.includes(invocation.from))
     note(
       "invocation",
-      `${printed.hour}:${String(printed.minute).padStart(2, "0")}${printed.partOfDay ? ` ${printed.partOfDay}` : ""}`,
+      absent
+        ? ""
+        : `${printed.hour}:${String(printed.minute).padStart(2, "0")}${printed.partOfDay ? ` ${printed.partOfDay}` : ""}`,
       `${Math.floor(invocation.from / 60)}:${String(invocation.from % 60).padStart(2, "0")}`,
     );
 

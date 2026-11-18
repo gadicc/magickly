@@ -258,6 +258,56 @@ failure named the next thing missing. It now rebuilds the apparatus and the
 `assemble.ts` still reads the extractions, by design: it is a gather step like
 `gatherPages.ts`, run after a re-extraction, and what it writes is committed.
 
+## Other witnesses (18 November 2026)
+
+The scan this edition transcribes is not a facsimile of 1823. Set beside the
+1823 printing, page 53 shares no line break with it, its spelling is
+modernised ("savans", "talens" → "savants", "talents"), and the same page
+number holds different text. The reissue (OCLC records a 1909 printing of 153
+pages) was reset from scratch. So the page numbers this edition anchors to are
+the reissue's, not Lenain's, and an error in its text may be its compositor's.
+The base text stays the reissue: its anchors and routes are public, and
+re-reading 178 pages of 1823 is a separate decision.
+
+Two further copies were read where the apparatus turns on a value, each by a
+reader not told the edition's own reading, and recorded in
+`packages/magick-data/src/kabbalah/lenain/witnesses.json5`:
+
+| Witness | Where | What it is |
+| --- | --- | --- |
+| 1823 printing | Google Books `qt9SAAAAcAAJ`, Koninklijke Bibliotheek | Lenain's printing; original paper wrapper, no Papus preface. The fold-out is folded too, but shows rows 57–72 |
+| Ms 5365 | archive.org `BIUSante_ms05365`, BIU Santé, Licence ouverte | An undated handwritten copy of 1823; omits the first table. Its variants are the copyist's |
+| Lyon's second copy | Google Books `BqzyzEEX3MAC` | The same reissue as ours, folded the same way |
+
+What they settled, against the reissue:
+
+- **The reissue's own errors**, which the apparatus had laid at Lenain's door:
+  18's and 71's presiding days, 53's and 62's degrees, the forty-sixth's
+  ordinal ("36e"), the five revolutions ("260 jours"), the twelfth's damaged
+  "qui.l", and the Hebrew of 37 (אנואל for אניאל) and 68 (הבויה for חבויה).
+  The 1823 printing has the right value in each.
+- **Lenain's own**, confirmed: every other table disagreement is in 1823 too.
+- **The reissue correcting Lenain**: the sixth's Hebrew is ללחאל in 1823, ללהאל
+  in the reissue; the thirtieth's last day is 18 janvier in 1823, the 31st the
+  tables require in the reissue.
+- **An artefact of ours**: genii 8, 38 and 44 give no hour in either printing.
+  The apparatus called them "printed 0:00"; they now say nothing is printed.
+- **The first table**: the 1823 plate adds rows 57 (cut through) to 61, names
+  the sixty-second (Iahhel, blank on the reissue's), and has "Haiaiel" and
+  "Les Brachmanes" where the reissue has "Haiuiel" and "Les Brahmanes". Rows 1
+  to 56 are on no image found.
+
+No copy with the plate opened was found: Gallica and HathiTrust refused
+automated access, and Papus's *La Cabbale* (1903) describes the book without
+reprinting the table. Lenain's own sources were found and are cited, not
+copied: Agrippa, *La Philosophie occulte* (The Hague 1727), vol. II pp. 109–110
+(archive.org `per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22`,
+leaves n588–589), the 72 names in Lenain's spellings; and Kircher, *Oedipus
+Aegyptiacus* II.1 (1653), pp. 271–273 (archive.org `A027083`, leaves
+n278–280), the 72 angels by choir, whose last page Lenain cites, and p. 287
+(leaf n294), on the four-letter name of God. Neither table gives the nations
+or their names of God, so rows 1 to 56 of those columns still rest on the entries.
+
 ## Follow-ups
 
 - ~~**72 per-genius routes**~~ — done, `22ca738`. `/kabbalah/angel/<name>`,
@@ -272,3 +322,9 @@ failure named the next thing missing. It now rebuilds the apparatus and the
   the per-genius routes' job, but it is worth stating plainly: the page has
   almost no indexable content.
 - `output/preview-refresh-*` holds 7.8 GB of stale build directories.
+- The 47 Hebrew names two machine readings agreed on were read from the
+  reissue only. Checking them against the 1823 printing, or deriving all 72
+  from Exodus 14:19–21, would catch any more like 37 and 68.
+- Gallica (BnF) and the Bibliothèque d'Amiens may hold a copy with the plate
+  opened; both need a person in a browser.
+

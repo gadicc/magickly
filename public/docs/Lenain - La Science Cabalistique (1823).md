@@ -7,7 +7,9 @@ reproduces Lenain's title page — *A Amiens, chez l'Auteur, au Cabinet de
 lecture, place Saint-Firmin, N. 1. 1823* — and adds a preface by Papus for the
 Ordre Kabbalistique de la Rose-Croix, calling it "la réédition du rarissime
 opuscule de Lenain". The volume does not date itself; the first reprint is
-recorded as Dujols and Thomas, 1909.
+recorded as Dujols and Thomas, 1909. It is not a facsimile: the reissue was
+reset from scratch, with its own line breaks and page contents, and its
+spelling modernised ("savans" became "savants").
 
 Lenain died in 1877 and Papus in 1916, so both texts are public domain and no
 rights are asserted over either. This reading of it was made for [magick.ly](https://magick.ly) from the
@@ -16,15 +18,40 @@ scan, page by page, and is offered under
 the site's data. It replaces an earlier OCR, which could not read the Hebrew and
 rendered many of the digits as letters.
 
-Page numbers are Lenain's own. Footnotes are given under the page they were
-printed on, as he set them.
+Page numbers are the reissue's, not Lenain's: the same number holds different
+text in 1823. Footnotes are given under the page they were printed on, as the
+reissue sets them.
+
+Where an editorial note turns on what is printed, it also cites two other
+copies, so that a slip of the reissue's can be told from one of Lenain's:
+
+- the 1823 printing itself, the Koninklijke Bibliotheek's copy,
+  [Google Books qt9SAAAAcAAJ](https://books.google.com/books?id=qt9SAAAAcAAJ);
+- Bibliothèque interuniversitaire de santé, Ms 5365, an undated handwritten
+  copy of the 1823 printing,
+  [archive.org BIUSante_ms05365](https://archive.org/details/BIUSante_ms05365)
+  (Licence ouverte). Where it differs from the 1823 printing, the difference is
+  the copyist's.
+
+Lenain names his own sources under the first table. They have been consulted
+too. Their tables give the seventy-two but neither the nations nor their
+names of God:
+
+- Agrippa, *La Philosophie occulte*, The Hague 1727, vol. II, pp. 109–110
+  ([archive.org, leaves n588–n589](https://archive.org/details/per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22/page/n588/mode/1up)):
+  the seventy-two names, in the spellings Lenain uses;
+- Kircher, *Oedipus Aegyptiacus*, vol. II part 1, 1653, pp. 271–273
+  ([archive.org, leaves n278–n280](https://archive.org/details/A027083/page/n278/mode/1up)):
+  the seventy-two angels by choir, in Hebrew and Latin, the table whose
+  last page Lenain cites; and p. 287 ([leaf n294](https://archive.org/details/A027083/page/n294/mode/1up)), where Kircher
+  explains the four-letter name of God.
 
 <small>
 
 **About this edition**
 
-- **first cabalistic table** (reconstruction) — The table is a fold-out leaf, and the scan photographed it folded: only its last eleven rows were captured, and the page behind it is blank. Rows 1 to 61 are in no image of this copy. Every column it carries — name, nation, divine name — is also given in the entry for each genius, so nothing it held is lost, only its arrangement.
-- **first cabalistic table, rows 1-61** (reconstruction) — Rows 62 to 72 are on the plate; 1 to 61 are in no image of this copy. They are put back from each genius's own entry, which carries the same three columns, and are marked as reconstructed wherever they are shown — never written into the transcription, which is what the page prints. The method can be checked against the eleven rows that survive: it recovers the divine name and the nation for ten of them and the genius's name for eight, the misses being places Lenain disagrees with himself, spelling Mogols, Eiael, Habuiah and Haiuiel in the table where his entries have Mongols, Eiael, Habuhiah and Haiaiel. He names his own sources under the table — Kircher's Oedipus Aegyptiacus, tome 2, pages 273 and 287, and Agrippa's Occult Philosophy, book 3, pages 109 and 110, The Hague 1727 — both public domain, and neither yet consulted here.
+- **first cabalistic table** (reconstruction) — The table is a fold-out leaf, and the scan photographed it folded: only its last eleven rows were captured, and the page behind it is blank. The 1823 printing's copy (Google Books qt9SAAAAcAAJ, page 25) was photographed folded too, but further open, and shows rows 57 to 72, the fifty-seventh only in part. Rows 1 to 56 are in no image found. Every column the table carries — name, nation, divine name — is also given in the entry for each genius, so nothing it held is lost, only its arrangement.
+- **first cabalistic table, rows 1-56** (reconstruction) — Rows 62 to 72 are on the reissue's plate, and 57 to 72 on the 1823 printing's; 1 to 56 are in no image found. They are put back from each genius's own entry, which carries the same three columns, and are marked as reconstructed wherever they are shown — never written into the transcription, which is what the page prints. The method can be checked against the rows the plates do show, and the reconstructed table says how often it recovers each column; the misses are places where Lenain's table and his entries differ, such as Mogols for Mongols and Habuiah for Habuhiah. He names his own sources under the table — Kircher's Oedipus Aegyptiacus, tome 2, pages 273 and 287, and Agrippa's Occult Philosophy, book 3, pages 109 and 110, The Hague 1727 — and both have been consulted: Agrippa gives the seventy-two names in the spellings Lenain uses, and Kircher the seventy-two angels by choir in Hebrew and Latin. Neither gives the nations or their names of God, so those two columns rest on Lenain alone.
 - **name.he** (reading) · U+05C4 — Lenain dots his Hebrew above the letter bodies, not within them and not beneath. Those dots are encoded here as U+05C4 HEBREW MARK UPPER DOT, which is what that position means; whether he intended the biblical punctum extraordinarium or a device of his own is not something the type can settle.
 
 </small>
@@ -701,7 +728,7 @@ Notez que cette table est la plus exacte, en comparaison de celles qui se trouve
 
 **Editorial notes**
 
-- **genius 72, godName** (correction) · KALO → Kalo — The entry gives no name for God, so this is taken from the first cabalistic table, where the column is that nation's own name for Him. The alpha and omega the invocation says to pronounce are divine names but not Thrace's.
+- **genius 72, godName** (correction) · KALO → Kalo — The entry gives no name for God, so this is taken from the first cabalistic table, where the column is that nation's own name for Him. The alpha and omega the invocation says to pronounce are divine names but not Thrace's. The 1823 printing gives none either (p. 96). The manuscript copy Ms 5365 gives none either (leaf n102). The 1823 plate gives KALO (p. 25), as the reissue's does. [1823 printing, p. 96](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA96) · [Ms 5365, leaf n102](https://archive.org/details/BIUSante_ms05365/page/n102/mode/1up)
 
 </small>
 
@@ -1054,7 +1081,7 @@ C'est ici l'alpha et l'oméga (2) des sages de la Grèce, adorés par tous les s
 
 **Editorial notes**
 
-- **revolutions** (correction) · pour les 260 jours → 360 — Five revolutions of 72 days are 360, as the same page says twice elsewhere and as the third table sets out row by row.
+- **revolutions** (correction) · pour les 260 jours → 360 — Five revolutions of 72 days are 360, as the same page says twice elsewhere and as the third table sets out row by row. The reissue's resetting misprints this: the 1823 printing reads “pour les 360 jours” (p. 35). The manuscript copy Ms 5365 has the same (leaf n42). [1823 printing, p. 35](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA35) · [Ms 5365, leaf n42](https://archive.org/details/BIUSante_ms05365/page/n42/mode/1up)
 
 </small>
 
@@ -1353,7 +1380,7 @@ C’est ainsi que les anciens sages des premières nations du monde admettaient 
 
 **Editorial notes**
 
-- **genius 1, presidingDays** (correction) · 20/3, 31/4, 11/8, 22/10, 2/1 → 20/3, 31/5, 11/8, 22/10, 2/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 1, presidingDays** (correction) · 20/3, 31/4, 11/8, 22/10, 2/1 → 20/3, 31/5, 11/8, 22/10, 2/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 46), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n54). [1823 printing, p. 46](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA46) · [Ms 5365, leaf n54](https://archive.org/details/BIUSante_ms05365/page/n54/mode/1up)
 
 </small>
 
@@ -1427,9 +1454,9 @@ Le génie contraire domine l'ignorance, le libertinage, et toutes les mauvaises 
 
 **Editorial notes**
 
-- **genius 5, presidingDays** (correction) · 24/3, 4/6, 14/8, 26/10, 6/1 → 24/3, 4/6, 15/8, 26/10, 6/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **genius 6, name.he** (reading) · לׄלּׄהאׄלּׄ → ללהאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **genius 6, presidingDays** (correction) · 25/3, 5/6, 15/8, 27/10, 7/1 → 25/3, 5/6, 16/8, 27/10, 7/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 5, presidingDays** (correction) · 24/3, 4/6, 14/8, 26/10, 6/1 → 24/3, 4/6, 15/8, 26/10, 6/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 49), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n57). [1823 printing, p. 49](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA49) · [Ms 5365, leaf n57](https://archive.org/details/BIUSante_ms05365/page/n57/mode/1up)
+- **genius 6, name.he** (reading) · לׄלּׄהאׄלּׄ → ללהאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing has “ללחאל” (p. 49); the reissue corrected it. The manuscript copy Ms 5365 has the same (leaf n57). The triad of the Shem HaMephorash is ללה, so the reissue's he is right and the 1823 het a slip. [1823 printing, p. 49](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA49) · [Ms 5365, leaf n57](https://archive.org/details/BIUSante_ms05365/page/n57/mode/1up)
+- **genius 6, presidingDays** (correction) · 25/3, 5/6, 15/8, 27/10, 7/1 → 25/3, 5/6, 16/8, 27/10, 7/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 49), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n57). [1823 printing, p. 49](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA49) · [Ms 5365, leaf n57](https://archive.org/details/BIUSante_ms05365/page/n57/mode/1up)
 
 </small>
 
@@ -1460,9 +1487,9 @@ Le génie contraire est l'ennemi des lumières; il domine la négligence, la par
 
 **Editorial notes**
 
-- **genius 7, presidingDays** (correction) · 26/3, 6/6, 16/8, 28/10, 8/1 → 26/3, 6/6, 17/8, 28/10, 8/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **genius 8, invocation** (correction) · 0:00 → 2:20 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **genius 8, presidingDays** (correction) · 27/3, 7/6, 17/8, 29/10, 9/1 → 27/3, 7/6, 18/8, 29/10, 9/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 7, presidingDays** (correction) · 26/3, 6/6, 16/8, 28/10, 8/1 → 26/3, 6/6, 17/8, 28/10, 8/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 50), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n58). [1823 printing, p. 50](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA50) · [Ms 5365, leaf n58](https://archive.org/details/BIUSante_ms05365/page/n58/mode/1up)
+- **genius 8, invocation** (correction) · 2:20 — Neither the 1823 printing (p. 50) nor the reissue gives an hour for this genius; the one used here is from Lenain's tables. The manuscript copy Ms 5365 gives none either (leaf n59). [1823 printing, p. 50](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA50) · [Ms 5365, leaf n59](https://archive.org/details/BIUSante_ms05365/page/n59/mode/1up)
+- **genius 8, presidingDays** (correction) · 27/3, 7/6, 17/8, 29/10, 9/1 → 27/3, 7/6, 18/8, 29/10, 9/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 51), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n59). [1823 printing, p. 51](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA51) · [Ms 5365, leaf n59](https://archive.org/details/BIUSante_ms05365/page/n59/mode/1up)
 
 </small>
 
@@ -1487,7 +1514,7 @@ Le mauvais génie provoque tout ce qui est nuisible aux productions de la terre;
 
 **Editorial notes**
 
-- **genius 9, presidingDays** (correction) · 28/3, 8/6, 18/8, 30/10, 10/1 → 28/3, 8/6, 19/8, 30/10, 10/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 9, presidingDays** (correction) · 28/3, 8/6, 18/8, 30/10, 10/1 → 28/3, 8/6, 19/8, 30/10, 10/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 51), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n59). [1823 printing, p. 51](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA51) · [Ms 5365, leaf n59](https://archive.org/details/BIUSante_ms05365/page/n59/mode/1up)
 
 </small>
 
@@ -1515,9 +1542,9 @@ Le génie contraire influe sur ceux qui négligent leur santé et leurs affaires
 
 **Editorial notes**
 
-- **genius 10, degrees** (correction) · 41-50 → 46-50 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **genius 10, presidingDays** (correction) · 29/3, 9/6, 19/8, 31/10, 11/1 → 29/3, 9/6, 20/8, 31/10, 11/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **genius 11, presidingDays** (correction) · 30/3, 10/6, 20/8, 1/11, 12/1 → 30/3, 10/6, 21/8, 1/11, 12/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 10, degrees** (correction) · 41-50 → 46-50 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 52), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n60). [1823 printing, p. 52](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA52) · [Ms 5365, leaf n60](https://archive.org/details/BIUSante_ms05365/page/n60/mode/1up)
+- **genius 10, presidingDays** (correction) · 29/3, 9/6, 19/8, 31/10, 11/1 → 29/3, 9/6, 20/8, 31/10, 11/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 52), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n60). [1823 printing, p. 52](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA52) · [Ms 5365, leaf n60](https://archive.org/details/BIUSante_ms05365/page/n60/mode/1up)
+- **genius 11, presidingDays** (correction) · 30/3, 10/6, 20/8, 1/11, 12/1 → 30/3, 10/6, 21/8, 1/11, 12/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 52), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n61). [1823 printing, p. 52](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA52) · [Ms 5365, leaf n61](https://archive.org/details/BIUSante_ms05365/page/n61/mode/1up)
 
 </small>
 
@@ -1547,9 +1574,9 @@ Le génie contraire domine l'indiscrétion et le mensonge ; il influe sur tous c
 
 **Editorial notes**
 
-- **genius 12, psalm.la** (reading) · Ut qui.l Domine recessisti longè → quid — The italic d of "quid" has printed as a dot and a broken stroke, so the page reads "qui.l". At 500 dpi it is plainly damaged type rather than a spelling: the verse is Psalm 9:22, "Ut quid Domine recessisti longe".
-- **genius 13, name.he** (reading) · יזּלּׄאׄלּ → יזלאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **genius 13, presidingDays** (correction) · 1/4, 12/6, 23/8, 3/9, 14/1 → 1/4, 12/6, 23/8, 3/11, 14/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 12, psalm.la** (reading) · Ut qui.l Domine recessisti longè → quid — The italic d of "quid" has printed as a dot and a broken stroke, so the page reads "qui.l". At 500 dpi it is plainly damaged type rather than a spelling: the verse is Psalm 9:22, "Ut quid Domine recessisti longe". The reissue's resetting misprints this: the 1823 printing reads “Ut quid Domine recessisti longè” (p. 53). The manuscript copy Ms 5365 has the same (leaf n61). [1823 printing, p. 53](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA53) · [Ms 5365, leaf n61](https://archive.org/details/BIUSante_ms05365/page/n61/mode/1up)
+- **genius 13, name.he** (reading) · יזּלּׄאׄלּ → יזלאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 53). The manuscript copy Ms 5365 has the same (leaf n61). [1823 printing, p. 53](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA53) · [Ms 5365, leaf n61](https://archive.org/details/BIUSante_ms05365/page/n61/mode/1up)
+- **genius 13, presidingDays** (correction) · 1/4, 12/6, 23/8, 3/9, 14/1 → 1/4, 12/6, 23/8, 3/11, 14/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 54), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n62). [1823 printing, p. 54](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA54) · [Ms 5365, leaf n62](https://archive.org/details/BIUSante_ms05365/page/n62/mode/1up)
 
 </small>
 
@@ -1576,7 +1603,7 @@ Le génie contraire domine la calomnie, les faux témoignages et les procédures
 
 **Editorial notes**
 
-- **genius 14, degrees** (correction) · 66-10 → 66-70 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 14, degrees** (correction) · 66-10 → 66-70 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 54), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 reads “66–70” (leaf n62), a copyist's variant. [1823 printing, p. 54](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA54) · [Ms 5365, leaf n62](https://archive.org/details/BIUSante_ms05365/page/n62/mode/1up)
 
 </small>
 
@@ -1607,8 +1634,8 @@ Le génie contraire domine l'athéisme, les philosophes impies et tous ceux qui 
 
 **Editorial notes**
 
-- **genius 17, invocation** (correction) · 5:00 matin → 5:20 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **genius 18, presidingDays** (correction) · 6/4, 17/6, 28/8, 8/11, 18/1 → 6/4, 17/6, 28/8, 8/11, 19/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 17, invocation** (correction) · 5:00 matin → 5:20 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 56), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n64). [1823 printing, p. 56](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA56) · [Ms 5365, leaf n64](https://archive.org/details/BIUSante_ms05365/page/n64/mode/1up)
+- **genius 18, presidingDays** (correction) · 6/4, 17/6, 28/8, 8/11, 18/1 → 6/4, 17/6, 28/8, 8/11, 19/1 — The reissue's resetting misprints this: the 1823 printing reads “6 avril, 17 juin, 28 août, 8 novembre, 19 janvier” (p. 57), as Lenain's own tables require. The manuscript copy Ms 5365 has the same (leaf n65). [1823 printing, p. 57](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA57) · [Ms 5365, leaf n65](https://archive.org/details/BIUSante_ms05365/page/n65/mode/1up)
 
 </small>
 
@@ -1631,7 +1658,7 @@ Le génie contraire domine sur les procès scandaleux, il influe sur les hommes 
 
 **Editorial notes**
 
-- **genius 19, name.he** (reading) · לּׄוויׄה → לוויה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 19, name.he** (reading) · לּׄוויׄה → לוויה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 57). The manuscript copy Ms 5365 has the same (leaf n65). [1823 printing, p. 57](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA57) · [Ms 5365, leaf n65](https://archive.org/details/BIUSante_ms05365/page/n65/mode/1up)
 
 </small>
 
@@ -1657,7 +1684,7 @@ Le génie contraire domine l'irréligion, les apostats, les libertins et les ren
 
 **Editorial notes**
 
-- **genius 20, degrees** (correction) · 95-100 → 96-100 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 20, degrees** (correction) · 95-100 → 96-100 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 58), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n66). [1823 printing, p. 58](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA58) · [Ms 5365, leaf n66](https://archive.org/details/BIUSante_ms05365/page/n66/mode/1up)
 
 </small>
 
@@ -1684,9 +1711,9 @@ Le génie contraire domine sur les pirates, les corsaires et les esclaves; il in
 
 **Editorial notes**
 
-- **genius 22, name.he** (reading) · יׄיׄיׄאׄלּׄ → יייאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **genius 22, presidingDays** (correction) · 10/4, 21/6, 1/9, 12/11, 22/1 → 10/4, 21/6, 1/9, 12/11, 23/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **genius 23, name.he** (reading) · מלּׄהאׄלּׄ → מלהאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 22, name.he** (reading) · יׄיׄיׄאׄלּׄ → יייאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 59). The manuscript copy Ms 5365 has the same (leaf n67). [1823 printing, p. 59](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA59) · [Ms 5365, leaf n67](https://archive.org/details/BIUSante_ms05365/page/n67/mode/1up)
+- **genius 22, presidingDays** (correction) · 10/4, 21/6, 1/9, 12/11, 22/1 → 10/4, 21/6, 1/9, 12/11, 23/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 59), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n67). [1823 printing, p. 59](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA59) · [Ms 5365, leaf n67](https://archive.org/details/BIUSante_ms05365/page/n67/mode/1up)
+- **genius 23, name.he** (reading) · מלּׄהאׄלּׄ → מלהאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 60). The manuscript copy Ms 5365 has the same (leaf n68). [1823 printing, p. 60](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA60) · [Ms 5365, leaf n68](https://archive.org/details/BIUSante_ms05365/page/n68/mode/1up)
 
 </small>
 
@@ -1753,8 +1780,8 @@ Le génie contraire domine sur les catastrophes, les accidents, et cause les apo
 
 **Editorial notes**
 
-- **genius 28, name.he** (reading) · שאׄהיׄה → שאהיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **genius 29, name.he** (reading) · ריׄיׄאׄלּׄ → רייאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 28, name.he** (reading) · שאׄהיׄה → שאהיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 63). The manuscript copy Ms 5365 has the same (leaf n71). [1823 printing, p. 63](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA63) · [Ms 5365, leaf n71](https://archive.org/details/BIUSante_ms05365/page/n71/mode/1up)
+- **genius 29, name.he** (reading) · ריׄיׄאׄלּׄ → רייאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 64). The manuscript copy Ms 5365 has the same (leaf n72). [1823 printing, p. 64](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA64) · [Ms 5365, leaf n72](https://archive.org/details/BIUSante_ms05365/page/n72/mode/1up)
 
 </small>
 
@@ -1779,8 +1806,8 @@ Le génie contraire domine le fanatisme et l'hypocrisie; il influe sur tous ceux
 
 **Editorial notes**
 
-- **genius 30, decade** (correction) · 9 → 15 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **genius 30, presidingDays** (correction) · 28/4, 29/6, 9/9, 20/11, 31/1 → 18/4, 29/6, 9/9, 20/11, 31/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 30, decade** (correction) · 9 → 15 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 64), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n72). [1823 printing, p. 64](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA64) · [Ms 5365, leaf n72](https://archive.org/details/BIUSante_ms05365/page/n72/mode/1up)
+- **genius 30, presidingDays** (correction) · 28/4, 29/6, 9/9, 20/11, 31/1 → 18/4, 29/6, 9/9, 20/11, 31/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has “28 avril, 29 juin, 9 septembre, 20 novembre, 18 janvier” (p. 64). The manuscript copy Ms 5365 has the same (leaf n72). 28 avril is Lenain's slip, and the reissue keeps it; 18 janvier for the fifth day is his too, which the reissue corrected to the 31st the tables require. [1823 printing, p. 64](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA64) · [Ms 5365, leaf n72](https://archive.org/details/BIUSante_ms05365/page/n72/mode/1up)
 
 </small>
 
@@ -1841,7 +1868,7 @@ Le génie contraire domine la discorde; il provoque la guerre, les trahisons, et
 
 **Editorial notes**
 
-- **genius 34, name.he** (reading) · לּׄההיׄה → לההיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 34, name.he** (reading) · לּׄההיׄה → לההיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 67). The manuscript copy Ms 5365 has the same (leaf n75). [1823 printing, p. 67](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA67) · [Ms 5365, leaf n75](https://archive.org/details/BIUSante_ms05365/page/n75/mode/1up)
 
 </small>
 
@@ -1872,8 +1899,8 @@ Le génie contraire domine sur les esprits pervers; il influe sur les charlatans
 
 **Editorial notes**
 
-- **genius 37, name.he** (reading) · אׄנואלּ → אנואל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **genius 38, invocation** (correction) · 0:00 → 12:20 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 37, name.he** (reading) · אׄנואלּ → אניאל — Two readings of the scan could not settle this name. The reissue's letters were read from the scan by Gadi Cohen, who reads Hebrew; the dots sit above the letters, not within them. The name given is not those letters but the 1823 printing's. The reissue's resetting misprints this: the 1823 printing reads “אניאל” (p. 69). The manuscript copy Ms 5365 has the same (leaf n77). The triad of the Shem HaMephorash is אני. [1823 printing, p. 69](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA69) · [Ms 5365, leaf n77](https://archive.org/details/BIUSante_ms05365/page/n77/mode/1up)
+- **genius 38, invocation** (correction) · 12:20 — Neither the 1823 printing (p. 71) nor the reissue gives an hour for this genius; the one used here is from Lenain's tables. The manuscript copy Ms 5365 gives none either (leaf n78). [1823 printing, p. 71](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA71) · [Ms 5365, leaf n78](https://archive.org/details/BIUSante_ms05365/page/n78/mode/1up)
 
 </small>
 
@@ -1904,7 +1931,7 @@ Le génie contraire domine l'erreur et le mensonge, et influe sur tous ceux qui 
 
 **Editorial notes**
 
-- **genius 39, name.he** (reading) · רהעאׄלּׄ → רהעאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 39, name.he** (reading) · רהעאׄלּׄ → רהעאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 71). The manuscript copy Ms 5365 has the same (leaf n79). [1823 printing, p. 71](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA71) · [Ms 5365, leaf n79](https://archive.org/details/BIUSante_ms05365/page/n79/mode/1up)
 
 </small>
 
@@ -1932,7 +1959,7 @@ Le génie contraire est nommé Terre-Morte ou Terre-Damnée, suivant l'expressio
 
 **Editorial notes**
 
-- **genius 40, name.he** (reading) · יׄיׄזּאׄלּׄ → ייזאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 40, name.he** (reading) · יׄיׄזּאׄלּׄ → ייזאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 72). The manuscript copy Ms 5365 has the same (leaf n79). [1823 printing, p. 72](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA72) · [Ms 5365, leaf n79](https://archive.org/details/BIUSante_ms05365/page/n79/mode/1up)
 
 </small>
 
@@ -1958,7 +1985,7 @@ Le génie contraire influe sur les apostats, les renégats, et sur tous ceux qui
 
 **Editorial notes**
 
-- **genius 41, name.he** (reading) · הההאׄלּׄ → הההאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 41, name.he** (reading) · הההאׄלּׄ → הההאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 73). The manuscript copy Ms 5365 has the same (leaf n80). [1823 printing, p. 73](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA73) · [Ms 5365, leaf n80](https://archive.org/details/BIUSante_ms05365/page/n80/mode/1up)
 
 </small>
 
@@ -1984,8 +2011,8 @@ Le génie contraire domine sur les traîtres ; il influe sur la malveillance, et
 
 **Editorial notes**
 
-- **genius 42, degrees** (correction) · 216-210 → 206-210 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **genius 43, name.he** (reading) · וולּּׄיׄה → ווליה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 42, degrees** (correction) · 216-210 → 206-210 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 74), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 reads “206–210” (leaf n81), a copyist's variant. [1823 printing, p. 74](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA74) · [Ms 5365, leaf n81](https://archive.org/details/BIUSante_ms05365/page/n81/mode/1up)
+- **genius 43, name.he** (reading) · וולּּׄיׄה → ווליה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 74). The manuscript copy Ms 5365 has the same (leaf n81). [1823 printing, p. 74](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA74) · [Ms 5365, leaf n81](https://archive.org/details/BIUSante_ms05365/page/n81/mode/1up)
 
 </small>
 
@@ -2011,7 +2038,7 @@ Le mauvais génie met la discorde entre les princes ; il influe sur la destructi
 
 **Editorial notes**
 
-- **genius 44, invocation** (correction) · 0:00 → 14:20 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 44, invocation** (correction) · 14:20 — Neither the 1823 printing (p. 75) nor the reissue gives an hour for this genius; the one used here is from Lenain's tables. The manuscript copy Ms 5365 gives none either (leaf n82). [1823 printing, p. 75](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA75) · [Ms 5365, leaf n82](https://archive.org/details/BIUSante_ms05365/page/n82/mode/1up)
 
 </small>
 
@@ -2036,11 +2063,11 @@ Le génie contraire domine sur l'atmosphère ; il provoque les grandes chaleurs 
 
 **Editorial notes**
 
-- **genius 45, name.he** (reading) · סאׄלּׄיׄה → סאליה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **genius 45, psalm.la** (correction) · misericordia tua Domine adjuvebat me → adjuvabat — The page prints "adjuvebat" in italic, plainly and not as scan damage, where the psalter reads "adiuvabat" at Psalm 93:18. The entry's French keeps his spelling; this field gives the verse as the psalter has it.
-- **genius 46, degrees** (correction) · 226-130 → 226-230 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **genius 46, name.he** (reading) · עריׄאׄלּׄ → עריאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **genius 46, ordinal** (correction) · 36e → 46 — The entry stands between the 45th and the 47th, and the first cabalistic table numbers it 46.
+- **genius 45, name.he** (reading) · סאׄלּׄיׄה → סאליה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 76). The manuscript copy Ms 5365 has the same (leaf n83). [1823 printing, p. 76](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA76) · [Ms 5365, leaf n83](https://archive.org/details/BIUSante_ms05365/page/n83/mode/1up)
+- **genius 45, psalm.la** (correction) · misericordia tua Domine adjuvebat me → adjuvabat — The page prints "adjuvebat" in italic, plainly and not as scan damage, where the psalter reads "adiuvabat" at Psalm 93:18. The entry's French keeps his spelling; this field gives the verse as the psalter has it. The 1823 printing has the same (p. 76), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n83). [1823 printing, p. 76](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA76) · [Ms 5365, leaf n83](https://archive.org/details/BIUSante_ms05365/page/n83/mode/1up)
+- **genius 46, degrees** (correction) · 226-130 → 226-230 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 76), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n83). [1823 printing, p. 76](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA76) · [Ms 5365, leaf n83](https://archive.org/details/BIUSante_ms05365/page/n83/mode/1up)
+- **genius 46, name.he** (reading) · עריׄאׄלּׄ → עריאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 76). The manuscript copy Ms 5365 has the same (leaf n83). [1823 printing, p. 76](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA76) · [Ms 5365, leaf n83](https://archive.org/details/BIUSante_ms05365/page/n83/mode/1up)
+- **genius 46, ordinal** (correction) · 36e → 46 — The entry stands between the 45th and the 47th, and the first cabalistic table numbers it 46. The reissue's resetting misprints this: the 1823 printing reads “46e” (p. 76). The manuscript copy Ms 5365 has the same (leaf n83). [1823 printing, p. 76](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA76) · [Ms 5365, leaf n83](https://archive.org/details/BIUSante_ms05365/page/n83/mode/1up)
 
 </small>
 
@@ -2065,7 +2092,7 @@ Le génie contraire cause les tribulations d'esprit; il porte les hommes à comm
 
 **Editorial notes**
 
-- **genius 47, name.he** (reading) · עּשלּׄיׄה → עשליה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 47, name.he** (reading) · עּשלּׄיׄה → עשליה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 77). The manuscript copy Ms 5365 has the same (leaf n84). [1823 printing, p. 77](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA77) · [Ms 5365, leaf n84](https://archive.org/details/BIUSante_ms05365/page/n84/mode/1up)
 
 </small>
 
@@ -2106,7 +2133,7 @@ Le génie contraire influue sur les hommes égoïstes ; il domine sur la haine e
 
 **Editorial notes**
 
-- **genius 50, degrees** (correction) · 246-145 → 246-250 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 50, degrees** (correction) · 246-145 → 246-250 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 79), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n86). [1823 printing, p. 79](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA79) · [Ms 5365, leaf n86](https://archive.org/details/BIUSante_ms05365/page/n86/mode/1up)
 
 </small>
 
@@ -2148,9 +2175,9 @@ Le génie contraire domine l'orgueil, le blasphême et la méchanceté; il influ
 
 **Editorial notes**
 
-- **genius 52, name.he** (reading) · עּממיׄה → עממיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **genius 53, degrees** (correction) · 216-265 → 261-265 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **genius 53, name.he** (reading) · ננאׄאׄלּׄ → ננאאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 52, name.he** (reading) · עּממיׄה → עממיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 81). The manuscript copy Ms 5365 has the same (leaf n88). [1823 printing, p. 81](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA81) · [Ms 5365, leaf n88](https://archive.org/details/BIUSante_ms05365/page/n88/mode/1up)
+- **genius 53, degrees** (correction) · 216-265 → 261-265 — The reissue's resetting misprints this: the 1823 printing reads “261–265” (p. 82), as Lenain's own tables require. The manuscript copy Ms 5365 has the same (leaf n88). [1823 printing, p. 82](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA82) · [Ms 5365, leaf n88](https://archive.org/details/BIUSante_ms05365/page/n88/mode/1up)
+- **genius 53, name.he** (reading) · ננאׄאׄלּׄ → ננאאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 81). The manuscript copy Ms 5365 has the same (leaf n88). [1823 printing, p. 81](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA81) · [Ms 5365, leaf n88](https://archive.org/details/BIUSante_ms05365/page/n88/mode/1up)
 
 </small>
 
@@ -2173,7 +2200,7 @@ Le génie contraire domine l'ignorance et toutes les mauvaises qualités du corp
 
 **Editorial notes**
 
-- **genius 54, name.he** (reading) · ניׄתאׄלׄ → ניתאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 54, name.he** (reading) · ניׄתאׄלׄ → ניתאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 82). The manuscript copy Ms 5365 has the same (leaf n89). [1823 printing, p. 82](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA82) · [Ms 5365, leaf n89](https://archive.org/details/BIUSante_ms05365/page/n89/mode/1up)
 
 </small>
 
@@ -2233,8 +2260,8 @@ Le génie contraire domine sur les trahisons, cause la mésintelligence entre le
 
 **Editorial notes**
 
-- **genius 57, name.he** (reading) · נממיה → נממיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **genius 58, name.he** (reading) · יׄיׄלּׄאׄלּׄ → יילאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 57, name.he** (reading) · נממיה → נממיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 85). The manuscript copy Ms 5365 has the same (leaf n91). [1823 printing, p. 85](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA85) · [Ms 5365, leaf n91](https://archive.org/details/BIUSante_ms05365/page/n91/mode/1up)
+- **genius 58, name.he** (reading) · יׄיׄלּׄאׄלּׄ → יילאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 85). The manuscript copy Ms 5365 has the same (leaf n92). [1823 printing, p. 85](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA85) · [Ms 5365, leaf n92](https://archive.org/details/BIUSante_ms05365/page/n92/mode/1up)
 
 </small>
 
@@ -2285,7 +2312,7 @@ Le génie contraire influe sur les libertins, et particulièrement ceux qui se l
 
 **Editorial notes**
 
-- **genius 62, degrees** (correction) · 306-301 → 306-310 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 62, degrees** (correction) · 306-301 → 306-310 — The reissue's resetting misprints this: the 1823 printing reads “306–310” (p. 88), as Lenain's own tables require. The manuscript copy Ms 5365 has the same (leaf n94). [1823 printing, p. 88](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA88) · [Ms 5365, leaf n94](https://archive.org/details/BIUSante_ms05365/page/n94/mode/1up)
 
 </small>
 
@@ -2311,9 +2338,9 @@ Le génie contraire domine la folie et la prodigalité ; il influe sur tous ceux
 
 **Editorial notes**
 
-- **genius 64, choir** (correction) · le chœur des anges → Archangels — Lenain opens the ninth choir here and ends the eighth at the sixty-third, making one of seven and one of nine. His own first eight declarations fall on the first, ninth, seventeenth and so on — eight apiece — and Agrippa and Kircher have it so. The pattern is followed and the departure noted.
-- **genius 64, choir** (correction) · anges → Archangels — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **genius 64, degrees** (correction) · 316-220 → 316-320 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 64, choir** (correction) · le chœur des anges → Archangels — Lenain opens the ninth choir here and ends the eighth at the sixty-third, making one of seven and one of nine. His own first eight declarations fall on the first, ninth, seventeenth and so on — eight apiece — and Agrippa and Kircher have it so. The pattern is followed and the departure noted. The 1823 printing has the same (p. 90), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n96). [1823 printing, p. 90](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA90) · [Ms 5365, leaf n96](https://archive.org/details/BIUSante_ms05365/page/n96/mode/1up)
+- **genius 64, choir** (correction) · anges → Archangels — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 90), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n96). [1823 printing, p. 90](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA90) · [Ms 5365, leaf n96](https://archive.org/details/BIUSante_ms05365/page/n96/mode/1up)
+- **genius 64, degrees** (correction) · 316-220 → 316-320 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 89), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n96). [1823 printing, p. 89](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA89) · [Ms 5365, leaf n96](https://archive.org/details/BIUSante_ms05365/page/n96/mode/1up)
 
 </small>
 
@@ -2355,7 +2382,7 @@ Le génie contraire influe sur toutes les mauvaises qualités physiques et moral
 
 **Editorial notes**
 
-- **genius 67, name.he** (reading) · אׄיעּאׄלּׄ → איעאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 67, name.he** (reading) · אׄיעּאׄלּׄ → איעאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 91). The manuscript copy Ms 5365 has the same (leaf n98). [1823 printing, p. 91](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA91) · [Ms 5365, leaf n98](https://archive.org/details/BIUSante_ms05365/page/n98/mode/1up)
 
 </small>
 
@@ -2379,8 +2406,8 @@ Le génie contraire domine l'erreur, les préjugés, et ceux qui propagent des s
 
 **Editorial notes**
 
-- **genius 68, degrees** (correction) · 337-340 → 336-340 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
-- **genius 68, name.he** (reading) · הבויׄה → הבויה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 68, degrees** (correction) · 337-340 → 336-340 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 92), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 reads “337–310” (leaf n98), a copyist's variant. [1823 printing, p. 92](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA92) · [Ms 5365, leaf n98](https://archive.org/details/BIUSante_ms05365/page/n98/mode/1up)
+- **genius 68, name.he** (reading) · הבויׄה → חבויה — Two readings of the scan could not settle this name. The reissue's letters were read from the scan by Gadi Cohen, who reads Hebrew; the dots sit above the letters, not within them. The name given is not those letters but the 1823 printing's. The reissue's resetting misprints this: the 1823 printing reads “חבויה” (p. 92). The manuscript copy Ms 5365 reads “הבויה” (leaf n98), a copyist's variant. The triad of the Shem HaMephorash is חבו. [1823 printing, p. 92](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA92) · [Ms 5365, leaf n98](https://archive.org/details/BIUSante_ms05365/page/n98/mode/1up)
 
 </small>
 
@@ -2404,7 +2431,7 @@ Le génie contraire domine sur les procès, les testaments et les legs qui se fo
 
 **Editorial notes**
 
-- **genius 70, name.he** (reading) · יׄבמיׄה → יבמיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
+- **genius 70, name.he** (reading) · יׄבמיׄה → יבמיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 93). The manuscript copy Ms 5365 has the same (leaf n99). [1823 printing, p. 93](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA93) · [Ms 5365, leaf n99](https://archive.org/details/BIUSante_ms05365/page/n99/mode/1up)
 
 </small>
 
@@ -2444,8 +2471,8 @@ Le génie contraire domine l'athéisme, et tous ceux qui propagent des écrits d
 
 **Editorial notes**
 
-- **genius 71, name.he** (reading) · היׄיׄאׄלּׄ → הייאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them.
-- **genius 71, presidingDays** (correction) · 29/5, 9/8, 20/10, 31/12, 14/3 → 29/5, 9/8, 20/10, 31/12, 13/3 — Lenain's own tables give otherwise, and the rest of the book keeps to them.
+- **genius 71, name.he** (reading) · היׄיׄאׄלּׄ → הייאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 95). The manuscript copy Ms 5365 has the same (leaf n101). [1823 printing, p. 95](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA95) · [Ms 5365, leaf n101](https://archive.org/details/BIUSante_ms05365/page/n101/mode/1up)
+- **genius 71, presidingDays** (correction) · 29/5, 9/8, 20/10, 31/12, 14/3 → 29/5, 9/8, 20/10, 31/12, 13/3 — The reissue's resetting misprints this: the 1823 printing reads “29 mai, 9 août, 20 octobre, 31 décembre, 13 mars” (p. 95), as Lenain's own tables require. The manuscript copy Ms 5365 has the same (leaf n101). [1823 printing, p. 95](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA95) · [Ms 5365, leaf n101](https://archive.org/details/BIUSante_ms05365/page/n101/mode/1up)
 
 </small>
 
@@ -3402,7 +3429,11 @@ La Sorcellerie des Campagnes est un ouvrage de science très sérieuse et une œ
 
 ## The first cabalistic table, reconstructed
 
-The plate is a fold-out and the scan caught it folded: only rows 62 to 72 are legible. The 61 rows marked *reconstructed* below are **not from the plate** — they are put back from each genius's own entry, which gives the same three columns. Checked against the 11 rows that survive, the method recovers the divine name and the nation for ten and the name for eight.
+The plate is a fold-out, and both copies scanned caught it folded. The reissue's shows rows 62 to 72. The 1823 printing's was opened further and shows rows 57 to 72, row 57 only in part; the 5 rows it alone shows are given below from it. The 56 rows marked *reconstructed* are **not from either plate** — they are put back from each genius's own entry, which gives the same three columns.
+
+Checked against the rows the plates show in full (row 57, only partly legible, left out), the method recovers the name of God for all 11 on the reissue's plate and 14 of the 15 on the 1823, the nation for 8 of the 11 on the reissue's plate and 8 of the 15 on the 1823, and the genius's name for 7 of the 11 on the reissue's plate and 12 of the 15 on the 1823. The misses are places where Lenain's table and his entries spell or word a name or a nation differently — “Les Carmaniens” in the table, “les anciens Carmaniens” in the entry — or where the plate leaves a cell blank.
+
+Where both plates show a row, they differ 4 times: row 62's name is blank on the reissue's plate and “Iahhel” on the 1823; row 66's nation is “Les Brahmanes” on the reissue's plate and “Les Brachmanes” on the 1823; row 69's name of God is “DÉOS” on the reissue's plate and “DÊOS” on the 1823; row 71's name is “Haiuiel” on the reissue's plate and “Haiaiel” on the 1823. Those rows are given here as the reissue's plate has them, since that is the copy this edition transcribes.
 
 | # | Genius | Peuple | Name of God | Source |
 | --- | --- | --- | --- | --- |
@@ -3462,19 +3493,19 @@ The plate is a fold-out and the scan caught it folded: only rows 62 to 72 are le
 | 54 | Nithael | Les Zaflaniens | BORA | reconstructed |
 | 55 | Mebahiah | Les peuples d'Ormuz | ALAY | reconstructed |
 | 56 | Poiel | Les peuple d'Aden | ILLI | reconstructed |
-| 57 | Nemamiah | Les Ciréniens | POPA | reconstructed |
-| 58 | Ieialel | Les Célamites | PARA | reconstructed |
-| 59 | Harahel | Les Mésopotamiens | ELLA | reconstructed |
-| 60 | Mitzrael | Les peuples du Thibet | GÉNA | reconstructed |
-| 61 | Umabel | Les anciens Béthuliens | SILA | reconstructed |
-| 62 |  | Les Carmaniens | SUNA | on the plate |
-| 63 | Anauel | Les Camboens | MIRI | on the plate |
-| 64 | Mehiel | Les Mogols | ALLI | on the plate |
-| 65 | Damabiah | Les Gymnosophes | TARA | on the plate |
-| 66 | Manakel | Les Brahmanes | PORA | on the plate |
-| 67 | Eiael | Les Albanais | BOGO | on the plate |
-| 68 | Habuiah | Les Péloponésiens | DÉPOS | on the plate |
-| 69 | Rochel | Les Crétois | DÉOS | on the plate |
-| 70 | Jabamiah | Les Béotiens | ARIS | on the plate |
-| 71 | Haiuiel | Les Phrygiens | ZEUT | on the plate |
-| 72 | Mumiah | La Thrace | KALO | on the plate |
+| 57 | Nemamiah | Les Ciréniens | POPA | on the 1823 plate, partly legible |
+| 58 | Ieialel | Les Célamites | PARA | on the 1823 plate |
+| 59 | Harahel | La Mésopotamie | ELLA | on the 1823 plate |
+| 60 | Mitzrael | Le Thibet | GÉNA | on the 1823 plate |
+| 61 | Umabel | Les Béthuliens | SILA | on the 1823 plate |
+| 62 |  | Les Carmaniens | SUNA | on the reissue's plate |
+| 63 | Anauel | Les Camboens | MIRI | on the reissue's plate |
+| 64 | Mehiel | Les Mogols | ALLI | on the reissue's plate |
+| 65 | Damabiah | Les Gymnosophes | TARA | on the reissue's plate |
+| 66 | Manakel | Les Brahmanes | PORA | on the reissue's plate |
+| 67 | Eiael | Les Albanais | BOGO | on the reissue's plate |
+| 68 | Habuiah | Les Péloponésiens | DÉPOS | on the reissue's plate |
+| 69 | Rochel | Les Crétois | DÉOS | on the reissue's plate |
+| 70 | Jabamiah | Les Béotiens | ARIS | on the reissue's plate |
+| 71 | Haiuiel | Les Phrygiens | ZEUT | on the reissue's plate |
+| 72 | Mumiah | La Thrace | KALO | on the reissue's plate |

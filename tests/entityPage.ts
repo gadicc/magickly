@@ -86,11 +86,14 @@ const ROUTES = new Set<string>([
 
 /**
  * The only places off the site a page may link to: the licence, the
- * scanned sources a hall cites, and the code's own repository.
+ * scanned sources a hall or an editorial note cites (an angel's notes cite
+ * the 1823 printing of Lenain on Google Books), and the code's own
+ * repository.
  */
 const EXTERNAL = [
   "https://creativecommons.org/licenses/",
   "https://archive.org/details/",
+  "https://books.google.com/books",
   "https://github.com/gadicc/magickly/",
 ];
 

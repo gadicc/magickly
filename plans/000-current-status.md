@@ -816,9 +816,11 @@ Follow-ups are separate from the completed migration work:
   because the scan cannot supply them and a wrong one passes every check we
   have; they want deriving from Exodus 14:19-21, or a named source. TODO: the
   twenty-second entry's name comes from the model rather than the scan, whose
-  heading is gone. TODO: thirty-five disagreements between the entries and
-  Lenain's own tables are recorded but not resolved, and telling the scan's
-  errors from the book's is per-entry work against the plates.
+  heading is gone. The disagreements between the entries and
+  Lenain's own tables are now resolved per entry against the 1823 printing
+  and a manuscript copy (18 November; [plan 033](033-lenain-edition.md#other-witnesses-18-november-2026)):
+  the scan is a reset reissue, and nine of its departures, two Hebrew names
+  among them, are the reissue's rather than Lenain's.
 - TODO: the sigils the 72 angels page has promised since 2023. The plates in
   the public-domain scan would serve, but only the OCR sidecar is in the repo,
   not the PDF. Vaughan's blog images are his own work.

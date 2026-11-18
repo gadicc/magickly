@@ -333,13 +333,15 @@ function SevenyTwo() {
             that French and from nothing else.
           </p>
           <p>
-            Lenain makes mistakes, and where he does the text keeps his words
-            and a note says what is wrong — an impossible 31 April, a genius
-            numbered 36 in the middle of the forties, five revolutions of 72
-            days called 260. The tables on this page use the corrected value.
-            Most of those notes found themselves: his own four tables say what
-            each entry should contain, so a disagreement is arithmetic rather
-            than opinion.
+            Where the text is wrong it keeps its words, and a note says what is
+            wrong — an impossible 31 April, a genius numbered 36 in the middle
+            of the forties, five revolutions of 72 days called 260. The tables
+            on this page use the corrected value. Most of those notes found
+            themselves: Lenain&apos;s own four tables say what each entry should
+            contain, so a disagreement is arithmetic rather than opinion. Not
+            every slip is Lenain&apos;s: the 31 April is in his 1823 printing,
+            but the 36 and the 260 are the reissue&apos;s, and the notes say
+            which is which.
           </p>
           <p>
             The Hebrew was the hard part. He dots his letters above rather than
@@ -347,7 +349,9 @@ function SevenyTwo() {
             letters or invents them. Forty-seven names are given here because
             two independent readings of the scan agree on them; the other
             twenty-five were read by a person who reads Hebrew. Each name is
-            given both as Lenain points it and as its bare letters.
+            given both as the page points it and as its bare letters. Two, the
+            thirty-seventh and the sixty-eighth, are misprinted in the reissue;
+            their bare letters follow the 1823 printing.
           </p>
           <p>
             The scan is not of the 1823 printing but of a later reissue, which
@@ -358,7 +362,18 @@ function SevenyTwo() {
             </i>{" "}
             &mdash; and adds a preface by Papus for the Ordre Kabbalistique de
             la Rose-Croix. The volume does not date itself; the first reprint is
-            recorded as Dujols and Thomas, 1909.
+            recorded as Dujols and Thomas, 1909. It is not a facsimile: the
+            reissue was reset from scratch, with modernised spelling, so its
+            page numbers are its own and not Lenain&apos;s. Where an editorial
+            note turns on what is printed, it also cites{" "}
+            <a href="https://books.google.com/books?id=qt9SAAAAcAAJ">
+              the 1823 printing
+            </a>{" "}
+            and{" "}
+            <a href="https://archive.org/details/BIUSante_ms05365">
+              a handwritten copy of it
+            </a>{" "}
+            (Bibliothèque interuniversitaire de santé, Ms 5365).
           </p>
           <p>
             Lenain died in 1877 and Papus in 1916, so both texts are public

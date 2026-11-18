@@ -12,6 +12,13 @@
 // dots and all, encoded with U+05C4 for the marks above the letters and
 // U+05BC for those within. The pattern of the marks is not known; some names
 // carry several, some one, and the fifty-seventh none at all.
+//
+// `pointed` is the page this edition transcribes, a reissue recorded as 1909
+// and reset from scratch. For the thirty-seventh and the sixty-eighth that
+// page misprints the name, where the 1823 printing has the triads אני and
+// חבו. Those two rows say so: `reissue` is the reissue's bare letters, which
+// `pointed` must strip to, and `plain` is the 1823 printing's, which
+// witnesses.json5 must record. The build accepts the difference only there.
 [
   { no: 6, plain: "ללהאל", pointed: "לׄלּׄהאׄלּׄ" },
   { no: 13, plain: "יזלאל", pointed: "יזּלּׄאׄלּ" },
@@ -21,7 +28,7 @@
   { no: 28, plain: "שאהיה", pointed: "שאׄהיׄה" },
   { no: 29, plain: "רייאל", pointed: "ריׄיׄאׄלּׄ" },
   { no: 34, plain: "לההיה", pointed: "לּׄההיׄה" },
-  { no: 37, plain: "אנואל", pointed: "אׄנואלּ" },
+  { no: 37, plain: "אניאל", pointed: "אׄנואלּ", reissue: "אנואל" },
   { no: 39, plain: "רהעאל", pointed: "רהעאׄלּׄ" },
   { no: 40, plain: "ייזאל", pointed: "יׄיׄזּאׄלּׄ" },
   { no: 41, plain: "הההאל", pointed: "הההאׄלּׄ" },
@@ -35,7 +42,7 @@
   { no: 57, plain: "נממיה", pointed: "נממיה" },
   { no: 58, plain: "יילאל", pointed: "יׄיׄלּׄאׄלּׄ" },
   { no: 67, plain: "איעאל", pointed: "אׄיעּאׄלּׄ" },
-  { no: 68, plain: "הבויה", pointed: "הבויׄה" },
+  { no: 68, plain: "חבויה", pointed: "הבויׄה", reissue: "הבויה" },
   { no: 70, plain: "יבמיה", pointed: "יׄבמיׄה" },
   { no: 71, plain: "הייאל", pointed: "היׄיׄאׄלּׄ" },
 ]

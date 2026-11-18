@@ -1,4 +1,4 @@
-import { divisions, leavesOf } from "magick-data/kabbalah/lenain/volume";
+import { divisions } from "magick-data/kabbalah/lenain/volume";
 import { breadcrumbList, entityTrail } from "./Breadcrumbs";
 import type { EntityPage } from "./entities";
 
@@ -42,21 +42,6 @@ export function lenainChapterPage(slug: string): EntityPage | null {
   };
 }
 
-/** The printed pages a division runs across, as the volume numbers them. */
-function printedRange(slug: string) {
-  const division = divisions.find((entry) => entry.slug === slug);
-  if (!division) return {};
-  const numbered = leavesOf(division).filter((leaf) => leaf.page.label);
-  const first = numbered[0]?.page.label;
-  const last = numbered[numbered.length - 1]?.page.label;
-  if (!first || !last) return {};
-  return {
-    pageStart: first,
-    pageEnd: last,
-    pagination: first === last ? first : `${first}-${last}`,
-  };
-}
-
 /** Every chapter, in the book's order, for the sitemap. */
 export function lenainPages(): EntityPage[] {
   return divisions
@@ -82,7 +67,10 @@ export function lenainSlugs() {
  * is `BreadcrumbList`, which the site has nowhere else. See plan 033.
  */
 
+/** The scan this edition transcribes: a reissue, recorded as 1909. */
 const SCAN_URL = "https://books.google.com/books?id=ZqgpxTZ43HkC";
+/** The 1823 printing itself, which the apparatus cites (plan 033). */
+const PRINT_1823_URL = "https://books.google.com/books?id=qt9SAAAAcAAJ";
 const CC_BY = "https://creativecommons.org/licenses/by/4.0/";
 
 const LENAIN = {
@@ -92,33 +80,45 @@ const LENAIN = {
   deathDate: "1877",
 };
 
-/** The book itself, with its chapters as parts. */
+/**
+ * The edition, based on two things: Lenain's 1823 book, which is the work,
+ * and the reissue it was read from, which is the copy. The 1823 `Book` is the
+ * 1823 printing only, so its `sameAs` is that printing's scan and its chapters
+ * carry no page numbers — the edition's are the reissue's, which was reset,
+ * and the same number holds different text in 1823.
+ */
 export function bookJsonLd(siteUrl: string) {
   return {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
-    name: "La Science Cabalistique: a reading of the 1823 edition",
+    name: "La Science Cabalistique: Lenain's 1823 text, read from its reissue",
     url: `${siteUrl}${BOOK_PATH}`,
     license: CC_BY,
     creditText: "magick.ly",
-    isBasedOn: {
-      "@type": "Book",
-      name: "La Science Cabalistique, ou l'art de connaître les bons génies qui influent sur la destinée des hommes",
-      author: LENAIN,
-      datePublished: "1823",
-      inLanguage: "fr",
-      locationCreated: { "@type": "Place", name: "Amiens" },
-      sameAs: SCAN_URL,
-      hasPart: divisions.map((division) => ({
-        "@type": "Chapter",
-        name: division.heading,
-        alternateName: division.title,
-        url: `${siteUrl}${BOOK_PATH}/${division.slug}`,
-        // Lenain's own pages, not the scan's: a bibliographic pagination that
-        // cites the PDF is no use to anyone holding the book.
-        ...printedRange(division.slug),
-      })),
-    },
+    isBasedOn: [
+      {
+        "@type": "Book",
+        name: "La Science Cabalistique, ou l'art de connaître les bons génies qui influent sur la destinée des hommes",
+        author: LENAIN,
+        datePublished: "1823",
+        inLanguage: "fr",
+        locationCreated: { "@type": "Place", name: "Amiens" },
+        sameAs: PRINT_1823_URL,
+        hasPart: divisions.map((division) => ({
+          "@type": "Chapter",
+          name: division.heading,
+          alternateName: division.title,
+          url: `${siteUrl}${BOOK_PATH}/${division.slug}`,
+        })),
+      },
+      {
+        "@type": "Book",
+        name: "La Science Cabalistique (reissue with a preface by Papus)",
+        author: LENAIN,
+        inLanguage: "fr",
+        url: SCAN_URL,
+      },
+    ],
   };
 }
 

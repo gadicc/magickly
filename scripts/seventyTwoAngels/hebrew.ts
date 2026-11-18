@@ -12,6 +12,7 @@ import JSON5 from "json5";
 import { z } from "zod";
 import { PDF_PATH } from "./pages";
 import { plateEntries } from "./plateSource";
+import { readWitnesses, WITNESSES_PATH } from "./witnesses";
 
 /**
  * Reads each genius's Hebrew name a second time, from a closer crop.
@@ -324,8 +325,16 @@ export interface HandReading {
   no: number;
   /** The consonantal name: five letters, a triad and then יה or אל. */
   plain: string;
-  /** What Lenain prints, marks and all. */
+  /**
+   * What the page prints, marks and all. For two names (37 and 68) it is the
+   * reissue's misprint, and `plain` is the 1823 printing's letters instead.
+   */
   pointed: string;
+  /**
+   * Where the reissue misprints the name: its bare letters, which `pointed`
+   * strips to and `plain` corrects. Absent everywhere else.
+   */
+  reissue?: string;
 }
 
 /**
@@ -337,12 +346,27 @@ export interface HandReading {
  * validated on load: an unknown genius, a name that is not five letters, or a
  * pointed form that does not strip to its plain one stops the build rather
  * than being taken on trust.
+ *
+ * The one exception is a name the reissue misprints. There the row gives the
+ * reissue's bare letters as `reissue`, the pointed form must strip to them,
+ * and `plain` is the 1823 printing's letters — accepted only where
+ * witnesses.json5 records that misprint with exactly those letters, and
+ * required wherever it records one.
  */
 export function handReadings(
   path = "scripts/seventyTwoAngels/hebrewByHand.json5",
+  witnessesPath = WITNESSES_PATH,
 ): Map<number, HandReading> {
   const rows: HandReading[] = JSON5.parse(readFileSync(path, "utf8"));
   const byNo = new Map<number, HandReading>();
+  const misprinted = new Map(
+    readWitnesses(witnessesPath)
+      .readings.filter(
+        (reading) =>
+          reading.field === "name.he" && reading.verdict === "reissue",
+      )
+      .map((reading) => [reading.no, reading.print1823.reads]),
+  );
 
   for (const row of rows) {
     if (!Number.isInteger(row.no) || row.no < 1 || row.no > 72)
@@ -358,9 +382,24 @@ export function handReadings(
       );
     if (!/(יה|אל)$/.test(plain))
       throw new Error(`Hand reading ${row.no} does not end in יה or אל`);
-    if (hebrewLetters(row.pointed) !== plain)
+    // What the page prints: the name itself, or the reissue's misprint of it.
+    const printed = row.reissue === undefined ? plain : row.reissue;
+    if (hebrewLetters(row.pointed) !== printed)
       throw new Error(
-        `Hand reading ${row.no}: the pointed form strips to ${hebrewLetters(row.pointed)}, not ${plain}`,
+        `Hand reading ${row.no}: the pointed form strips to ${hebrewLetters(row.pointed)}, not ${printed}`,
+      );
+    if (row.reissue !== undefined) {
+      if (row.reissue === plain)
+        throw new Error(
+          `Hand reading ${row.no}: the reissue's letters are the name, so it misprints nothing`,
+        );
+      if (misprinted.get(row.no) !== plain)
+        throw new Error(
+          `Hand reading ${row.no}: no witness records the 1823 printing as ${plain}`,
+        );
+    } else if (misprinted.has(row.no))
+      throw new Error(
+        `Hand reading ${row.no}: a witness records a misprint, but the row gives no reissue letters`,
       );
     byNo.set(row.no, row);
   }

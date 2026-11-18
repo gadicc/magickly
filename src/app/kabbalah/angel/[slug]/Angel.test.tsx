@@ -21,6 +21,12 @@ import AngelPage from "./Angel";
  * refactor changed the page's frame, links and styles and none of its text,
  * and this is what says so. The body is synchronous now, with the texts
  * loaded by the route, and the route is held to the same text.
+ *
+ * It has been regenerated once since, the same way, for plan 033's other
+ * witnesses: the notes now cite the 1823 printing and the manuscript copy
+ * with links, the pointed Hebrew is "as the page points it" rather than
+ * Lenain's, and "In the book" says its page numbers are the reissue's.
+ * Nothing else in the text changed.
  */
 const GOLDEN = readFileSync(
   path.join(import.meta.dirname, "angel.golden.txt"),
@@ -82,6 +88,38 @@ describe("the angel page", () => {
     );
     expect(html).toMatch(
       /<a [^>]*href="\/astrology\/planet\/sol"[^>]*>Sol<\/a>/,
+    );
+  });
+
+  it("links the other copies an editorial note cites", async () => {
+    const html = await body(46);
+    expect(html).toContain(
+      '<a href="https://books.google.com/books?id=qt9SAAAAcAAJ&amp;pg=PA76" rel="noopener">1823 printing, p. 76</a>',
+    );
+    expect(html).toContain(
+      '<a href="https://archive.org/details/BIUSante_ms05365/page/n83/mode/1up" rel="noopener">Ms 5365, leaf n83</a>',
+    );
+  });
+
+  it("does not call a misprinted name Lenain's pointing", async () => {
+    // The reissue prints אנואל for the 37th; 1823 has אניאל, which is used.
+    expect(textOf(await body(37))).toContain(
+      "אניאל — as the reissue misprints it: ",
+    );
+    expect(textOf(await body(46))).toContain("עריאל — as the page points it: ");
+  });
+
+  it("says which hour is used where none is printed", async () => {
+    // The eighth gives no hour in either printing; the tables' is used.
+    expect(textOf(await body(8))).toContain(
+      "invocation correction · 2:20 — Neither the 1823 printing (p. 50)",
+    );
+  });
+
+  it("marks the Hebrew inside a note as Hebrew", async () => {
+    const html = await body(37);
+    expect(html).toMatch(
+      /reads “<span lang="he" dir="rtl"[^>]*>אניאל<\/span>” \(p\. 69\)/,
     );
   });
 });

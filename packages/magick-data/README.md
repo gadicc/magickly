@@ -385,6 +385,7 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `kabbalah/lenain/apparatus.json5` | [Lenain](#lenain) | 2026-11-12 |
 | `kabbalah/lenain/evidence.json5` | [Lenain](#lenain) | 2026-11-12 |
 | `kabbalah/lenain/pages.json5` | [Lenain](#lenain) | 2026-11-12 |
+| `kabbalah/lenain/witnesses.json5` | [Lenain](#lenain): what the 1823 printing and the manuscript copy of it print where a note turns on a value, read from their page images | 2026-11-18 |
 | `kabbalah/paths.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `kabbalah/sephirot.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `kabbalah/seventyTwoAngels.json5` | [Lenain](#lenain) | 2026-11-12 |
@@ -412,8 +413,21 @@ the Google Books scan in the repository's
 That scan is of a later reissue: it reproduces the 1823 title page and adds
 a preface by Papus for the Ordre Kabbalistique de la Rose-Croix. The volume
 does not date itself; the first reprint is recorded as Dujols and Thomas,
-1909. Lenain died in 1877 and Papus in 1916, so **no rights are asserted
-over either text**.
+1909. It is not a facsimile: the reissue was reset, with its own page
+contents and modernised spelling, so its page numbers are not Lenain's.
+Lenain died in 1877 and Papus in 1916, so **no rights are asserted over
+either text**.
+
+Where the apparatus turns on what is printed, **`lenain/witnesses.json5`**
+records what two other copies have there: the 1823 printing itself, the
+Koninklijke Bibliotheek's copy
+([Google Books qt9SAAAAcAAJ](https://books.google.com/books?id=qt9SAAAAcAAJ)),
+and Ms 5365 of the Bibliothèque interuniversitaire de santé, an undated
+handwritten copy of it
+([archive.org BIUSante_ms05365](https://archive.org/details/BIUSante_ms05365),
+Licence ouverte). Each reading is a short value with its page or leaf, read
+from the page image: the 1823 printing is public domain, and the manuscript's
+images are offered under the Licence ouverte.
 
 What is offered under CC BY 4.0 is the work done on top: the English translated
 from that French, the choice and arrangement of fields, the editorial apparatus,
@@ -421,7 +435,9 @@ and the corrections. No rights are claimed where none subsist. Nothing in it
 draws on any modern published translation of the work — the point of the
 exercise was a copyright-free rendering of the same public-domain material.
 
-The Hebrew names are given both as Lenain points them and as bare letters.
+The Hebrew names are given both as the page points them and as bare letters;
+for two, the thirty-seventh and the sixty-eighth, the reissue misprints the
+name and the bare letters follow the 1823 printing.
 Forty-seven are there because two independent readings of the scan agree;
 twenty-five were read by a person who reads Hebrew, and each of those carries a
 note saying so. See

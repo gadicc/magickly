@@ -1,6 +1,12 @@
 import { readFileSync } from "node:fs";
 import JSON5 from "json5";
 import { describe, expect, it } from "vitest";
+import {
+  firstTable,
+  firstTableAgreement,
+  firstTableCounts,
+  plateDifferences,
+} from "./lenain/firstTable.ts";
 import { piecesOf, segmentsOf } from "./lenain/pieces.ts";
 import {
   bookLeaves,
@@ -53,11 +59,21 @@ interface Note {
   printed: string;
   used: string;
   why: string;
+  witnesses?: { source: string; label: string; url: string; reads: string }[];
+}
+
+interface Witnessed {
+  no: number;
+  field: string;
+  verdict: string;
+  print1823: { at: number; reads: string };
+  ms5365?: { at: number; reads: string };
 }
 
 const leaves: Leaf[] = read("./lenain/pages.json5");
 const notes: Note[] = read("./lenain/apparatus.json5");
 const evidence: { no: number }[] = read("./lenain/evidence.json5");
+const witnessed: { readings: Witnessed[] } = read("./lenain/witnesses.json5");
 
 const KINDS = new Set([
   "heading",
@@ -275,5 +291,99 @@ describe("the apparatus", () => {
       expect(note.why.length, note.field).toBeGreaterThan(40);
       expect(note.field, JSON.stringify(note)).not.toMatch(/^p\.\s*\d/);
     }
+  });
+});
+
+describe("the other witnesses", () => {
+  it("joins every reading to a note, and links its pages", () => {
+    // apparatus.ts stops on a reading that matches no note; this holds the
+    // committed apparatus to the same, so a hand edit cannot drop one either.
+    for (const reading of witnessed.readings) {
+      const where = `${reading.no} ${reading.field}`;
+      const at = notes.filter(
+        (note) => note.no === reading.no && note.field === reading.field,
+      );
+      expect(at.length, where).toBeGreaterThan(0);
+      for (const note of at) {
+        const [printing, copy] = note.witnesses ?? [];
+        expect(printing?.url, where).toBe(
+          `https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA${reading.print1823.at}`,
+        );
+        expect(printing?.reads, where).toBe(reading.print1823.reads);
+        if (reading.ms5365)
+          expect(copy?.label, where).toBe(
+            `Ms 5365, leaf n${reading.ms5365.at}`,
+          );
+      }
+    }
+  });
+
+  it("says nothing is printed where neither printing gives an hour", () => {
+    const absent = witnessed.readings.filter((r) => r.verdict === "absent");
+    expect(absent.map((r) => r.no)).toEqual([8, 38, 44]);
+    for (const reading of absent) {
+      const note = notes.find(
+        (n) => n.no === reading.no && n.field === "invocation",
+      );
+      expect(note?.printed, `genius ${reading.no}`).toBe("");
+      expect(note?.used, `genius ${reading.no}`).not.toBe("");
+    }
+  });
+
+  it("gives the two misprinted Hebrew names as 1823 prints them", () => {
+    for (const [no, printed, used] of [
+      [37, "אנואל", "אניאל"],
+      [68, "הבויה", "חבויה"],
+    ] as const) {
+      const note = notes.find((n) => n.no === no && n.field === "name.he");
+      expect(note?.printed.replace(/\p{Mark}/gu, ""), `genius ${no}`).toBe(
+        printed,
+      );
+      expect(note?.used, `genius ${no}`).toBe(used);
+      expect(note?.witnesses?.[0]?.reads, `genius ${no}`).toBe(used);
+    }
+  });
+});
+
+describe("the first table", () => {
+  it("takes 57 to 61 from the 1823 plate, and 62 to 72 from the reissue's", () => {
+    const rows = firstTable();
+    const from = (source: string) =>
+      rows.filter((row) => row.source === source).map((row) => row.no);
+    expect(from("plate1823")).toEqual([57, 58, 59, 60, 61]);
+    expect(from("plate1909")).toEqual([
+      62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72,
+    ]);
+    expect(rows.filter((row) => row.partly).map((row) => row.no)).toEqual([57]);
+    expect(firstTableCounts()).toEqual({
+      plate1909: 11,
+      plate1823: 5,
+      reconstructed: 56,
+    });
+  });
+
+  it("counts how often the entries recover each plate", () => {
+    // The page used to say "ten and eight" in words, which no change to the
+    // data could correct. These are counted, and pinned here so that a change
+    // to a plate or an entry is noticed.
+    expect(firstTableAgreement()).toEqual({
+      plate1909: { rows: 11, name: 7, nation: 8, godName: 11 },
+      // Row 57, cut through by the fold, is not counted.
+      plate1823: { rows: 15, name: 12, nation: 8, godName: 14 },
+    });
+  });
+
+  it("finds where the two plates differ", () => {
+    expect(plateDifferences()).toEqual([
+      { no: 62, column: "name", plate1909: "", plate1823: "Iahhel" },
+      {
+        no: 66,
+        column: "nation",
+        plate1909: "Les Brahmanes",
+        plate1823: "Les Brachmanes",
+      },
+      { no: 69, column: "godName", plate1909: "DÉOS", plate1823: "DÊOS" },
+      { no: 71, column: "name", plate1909: "Haiuiel", plate1823: "Haiaiel" },
+    ]);
   });
 });

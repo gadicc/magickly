@@ -1350,7 +1350,7 @@ export const schemas = {
             v.pipe(
               v.string(),
               v.description(
-                "The name's Hebrew letters, without Lenain's marks: what identifies the name.",
+                "The name's Hebrew letters, without the page's marks: what identifies the name.",
               ),
             ),
           ),
@@ -1358,7 +1358,7 @@ export const schemas = {
             v.pipe(
               v.string(),
               v.description(
-                "The Hebrew as Lenain printed it, with his marks, on the twenty-five names a person read.",
+                "The Hebrew as the reissue this edition transcribes prints it, with its marks, on the twenty-five names a person read. For the 37th and the 68th the reissue misprints the name, so this does not strip to `he`.",
               ),
             ),
           ),
@@ -1366,7 +1366,7 @@ export const schemas = {
             v.pipe(
               v.picklist(["hand", "corroborated"]),
               v.description(
-                "Where the Hebrew came from: `corroborated` where two machine readings of the scan agree (forty-seven names), `hand` where a person read it because they never would (twenty-five).",
+                "Where the Hebrew came from: `corroborated` where two machine readings of the scan agree (forty-seven names), `hand` where a person read it because they never would (twenty-five). For the 37th and the 68th, which the reissue misprints, `he` is the 1823 printing's letters instead.",
               ),
             ),
           ),
@@ -1378,7 +1378,7 @@ export const schemas = {
       printedPages: v.pipe(
         v.array(v.number()),
         v.description(
-          "The pages of Lenain's La Science Cabalistique (Amiens, 1823) that print the entry.",
+          "The pages that print the entry in the reissue of La Science Cabalistique (Amiens, 1823) this edition transcribes; they are the reissue's numbers, not the 1823 printing's.",
         ),
       ),
       attribute: v.pipe(

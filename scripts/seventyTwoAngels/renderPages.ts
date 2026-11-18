@@ -2,9 +2,13 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import JSON5 from "json5";
 import {
+  checkedSentence,
+  differencesSentence,
   firstTable,
   firstTableCounts,
-  PRINTED_FROM,
+  partlyClause,
+  plateRange,
+  SOURCE_LABEL,
 } from "magick-data/kabbalah/lenain/firstTable";
 import {
   footnoteText,
@@ -29,7 +33,8 @@ import { plateEntries } from "./plateSource";
  *   … --out-dir output     where to write, for a partial run
  */
 
-const MARKDOWN_PATH = "public/docs/Lenain - La Science Cabalistique (1823).md";
+export const MARKDOWN_PATH =
+  "public/docs/Lenain - La Science Cabalistique (1823).md";
 
 const MARKDOWN_HEADER = `# La Science Cabalistique
 
@@ -40,7 +45,9 @@ reproduces Lenain's title page — *A Amiens, chez l'Auteur, au Cabinet de
 lecture, place Saint-Firmin, N. 1. 1823* — and adds a preface by Papus for the
 Ordre Kabbalistique de la Rose-Croix, calling it "la réédition du rarissime
 opuscule de Lenain". The volume does not date itself; the first reprint is
-recorded as Dujols and Thomas, 1909.
+recorded as Dujols and Thomas, 1909. It is not a facsimile: the reissue was
+reset from scratch, with its own line breaks and page contents, and its
+spelling modernised ("savans" became "savants").
 
 Lenain died in 1877 and Papus in 1916, so both texts are public domain and no
 rights are asserted over either. This reading of it was made for [magick.ly](https://magick.ly) from the
@@ -49,8 +56,33 @@ scan, page by page, and is offered under
 the site's data. It replaces an earlier OCR, which could not read the Hebrew and
 rendered many of the digits as letters.
 
-Page numbers are Lenain's own. Footnotes are given under the page they were
-printed on, as he set them.
+Page numbers are the reissue's, not Lenain's: the same number holds different
+text in 1823. Footnotes are given under the page they were printed on, as the
+reissue sets them.
+
+Where an editorial note turns on what is printed, it also cites two other
+copies, so that a slip of the reissue's can be told from one of Lenain's:
+
+- the 1823 printing itself, the Koninklijke Bibliotheek's copy,
+  [Google Books qt9SAAAAcAAJ](https://books.google.com/books?id=qt9SAAAAcAAJ);
+- Bibliothèque interuniversitaire de santé, Ms 5365, an undated handwritten
+  copy of the 1823 printing,
+  [archive.org BIUSante_ms05365](https://archive.org/details/BIUSante_ms05365)
+  (Licence ouverte). Where it differs from the 1823 printing, the difference is
+  the copyist's.
+
+Lenain names his own sources under the first table. They have been consulted
+too. Their tables give the seventy-two but neither the nations nor their
+names of God:
+
+- Agrippa, *La Philosophie occulte*, The Hague 1727, vol. II, pp. 109–110
+  ([archive.org, leaves n588–n589](https://archive.org/details/per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22/page/n588/mode/1up)):
+  the seventy-two names, in the spellings Lenain uses;
+- Kircher, *Oedipus Aegyptiacus*, vol. II part 1, 1653, pp. 271–273
+  ([archive.org, leaves n278–n280](https://archive.org/details/A027083/page/n278/mode/1up)):
+  the seventy-two angels by choir, in Hebrew and Latin, the table whose
+  last page Lenain cites; and p. 287 ([leaf n294](https://archive.org/details/A027083/page/n294/mode/1up)), where Kircher
+  explains the four-letter name of God.
 
 `;
 
@@ -90,7 +122,10 @@ function notesToMarkdown(notes: Note[], title = "Editorial notes") {
         : `${note.printed}, kept as printed`
       : note.used;
     const who = note.no ? `genius ${note.no}, ` : "";
-    return `- **${who}${note.field}** (${note.kind})${change ? ` · ${change}` : ""} — ${note.why}`;
+    const witnesses = (note.witnesses ?? [])
+      .map((witness) => `[${witness.label}](${witness.url})`)
+      .join(" · ");
+    return `- **${who}${note.field}** (${note.kind})${change ? ` · ${change}` : ""} — ${note.why}${witnesses ? ` ${witnesses}` : ""}`;
   });
   return `<small>\n\n**${title}**\n\n${lines.join("\n")}\n\n</small>`;
 }
@@ -168,12 +203,11 @@ function pieceToMarkdown(piece: Piece) {
   return text;
 }
 
-function main() {
-  const args = process.argv.slice(2);
-  const outAt = args.indexOf("--out-dir");
-  const outDir = outAt < 0 ? "" : `${args[outAt + 1]}/`;
-
-  const pages = bookPages();
+/**
+ * The edition as Markdown, from the committed files alone, so that a test can
+ * hold the committed copy to a fresh rendering.
+ */
+export function renderMarkdown(pages: BookPage[] = bookPages()): string {
   const byPage = notesByPage(pages);
   const doubts = new Map(
     pages.map((page) => [page.page.anchor, page.uncertain]),
@@ -197,30 +231,43 @@ function main() {
   });
 
   // The fold-out's lost rows, put back from the entries and marked as such.
+  // Every number is counted from the rows, so the prose cannot go stale.
   const counts = firstTableCounts();
+  const later = plateRange("plate1909");
+  const original = plateRange("plate1823");
+  const differences = differencesSentence();
   const reconstruction = [
     "## The first cabalistic table, reconstructed",
-    `The plate is a fold-out and the scan caught it folded: only rows ${PRINTED_FROM} to 72 are legible. The ${counts.reconstructed} rows marked *reconstructed* below are **not from the plate** — they are put back from each genius's own entry, which gives the same three columns. Checked against the ${counts.printed} rows that survive, the method recovers the divine name and the nation for ten and the name for eight.`,
+    `The plate is a fold-out, and both copies scanned caught it folded. The reissue's shows rows ${later.from} to ${later.to}. The 1823 printing's was opened further and shows rows ${original.from} to ${original.to}${partlyClause()}; the ${counts.plate1823} rows it alone shows are given below from it. The ${counts.reconstructed} rows marked *reconstructed* are **not from either plate** — they are put back from each genius's own entry, which gives the same three columns.`,
+    checkedSentence(),
+    ...(differences ? [differences] : []),
     table(
       firstTable().map((row) => [
         String(row.no),
         row.name,
         row.nation,
         row.godName,
-        row.source === "printed" ? "on the plate" : "reconstructed",
+        `${SOURCE_LABEL[row.source]}${row.partly ? ", partly legible" : ""}`,
       ]),
       ["#", "Genius", "Peuple", "Name of God", "Source"],
     ),
   ].join("\n\n");
 
   const edition = notesToMarkdown(editionNotes(), "About this edition");
+  return `${MARKDOWN_HEADER}${edition ? `${edition}\n\n` : ""}${body.join("\n\n")}\n\n---\n\n${reconstruction}\n`;
+}
+
+function main() {
+  const args = process.argv.slice(2);
+  const outAt = args.indexOf("--out-dir");
+  const outDir = outAt < 0 ? "" : `${args[outAt + 1]}/`;
+
+  const pages = bookPages();
+  const pieces = piecesOf(pages);
   const markdownPath = `${outDir}${MARKDOWN_PATH}`;
   if (!existsSync(dirname(markdownPath)))
     mkdirSync(dirname(markdownPath), { recursive: true });
-  writeFileSync(
-    markdownPath,
-    `${MARKDOWN_HEADER}${edition ? `${edition}\n\n` : ""}${body.join("\n\n")}\n\n---\n\n${reconstruction}\n`,
-  );
+  writeFileSync(markdownPath, renderMarkdown(pages));
 
   const blocks = pages.flatMap((page) => page.blocks);
   const hebrew = JSON.stringify(blocks).match(/[\u0590-\u05ff]/g)?.length ?? 0;

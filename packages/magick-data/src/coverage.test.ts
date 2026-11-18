@@ -19,6 +19,7 @@ describe("what the graph does not check", () => {
       "kabbalah/lenain/apparatus.json5",
       "kabbalah/lenain/evidence.json5",
       "kabbalah/lenain/pages.json5",
+      "kabbalah/lenain/witnesses.json5",
       "kabbalah/seventyTwoAngelsText/en.json5",
       "kabbalah/seventyTwoAngelsText/fr.json5",
     ]);

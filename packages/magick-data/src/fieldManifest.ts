@@ -387,9 +387,9 @@ export const TEXTS: Readonly<Record<string, TextSpec>> = {
     page: "/books/la-science-cabalistique",
   },
   "./kabbalah/lenain/firstTable": {
-    sources: [],
+    sources: ["kabbalah/lenain/witnesses"],
     description:
-      "Lenain's first table, reconstructed from the volume and the seventy-two.",
+      "Lenain's first table: the rows either printing's plate shows, and the rest reconstructed from the seventy-two.",
     page: "/books/la-science-cabalistique",
   },
   "./json/kabbalah/lenain/evidence.json": {

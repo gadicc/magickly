@@ -1,0 +1,118 @@
+// Second witnesses to Lenain's text, read by hand where this edition needs
+// one. The edition itself transcribes Google Books ZqgpxTZ43HkC, a later
+// reissue (recorded as 1909) that was reset from scratch: its line breaks,
+// page contents and spelling are not the 1823 printing's. These are the two
+// other copies consulted, and what each prints where an editorial note turns
+// on it. See plan 033, "Other witnesses".
+//
+// print1823 — the first printing, Amiens 1823: Koninklijke Bibliotheek copy,
+//   digitised by Google Books as qt9SAAAAcAAJ (original paper wrapper, no
+//   Papus preface). `at` is Lenain's printed page number:
+//   https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA<at>
+// ms5365 — Bibliothèque interuniversitaire de santé (Paris), Ms 5365: an
+//   undated handwritten copy of the 1823 printing, without the first table.
+//   archive.org BIUSante_ms05365, Licence ouverte (Etalab). `at` is the
+//   archive.org leaf: https://archive.org/details/BIUSante_ms05365/page/n<at>
+//   It is a copy, so where it differs from the 1823 printing that is the
+//   copyist's reading, not evidence of what Lenain printed.
+//
+// `verdict` says whose slip a note's departure is:
+//   reissue           the 1823 printing has what is required; the
+//                     reissue's resetting introduced the error.
+//   lenain            the 1823 printing has the same; the slip is Lenain's or
+//                     his printer's, not the reissue's.
+//   reissueCorrected  the 1823 printing has a slip the reissue does not.
+//   agree             the 1823 printing agrees with this edition's reading.
+//   absent            neither printing gives the value at all.
+//   mixed             part of the value is each's; `remark` says which.
+//
+// Read 18 November 2026 from the page images, each by a reader not told the
+// edition's own value, and the disagreements checked by eye. `reads` is the
+// value only, in the edition's notation (degrees as from–to).
+{
+  readings: [
+    {"no": 1, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 46, "reads": "20 mars, 31 avril, 11 août, 22 octobre, 2 janvier"}, "ms5365": {"at": 54, "reads": "20 mars, 31 avril, 11 août, 22 octobre, 2 janvier"}},
+    {"no": 5, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 49, "reads": "24 mars, 4 juin, 14 août, 26 octobre, 6 janvier"}, "ms5365": {"at": 57, "reads": "24 mars, 4 juin, 14 août, 26 octobre, 6 janvier"}},
+    {"no": 6, "field": "name.he", "verdict": "reissueCorrected", "print1823": {"at": 49, "reads": "ללחאל"}, "ms5365": {"at": 57, "reads": "ללחאל"}, "remark": "The triad of the Shem HaMephorash is ללה, so the reissue's he is right and the 1823 het a slip."},
+    {"no": 6, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 49, "reads": "25 mars, 5 juin, 15 août, 27 octobre, 7 janvier"}, "ms5365": {"at": 57, "reads": "25 mars, 5 juin, 15 août, 27 octobre, 7 janvier"}},
+    {"no": 7, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 50, "reads": "26 mars, 6 juin, 16 août, 28 octobre, 8 janvier"}, "ms5365": {"at": 58, "reads": "26 mars, 6 juin, 16 août, 28 octobre, 8 janvier"}},
+    {"no": 8, "field": "invocation", "verdict": "absent", "print1823": {"at": 50, "reads": ""}, "ms5365": {"at": 59, "reads": ""}},
+    {"no": 8, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 51, "reads": "27 mars, 7 juin, 17 août, 29 octobre, 9 janvier"}, "ms5365": {"at": 59, "reads": "27 mars, 7 juin, 17 août, 29 octobre, 9 janvier"}},
+    {"no": 9, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 51, "reads": "28 mars, 8 juin, 18 août, 30 octobre, 10 janvier"}, "ms5365": {"at": 59, "reads": "28 mars, 8 juin, 18 août, 30 octobre, 10 janvier"}},
+    {"no": 10, "field": "degrees", "verdict": "lenain", "print1823": {"at": 52, "reads": "41–50"}, "ms5365": {"at": 60, "reads": "41–50"}},
+    {"no": 10, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 52, "reads": "29 mars, 9 juin, 19 août, 31 octobre, 11 janvier"}, "ms5365": {"at": 60, "reads": "29 mars, 9 juin, 19 août, 31 octobre, 11 janvier"}},
+    {"no": 11, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 52, "reads": "30 mars, 10 juin, 20 août, 1 novembre, 12 janvier"}, "ms5365": {"at": 61, "reads": "30 mars, 10 juin, 20 août, 1 novembre, 12 janvier"}},
+    {"no": 12, "field": "psalm.la", "verdict": "reissue", "print1823": {"at": 53, "reads": "Ut quid Domine recessisti longè"}, "ms5365": {"at": 61, "reads": "Ut quid Domine recessisti longè"}},
+    {"no": 13, "field": "name.he", "verdict": "agree", "print1823": {"at": 53, "reads": "יזלאל"}, "ms5365": {"at": 61, "reads": "יזלאל"}},
+    {"no": 13, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 54, "reads": "1 avril, 12 juin, 23 août, 3 septembre, 14 janvier"}, "ms5365": {"at": 62, "reads": "1 avril, 12 juin, 23 août, 3 septembre, 14 janvier"}},
+    {"no": 14, "field": "degrees", "verdict": "lenain", "print1823": {"at": 54, "reads": "66–10"}, "ms5365": {"at": 62, "reads": "66–70"}},
+    {"no": 17, "field": "invocation", "verdict": "lenain", "print1823": {"at": 56, "reads": "depuis 5 heures du matin jusqu'à 5 heures 20 minutes"}, "ms5365": {"at": 64, "reads": "depuis 5 heures du matin jusqu'à 5 heures 20 minutes"}},
+    {"no": 18, "field": "presidingDays", "verdict": "reissue", "print1823": {"at": 57, "reads": "6 avril, 17 juin, 28 août, 8 novembre, 19 janvier"}, "ms5365": {"at": 65, "reads": "6 avril, 17 juin, 28 août, 8 novembre, 19 janvier"}},
+    {"no": 19, "field": "name.he", "verdict": "agree", "print1823": {"at": 57, "reads": "לוויה"}, "ms5365": {"at": 65, "reads": "לוויה"}},
+    {"no": 20, "field": "degrees", "verdict": "lenain", "print1823": {"at": 58, "reads": "95–100"}, "ms5365": {"at": 66, "reads": "95–100"}},
+    {"no": 22, "field": "name.he", "verdict": "agree", "print1823": {"at": 59, "reads": "יייאל"}, "ms5365": {"at": 67, "reads": "יייאל"}},
+    {"no": 22, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 59, "reads": "10 avril, 21 juin, 1 septembre, 12 novembre, 22 janvier"}, "ms5365": {"at": 67, "reads": "10 avril, 21 juin, 1 septembre, 12 novembre, 22 janvier"}},
+    {"no": 23, "field": "name.he", "verdict": "agree", "print1823": {"at": 60, "reads": "מלהאל"}, "ms5365": {"at": 68, "reads": "מלהאל"}},
+    {"no": 28, "field": "name.he", "verdict": "agree", "print1823": {"at": 63, "reads": "שאהיה"}, "ms5365": {"at": 71, "reads": "שאהיה"}},
+    {"no": 29, "field": "name.he", "verdict": "agree", "print1823": {"at": 64, "reads": "רייאל"}, "ms5365": {"at": 72, "reads": "רייאל"}},
+    {"no": 30, "field": "decade", "verdict": "lenain", "print1823": {"at": 64, "reads": "9e décade"}, "ms5365": {"at": 72, "reads": "9e décade"}},
+    {"no": 30, "field": "presidingDays", "verdict": "mixed", "print1823": {"at": 64, "reads": "28 avril, 29 juin, 9 septembre, 20 novembre, 18 janvier"}, "ms5365": {"at": 72, "reads": "28 avril, 29 juin, 9 septembre, 20 novembre, 18 janvier"}, "remark": "28 avril is Lenain's slip, and the reissue keeps it; 18 janvier for the fifth day is his too, which the reissue corrected to the 31st the tables require."},
+    {"no": 34, "field": "name.he", "verdict": "agree", "print1823": {"at": 67, "reads": "לההיה"}, "ms5365": {"at": 75, "reads": "לההיה"}},
+    {"no": 37, "field": "name.he", "verdict": "reissue", "print1823": {"at": 69, "reads": "אניאל"}, "ms5365": {"at": 77, "reads": "אניאל"}, "remark": "The triad of the Shem HaMephorash is אני."},
+    {"no": 38, "field": "invocation", "verdict": "absent", "print1823": {"at": 71, "reads": ""}, "ms5365": {"at": 78, "reads": ""}},
+    {"no": 39, "field": "name.he", "verdict": "agree", "print1823": {"at": 71, "reads": "רהעאל"}, "ms5365": {"at": 79, "reads": "רהעאל"}},
+    {"no": 40, "field": "name.he", "verdict": "agree", "print1823": {"at": 72, "reads": "ייזאל"}, "ms5365": {"at": 79, "reads": "ייזאל"}},
+    {"no": 41, "field": "name.he", "verdict": "agree", "print1823": {"at": 73, "reads": "הההאל"}, "ms5365": {"at": 80, "reads": "הההאל"}},
+    {"no": 42, "field": "degrees", "verdict": "lenain", "print1823": {"at": 74, "reads": "216–210"}, "ms5365": {"at": 81, "reads": "206–210"}},
+    {"no": 43, "field": "name.he", "verdict": "agree", "print1823": {"at": 74, "reads": "ווליה"}, "ms5365": {"at": 81, "reads": "ווליה"}},
+    {"no": 44, "field": "invocation", "verdict": "absent", "print1823": {"at": 75, "reads": ""}, "ms5365": {"at": 82, "reads": ""}},
+    {"no": 45, "field": "name.he", "verdict": "agree", "print1823": {"at": 76, "reads": "סאליה"}, "ms5365": {"at": 83, "reads": "סאליה"}},
+    {"no": 45, "field": "psalm.la", "verdict": "lenain", "print1823": {"at": 76, "reads": "misericordia tua Domine adjuvebat me"}, "ms5365": {"at": 83, "reads": "misericordia tua Domine adjuvebat me"}},
+    {"no": 46, "field": "degrees", "verdict": "lenain", "print1823": {"at": 76, "reads": "226–130"}, "ms5365": {"at": 83, "reads": "226–130"}},
+    {"no": 46, "field": "name.he", "verdict": "agree", "print1823": {"at": 76, "reads": "עריאל"}, "ms5365": {"at": 83, "reads": "עריאל"}},
+    {"no": 46, "field": "ordinal", "verdict": "reissue", "print1823": {"at": 76, "reads": "46e"}, "ms5365": {"at": 83, "reads": "46e"}},
+    {"no": 47, "field": "name.he", "verdict": "agree", "print1823": {"at": 77, "reads": "עשליה"}, "ms5365": {"at": 84, "reads": "עשליה"}},
+    {"no": 50, "field": "degrees", "verdict": "lenain", "print1823": {"at": 79, "reads": "246–145"}, "ms5365": {"at": 86, "reads": "246–145"}},
+    {"no": 52, "field": "name.he", "verdict": "agree", "print1823": {"at": 81, "reads": "עממיה"}, "ms5365": {"at": 88, "reads": "עממיה"}},
+    {"no": 53, "field": "degrees", "verdict": "reissue", "print1823": {"at": 82, "reads": "261–265"}, "ms5365": {"at": 88, "reads": "261–265"}},
+    {"no": 53, "field": "name.he", "verdict": "agree", "print1823": {"at": 81, "reads": "ננאאל"}, "ms5365": {"at": 88, "reads": "ננאאל"}},
+    {"no": 54, "field": "name.he", "verdict": "agree", "print1823": {"at": 82, "reads": "ניתאל"}, "ms5365": {"at": 89, "reads": "ניתאל"}},
+    {"no": 57, "field": "name.he", "verdict": "agree", "print1823": {"at": 85, "reads": "נממיה"}, "ms5365": {"at": 91, "reads": "נממיה"}},
+    {"no": 58, "field": "name.he", "verdict": "agree", "print1823": {"at": 85, "reads": "יילאל"}, "ms5365": {"at": 92, "reads": "יילאל"}},
+    {"no": 62, "field": "degrees", "verdict": "reissue", "print1823": {"at": 88, "reads": "306–310"}, "ms5365": {"at": 94, "reads": "306–310"}},
+    {"no": 64, "field": "choir", "verdict": "lenain", "print1823": {"at": 90, "reads": "le chœur des anges"}, "ms5365": {"at": 96, "reads": "le chœur des anges"}},
+    {"no": 64, "field": "degrees", "verdict": "lenain", "print1823": {"at": 89, "reads": "316–220"}, "ms5365": {"at": 96, "reads": "316–220"}},
+    {"no": 67, "field": "name.he", "verdict": "agree", "print1823": {"at": 91, "reads": "איעאל"}, "ms5365": {"at": 98, "reads": "איעאל"}},
+    {"no": 68, "field": "degrees", "verdict": "lenain", "print1823": {"at": 92, "reads": "337–340"}, "ms5365": {"at": 98, "reads": "337–310"}},
+    {"no": 68, "field": "name.he", "verdict": "reissue", "print1823": {"at": 92, "reads": "חבויה"}, "ms5365": {"at": 98, "reads": "הבויה"}, "remark": "The triad of the Shem HaMephorash is חבו."},
+    {"no": 70, "field": "name.he", "verdict": "agree", "print1823": {"at": 93, "reads": "יבמיה"}, "ms5365": {"at": 99, "reads": "יבמיה"}},
+    {"no": 71, "field": "name.he", "verdict": "agree", "print1823": {"at": 95, "reads": "הייאל"}, "ms5365": {"at": 101, "reads": "הייאל"}},
+    {"no": 71, "field": "presidingDays", "verdict": "reissue", "print1823": {"at": 95, "reads": "29 mai, 9 août, 20 octobre, 31 décembre, 13 mars"}, "ms5365": {"at": 101, "reads": "29 mai, 9 août, 20 octobre, 31 décembre, 13 mars"}},
+    {"no": 72, "field": "godName", "verdict": "agree", "print1823": {"at": 96, "reads": ""}, "ms5365": {"at": 102, "reads": ""}, "remark": "The 1823 plate gives KALO (p. 25), as the reissue's does."},
+    {"no": 0, "field": "revolutions", "verdict": "reissue", "print1823": {"at": 35, "reads": "pour les 360 jours"}, "ms5365": {"at": 42, "reads": "pour les 360 jours"}},
+  ],
+  // The first cabalistic table on the 1823 plate (p. 25). It too is a
+  // fold-out photographed folded, but further open than the reissue's: rows
+  // 57 to 72 show, 57 cut through by the fold. The manuscript omits the table.
+  firstTable: {
+    page: 25,
+    rows: [
+      {"no": 57, "name": "Nemamiah", "nation": "Les Ciréniens", "godName": "POPA", "partly": true},
+      {"no": 58, "name": "Ieialel", "nation": "Les Célamites", "godName": "PARA"},
+      {"no": 59, "name": "Harahel", "nation": "La Mésopotamie", "godName": "ELLA"},
+      {"no": 60, "name": "Mitzrael", "nation": "Le Thibet", "godName": "GÉNA"},
+      {"no": 61, "name": "Umabel", "nation": "Les Béthuliens", "godName": "SILA"},
+      {"no": 62, "name": "Iahhel", "nation": "Les Carmaniens", "godName": "SUNA"},
+      {"no": 63, "name": "Anauel", "nation": "Les Camboens", "godName": "MIRI"},
+      {"no": 64, "name": "Mehiel", "nation": "Les Mogols", "godName": "ALLI"},
+      {"no": 65, "name": "Damabiah", "nation": "Les Gymnosophes", "godName": "TARA"},
+      {"no": 66, "name": "Manakel", "nation": "Les Brachmanes", "godName": "PORA"},
+      {"no": 67, "name": "Eiael", "nation": "Les Albanais", "godName": "BOGO"},
+      {"no": 68, "name": "Habuiah", "nation": "Les Péloponésiens", "godName": "DÉPOS"},
+      {"no": 69, "name": "Rochel", "nation": "Les Crétois", "godName": "DÊOS"},
+      {"no": 70, "name": "Jabamiah", "nation": "Les Béotiens", "godName": "ARIS"},
+      {"no": 71, "name": "Haiaiel", "nation": "Les Phrygiens", "godName": "ZEUT"},
+      {"no": 72, "name": "Mumiah", "nation": "La Thrace", "godName": "KALO"},
+    ],
+  },
+}

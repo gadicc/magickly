@@ -103,8 +103,10 @@ let byHand = new Map<number, { plain: string; pointed: string }>();
 
 /**
  * A name read by a person outranks one two machines happened to agree on, and
- * the data says which it was. Lenain's dots are kept apart from the letters:
- * `he` identifies the name, `hePointed` is what he printed.
+ * the data says which it was. The page's dots are kept apart from the letters:
+ * `he` identifies the name, `hePointed` is what the reissue prints. For the
+ * two names the reissue misprints, `he` is the 1823 printing's letters and
+ * `hePointed` does not strip to it (see hebrewByHand.json5).
  */
 function hebrewFor(no: number, en: string) {
   const hand = byHand.get(no);

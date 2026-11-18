@@ -12,7 +12,9 @@ import { Fragment, type ReactNode } from "react";
 // French: they are set in Frank Ruhl Libre (the root layout's stylesheet),
 // whose build adds U+05C4, the upper dot Lenain points his letters with
 // (plan 079).
+import { hebrewRuns } from "./hebrewRuns";
 import styles from "./reading.module.css";
+import Witnesses from "./Witnesses";
 
 /**
  * Lenain's text as HTML, from the same fold the Markdown edition uses.
@@ -34,8 +36,6 @@ function facsimileUrl(label: string, sequence: string) {
   return `${SCAN}&pg=${prefix}${label}`;
 }
 
-const HEBREW = /[֐-׿יִ-ﭏ]+/;
-
 /**
  * Hebrew set inside French runs left to right unless it is told otherwise, and
  * the damage is already visible in the data: "Vehuiah .והויה" has the stop on
@@ -44,30 +44,11 @@ const HEBREW = /[֐-׿יִ-ﭏ]+/;
  * a screen reader switches voice rather than spelling it out.
  */
 function withHebrew(text: string, keyPrefix: string): ReactNode[] {
-  const out: ReactNode[] = [];
-  let rest = text;
-  let index = 0;
-  while (rest) {
-    const found = rest.match(HEBREW);
-    if (!found || found.index === undefined) {
-      out.push(rest);
-      break;
-    }
-    if (found.index > 0) out.push(rest.slice(0, found.index));
-    out.push(
-      <span
-        key={`${keyPrefix}-he-${index}`}
-        lang="he"
-        dir="rtl"
-        className={styles.hebrew}
-      >
-        {found[0]}
-      </span>,
-    );
-    rest = rest.slice(found.index + found[0].length);
-    index++;
-  }
-  return out;
+  return hebrewRuns(text, keyPrefix, (run, key) => (
+    <span key={key} lang="he" dir="rtl" className={styles.hebrew}>
+      {run}
+    </span>
+  ));
 }
 
 function PageBreak({
@@ -157,11 +138,19 @@ function Apparatus({ notes }: { notes: Note[] }) {
               <>
                 {" · "}
                 {withHebrew(note.printed, `n-${note.no}-${note.field}`)}
-                {note.used ? ` → ${note.used}` : ", kept as printed"}
+                {note.used ? " → " : ", kept as printed"}
+                {withHebrew(note.used, `u-${note.no}-${note.field}`)}
+              </>
+            ) : note.used ? (
+              // Nothing is printed, but a value is used: say which.
+              <>
+                {" · "}
+                {withHebrew(note.used, `u-${note.no}-${note.field}`)}
               </>
             ) : null}
             {" — "}
-            {note.why}
+            {withHebrew(note.why, `w-${note.no}-${note.field}`)}
+            <Witnesses witnesses={note.witnesses} />
           </li>
         ))}
       </ul>

@@ -13,6 +13,23 @@ import apparatus from "../../../dist/kabbalah/lenain/apparatus.js";
  * is the reading side of it. See plan 033.
  */
 
+/**
+ * Another copy read at the place a note concerns: the 1823 printing, or the
+ * handwritten copy of it in Paris (Ms 5365). The edition transcribes a later
+ * reissue, and these say whether a slip is the reissue's or Lenain's.
+ */
+export interface NoteWitness {
+  source: "print1823" | "ms5365";
+  /** "1823 printing, p. 57" or "Ms 5365, leaf n66". */
+  label: string;
+  /** The page ("57") or the archive.org leaf ("n66"). */
+  at: string;
+  /** That page or leaf, online. */
+  url: string;
+  /** What it prints there; empty where it gives nothing. */
+  reads: string;
+}
+
 export interface Note {
   /** The genius it concerns, or 0 for a note about the book at large. */
   no: number;
@@ -23,6 +40,8 @@ export interface Note {
   printed: string;
   used: string;
   why: string;
+  /** The other copies read at this place, the 1823 printing first. */
+  witnesses?: NoteWitness[];
 }
 
 export const notes = apparatus as Note[];

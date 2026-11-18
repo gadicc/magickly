@@ -18,6 +18,8 @@ import {
   presidingDaysOf,
   signOf,
 } from "magick-data/kabbalah/seventyTwoAngels/derived";
+import { hebrewRuns } from "@/app/books/la-science-cabalistique/hebrewRuns";
+import Witnesses from "@/app/books/la-science-cabalistique/Witnesses";
 import { angelSlug } from "@/lib/angelSlugs";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import {
@@ -57,6 +59,22 @@ const formatter = new Intl.DateTimeFormat("en", {
   month: "long",
   day: "numeric",
 });
+
+/**
+ * A pointed name without its marks. Where that is not the name itself, the
+ * reissue has misprinted it (the 37th and the 68th) and the name follows the
+ * 1823 printing, so the pointed form is the misprint's.
+ */
+function lettersOf(pointed: string) {
+  return [...pointed].filter((c) => !/\p{Mark}/u.test(c)).join("");
+}
+
+/** Hebrew inside a note's text, marked as the reading edition marks it. */
+function withHebrew(text: string, keyPrefix: string) {
+  return hebrewRuns(text, keyPrefix, (run, key) => (
+    <Hebrew key={key}>{run}</Hebrew>
+  ));
+}
 
 /** Lenain's days belong to the year, not to one of them; 2001 is common. */
 function day([month, dayOfMonth]: MonthDay) {
@@ -151,7 +169,9 @@ export default function AngelPage({
               <Hebrew>{angel.name.he}</Hebrew>
               {angel.name.hePointed ? (
                 <>
-                  {" — as Lenain points it: "}
+                  {lettersOf(angel.name.hePointed) === angel.name.he
+                    ? " — as the page points it: "
+                    : " — as the reissue misprints it: "}
                   <Hebrew>{angel.name.hePointed}</Hebrew>
                 </>
               ) : null}
@@ -220,12 +240,20 @@ export default function AngelPage({
                 {note.printed ? (
                   <>
                     {" · "}
-                    {note.printed}
-                    {note.used ? ` → ${note.used}` : ", kept as printed"}
+                    {withHebrew(note.printed, `p-${note.field}`)}
+                    {note.used ? " → " : ", kept as printed"}
+                    {withHebrew(note.used, `u-${note.field}`)}
+                  </>
+                ) : note.used ? (
+                  // Nothing is printed, but a value is used: say which.
+                  <>
+                    {" · "}
+                    {withHebrew(note.used, `u-${note.field}`)}
                   </>
                 ) : null}
                 {" — "}
-                {note.why}
+                {withHebrew(note.why, `w-${note.field}`)}
+                <Witnesses witnesses={note.witnesses} />
               </li>
             ))}
           </ul>
@@ -235,11 +263,11 @@ export default function AngelPage({
       <h2>In the book</h2>
       <p>
         Printed on page{angel.printedPages.length > 1 ? "s" : ""}{" "}
-        {angel.printedPages.join(" and ")} of{" "}
+        {angel.printedPages.join(" and ")} of the reissue of{" "}
         <Link href={BOOK}>
           <i>La Science Cabalistique</i>
-        </Link>
-        , Amiens 1823.{" "}
+        </Link>{" "}
+        (Amiens, 1823) that this site transcribes.{" "}
         {anchor ? (
           <Link href={`${BOOK}/chapitre-6#${anchor}`}>
             Read it in the French, on the page

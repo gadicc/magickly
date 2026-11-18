@@ -1372,7 +1372,7 @@
     no: 37,
     name: {
       en: 'Aniel',
-      he: 'אנואל',
+      he: 'אניאל',
       hePointed: 'אׄנואלּ',
       heSource: 'hand',
     },
@@ -2554,7 +2554,7 @@
     no: 68,
     name: {
       en: 'Habuhiah',
-      he: 'הבויה',
+      he: 'חבויה',
       hePointed: 'הבויׄה',
       heSource: 'hand',
     },

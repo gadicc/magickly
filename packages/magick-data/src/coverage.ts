@@ -29,6 +29,8 @@ const CHECKED_ELSEWHERE: Record<string, string> = {
   "kabbalah/lenain/pages.json5": "lenainEdition.test.ts",
   "kabbalah/lenain/apparatus.json5": "lenainEdition.test.ts",
   "kabbalah/lenain/evidence.json5": "lenainQuotations.test.ts",
+  // Read by apparatus.ts, which stops on a reading that matches no note.
+  "kabbalah/lenain/witnesses.json5": "lenainEdition.test.ts",
   "kabbalah/seventyTwoAngelsText/fr.json5": "lenainQuotations.test.ts",
   // Not a table and never was, which tables.ts says in as many words; the
   // integrity check holds every entry to its schema instead.
