@@ -5,7 +5,8 @@ Status: designed, not built. Gadi settled decisions 1–3 and 6 on
 day ([below](#review-18-november-2026)) showed those measurements
 overstated the history cost about sixfold. Gadi reconfirmed decision 1 on
 the corrected numbers the same day and dropped the history rewrite
-(decision 6); S0 is done. S1, the spike, is next. Read [plan 070](070-site-search.md) (the site
+(decision 6); S0 is done. S1 is built on `gate/search-vectors`
+(below); S2 is next. Read [plan 070](070-site-search.md) (the site
 search and its embedding contract) and `src/search/README.md` first. The
 number was free on every local and remote branch on 18 November 2026.
 
@@ -184,13 +185,192 @@ assembled matrix, read in catalogue order, hashes to `6f58ec17ab64…`, the
 current manifest's SHA-256, which implies identical ranking with no provider
 call.
 
+#### Built (18 November 2026, `gate/search-vectors`)
+
+Three commits on `c907203b` (the plan, on `main` at `afe7f7e1`):
+`5e447eb2` adds the rows, `9023d77d` builds from them, and `a4c9f0da`
+applies the review ([below](#s1-review)). Behaviour is unchanged: the same
+vectors, ranking and all-or-nothing catalogue gate. They were first built
+on `d7f3824e` as `010a50b9` and `8eb08b0a`; `main` then republished
+([Rebased](#rebased-onto-afe7f7e1)), and the measurements below say which
+tree they were taken on.
+
+- **Rows.** `search-vectors/gemini-embedding-2-768-search-v1/<key[0:2]>/
+  <key>.f32`, 3,076 files of 3,072 bytes, 256 fan-out directories;
+  `.gitattributes` marks `*.f32 binary`. `src/search/embeddings/rows.ts`
+  owns paths, validation (length, finite values, L2 norm within 10⁻³ of
+  1), writing (only rows missing or different), pruning (with emptied
+  fan-out directories), listing (anything but a correctly placed
+  `<key>.f32` or a dot file is an error) and assembly.
+- **One recipe.** `records.ts` has `embeddingDocumentInput(profile,
+  record)` (the old `embed.mts:75-82`) and `embeddingRowKey`, over the
+  unchanged `embeddingCacheKey`. `embed.mts` uses it for embedding and for
+  its price estimate, which had used the title alone. A golden test in
+  `embeddings.test.ts` pins two keys under the shipped profile.
+- **Artifact.** `search:build` (`scripts/search/buildProse.ts`, after the
+  prose) assembles the manifest's selected profile into
+  `src/search/generated/search-vectors.bin`: one file, the magic `SVK1`, a
+  length-prefixed JSON header `{ profile, dimensions, keys }` with keys
+  strictly ascending, then the rows in key order (format in
+  `artifact.ts`). It includes every row in the profile directory, orphans
+  too; it is written only when its bytes change. Assembly costs 30–60 ms
+  on top of the ~0.55 s prose extraction (a full `search:build` measured
+  0.60 s against 0.56 s before). With no profile selected the artifact
+  is removed. Every build, type check, test (including `test:coverage`,
+  which CI shards run) and dev entry already runs `search:build`; and
+  because `catalogue.ts` imports the generated `prose.json`, no build can
+  succeed without it, so the artifact always exists where the catalogue
+  does.
+- **Store.** `store.ts` reads the artifact, computes each record's key and
+  copies its row by key, never by position (`recordMatrix`,
+  `artifactVectors`). The manifest's profile and catalogue digest checks
+  stay; an artifact for another profile, or one lacking any record's row,
+  returns null, as a digest mismatch does; the matrix rebuilt in record
+  order must still hash to `manifest.profiles[…].sha256`, else it throws;
+  the per-value finiteness check stays. Dropped: the check on the
+  manifest's `.bin` file name, which `store.ts` no longer reads. A missing
+  artifact still throws (`ENOENT`), as a missing `.bin` did.
+- **Tracing.** `/api/search` traces
+  `./src/search/generated/search-vectors.bin` instead of
+  `public/search-vectors/*.bin`; that directory and its file stay until
+  S3, and `semantic.test.ts` is unchanged.
+- **Publish.** `search:publish` also calls `publishRows`: it writes the
+  profile's rows from the matrix bytes it already builds, so the rows and
+  the `.bin` are the same bytes, and prunes the rows no record uses. Not
+  run (it calls the provider); covered by unit tests.
+- **Tests.** `rows.test.ts` and `artifact.test.ts`: row validation,
+  writing, listing, pruning, publishing, the assembly round trip, keyed
+  lookup in any file order, null for another profile or a missing row, a
+  checksum mismatch and a non-finite value under a matching checksum.
+
+**Conversion.** A one-off script outside the repository (a scratch
+directory under `/home`, deleted afterwards) checked that
+`catalogueDigest(buildSearchCatalogue())` equals the manifest's
+`catalogueSha256` (`5ffd4f69…`, it did) and that the committed
+`public/search-vectors/gemini-embedding-2-768-search-v1-6f58ec17ab64.bin`
+hashes to the manifest's `sha256`; then, for each record of
+`embeddingRecords(catalogue)` in order, it took row *i* of that matrix
+(bytes `i × 3072` to `(i + 1) × 3072`) and wrote it with `writeRows` under
+`embeddingRowKey(profile, record)`. All 3,074 keys were distinct. As an
+independent check of the recipe, a read-only pass over the main
+checkout's `.private/site-search` found every one of the 3,074 keys there
+(the cache has filled since `bf4db692`), each holding a vector that
+encodes to byte-identical row bytes. The private cache was not used as a
+source.
+
+**Acceptance**, at `8eb08b0a` after its `pnpm build`: the artifact,
+parsed and read in catalogue record order with `recordMatrix`, hashed with
+SHA-256:
+
+```
+artifact rows 3074, records 3074, matrix bytes 9443328
+sha256 6f58ec17ab64772b96258a8c475e2e4bb511b32bd94281974ae7b42e432b704b
+```
+
+equal to the manifest's `sha256`, so ranking is identical without a
+provider call.
+
+**Gates** (a script run with `bash`, each step's exit status recorded;
+Node 24.18.0; the placeholder environment from `ci.yml`; a fresh
+`pnpm install --frozen-lockfile` in each tree):
+
+| Commit | install | check | typecheck | test | build |
+| --- | --- | --- | --- | --- | --- |
+| `010a50b9` (rows only, clean worktree) | 0 | 0 | 0 | 0 (661 files, 12,730 tests passed; 3 files, 18 tests skipped) | 0 |
+| `8eb08b0a` | 0 | 0 | 0 | 0 (663 files, 12,747 tests passed; 3 files, 18 tests skipped) | 0 |
+
+After the `8eb08b0a` build,
+`.next/server/app/api/search/route.js.nft.json` lists
+`../../../../../src/search/generated/search-vectors.bin` and no longer any
+`public/search-vectors` file.
+
+#### Rebased onto `afe7f7e1`
+
+`main`'s `afe7f7e1` republished the vectors (3,076 rows,
+`gemini-embedding-2-768-search-v1-ddf799a2b4e8.bin`, catalogue digest
+`2060ab89…`). After rebasing, the conversion ran again on the rebased
+tree, after `pnpm data:build` and `pnpm search:build`: it checked the
+catalogue digest and the matrix's SHA-256 against the new manifest, then
+called `publishRows` with the record keys and that matrix, which wrote 11
+rows and pruned 9. The change was folded into the row commit.
+
+**Acceptance** on the rebased tree: an independent script, outside the
+repository, recomputing each key with the recipe as `main`'s `embed.mts`
+writes it and reading the row files directly (not the artifact):
+
+```
+digest matches manifest: true
+rows 3076 sha256 ddf799a2b4e86fd9e420df6a39718ffc620d7bae720fe963fc49dcdfd55d99e9 manifest ddf799a2b4e86fd9e420df6a39718ffc620d7bae720fe963fc49dcdfd55d99e9
+```
+
+The same script gave `6f58ec17…` for the 3,074 rows on `8eb08b0a`,
+matching that manifest.
+
+**Gate** at `b8600942`, whose tree is `9023d77d`'s plus the plan (same
+script and environment as above):
+
+| Commit | install | check | typecheck | test | build |
+| --- | --- | --- | --- | --- | --- |
+| `b8600942` | 0 | 0 | 0 | 0 (666 files, 12,784 tests passed; 3 files, 18 tests skipped) | 0 |
+
+The `/api/search` trace lists only `src/search/generated/search-vectors.bin`.
+`semantic.test.ts` loads the real index through `artifactVectors`, which
+checks the record-order hash, so the passing test also proves every row
+pairs with its record. `a4c9f0da` changes only `package.json` and
+`embed.mts`; on it `pnpm check` and the scripts' `tsc` exit 0.
+
+#### S1 review
+
+An independent Opus 5.5 review (high) of the rebased diff found no critical
+or high defects. It confirmed every row's bytes against the committed
+matrix and, for 3,065 of the 3,076 keys, against the private cache, and
+found the row listing and pruning safe against path traversal.
+
+| Finding | Outcome |
+| --- | --- |
+| The S1 record and the row commit described the pre-rebase tree | This section and the row commit's message |
+| `search:publish` wrote the manifest before the rows | Rows first (`a4c9f0da`) |
+| `search:publish` left the artifact without the new rows | Rebuilds afterwards (`a4c9f0da`) |
+| `/search/index` stays digest-only while the store can be null for a missing row | S2 (decision 3) |
+| An unknown profile or malformed row now stops `search:build`, and with it dev | Kept: it fails at build rather than in `/api/search`; S2 revisits for dev |
+| No tests for `buildProse`'s branches or the publish call site | S2 |
+| `semantic.test.ts`'s comment on what `/api/search` bundles | S3 deletes the test |
+
+What S2 must also handle is listed under S2.
+
 ### S2. Publish, coverage and recipe
 
 `search:publish` reads committed rows, then the worktree's private cache,
-then the provider; writes new rows and prunes orphans. The shared recipe
-and golden-key test, the coverage report and the zero-coverage rule
-(decision 3). Tests for malformed rows. `src/search/README.md` and plan
-070's contract updated.
+then the provider; writes new rows and prunes orphans (S1 already writes
+and prunes). The coverage report and the zero-coverage rule (decision 3);
+the shared recipe, golden-key test and malformed-row tests landed in S1.
+`src/search/README.md` and plan 070's contract updated. Also, found in S1:
+
+- A committed row reused as cache must be copied as bytes. Running it back
+  through `unitVector` and re-encoding can move the last bit of a float32
+  and stop the assembled matrix reproducing its published bytes.
+- The artifact includes orphan rows, so the function bundle carries them
+  until a publish prunes them. Once `search:build` computes coverage it
+  has the catalogue's keys and can assemble only the referenced rows.
+- The dev watcher (`scripts/search/watch.mts`) reacts only to `.js`/`.ts`
+  changes under `src/`, so a pull that adds rows or changes the manifest
+  reaches a running dev server only on the next source save. Decide
+  whether that is acceptable or whether the watcher should also watch the
+  selected profile's directory (257 directories, not the whole tree).
+- A missing artifact throws today. With per-record coverage, decide
+  whether it counts as zero coverage (unavailable) or stays an error; it
+  can only be missing when `search:build` did not run, which also leaves
+  `prose.json` missing and fails the build.
+- `pruneRows` touches only the published profile's directory. Decide
+  whether any other profile (the comparison's Qwen) may keep committed
+  rows; `search:compare` writes none today.
+- Any field added to `EmbeddingProfile`, even an optional one (such as
+  decision 4's int8), changes `JSON.stringify(profile)` and so every key.
+  The golden test catches it; such a change needs a new profile, not an
+  edited one.
+- `semantic.test.ts`'s "only the files the manifest names" test says
+  `/api/search` bundles every file there, no longer true; S3 deletes it
+  with the directory.
 
 ### S3. Remove `public/search-vectors`
 
