@@ -447,6 +447,12 @@ per-figure annotations of Vaughan's work.
 | S5 (later) | Kamea profile and layout on `Kamea`. What S1 found: Zazel's figure (p. 81) has a circle at both ends and no bar, Taphthartharath's (p. 85) neither circle nor bar, and both draw a return to a cell as a rounded U beside the outgoing stroke; p. 85's printed Mercury square swaps three pairs of cells against Agrippa's (none the name uses); a 1-unit noose tolerance is 0.1 cell, which on a 9×9 square catches near-diagonal passes | Its own plan |
 
 `/gd/sigils` is not among the docs screenshots, so no capture is needed.
+Below the generator, the page sets out the rules, what Regardie's figures
+show and how the generator applies them (`SigilsText.tsx`, in English and
+Hebrew), with Regardie's pp. 57–60 linked on archive.org rather than
+mirrored, since the volume's renewal status is unverified
+(`src/sources/mirroredPages.ts` holds only works out of copyright
+everywhere).
 
 ## Decisions
 
