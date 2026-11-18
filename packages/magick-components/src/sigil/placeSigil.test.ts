@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { ROSE_SIGIL_PROFILE, roseSigilLayout } from "../gd/roseSigilLayout.ts";
-import { sigilFrame, wordInk } from "./ink.ts";
 import { placeSigil, placeSigilWords, wordFailures } from "./placeSigil.ts";
 import { planSigil, sigilWords } from "./planSigil.ts";
 import { SIGIL_MARK_ORDER } from "./types.ts";
@@ -85,11 +84,17 @@ describe("placeSigilWords", () => {
     expect(Object.isFrozen(word)).toBe(true);
     expect(Object.isFrozen(word[0])).toBe(true);
     expect(Object.isFrozen(word[0].point)).toBe(true);
+    expect(Object.isFrozen(word[0].marks)).toBe(true);
+  });
+
+  it("leaves the caller's plan unfrozen", () => {
+    const planned = plan("אבגדה");
+    placeSigil(planned, rose, ROSE_SIGIL_PROFILE);
+    expect(Object.isFrozen(planned[0][0].marks)).toBe(false);
   });
 });
 
 describe("wordFailures", () => {
-  const frame = sigilFrame(rose);
   it("passes a placed figure and finds a broken one", () => {
     const [word] = placeSigil(plan("מטטרון"), rose, ROSE_SIGIL_PROFILE);
     const judge = (w: typeof word) => wordFailures(w, rose, ROSE_SIGIL_PROFILE);

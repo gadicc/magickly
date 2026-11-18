@@ -865,11 +865,15 @@ const CACHE_SIZE = 256;
  */
 const BUDGET_FLOOR = 1 / 8;
 
-/** A placed word frozen, so the cache can hand the same one to every caller. */
+/**
+ * A placed word frozen, so the cache can hand the same one to every
+ * caller. Each vertex's marks are copied first: they are the caller's
+ * plan's own arrays, which placement must not freeze.
+ */
 function frozen(placed: PlacedSigilWord): PlacedSigilWord {
   for (const v of placed.word) {
+    (v as { marks: PlacedVertex["marks"] }).marks = Object.freeze([...v.marks]);
     Object.freeze(v.point);
-    Object.freeze(v.marks);
     Object.freeze(v);
   }
   for (const f of placed.failures) {

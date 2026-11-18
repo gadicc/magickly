@@ -14,7 +14,6 @@ import { sigilFigure } from "magick-components/sigil/SigilImage";
 import type { ReactElement } from "react";
 import { createRitualSvgValidator } from "@/files/validateRitualSvg";
 import { SEVENTY_TWO_NAMES } from "../../packages/magick-components/src/sigil/oracle/corpus";
-import { PLAN_TEMPLATES } from "../../packages/magick-components/src/sigil/oracle/templates";
 import { renderComponentImage } from "./componentImage";
 import { COMPONENT_IMAGE_SLUGS, CONTRACTS } from "./contracts";
 import { contractViewBox } from "./contracts/types";
@@ -419,19 +418,38 @@ describe("component image registry", () => {
   });
 
   // A digest of the drawing itself, by the same profile: the path data
-  // of the 72 names and every template, on both roses. A change to the
-  // engine that moves any of them, even one the four pinned images above
-  // do not show, must come with a new profile.
+  // of the 72 names and a fixed list of texts that use every mark and
+  // placement rule, on both roses. A change to the engine that moves any
+  // of them, even one the four pinned images above do not show, must come
+  // with a new profile. The list is written out here, not taken from the
+  // oracle's templates, so adding a template never moves the digest.
+  const ROSE_SIGIL_DIGEST_TEXTS = [
+    "מטטרון", // a crook and a noose (Regardie, p. 58)
+    "יהוה אלהים", // two words; a revisit beside its first visit
+    "יוד הא ואו הא", // four words; one-stroke words; a return to the start
+    "אגיאל", // a later recurrence
+    "זאזל", // a wedge under the start circle
+    "הההאל", // a run of three: two crooks
+    "האאיה", // a doubled letter on a straight pass
+    "במכק", // two nooses in a row
+    "ההאדלה", // a return past a noose run
+    "אבהאל", // a start letter passed again with a noose
+    "אהא", // a word ending beside its start
+    "מממדתב", // a crooked start the last stroke passes
+    "פלפלפ", // A-B-A-B-A
+    "עעע", // a lone crooked letter on the outer ring
+    "א", // one letter
+  ];
   const ROSE_SIGIL_DRAWING_DIGESTS: Record<string, string> = {
     "magickli-rose-sigil-image-v1":
-      "7c970cc0f61526531e8d428b9f2d2d905bd7c6fc65ff871bb6d30136b77d9f37",
+      "3bb33e8655f61909a89ea3f9afad456c68a7f12a8553ceeda0a475ffc077a1ef",
   };
 
   it("pins a digest of the rose sigil's drawings under its image profile", () => {
     const texts = [
       ...new Set([
         ...SEVENTY_TWO_NAMES.map((n) => n.text),
-        ...PLAN_TEMPLATES.map((t) => t.text),
+        ...ROSE_SIGIL_DIGEST_TEXTS,
       ]),
     ];
     const drawings = (["gd", "regardie1939"] as const).flatMap((version) =>
