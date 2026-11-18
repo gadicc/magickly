@@ -157,16 +157,8 @@ export default async function (phase: string): Promise<NextConfig> {
       rules: {
         "*.svg": { loaders: ["@svgr/webpack"], as: "*.js" },
       },
-      resolveAlias: {
-        // nlopt-js's Emscripten glue requires fs; see the webpack fallback.
-        fs: { browser: "./src/lib/emptyModule.ts" },
-      },
     },
     webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-      // https://stackoverflow.com/questions/64926174/module-not-found-cant-resolve-fs-in-next-js-application
-      // ./node_modules/nlopt-js/dist/index.js; Module not found: Can't resolve 'fs'
-      config.resolve.fallback = { fs: false };
-
       // Built-in ritual sources are imported `with { type: "text" }`. Next's
       // webpack ignores that attribute, so match the extension.
       config.module.rules.push({
