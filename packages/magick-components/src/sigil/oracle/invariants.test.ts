@@ -66,6 +66,28 @@ const NAIVE_BREAKS: Record<string, InvariantCheck[]> = {
   "visits-count-vertices": ["overlap"],
   "crook-on-revisit": ["overlap"],
   "foot-outside": ["clearance", "overlap"],
+  // The return's noose lands on the start circle; V‑P‑V‑N also runs back
+  // over the first stroke.
+  ...Object.fromEntries(
+    PLAN_TEMPLATES.filter((t) => t.id.startsWith("repass-vpvn-")).map((t) => [
+      t.id,
+      ["clearance", "loop-clearance", "noose", "overlap", "start-circle"],
+    ]),
+  ),
+  ...Object.fromEntries(
+    PLAN_TEMPLATES.filter((t) => t.id.startsWith("repass-vxpvn-")).map((t) => [
+      t.id,
+      ["loop-clearance"],
+    ]),
+  ),
+  "crook-crossed-מממדתב": ["crook-clearance"],
+  "crook-crossed-כככוההגג": ["crook-clearance"],
+  "crook-crossed-וווגוכהז": ["crook-clearance", "overlap"],
+  // Visits 4 units apart, the third outside the slack.
+  "ababa-פל": ["bar", "clearance", "overlap", "slack"],
+  "ababa-הו": ["bar", "clearance", "slack"],
+  "ababa-שמ": ["bar", "clearance", "slack"],
+  "ababa-טצ": ["bar", "clearance", "overlap", "slack"],
 };
 
 describe("checkInvariants", () => {

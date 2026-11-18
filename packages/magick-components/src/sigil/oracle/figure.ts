@@ -110,6 +110,11 @@
  *   the start circle whose rim it leaves and a bar at its vertex. A narrow
  *   return along the far side of its line, F1's wedge at a crooked vertex,
  *   leaves the cups standing and passes.
+ * - **Loop clearance.** No two loops, the start circle and the nooses,
+ *   come within 1 unit of each other (a stroke width: their inks would
+ *   touch). A noose drawn through or against the start circle reads as
+ *   one interlocked figure-8, not two marks; it is what a word risks when
+ *   it passes straight back through its first letter (V‑P‑V‑N, V‑X‑P‑V‑N).
  * - **Outer bound.** Every mark of a word lies within its layout's outer
  *   bound: for the rose the disc of radius 40, its outer ring (letters at 35,
  *   slack 4.6). For any layout, unless one is supplied, the disc about the
@@ -222,6 +227,11 @@ export const FIGURE_GRAMMAR = {
    * wipes it out.
    */
   crookClearance: 1,
+  /**
+   * No two loops (the start circle, nooses) come within one stroke width
+   * of each other: touching rings read as one interlocked mark.
+   */
+  loopClearance: 1,
   /**
    * Visits to one place a word may make and still read (the grammar's
    * domain): four points two units apart fit in the rose's 4.6-unit slack,

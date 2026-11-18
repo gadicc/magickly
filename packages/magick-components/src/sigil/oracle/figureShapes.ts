@@ -750,3 +750,24 @@ export function waveIntrusions(
     return { distance, at: wave.b };
   });
 }
+
+/** The least distance between two loops' inks, for every pair, closest first. */
+export function loopContacts(
+  shapes: InkShapes,
+): { a: number; b: number; distance: number; at: Point }[] {
+  const contacts: { a: number; b: number; distance: number; at: Point }[] = [];
+  for (let a = 0; a < shapes.loops.length; a++)
+    for (let b = a + 1; b < shapes.loops.length; b++) {
+      const p = shapes.loops[a];
+      const q = shapes.loops[b];
+      // Rings whose centres are farther apart than their radii and a margin cannot touch.
+      if (dist(p.center, q.center) > p.radius + q.radius + 4) continue;
+      contacts.push({
+        a,
+        b,
+        distance: pointsToPoints(p.points, q.points),
+        at: p.center,
+      });
+    }
+  return contacts.sort((x, y) => x.distance - y.distance);
+}

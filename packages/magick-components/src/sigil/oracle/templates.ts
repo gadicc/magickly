@@ -98,6 +98,71 @@ const METATRON = [
   v("נ", 0, 0, "end"),
 ];
 
+/**
+ * A start letter passed again with a noose (the review of 18 November
+ * 2026): a mother letter lies on the diameter between two outer letters
+ * (ה‑א‑ל on the vertical, צ‑מ‑ט and ז‑ש‑ס on the others), so returning to
+ * it between them is a straight pass, and its noose sits beside the start
+ * circle. V‑P‑V‑N returns at once; V‑X‑P‑V‑N by way of a letter off the
+ * line (no noose there: X and P are far off their neighbours' chords).
+ */
+function startRepassTemplates(): PlanTemplate[] {
+  const repass = (
+    id: string,
+    text: string,
+    [start, ...rest]: readonly string[],
+  ): PlanTemplate => {
+    const [pass, end] = rest.slice(-2);
+    const between = rest.slice(0, -2);
+    return {
+      id,
+      text,
+      version: "gd",
+      plan: [
+        [
+          v(start, 0, 0, "start"),
+          ...between.map((place) => v(place, 0, 0)),
+          v(pass, 1, 0, "noose"),
+          v(end, 0, 0, "end"),
+        ],
+      ],
+      why: `R4 at a revisit of the start letter: ${start} lies on the chord from ${between[between.length - 1]} to ${end}, so its second visit is a noose beside the start circle; loop clearance keeps the two apart`,
+    };
+  };
+  return [
+    repass("repass-vpvn-א-down", "אהאל", ["א", "ה", "א", "ל"]),
+    repass("repass-vpvn-א-up", "אלאה", ["א", "ל", "א", "ה"]),
+    repass("repass-vpvn-מ-out", "מצמט", ["מ", "צ", "מ", "ט"]),
+    repass("repass-vpvn-מ-in", "מטמצ", ["מ", "ט", "מ", "צ"]),
+    repass("repass-vpvn-ש-out", "שזשס", ["ש", "ז", "ש", "ס"]),
+    repass("repass-vpvn-ש-in", "שסשז", ["ש", "ס", "ש", "ז"]),
+    repass("repass-vxpvn-א-ב", "אבהאל", ["א", "ב", "ה", "א", "ל"]),
+    repass("repass-vxpvn-א-ג", "אגהאל", ["א", "ג", "ה", "א", "ל"]),
+    repass("repass-vxpvn-א-כ", "אכהאל", ["א", "כ", "ה", "א", "ל"]),
+    repass("repass-vxpvn-מ-ר", "מרצמט", ["מ", "ר", "צ", "מ", "ט"]),
+    repass("repass-vxpvn-ש-ד", "שדסשז", ["ש", "ד", "ס", "ש", "ז"]),
+  ];
+}
+
+/** A-B-A-B-A: two returns to each place, each a later visit, no marks between. */
+function ababaTemplate(a: string, b: string): PlanTemplate {
+  return {
+    id: `ababa-${a}${b}`,
+    text: `${a}${b}${a}${b}${a}`,
+    version: "gd",
+    plan: [
+      [
+        v(a, 0, 0, "start"),
+        v(b, 0, 0),
+        v(a, 1, 0),
+        v(b, 1, 0),
+        v(a, 2, 0, "end"),
+      ],
+    ],
+    why: "F1 twice over: every return beside the earlier visits; neighbours at one place, so no noose",
+  };
+}
+
 /** Every template, in a stable order. */
 export const PLAN_TEMPLATES: readonly PlanTemplate[] = [
   ...repeatTemplates(),
@@ -465,4 +530,54 @@ export const PLAN_TEMPLATES: readonly PlanTemplate[] = [
     plan: [[v("א", 0, 0, "start"), v("ל", 0, 0), v("ה", 0, 0, "end")]],
     why: "Zero-width joiners are not whitespace and have no place; Lamed→He goes back over Aleph (F3 shape), no noose",
   },
+  ...startRepassTemplates(),
+  // The last stroke runs back past the first letter's crook.
+  {
+    id: "crook-crossed-מממדתב",
+    text: "מממדתב",
+    version: "gd",
+    plan: [
+      [
+        v("מ", 0, 2, "start", "crook"),
+        v("ד", 0, 0),
+        v("ת", 0, 0),
+        v("ב", 0, 0, "end"),
+      ],
+    ],
+    why: "R3 at the start, and a last stroke ending beside the first letter: crook clearance",
+  },
+  {
+    id: "crook-crossed-כככוההגג",
+    text: "כככוההגג",
+    version: "gd",
+    plan: [
+      [
+        v("כ", 0, 2, "start", "crook"),
+        v("ו", 0, 0),
+        v("ה", 0, 1, "crook"),
+        v("ג", 0, 1, "crook", "end"),
+      ],
+    ],
+    why: "Three crooked vertices; the strokes from He to Gimel pass Kaph's crook",
+  },
+  {
+    id: "crook-crossed-וווגוכהז",
+    text: "וווגוכהז",
+    version: "gd",
+    plan: [
+      [
+        v("ו", 0, 2, "start", "crook"),
+        v("ג", 0, 0),
+        v("ו", 1, 0),
+        v("כ", 0, 0),
+        v("ה", 0, 0),
+        v("ז", 0, 0, "end"),
+      ],
+    ],
+    why: "A return to the first letter beside its two crooks, then away: crook clearance",
+  },
+  ababaTemplate("פ", "ל"),
+  ababaTemplate("ה", "ו"),
+  ababaTemplate("ש", "מ"),
+  ababaTemplate("ט", "צ"),
 ];

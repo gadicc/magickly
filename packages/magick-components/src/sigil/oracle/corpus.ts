@@ -150,7 +150,35 @@ export function randomRoseTexts({
 }
 
 /**
+ * Longer words, beyond the tested domain: the contract and the page take
+ * 32 letters, but CI's corpus stops at 12, and longer words are drawn
+ * best effort, the page saying when a figure fails its own checks. The
+ * report (`pnpm sigils:oracle`) runs these, apart from the rest; CI does
+ * not. The same generator as `RANDOM_CORPUS`, so only the length is
+ * beyond it: runs and visits stay within the grammar's domain.
+ */
+export const BEYOND_DOMAIN_CORPUS = {
+  seed: 1332,
+  perLength: 10,
+  minLength: 13,
+  maxLength: 32,
+} as const;
+
+/**
  * Words at the edge of the domain the random corpus seldom reaches: four
  * visits to one place, with and without crooks.
  */
 export const DOMAIN_EDGE_TEXTS = ["אבאגאדא", "ללהללהללהל"] as const;
+
+/**
+ * Every A-B-A-B-A word on the rose, A and B any two letters (462): two
+ * returns to each place, the case where the earlier visits crowd a slack
+ * disc most within the domain's short words.
+ */
+export function ababaTexts(version: RoseVersionId): string[] {
+  const letters = roseRings(version).flat();
+  const texts: string[] = [];
+  for (const a of letters)
+    for (const b of letters) if (a !== b) texts.push(`${a}${b}${a}${b}${a}`);
+  return texts;
+}

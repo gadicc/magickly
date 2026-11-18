@@ -185,6 +185,17 @@ function crookedFigure(dy: number): JudgedFigure {
   });
 }
 
+/**
+ * אבהאל, whose second Aleph is a noose on the vertical between He and
+ * Lamed, with its start circle at `start` and the noose to the right.
+ */
+function repassFigure(start: Point): JudgedFigure {
+  return simple("אבהאל", {
+    overrides: [[start]],
+    choices: { nooseRight: [{ word: 0, vertex: 3 }] },
+  });
+}
+
 /** Figures that follow the grammar and must pass O2 and O3. */
 export const KNOWN_GOOD: readonly { id: string; figure: () => JudgedFigure }[] =
   [
@@ -204,6 +215,11 @@ export const KNOWN_GOOD: readonly { id: string; figure: () => JudgedFigure }[] =
     { id: "vau-aleph-vau", figure: () => simple("ואו") },
     // Pe moved down within its slack, so Pe→Shin clears Aleph's cups.
     { id: "mem-aleph-aleph-pe-shin", figure: () => crookedFigure(4) },
+    // The start circle moved 4 units right, clear of the return's noose.
+    {
+      id: "aleph-beth-he-aleph-lamed",
+      figure: () => repassFigure({ x: 4, y: -15 }),
+    },
     {
       id: "zazel-kamea",
       figure: () => {
@@ -228,9 +244,9 @@ export interface Mutant {
 }
 
 /**
- * Plan 088's mutants, each a known-good figure broken one way, and two
- * the review of the engine asked for: a bar through the start circle and
- * a stroke through a crook.
+ * Plan 088's mutants, each a known-good figure broken one way, and three
+ * the reviews of the engine asked for: a bar through the start circle, a
+ * stroke through a crook and a noose through the start circle.
  */
 export const MUTANTS: readonly Mutant[] = [
   {
@@ -307,5 +323,12 @@ export const MUTANTS: readonly Mutant[] = [
     check: "crook-clearance",
     // Pe moved up instead of down: Pe→Shin runs through Aleph's cups.
     figure: () => crookedFigure(-4),
+  },
+  {
+    id: "a noose through the start circle",
+    caughtBy: ["O2", "O3"],
+    check: "loop-clearance",
+    // The start circle left on Aleph's anchor, where the return's noose is.
+    figure: () => repassFigure(rose.anchor("א")),
   },
 ];

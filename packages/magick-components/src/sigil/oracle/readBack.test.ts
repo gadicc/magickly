@@ -28,10 +28,21 @@ const NAIVE_UNREADABLE: Record<string, string> = {
   "yhvh-elohim": "as elohim, in the second word",
   "no-place-joiners": "as elohim (א ל ה)",
   "beyond-the-end": "ה→ל lies on the first stroke, through the start circle",
-  // A third visit six units out leaves Aleph's 4.6-unit slack.
+  // A third visit eight units out leaves Aleph's 4.6-unit slack.
   ababa: "the third visit to א is drawn outside its place",
   // Shin lies 1–2 units off Nun→He, so the line turns between 2° and 10°.
   "near-miss": "the turn at ש is too slight to read or to ignore",
+  ...Object.fromEntries(
+    PLAN_TEMPLATES.flatMap((t): [string, string][] => {
+      if (t.id.startsWith("repass-"))
+        return [[t.id, "the return's noose is drawn on the start circle"]];
+      if (t.id.startsWith("crook-crossed-"))
+        return [[t.id, "a stroke runs through the first letter's crook"]];
+      if (t.id.startsWith("ababa-"))
+        return [[t.id, "the third visit is drawn outside its place"]];
+      return [];
+    }),
+  ),
 };
 
 describe("readBack", () => {

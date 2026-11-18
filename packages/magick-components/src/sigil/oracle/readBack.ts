@@ -14,8 +14,8 @@
  *    rim as the start circle; every other loop as a noose on a line it is
  *    tangent to (within 0.4 units); a line centred across another's end as
  *    the bar, unless other ink runs into it (closer than half a stroke
- *    width). Ink that close to a crook's cups, on their side, makes the
- *    word unreadable.
+ *    width). Ink that close to a crook's cups, on their side, or two
+ *    loops that close, make the word unreadable.
  * 4. Build a graph: line ends, wave ends, noose feet and points where one
  *    line's end lies on another are nodes; crossings are not, so the trace
  *    goes straight through them.
@@ -53,6 +53,7 @@ import {
   inkEnds,
   inkShapes,
   length,
+  loopContacts,
   nooseContacts,
   norm,
   rimEnds,
@@ -420,6 +421,12 @@ export function readWordShapes(
     : undefined;
   if (crossed)
     problems.push(`ink runs through the crook at ${fmt(crossed.at)}`);
+  // Touching loops are one interlocked mark, not a start circle and a noose.
+  const locked = strict
+    ? loopContacts(shapes).find((touch) => touch.distance < READ.touch * unit)
+    : undefined;
+  if (locked)
+    problems.push(`two loops touch at ${fmt(shapes.loops[locked.a].center)}`);
   if (problems.length) return { readings: [], problems };
 
   const readings = new Map<string, WordReading>();

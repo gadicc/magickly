@@ -6,9 +6,9 @@
  * alone) is `planSigil.test.ts`.
  *
  * The whole corpus runs here, in CI: the hand fixtures, the templates, the
- * 72 names and every pair and triple of letters on both roses (22,524
- * figures, about 7 s), a seeded random corpus of 4- to 12-letter words on
- * both roses, and the kamea stubs. `KNOWN_FAILURES`
+ * 72 names, every pair and triple of letters, a seeded random corpus of 4-
+ * to 12-letter words and every A-B-A-B-A word, each on both roses (the
+ * last on Regardie's only where it differs), and the kamea stubs. `KNOWN_FAILURES`
  * (`oracle/engineKnownFailures.ts`) lists the figures the engine is known
  * to draw wrongly, with the checks each fails, and may only shrink.
  */
@@ -20,6 +20,7 @@ import { svgCoordinate } from "../svgCoordinate.ts";
 import { sigilFrame, sigilPathData, sigilViewBox } from "./ink.ts";
 import { kameaUnroundedAnchor, roseUnroundedAnchor } from "./oracle/anchors.ts";
 import {
+  ababaTexts,
   CORPUS_ROSE_VERSIONS,
   DOMAIN_EDGE_TEXTS,
   randomRoseTexts,
@@ -183,6 +184,20 @@ describe("the engine against O2 and O3", () => {
       expect(misplanned).toEqual([]);
       expect(failing(random.map((text) => ({ text, version })))).toEqual(
         expectedFailures(version, random),
+      );
+    }, 60_000);
+
+  for (const version of CORPUS_ROSE_VERSIONS)
+    it(`draws every A-B-A-B-A word on the ${version} rose`, () => {
+      // Regardie's rose moves only Kaph and Tau, so a word with neither is
+      // the gd rose's figure; it is drawn once. The engine takes about
+      // 12 ms a figure here, so this keeps the pair to about 6 s.
+      const texts = ababaTexts(version).filter(
+        (text) => version === "gd" || /[כת]/u.test(text),
+      );
+      expect(texts).toHaveLength(version === "gd" ? 22 * 21 : 82);
+      expect(failing(texts.map((text) => ({ text, version })))).toEqual(
+        expectedFailures(version, texts),
       );
     }, 60_000);
 

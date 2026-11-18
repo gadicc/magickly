@@ -26,6 +26,7 @@ import {
   inkShapes,
   type LoopShape,
   length,
+  loopContacts,
   nooseContacts,
   norm,
   rimEnds,
@@ -53,6 +54,7 @@ export type InvariantCheck =
   | "clearance"
   | "bar-clearance"
   | "crook-clearance"
+  | "loop-clearance"
   | "domain";
 
 /** One broken invariant. */
@@ -389,6 +391,15 @@ function checkWord(
       fail(
         "crook-clearance",
         `other ink comes ${touch.distance.toFixed(2)} from the crook at ${fmt(touch.at)}`,
+        placeNear(touch.at, places, layout) ?? undefined,
+      );
+
+  // No two loops touching: a noose through the start circle is one mark.
+  for (const touch of loopContacts(merged))
+    if (touch.distance < (G.loopClearance - SIZE_TOLERANCE) * unit)
+      fail(
+        "loop-clearance",
+        `loops at ${fmt(merged.loops[touch.a].center)} and ${fmt(merged.loops[touch.b].center)} come ${touch.distance.toFixed(2)} apart`,
         placeNear(touch.at, places, layout) ?? undefined,
       );
 
