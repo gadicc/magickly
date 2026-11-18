@@ -18,7 +18,7 @@ import { type SigilGeometry, sigilFrame, wordOffset } from "./figure.ts";
 export const SIMPLE_SIZES = {
   startRadius: 1.5,
   cupChord: 2,
-  /** A semicircle on its chord. */
+  /** Half the chord: a semicircle. */
   cupDepth: 1,
   nooseRadius: 1.25,
   barLength: 4,
@@ -103,6 +103,8 @@ export interface DrawFaults {
 export interface DrawChoices {
   /** Nooses drawn to the right of the line instead of the left. */
   nooseRight?: readonly { word: number; vertex: number }[];
+  /** Other sizes, for drawing marks the grammar does not allow. */
+  sizes?: Partial<Record<keyof typeof SIMPLE_SIZES, number>>;
 }
 
 /**
@@ -118,7 +120,7 @@ export function drawPlaced(
 ): string {
   const unit = layout.unit;
   const frame = sigilFrame(layout);
-  const s = SIMPLE_SIZES;
+  const s = { ...SIMPLE_SIZES, ...choices.sizes };
   const paths = words.map((word, w) => {
     const offset = wordOffset(frame, w);
     const pts = word.map((v) => ({
@@ -132,11 +134,15 @@ export function drawPlaced(
       let out = "";
       let p = from;
       for (let k = 0; k < count; k++) {
-        const q = along(p, d, s.cupChord * unit);
-        const r = (s.cupChord * unit) / 2;
+        const c = s.cupChord * unit;
+        const h = s.cupDepth * unit;
+        const q = along(p, d, c);
+        // The circle through both ends and the cup's deepest point.
+        const r = ((c * c) / 4 + h * h) / (2 * h);
+        const large = h > c / 2 ? 1 : 0;
         // Sweep 0 bulges to the left of d in SVG's y-down coordinates.
         const sweep = side.x * left(d).x + side.y * left(d).y > 0 ? 0 : 1;
-        out += ` A ${r},${r} 0 0,${sweep} ${pair(q)}`;
+        out += ` A ${svgCoordinate(r)},${svgCoordinate(r)} 0 ${large},${sweep} ${pair(q)}`;
         p = q;
       }
       return { d: out, end: p };

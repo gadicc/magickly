@@ -112,9 +112,9 @@
  * The worst case on the rose, ללהאל (two strokes and a noose within the
  * slack at Aleph), is feasible: He at (0, −30.45) and the Lameds at
  * (±4.488, 34.7) give an Aleph 2.1 units off the first stroke and wedge
- * tips touching for 7.3 units. It needs He and both Lameds within 0.1
- * unit of the edge of their slack, so a placement that only tries a few
- * offsets may not find it.
+ * tips touching for 7.3 units (`invariants.test.ts` draws it). It needs
+ * He and both Lameds within 0.1 unit of the edge of their slack, so a
+ * placement that only tries a few offsets may not find it.
  */
 
 import type { Point, SigilLayout } from "../types.ts";
@@ -237,9 +237,12 @@ export function sigilFrame(
   const anchors = layout.places.map((place) => layout.anchor(place));
   const xs = anchors.map((p) => p.x);
   const ys = anchors.map((p) => p.y);
+  // Quantised as SVG coordinates are, so a 1-ulp nudge of the anchors
+  // cannot move the frame.
+  const q = (v: number) => Math.round(v * 1000) / 1000 + 0;
   const center = {
-    x: (Math.min(...xs) + Math.max(...xs)) / 2,
-    y: (Math.min(...ys) + Math.max(...ys)) / 2,
+    x: q((Math.min(...xs) + Math.max(...xs)) / 2),
+    y: q((Math.min(...ys) + Math.max(...ys)) / 2),
   };
   let reach = 0;
   for (const place of layout.places) {
