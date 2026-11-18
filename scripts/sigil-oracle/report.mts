@@ -126,8 +126,8 @@ const RULES: readonly Rule[] = [
   },
   {
     id: "R3",
-    title: "a crook per repeated letter",
-    checks: ["crook"],
+    title: "a crook per repeated letter, clear of other ink",
+    checks: ["crook", "crook-clearance"],
     applies: (plan) => plan.some((w) => w.some((v) => v.crooks > 0)),
   },
   {
@@ -139,8 +139,8 @@ const RULES: readonly Rule[] = [
   },
   {
     id: "R5",
-    title: "a bar at the last letter",
-    checks: ["bar"],
+    title: "a bar at the last letter, clear of other ink",
+    checks: ["bar", "bar-clearance"],
     applies: () => true,
   },
   {

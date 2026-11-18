@@ -245,25 +245,54 @@ written from this list:
 ### Placement: by rule, not by solver
 
 Both sources place revisits by hand just beside the first visit, and the
-solver is the source of most measured instability (cause 7). The
-recommendation is to replace it with deterministic placement:
+solver was the source of most measured instability (cause 7). It is
+replaced by rules and a bounded, deterministic search
+(`src/sigil/placeSigil.ts`). The first draft here proposed a short fixed
+list of candidates for revisits alone; S2 found that not enough, since
+ללהאל needs He and both Lameds moved to the edge of their slack, and the
+tightened oracle's bar and crook checks need other vertices moved too.
 
-- A first visit sits on its anchor.
-- A revisit, or the second of a crook, moves by a fixed offset of
-  `k × unit` perpendicular to the incoming stroke, on the side away from
-  the strokes already drawn at that place, which is what F1 and F3 show.
-- If that offset leaves a stroke within ε of another drawn vertex of the
-  name, or overlapping another stroke (O2's checks), try a short fixed list
-  of candidates in order: the other side, then 2k and 3k × unit on each
-  side, capped by the place's slack. Take the first that passes every
-  check; if none does, the one that fails fewest, ties to the earlier
-  candidate. Vertices are placed one at a time in path order. This is a
-  discrete search over a handful of positions, with O2's checks as its
-  constraints, so it cannot drift the way a continuous solver does.
-- A noose vertex is placed on the chord from its neighbours, at the foot
-  of the perpendicular from its anchor, so the line stays unbent (R4).
-- Only `+ − × ÷ √` and comparisons in placement, with inputs quantised to
-  the SVG's 0.001, so every engine draws the same figure.
+- **Rules.** A first visit sits on its anchor. A revisit sits 3 units
+  beside its anchor, square to the stroke into it, on the side farther
+  from the visits and strokes already at the place (F1, F3). A noose
+  vertex sits on its neighbours' chord at the foot of its anchor, kept at
+  least 2.25 units (its loop and a unit of line) from either end, so the
+  line stays unbent (R4). A crook's cups and a noose's loop start on the
+  outside of the turn.
+- **Checks.** Placement judges the figure as O2 does: overlap, clearance
+  from vertices and loops, the bar's and the crooks' clearance from other
+  ink, unmarked corners under 12°, a crook without room, ink outside the
+  outer ring, a vertex outside its slack. The score is one per failure
+  plus how far it misses; a stroke crossing a crook or the bar counts how
+  far the crossing must move to clear.
+- **Search.** While a check fails, each round tries every move of every
+  vertex the failures involve: a crook or noose on its other side, then a
+  step of 1.5 or 3 units or to the slack's edge (less 0.05) square to
+  its incoming stroke either way, back and forward along it, and on the
+  four diagonals. A noose vertex does not move itself; its failures
+  involve its neighbours. The move that lowers the score most is made,
+  the earliest on a tie, if it gains at least 0.01; otherwise the search
+  ends. If failures remain, it starts again with revisits on the other
+  side, then towards the layout's centre, then those three at the
+  slack's edge, and keeps the best figure.
+- **Budget.** Checking is incremental (the figure's elements are judged
+  by pair, and a move re-checks only what it changed), and a budget of
+  300,000 units of that work (an element looked at or a pair checked,
+  weighted by cups) bounds every word: the corpus's worst, ללהללהללהל,
+  takes about 80 ms, 32 random letters about 33 ms.
+- **Sizes** (`DEFAULT_SIGIL_MARKS`, sigil units): start circle radius
+  1.5, cups 2.6 wide (down to 2 on a short stroke) and 1.2 deep, noose
+  radius 1.25, bar 4 long, a unit of straight line beside marks. Deeper
+  or wider cups read barely better at 125 px and cost feasibility: with
+  cups 1.5 deep 12 corpus figures fail, 3 wide and 1.5 deep 17, against 9.
+- Only `+ − × ÷ √` and comparisons, on inputs quantised to the SVG's
+  0.001, so every engine draws the same figure. No continuous optimiser
+  and no randomness.
+
+Of 23,255 corpus figures (fixtures, templates, the 72 names, every pair
+and triple, and the random corpus, on both roses) and the two kamea
+stubs, 9 fail, five long random words at the edge of the grammar's
+domain, listed with reasons in `oracle/engineKnownFailures.ts`.
 
 The optimiser leaves the drawing path and the package (decision 7). Should
 a solver ever return, its preconditions are: quantised inputs, an
