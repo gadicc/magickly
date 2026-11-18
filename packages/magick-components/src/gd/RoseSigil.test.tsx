@@ -2,36 +2,21 @@ import { renderToStaticMarkup, renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import RoseSigil from "./RoseSigil.tsx";
 import { RoseSigilImage } from "./RoseSigilImage.tsx";
-import { letterPoint, sigilPoints } from "./roseSigilGeometry.ts";
-
-/** One or two doubles away from zero: the size of a Node/Chromium trig difference. */
-const nudge = (value: number) => value * (1 + Number.EPSILON);
+import { sigilPoints } from "./roseSigilGeometry.ts";
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
 describe("RoseSigil", () => {
-  it("hydrates when the browser's trig results differ in the last bit", async () => {
-    // The layout caches its anchors for the module's life, so the browser's
-    // side is drawn by fresh modules loaded under nudged trig: their
-    // letter centres, the rose's labels and the sigil's anchors all come
-    // from the nudged results, and must round to the server's figure.
-    const text = "אבגדהוזחטיכלמנסעפצקרשת יהוה";
-    const server = renderToString(<RoseSigil text={text} showRose animate />);
-    const yod = letterPoint("י");
-    const { cos, sin } = Math;
-    vi.spyOn(Math, "cos").mockImplementation((x) => nudge(cos(x)));
-    vi.spyOn(Math, "sin").mockImplementation((x) => nudge(sin(x)));
-    vi.resetModules();
-    const browser = await import("./RoseSigil.tsx");
-    const geometry = await import("./roseSigilGeometry.ts");
-    expect(geometry.letterPoint("י")).not.toEqual(yod);
-    const client = renderToString(
-      <browser.RoseSigil text={text} showRose animate />,
+  it("writes every number to three places, so engines that differ in trig agree", () => {
+    // That a last-bit difference in trig cannot change the figure is the
+    // oracle's to show: anchors.ts holds every unrounded anchor at least
+    // 1e-6 from a rounding boundary, and engine.oracle.test.tsx nudges the
+    // unrounded anchors by an ulp before the layout rounds them.
+    const server = renderToString(
+      <RoseSigil text="אבגדהוזחטיכלמנסעפצקרשת יהוה" showRose animate />,
     );
-    expect(client).toBe(server);
-
     // Node 25 wrote י's label at y="30.310889132455348", Chromium 152 at …344.
     expect(server).toContain('<text x="-17.5" y="30.311"');
     const numbers = [...server.matchAll(/ (?:x|y|cx|cy|d)="([^"]*)"/g)].flatMap(

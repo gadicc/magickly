@@ -345,41 +345,6 @@ describe("component image registry", () => {
       44_251,
       "a6f69235cd10092063a5a24572819d6bb7fecc489560f6f6b8a2b99ed91fa557",
     ],
-    // The rose sigil drawn by rule (plan 088): 13,454 bytes, 6edd6bd2…;
-    // 707, ef44185a…; and 13,416, f0cee48b…, while COBYLA placed the
-    // points. Reviewed again as rasterised, with two words beside them,
-    // and again when each word's bar became a path of its own (the same
-    // ink, so the draw-on can run in order).
-    [
-      "rose-sigil",
-      "text=גדי",
-      12_640,
-      "1d88b4f13ccfdecc093c69df7cc6bca8fa116220f44888f14a17eded3997d051",
-    ],
-    [
-      "rose-sigil",
-      "text=שלום&rose=false",
-      565,
-      "ea40b3f05b58d8ebc825d38cbe85bffd37269807bcecf2f2a0b3c3d1f6056f58",
-    ],
-    // Shabbathai on Regardie's rose of 1939, through Tau where Kaph is on
-    // the default rose (plan 080, "The rose's and the candlestick's
-    // versions"). Reviewed as rasterised.
-    [
-      "rose-sigil",
-      "text=שבתאי&version=regardie1939",
-      12_795,
-      "ab82d970a69cb2ce9ae79a86bb74740e604fe105b1e06d8a3eff30bfb055d5c2",
-    ],
-    // Two words, two sigils, right to left (R2); 25,639 bytes, ab904163…,
-    // before placement kept the bar and crooks clear of other ink.
-    // Reviewed as rasterised, and again with the bars as their own paths.
-    [
-      "rose-sigil",
-      "text=יהוה אלהים",
-      26_089,
-      "5fa3648ec5ce8299b372cecd626e7bdab9e0ab155a5bf7b1dd6ee5e2f765979d",
-    ],
   ] as const)(
     "pins the reviewed bytes of %s?%s so a silent font fallback fails",
     async (slug, query, byteSize, sha256) => {
@@ -388,6 +353,63 @@ describe("component image registry", () => {
       expect(image.sha256).toBe(sha256);
     },
   );
+
+  // The rose sigil's reviewed bytes, by the image profile they were
+  // reviewed under. Its identity reads no table, so the profile is all
+  // that tells an image drawn by one engine from another's: bytes that
+  // change must come with a new profile and a new set here. A profile's
+  // set never changes once the profile has shipped.
+  const ROSE_SIGIL_PINS: Record<
+    string,
+    readonly (readonly [query: string, byteSize: number, sha256: string])[]
+  > = {
+    "magickli-rose-sigil-image-v1": [
+      // Placed by rule (plan 088), each word its own sigil, every mark
+      // clear of other ink, each word's bar its own path. Reviewed as
+      // rasterised.
+      [
+        "text=גדי",
+        12_640,
+        "1d88b4f13ccfdecc093c69df7cc6bca8fa116220f44888f14a17eded3997d051",
+      ],
+      [
+        "text=שלום&rose=false",
+        565,
+        "ea40b3f05b58d8ebc825d38cbe85bffd37269807bcecf2f2a0b3c3d1f6056f58",
+      ],
+      // Shabbathai on Regardie's rose of 1939, through Tau where Kaph is
+      // on the default rose (plan 080, "The rose's and the candlestick's
+      // versions").
+      [
+        "text=שבתאי&version=regardie1939",
+        12_795,
+        "ab82d970a69cb2ce9ae79a86bb74740e604fe105b1e06d8a3eff30bfb055d5c2",
+      ],
+      // Two words, two sigils, right to left (R2).
+      [
+        "text=יהוה אלהים",
+        26_089,
+        "5fa3648ec5ce8299b372cecd626e7bdab9e0ab155a5bf7b1dd6ee5e2f765979d",
+      ],
+    ],
+  };
+
+  it("pins the rose sigil's reviewed bytes under its image profile", async () => {
+    const pins = ROSE_SIGIL_PINS[ROSE_SIGIL_IMAGE_PROFILE];
+    expect(
+      pins,
+      `no reviewed bytes for ${ROSE_SIGIL_IMAGE_PROFILE}: add its set to ROSE_SIGIL_PINS`,
+    ).toBeDefined();
+    for (const [query, byteSize, sha256] of pins) {
+      const image = await render("rose-sigil", query);
+      expect(
+        [image.byteSize, image.sha256],
+        `rose-sigil?${query} draws other bytes than ${ROSE_SIGIL_IMAGE_PROFILE} was reviewed with. ` +
+          "If the drawing changed on purpose, bump ROSE_SIGIL_IMAGE_PROFILE in registry.tsx " +
+          "and pin the reviewed bytes under the new profile; never re-pin a shipped profile.",
+      ).toEqual([byteSize, sha256]);
+    }
+  });
 
   it("draws different geomancy readings and sigils differently", async () => {
     const a = await render("astro-geomancy-chart", "m=1111111111111111");
