@@ -23,13 +23,13 @@ const leafUrl = (item: string, leaf: number, file?: string) =>
  */
 export const HEYDON_PAGES = {
   13: {
-    leaf: MIRRORED_PAGES.heydon13.leaf,
-    url: archivePageUrl(MIRRORED_PAGES.heydon13),
+    leaf: MIRRORED_PAGES.heydon13.scan.leaf,
+    url: archivePageUrl(MIRRORED_PAGES.heydon13.scan),
     mirror: "heydon13",
   },
   15: {
-    leaf: MIRRORED_PAGES.heydon15.leaf,
-    url: archivePageUrl(MIRRORED_PAGES.heydon15),
+    leaf: MIRRORED_PAGES.heydon15.scan.leaf,
+    url: archivePageUrl(MIRRORED_PAGES.heydon15.scan),
     mirror: "heydon15",
   },
 } as const;

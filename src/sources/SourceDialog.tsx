@@ -13,17 +13,18 @@ import React from "react";
 import { HallPanZoom } from "@/app/doc/[_id]/HallPanZoom";
 import { DARK_SELECTOR } from "@/colorScheme";
 import {
-  archiveBookUrl,
-  archivePageUrl,
+  bookUrl,
   type MirroredPage,
   mirrorPath,
+  pageUrl,
 } from "./mirroredPages";
 
 /**
  * A mirrored page of a cited book, full screen: the page, which pinches,
  * drags and zooms as a hall does in the reader, with the cited passage
  * outlined, and a caption naming the copy with links to the page and the
- * whole book on archive.org. On a phone it opens zoomed on the outline,
+ * whole book on archive.org or Google Books (credited, as Google asks, as
+ * its digitisation). On a phone it opens zoomed on the outline,
  * which the whole page shows too small to see. MUI's Dialog traps focus
  * and closes on Escape.
  */
@@ -124,9 +125,12 @@ export default function SourceDialog({
           [DARK_SELECTOR]: { borderColor: "divider" },
         }}
       >
-        Outlined: {page.cited}. Scanned from {page.copy}, on archive.org:{" "}
-        <Link href={archivePageUrl(page)}>this page</Link> and{" "}
-        <Link href={archiveBookUrl(page)}>the whole book</Link>.
+        Outlined: {page.cited}. Scanned from {page.copy},{" "}
+        {page.scan.site === "Google Books"
+          ? "digitised by Google Books"
+          : "on archive.org"}
+        : <Link href={pageUrl(page)}>this page</Link> and{" "}
+        <Link href={bookUrl(page)}>the whole book</Link>.
       </Typography>
     </Dialog>
   );

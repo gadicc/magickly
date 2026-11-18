@@ -296,7 +296,7 @@ What they settled, against the reissue:
 - **The first table**: the 1823 plate adds rows 57 (cut through) to 61, names
   the sixty-second (Iahhel, blank on the reissue's), and has "Haiaiel" and
   "Les Brachmanes" where the reissue has "Haiuiel" and "Les Brahmanes". Rows 1
-  to 56 are on no image found.
+  to 56 are on no image of Lenain's plate found.
 
 The other forty-seven Hebrew names, the ones two machine readings of the
 reissue agreed on, were then read from the 1823 pages too (that printing only,
@@ -333,14 +333,43 @@ Nothing is recorded for them until then.
 
 No copy with the plate opened was found: Gallica and HathiTrust refused
 automated access, and Papus's *La Cabbale* (1903) describes the book without
-reprinting the table. Lenain's own sources were found and are cited, not
-copied: Agrippa, *La Philosophie occulte* (The Hague 1727), vol. II pp. 109–110
+reprinting the table. Lenain's own sources were found and are cited:
+Agrippa, *La Philosophie occulte* (The Hague 1727), vol. II pp. 109–110
 (archive.org `per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22`,
 leaves n588–589), the 72 names in Lenain's spellings; and Kircher, *Oedipus
 Aegyptiacus* II.1 (1653), pp. 271–273 (archive.org `A027083`, leaves
 n278–280), the 72 angels by choir, whose last page Lenain cites, and p. 287
-(leaf n294), on the four-letter name of God. Neither table gives the nations
-or their names of God, so rows 1 to 56 of those columns still rest on the entries.
+(leaf n294), where Kircher says every nation's name of God has four letters
+and introduces "schema quod sequitur". Agrippa's table gives only the names.
+Kircher's schema is a plate of seventy-two four-letter names of God, each with
+its nation (Kalo and Zeut, Lenain's last two, are on it), so it is very likely
+the source of Lenain's last two columns. It is not in the Seville copy
+(`A027083`) but is in the Complutense copy, `bub_gb_XjfzMnomDQoC`, leaf n294
+(digitised by Google), photographed partly folded: the wheel's left part is
+folded over. It has not been transcribed, so in this edition rows 1 to 56 of
+those columns still rest on the entries (see Follow-ups).
+
+**The mirror** (18 November 2026). The pages the edition leans on hardest
+are now mirrored in the app and open in the lightbox of plan 080's "Source
+links and mirrored pages": both plates' p. 25 (1823, `qt9SAAAAcAAJ`;
+reissue, `ZqgpxTZ43HkC`), Kircher's pp. 271, 272 and 273 (the table's rows 1
+to 24, 25 to 67 and 68 to 72) and p. 287, and the 1727 Agrippa's pp. 109 and
+110. The eight are 2,356,672 bytes, Kircher's yellowed colour scans the
+heaviest (p. 273 is 453,438), so the mirror now holds 3,000,510 bytes and
+the cap in `src/sources/mirroredPages.test.ts` was raised from 1.5 MB to 3.5
+MB, deliberately: these are the pages a reader needs to check the first
+table and Lenain's sources, and the room left is for a page or two, not a
+second book. Google Books pages cannot be fetched by a script, so their
+originals were fetched by hand and are kept outside the repository; `pnpm
+sources:mirror --originals <dir>` reads and hash-checks them, and the
+caption credits "digitised by Google Books", as Google's notes on its scans
+ask. The reconstructed first table's account of the plates, the Markdown's
+(plain links: Markdown has no lightbox), the book's Sources list and the 72
+angels page's note link them. The per-note witness pages stay outside links
+(decided 18 November 2026), and so does Kircher's plate of the names of God
+by nation (above), which is in another copy and partly folded; if more pages
+are wanted, the mirror moves to the app's file storage rather than growing
+here.
 
 ## Follow-ups
 
@@ -356,8 +385,13 @@ or their names of God, so rows 1 to 56 of those columns still rest on the entrie
   the per-genius routes' job, but it is worth stating plainly: the page has
   almost no indexable content.
 - `output/preview-refresh-*` holds 7.8 GB of stale build directories.
-- Gallica (BnF) and the Bibliothèque d'Amiens may hold a copy with the plate
-  opened; both need a person in a browser. A sharper image of pp. 46–51 from
-  either would also settle the Hebrew of 1, 4, 5, 7 and 8 (see "Other
-  witnesses").
+- Gallica (BnF) may hold a copy with the plate opened; it needs a person in
+  a browser. The Bibliothèque Louis Aragon in Amiens holds two copies of 1823,
+  shelfmarks 42247 and M 2762, not digitised. A photograph of p. 25 with the
+  plate unfolded and of pp. 46–51 from either would settle the first table and
+  the open he/het names, 1, 4, 5, 7 and 8 (see "Other witnesses").
+- Transcribe Kircher's plate of the seventy-two names of God by nation
+  (archive.org `bub_gb_XjfzMnomDQoC`, leaf n294, partly folded) and compare it
+  with Lenain's nations and names of God, including the reconstructed rows 1
+  to 56; a copy photographed unfolded would give the folded-over part.
 

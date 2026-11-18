@@ -34,24 +34,31 @@ copies, so that a slip of the reissue's can be told from one of Lenain's:
   the copyist's.
 
 Lenain names his own sources under the first table. They have been consulted
-too. Their tables give the seventy-two but neither the nations nor their
-names of God:
+too:
 
 - Agrippa, *La Philosophie occulte*, The Hague 1727, vol. II, pp. 109–110
   ([archive.org, leaves n588–n589](https://archive.org/details/per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22/page/n588/mode/1up)):
-  the seventy-two names, in the spellings Lenain uses;
+  the seventy-two names, in the spellings Lenain uses, without nations or
+  names of God;
 - Kircher, *Oedipus Aegyptiacus*, vol. II part 1, 1653, pp. 271–273
   ([archive.org, leaves n278–n280](https://archive.org/details/A027083/page/n278/mode/1up)):
   the seventy-two angels by choir, in Hebrew and Latin, the table whose
   last page Lenain cites; and p. 287 ([leaf n294](https://archive.org/details/A027083/page/n294/mode/1up)), where Kircher
-  explains the four-letter name of God.
+  says every nation's name of God has four letters and introduces the plate
+  of them that follows;
+- Kircher's plate, which that copy lacks
+  ([archive.org bub_gb_XjfzMnomDQoC, leaf n294](https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n294/mode/1up),
+  the Universidad Complutense de Madrid's copy, photographed partly folded):
+  seventy-two four-letter names of God, each with its nation, Lenain's Kalo
+  and Zeut among them. It is very likely the source of the first table's last
+  two columns, and has not yet been transcribed for this edition.
 
 <small>
 
 **About this edition**
 
-- **first cabalistic table** (reconstruction) — The table is a fold-out leaf, and the scan photographed it folded: only its last eleven rows were captured, and the page behind it is blank. The 1823 printing's copy (Google Books qt9SAAAAcAAJ, page 25) was photographed folded too, but further open, and shows rows 57 to 72, the fifty-seventh only in part. Rows 1 to 56 are in no image found. Every column the table carries — name, nation, divine name — is also given in the entry for each genius, so nothing it held is lost, only its arrangement.
-- **first cabalistic table, rows 1-56** (reconstruction) — Rows 62 to 72 are on the reissue's plate, and 57 to 72 on the 1823 printing's; 1 to 56 are in no image found. They are put back from each genius's own entry, which carries the same three columns, and are marked as reconstructed wherever they are shown — never written into the transcription, which is what the page prints. The method can be checked against the rows the plates do show, and the reconstructed table says how often it recovers each column; the misses are places where Lenain's table and his entries differ, such as Mogols for Mongols and Habuiah for Habuhiah. He names his own sources under the table — Kircher's Oedipus Aegyptiacus, tome 2, pages 273 and 287, and Agrippa's Occult Philosophy, book 3, pages 109 and 110, The Hague 1727 — and both have been consulted: Agrippa gives the seventy-two names in the spellings Lenain uses, and Kircher the seventy-two angels by choir in Hebrew and Latin. Neither gives the nations or their names of God, so those two columns rest on Lenain alone.
+- **first cabalistic table** (reconstruction) — The table is a fold-out leaf, and the scan photographed it folded: only its last eleven rows were captured, and the page behind it is blank. The 1823 printing's copy (Google Books qt9SAAAAcAAJ, page 25) was photographed folded too, but further open, and shows rows 57 to 72, the fifty-seventh only in part. Rows 1 to 56 are on no image of the plate found. Every column the table carries — name, nation, divine name — is also given in the entry for each genius, so nothing it held is lost, only its arrangement.
+- **first cabalistic table, rows 1-56** (reconstruction) — Rows 62 to 72 are on the reissue's plate, and 57 to 72 on the 1823 printing's; 1 to 56 are on no image of Lenain's plate found. They are put back from each genius's own entry, which carries the same three columns, and are marked as reconstructed wherever they are shown — never written into the transcription, which is what the page prints. The method can be checked against the rows the plates do show, and the reconstructed table says how often it recovers each column; the misses are places where Lenain's table and his entries differ, such as Mogols for Mongols and Habuiah for Habuhiah. He names his own sources under the table — Kircher's Oedipus Aegyptiacus, tome 2, pages 273 and 287, and Agrippa's Occult Philosophy, book 3, pages 109 and 110, The Hague 1727 — and both have been consulted. Agrippa gives the seventy-two names in the spellings Lenain uses, without nations or names of God. Kircher gives the seventy-two angels by choir in Hebrew and Latin (pp. 271 to 273), and on p. 287 introduces a plate of seventy-two four-letter names of God, each with its nation; Kalo and Zeut, Lenain's last two, are on it, so it is very likely the source of the table's last two columns. The plate is not in the copy those pages were read from (archive.org A027083) but is in another (archive.org bub_gb_XjfzMnomDQoC, leaf n294), photographed partly folded, and has not been transcribed, so for rows 1 to 56 those two columns still rest on Lenain's entries.
 - **name.he** (reading) · U+05C4 — Lenain dots his Hebrew above the letter bodies, not within them and not beneath. Those dots are encoded here as U+05C4 HEBREW MARK UPPER DOT, which is what that position means; whether he intended the biblical punctum extraordinarium or a device of his own is not something the type can settle.
 
 </small>
@@ -3468,7 +3475,7 @@ La Sorcellerie des Campagnes est un ouvrage de science très sérieuse et une œ
 
 ## The first cabalistic table, reconstructed
 
-The plate is a fold-out, and both copies scanned caught it folded. The reissue's shows rows 62 to 72. The 1823 printing's was opened further and shows rows 57 to 72, row 57 only in part; the 5 rows it alone shows are given below from it. The 56 rows marked *reconstructed* are **not from either plate** — they are put back from each genius's own entry, which gives the same three columns.
+The plate is a fold-out, and both copies scanned caught it folded. The reissue's ([p. 25](https://books.google.com/books?id=ZqgpxTZ43HkC&pg=PA25)) shows rows 62 to 72. The 1823 printing's ([p. 25](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA25)) was opened further and shows rows 57 to 72, row 57 only in part; the 5 rows it alone shows are given below from it. The 56 rows marked *reconstructed* are **not from either plate** — they are put back from each genius's own entry, which gives the same three columns.
 
 Checked against the rows the plates show in full (row 57, only partly legible, left out), the method recovers the name of God for all 11 on the reissue's plate and 14 of the 15 on the 1823, the nation for 8 of the 11 on the reissue's plate and 8 of the 15 on the 1823, and the genius's name for 7 of the 11 on the reissue's plate and 12 of the 15 on the 1823. The misses are places where Lenain's table and his entries spell or word a name or a nation differently — “Les Carmaniens” in the table, “les anciens Carmaniens” in the entry — or where the plate leaves a cell blank.
 

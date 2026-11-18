@@ -2,21 +2,17 @@
 import MuiLink from "@mui/material/Link";
 import dynamic from "next/dynamic";
 import React from "react";
-import {
-  archivePageUrl,
-  MIRRORED_PAGES,
-  type MirroredPageKey,
-} from "./mirroredPages";
+import { MIRRORED_PAGES, type MirroredPageKey, pageUrl } from "./mirroredPages";
 
 // The dialog and its pan and zoom load on the first click.
 const SourceDialog = dynamic(() => import("./SourceDialog"), { ssr: false });
 
 /**
- * A link to a cited page on archive.org which, with JavaScript, opens our
- * mirror of the page in a dialog instead. A click with a modifier key, or
- * any other button, still follows the link, and so does a reader without
- * JavaScript. `plain` draws a bare `<a>`, for pages whose other outside
- * links are bare; otherwise it is MUI's link.
+ * A link to a cited page on archive.org or Google Books which, with
+ * JavaScript, opens our mirror of the page in a dialog instead. A click
+ * with a modifier key, or any other button, still follows the link, and so
+ * does a reader without JavaScript. `plain` draws a bare `<a>`, for pages
+ * whose other outside links are bare; otherwise it is MUI's link.
  */
 export default function SourceLink({
   page,
@@ -48,7 +44,7 @@ export default function SourceLink({
     setOpen(true);
   };
   const props = {
-    href: archivePageUrl(mirrored),
+    href: pageUrl(mirrored),
     ...rest,
     "aria-haspopup": "dialog" as const,
     onClick,

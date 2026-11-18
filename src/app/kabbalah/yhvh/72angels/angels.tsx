@@ -37,6 +37,7 @@ import {
 import Link from "next/link";
 import React from "react";
 import { angelSlug } from "@/lib/angelSlugs";
+import SourceLink from "@/sources/SourceLink";
 
 type AstrologySystem = "tropical" | "sidereal";
 
@@ -404,8 +405,11 @@ function SevenyTwo() {
               this post
             </a>
             . Nothing here is derived from his translation; it was consulted
-            only to check names against Lenain&apos;s own first table, whose
-            fold-out leaf this scan photographed folded.
+            only to check names against Lenain&apos;s own first table, whose{" "}
+            <SourceLink plain page="lenainReissue25">
+              fold-out leaf
+            </SourceLink>{" "}
+            this scan photographed folded.
           </p>
         </details>
         <p>The sigils will be added at a later time.</p>

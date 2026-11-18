@@ -101,6 +101,49 @@ describe("SourceLink", () => {
     OPENS_DIALOG,
   );
 
+  it(
+    "links a Google Books page there, and credits Google's digitisation",
+    async () => {
+      const GOOGLE_PAGE =
+        "https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA25";
+      expect(
+        renderToString(
+          <SourceLink plain page="lenain25">
+            p. 25
+          </SourceLink>,
+        ),
+      ).toBe(
+        `<a href="${GOOGLE_PAGE.replace("&", "&amp;")}" aria-haspopup="dialog">p. 25</a>`,
+      );
+      render(<SourceLink page="lenain25">the 1823 plate</SourceLink>);
+      fireEvent.click(screen.getByRole("link", { name: "the 1823 plate" }));
+      await screen.findByRole(
+        "dialog",
+        { name: "Lenain, La Science cabalistique (1823), p. 25" },
+        { timeout: 5000 },
+      );
+      expect(
+        screen.getByText(
+          /Outlined: the first cabalistic table, folded so that rows 57 to 72 show\. Scanned from the Koninklijke Bibliotheek's copy, digitised by Google Books:/,
+        ),
+      ).toBeTruthy();
+      expect(
+        screen.getByRole("link", { name: "this page" }).getAttribute("href"),
+      ).toBe(GOOGLE_PAGE);
+      expect(
+        screen
+          .getByRole("link", { name: "the whole book" })
+          .getAttribute("href"),
+      ).toBe("https://books.google.com/books?id=qt9SAAAAcAAJ");
+      expect(
+        screen
+          .getByRole("img", { name: /^Lenain, La Science cabalistique/ })
+          .getAttribute("src"),
+      ).toBe("/sources/lenain-science-cabalistique-1823-p25.webp");
+    },
+    OPENS_DIALOG,
+  );
+
   it("leaves a click with a modifier key, or another button, to the browser", () => {
     render(<SourceLink page="agrippa149">Agrippa</SourceLink>);
     const link = screen.getByRole("link", { name: "Agrippa" });

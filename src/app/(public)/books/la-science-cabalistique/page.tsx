@@ -1,18 +1,51 @@
+import { plateRange } from "magick-data/kabbalah/lenain/firstTable";
 import { editionNotes } from "magick-data/kabbalah/lenain/notes";
 import { bookLeaves, divisions } from "magick-data/kabbalah/lenain/volume";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { PageBreadcrumbs } from "@/seo/Breadcrumbs";
 import JsonLd from "@/seo/JsonLd";
 import { bookJsonLd } from "@/seo/lenain";
 import { pageMetadata } from "@/seo/metadata";
 import { SITE_URL } from "@/seo/site";
+import { MIRRORED_PAGES, type MirroredPageKey } from "@/sources/mirroredPages";
+import SourceLink from "@/sources/SourceLink";
 import styles from "../../../books/la-science-cabalistique/reading.module.css";
 
 const PATH = "/books/la-science-cabalistique";
 
+/**
+ * Kircher's plate of the seventy-two names of God by nation, which follows
+ * p. 287 in the Complutense copy but not in the Seville copy we mirror. It
+ * stays an outside link: it is photographed partly folded and not yet read.
+ */
+const KIRCHER_PLATE =
+  "https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n294/mode/1up";
+
+/** The Amiens library's records of its two copies of the 1823 printing. */
+const AMIENS_RECORD = (id: number) =>
+  `https://bibliotheques.amiens.fr/Default/doc/SYRACUSE/${id}/la-science-cabalistique-ou-l-art-de-connaitre-les-bons-genies-qui-influent-sur-la-destinee-des-homme`;
+
+/** A mirrored page, its link named by the full citation. */
+function PageLink({
+  page,
+  children,
+}: {
+  page: MirroredPageKey;
+  children: ReactNode;
+}) {
+  return (
+    <SourceLink plain page={page} aria-label={MIRRORED_PAGES[page].label}>
+      {children}
+    </SourceLink>
+  );
+}
+
 export const metadata = pageMetadata("/books/la-science-cabalistique");
 
 export default function BookPage() {
+  const reissuePlate = plateRange("plate1909");
+  const plate1823 = plateRange("plate1823");
   return (
     <>
       <PageBreadcrumbs path="/books/la-science-cabalistique" />
@@ -78,14 +111,27 @@ export default function BookPage() {
             <a href="https://books.google.com/books?id=ZqgpxTZ43HkC">
               Google Books ZqgpxTZ43HkC
             </a>
-            .
+            , the Bibliothèque municipale de Lyon&apos;s copy, whose folded
+            plate shows the first table&apos;s rows {reissuePlate.from} to{" "}
+            {reissuePlate.to} (<PageLink page="lenainReissue25">p. 25</PageLink>
+            ).
           </li>
           <li>
             The 1823 printing, Koninklijke Bibliotheek copy:{" "}
             <a href="https://books.google.com/books?id=qt9SAAAAcAAJ">
               Google Books qt9SAAAAcAAJ
             </a>
-            . Cited in the editorial notes wherever it bears on one.
+            . Cited in the editorial notes wherever it bears on one; its plate,
+            opened further, shows rows {plate1823.from} to {plate1823.to}, and
+            the same page names Lenain&apos;s sources (
+            <PageLink page="lenain25">p. 25</PageLink>).
+          </li>
+          <li>
+            A second copy of the reissue, also Lyon&apos;s:{" "}
+            <a href="https://books.google.com/books?id=BqzyzEEX3MAC">
+              Google Books BqzyzEEX3MAC
+            </a>
+            , its plate folded the same way, so it shows no further rows.
           </li>
           <li>
             Bibliothèque interuniversitaire de santé, Ms 5365, an undated
@@ -97,22 +143,44 @@ export default function BookPage() {
             difference is the copyist&apos;s.
           </li>
           <li>
-            Lenain&apos;s own sources, whose tables give the seventy-two but
-            neither the nations nor their names of God: Agrippa,{" "}
-            <i lang="fr">La Philosophie occulte</i>, The Hague 1727, vol. II,{" "}
-            <a href="https://archive.org/details/per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22/page/n588/mode/1up">
-              pp. 109–110
-            </a>
-            , the seventy-two names in the spellings Lenain uses; and Kircher,{" "}
-            <i lang="la">Oedipus Aegyptiacus</i>, vol. II part 1, 1653,{" "}
-            <a href="https://archive.org/details/A027083/page/n278/mode/1up">
-              pp. 271–273
-            </a>
-            , the seventy-two angels by choir, in Hebrew and Latin, and{" "}
-            <a href="https://archive.org/details/A027083/page/n294/mode/1up">
-              p. 287
-            </a>
-            , where he explains the four-letter name of God.
+            Two copies of the 1823 printing in Amiens, Bibliothèque Louis
+            Aragon, shelfmarks <a href={AMIENS_RECORD(1711996)}>42247</a> and{" "}
+            <a href={AMIENS_RECORD(293461)}>M 2762</a>: not digitised, and not
+            yet read for this edition.
+          </li>
+          <li>
+            Lenain&apos;s own sources, which he names on p. 25:
+            <ul>
+              <li>
+                Agrippa, <i lang="fr">La Philosophie occulte</i>, The Hague
+                1727, vol. II, pp. <PageLink page="agrippaFr109">109</PageLink>{" "}
+                and <PageLink page="agrippaFr110">110</PageLink>: the
+                seventy-two names, in the spellings Lenain uses, without nations
+                or names of God.
+              </li>
+              <li>
+                Kircher, <i lang="la">Oedipus Aegyptiacus</i>, vol. II part 1,
+                1653, pp. <PageLink page="kircher271">271</PageLink>,{" "}
+                <PageLink page="kircher272">272</PageLink> and{" "}
+                <PageLink page="kircher273">273</PageLink>: the seventy-two by
+                choir, in Hebrew and Latin, the table Lenain says he relies on
+                entirely; and p. <PageLink page="kircher287">287</PageLink>,
+                where Kircher says every nation&apos;s name of God has four
+                letters and introduces the plate of them that follows.
+              </li>
+              <li>
+                Kircher&apos;s plate after p. 287, which the copy above lacks:{" "}
+                <a href={KIRCHER_PLATE}>
+                  archive.org bub_gb_XjfzMnomDQoC, leaf n294
+                </a>
+                , the Universidad Complutense de Madrid&apos;s copy,
+                photographed partly folded. It gives seventy-two four-letter
+                names of God, each with its nation, Lenain&apos;s Kalo and Zeut
+                among them, and is very likely the source of his table&apos;s
+                last two columns; it has not yet been transcribed for this
+                edition.
+              </li>
+            </ul>
           </li>
         </ul>
         <p>

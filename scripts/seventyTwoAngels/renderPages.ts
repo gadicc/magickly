@@ -17,6 +17,7 @@ import {
   piecesOf,
   segmentsOf,
 } from "magick-data/kabbalah/lenain/pieces";
+import { MIRRORED_PAGES, pageUrl } from "../../src/sources/mirroredPages";
 import type { Note } from "./apparatus";
 import { type BookPage, bookPages } from "./bookPage";
 import { plateEntries } from "./plateSource";
@@ -72,17 +73,24 @@ copies, so that a slip of the reissue's can be told from one of Lenain's:
   the copyist's.
 
 Lenain names his own sources under the first table. They have been consulted
-too. Their tables give the seventy-two but neither the nations nor their
-names of God:
+too:
 
 - Agrippa, *La Philosophie occulte*, The Hague 1727, vol. II, pp. 109–110
   ([archive.org, leaves n588–n589](https://archive.org/details/per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22/page/n588/mode/1up)):
-  the seventy-two names, in the spellings Lenain uses;
+  the seventy-two names, in the spellings Lenain uses, without nations or
+  names of God;
 - Kircher, *Oedipus Aegyptiacus*, vol. II part 1, 1653, pp. 271–273
   ([archive.org, leaves n278–n280](https://archive.org/details/A027083/page/n278/mode/1up)):
   the seventy-two angels by choir, in Hebrew and Latin, the table whose
   last page Lenain cites; and p. 287 ([leaf n294](https://archive.org/details/A027083/page/n294/mode/1up)), where Kircher
-  explains the four-letter name of God.
+  says every nation's name of God has four letters and introduces the plate
+  of them that follows;
+- Kircher's plate, which that copy lacks
+  ([archive.org bub_gb_XjfzMnomDQoC, leaf n294](https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n294/mode/1up),
+  the Universidad Complutense de Madrid's copy, photographed partly folded):
+  seventy-two four-letter names of God, each with its nation, Lenain's Kalo
+  and Zeut among them. It is very likely the source of the first table's last
+  two columns, and has not yet been transcribed for this edition.
 
 `;
 
@@ -236,9 +244,12 @@ export function renderMarkdown(pages: BookPage[] = bookPages()): string {
   const later = plateRange("plate1909");
   const original = plateRange("plate1823");
   const differences = differencesSentence();
+  // The plates' pages link the scans: Markdown has no lightbox.
+  const reissuePlate = pageUrl(MIRRORED_PAGES.lenainReissue25);
+  const plate1823 = pageUrl(MIRRORED_PAGES.lenain25);
   const reconstruction = [
     "## The first cabalistic table, reconstructed",
-    `The plate is a fold-out, and both copies scanned caught it folded. The reissue's shows rows ${later.from} to ${later.to}. The 1823 printing's was opened further and shows rows ${original.from} to ${original.to}${partlyClause()}; the ${counts.plate1823} rows it alone shows are given below from it. The ${counts.reconstructed} rows marked *reconstructed* are **not from either plate** — they are put back from each genius's own entry, which gives the same three columns.`,
+    `The plate is a fold-out, and both copies scanned caught it folded. The reissue's ([p. 25](${reissuePlate})) shows rows ${later.from} to ${later.to}. The 1823 printing's ([p. 25](${plate1823})) was opened further and shows rows ${original.from} to ${original.to}${partlyClause()}; the ${counts.plate1823} rows it alone shows are given below from it. The ${counts.reconstructed} rows marked *reconstructed* are **not from either plate** — they are put back from each genius's own entry, which gives the same three columns.`,
     checkedSentence(),
     ...(differences ? [differences] : []),
     table(

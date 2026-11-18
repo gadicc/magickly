@@ -2162,6 +2162,9 @@ rebased onto `main` at `dee60a93`); not merged.
   established; if Fuller, it is in copyright in the UK and EU to 2036).
   The service worker does not precache `public/sources`; Serwist's
   default image rule caches a page when it is viewed.
+  (Lenain's eight pages joined it on 18 November 2026, with Google Books
+  originals read from `--originals` and the cap raised to 3.5 MB: plan 033,
+  "Other witnesses".)
 - **The lightbox** (`7791c03d`). `SourceLink` keeps the archive.org
   href (so no JavaScript, or a modified click, goes there) and opens
   `SourceDialog`: MUI's full-screen Dialog, named by the citation, the

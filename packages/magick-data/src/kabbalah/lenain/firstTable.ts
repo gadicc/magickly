@@ -5,14 +5,16 @@ import { leaves } from "./volume.ts";
 /**
  * The first cabalistic table, whole again.
  *
- * It is a fold-out leaf, and both copies scanned were photographed folded.
- * The reissue this edition transcribes (recorded as 1909) shows rows 62 to
- * 72; the 1823 printing (Google Books qt9SAAAAcAAJ, page 25) was opened
- * further and shows 57 to 72, the fifty-seventh cut through by the fold.
- * Rows 1 to 56 are in no image found. Every column the table carries — the
- * genius, the nation, that nation's name for God — is also given in the
- * genius's own entry, so nothing it held is lost, only its arrangement. This
- * puts the arrangement back.
+ * It is a fold-out leaf, and both copies scanned were photographed folded. The
+ * reissue this edition transcribes (recorded as 1909) shows rows 62 to 72; the
+ * 1823 printing (Google Books qt9SAAAAcAAJ, page 25) was opened further and
+ * shows 57 to 72, the fifty-seventh cut through by the fold. Rows 1 to 56 are
+ * on no image of Lenain's plate found. (Kircher's plate of the seventy-two
+ * names of God by nation, very likely the source of the last two columns, is
+ * in one archive.org copy, partly folded and not yet transcribed: plan 033.)
+ * Every column the table carries — the genius, the nation, that nation's name
+ * for God — is also given in the genius's own entry, so nothing it held is
+ * lost, only its arrangement. This puts the arrangement back.
  *
  * It is derived and never stored in `pages.json5`. That file is what the page
  * prints, and a reconstruction written into it would be indistinguishable from

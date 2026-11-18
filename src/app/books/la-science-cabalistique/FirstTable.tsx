@@ -7,6 +7,8 @@ import {
   plateRange,
   SOURCE_LABEL,
 } from "magick-data/kabbalah/lenain/firstTable";
+import { MIRRORED_PAGES } from "@/sources/mirroredPages";
+import SourceLink from "@/sources/SourceLink";
 import styles from "./reading.module.css";
 
 /**
@@ -34,9 +36,19 @@ export default function FirstTable() {
       <h2>The first cabalistic table, reconstructed</h2>
       <p>
         The plate is a fold-out, and both copies scanned caught it folded. The
-        reissue&apos;s shows rows {later.from} to {later.to}, printed above as
-        they survive. The 1823 printing&apos;s was opened further and shows rows{" "}
-        {original.from} to {original.to}
+        reissue&apos;s (
+        <SourceLink
+          page="lenainReissue25"
+          aria-label={MIRRORED_PAGES.lenainReissue25.label}
+        >
+          p. 25
+        </SourceLink>
+        ) shows rows {later.from} to {later.to}, printed above as they survive.
+        The 1823 printing&apos;s (
+        <SourceLink page="lenain25" aria-label={MIRRORED_PAGES.lenain25.label}>
+          p. 25
+        </SourceLink>
+        ) was opened further and shows rows {original.from} to {original.to}
         {partlyClause()}; the {counts.plate1823} rows it alone shows are given
         below from it. The {counts.reconstructed} rows before those are{" "}
         <strong>not from either plate</strong>. They are put back from each

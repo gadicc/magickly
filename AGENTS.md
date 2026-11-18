@@ -72,6 +72,51 @@ read worldwide, so treat every volume as in copyright: take facts, link
 its archive.org pages, and quote, mirror or trace nothing. Plan 091 has
 the records and what is still open.
 
+## Reference work: show the evidence
+
+magick.ly is a reference. A reader should be able to check any fact we
+give against the original, see where sources disagree, and understand
+why. So, for facts taken from books and manuscripts:
+
+1. **Read more than one witness.** Prefer the earliest printing or
+   manuscript you can reach, and use later editions, reprints, copies and
+   the author's own sources as further witnesses. A reprint may be reset
+   (the reissue of Lenain recorded as 1909 was, with new errors and silent
+   corrections), so check before treating it as a facsimile.
+2. **Say whose a discrepancy is.** Where witnesses differ, record what
+   each one reads, with its page or leaf, and say whose slip or change it
+   is when the evidence shows it (author, printer, a later edition, a
+   copyist, our own reading); where it cannot be settled, say so and what
+   would settle it. Check readings against independent derivations where
+   they exist (the 72 names against Exodus 14:19–21; a table against the
+   text it summarises), and record known exceptions explicitly, so a new
+   one fails the build.
+3. **Our own research counts as evidence, and is labelled.** Machine
+   readings, hand readings and comparisons are recorded with who or what
+   made them and how, and a reader not told the expected value is better
+   than one who is. Keep the data that verdicts rest on in committed
+   files, so the apparatus is rebuilt from the repository, not from a
+   chat.
+4. **Link the page, not just the book.** Every reading a note relies on
+   links the exact page or leaf of a scan (archive.org `/page/n<leaf>`,
+   Google Books `&pg=PA<n>`, Gallica `/f<n>`), and the pages listing an
+   edition's sources describe each one: what it is, whose copy, and what
+   it is used for.
+5. **Mirror what readers most need, within budget.** Public-domain pages
+   that a page leans on heavily (a plate, a table, a source's cited page)
+   may be mirrored in `public/sources/` and opened in the lightbox
+   (`src/sources/`, `pnpm sources:mirror`, with `--originals` for pages a
+   script cannot fetch, such as Google Books'), with the region outlined
+   and the basis for its public-domain status in `public/sources/README.md`.
+   The mirror's total is pinned by `src/sources/mirroredPages.test.ts`;
+   raise the cap only deliberately, say why in the plan, and when the
+   mirror outgrows the repository move it to the app's file storage
+   (plan 080) rather than raising it again. Everything else stays an
+   outside link.
+
+This sits beside "Outside sources" above, which governs what may enter the
+repository at all.
+
 ## Hebrew fonts
 
 Hebrew that stands alone (single letters, names, short or large words) is
