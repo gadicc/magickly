@@ -5,7 +5,7 @@
  * anything else has none.
  */
 
-import type { Point, SigilLayout } from "../sigil/types.ts";
+import type { Point, SigilLayout, SigilProfile } from "../sigil/types.ts";
 import { svgCoordinate } from "../svgCoordinate.ts";
 import {
   letterPoint,
@@ -20,6 +20,17 @@ import {
  * of every neighbour's.
  */
 export const ROSE_SLACK = 4.6;
+
+/**
+ * The Golden Dawn's rules for the rose (plan 088, R1–R5). The noose
+ * tolerance is provisional (decision 2): 1 unit puts nooses on Metatron's
+ * Resh (0.23 units off its chord) and on the seven of the 72 names
+ * ending האל, and on no corner.
+ */
+export const ROSE_SIGIL_PROFILE: SigilProfile = {
+  id: "golden-dawn",
+  nooseTolerance: 1,
+};
 
 const layouts = new Map<string, SigilLayout<string>>();
 
