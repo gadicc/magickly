@@ -1361,6 +1361,11 @@ msgstr "Separate words with spaces: each word is its own sigil, drawn right to l
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/sigils.tsx
+msgid "A sigil takes at most {max} letters; this text has {count}."
+msgstr "A sigil takes at most {max} letters; this text has {count}."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
 msgid "Invalid characters:"
 msgstr "Invalid characters:"
 

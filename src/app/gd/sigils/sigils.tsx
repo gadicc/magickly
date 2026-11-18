@@ -28,7 +28,10 @@ import { useUiLanguage } from "@/i18n/LocaleProvider";
 import UiRichText from "@/i18n/UiRichText";
 import UiText from "@/i18n/UiText";
 import { parseComponentImageRequest } from "@/render/componentImageRequest";
-import { rectifySigilText } from "@/render/contracts/roseSigil";
+import {
+  rectifySigilText,
+  SIGIL_MAX_LETTERS,
+} from "@/render/contracts/roseSigil";
 import DebugSigil from "./DebugSigil";
 
 export default function Sigils({
@@ -54,7 +57,13 @@ export default function Sigils({
       (letter) =>
         /\s/.test(letter) || ROSE_LETTERS.some((ring) => ring.includes(letter)),
     );
-  const isValid = charsValid.indexOf(false) === -1;
+  // As many rose letters as the image contract takes: a longer text is
+  // not drawn, which also bounds the work of placing it.
+  const letterCount = charsValid.filter(
+    (valid, i) => valid && !/\s/.test(rectified[i]),
+  ).length;
+  const tooLong = letterCount > SIGIL_MAX_LETTERS;
+  const isValid = charsValid.indexOf(false) === -1 && !tooLong;
 
   // Links only exist for text the server contract accepts, which collapses
   // the whitespace between words; the text is the user's own, so the
@@ -136,7 +145,17 @@ export default function Sigils({
         </div>
         {/* The two labels search has always read as the page's prose go
             through UiRichText, the adapter it reads (src/search). */}
-        {!isValid && (
+        {tooLong && (
+          <div>
+            <UiText
+              message={
+                /*i18n*/ "A sigil takes at most {max} letters; this text has {count}."
+              }
+              values={{ max: SIGIL_MAX_LETTERS, count: letterCount }}
+            />
+          </div>
+        )}
+        {charsValid.includes(false) && (
           <div>
             <UiRichText message={/*i18n*/ "Invalid characters:"} />{" "}
             {charsValid.map((valid, i) => (

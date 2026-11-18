@@ -107,6 +107,28 @@ describe("/gd/sigils' words and debug view", () => {
     ).toEqual([]);
   });
 
+  it("draws no more letters than the image contract takes", () => {
+    const { container } = render(
+      <Sigils initial={{ text: "גדי", rose: false, version: "gd" }} />,
+    );
+    const ink = () => container.querySelectorAll('svg[version="1.1"] g path');
+    const type = (value: string) =>
+      fireEvent.change(screen.getByPlaceholderText("Sigil text"), {
+        target: { value },
+      });
+    type(`${"אב".repeat(16)} `);
+    expect(ink().length).toBeGreaterThan(0);
+    expect(screen.queryByText(/at most 32 letters/)).toBeNull();
+    type(`${"אב".repeat(16)} ג`);
+    expect(
+      screen.getByText("A sigil takes at most 32 letters; this text has 33."),
+    ).toBeTruthy();
+    expect(ink()).toHaveLength(0);
+    expect(
+      screen.queryAllByRole("link", { name: "Open SVG image link" }),
+    ).toEqual([]);
+  });
+
   it("shows the engine's plan and placement in the debug view", () => {
     const { container } = render(
       <Sigils initial={{ text: "מטטרון", rose: true, version: "gd" }} />,

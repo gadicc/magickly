@@ -1361,6 +1361,11 @@ msgstr "הפרידו בין מילים ברווחים: כל מילה היא סי
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/sigils.tsx
+msgid "A sigil takes at most {max} letters; this text has {count}."
+msgstr "חותם מקבל לכל היותר {max} אותיות; בטקסט הזה יש {count}."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
 msgid "Invalid characters:"
 msgstr "תווים לא חוקיים:"
 
