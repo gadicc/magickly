@@ -48,8 +48,11 @@ export interface RoseSigilImageProps {
   points?: SigilPoint[];
   /**
    * A name for the draw-on animation, unique per instance because a
-   * `<style>` inside inline SVG is document-wide: its keyframes, and a
-   * class of that name running them; server renders never animate.
+   * `<style>` inside inline SVG is document-wide. The image writes its
+   * keyframes (the stroke dash offset run down to 0) and nothing runs
+   * them: `RoseSigil` runs them on each path in turn, in the browser. With
+   * the deprecated `points`, the style also has a class of that name that
+   * runs them over the whole connecting path, as before.
    */
   animation?: string;
   /** The `<svg>`, for exporting the drawing. */
@@ -123,12 +126,26 @@ function Rose({ version, debug }: { version?: RoseVersionId; debug: boolean }) {
   );
 }
 
-/** The draw-on animation's rule; it lasts a quarter second a letter. */
-function AnimationStyle({ name, text }: { name: string; text: string }) {
+/**
+ * The draw-on animation's keyframes and, for the deprecated points' one
+ * path (`withClass`), a class running them a quarter second a letter.
+ */
+function AnimationStyle({
+  name,
+  text,
+  withClass = false,
+}: {
+  name: string;
+  text: string;
+  withClass?: boolean;
+}) {
+  const keyframes = `@keyframes ${name} { to { stroke-dashoffset: 0; } }`;
   return (
     <style>
-      {`.${name} { animation: ${name} ${roseLetters(text).length / 4}s linear 0s forwards 1; }
-@keyframes ${name} { to { stroke-dashoffset: 0; } }`}
+      {withClass
+        ? `.${name} { animation: ${name} ${roseLetters(text).length / 4}s linear 0s forwards 1; }
+${keyframes}`
+        : keyframes}
     </style>
   );
 }
@@ -246,7 +263,7 @@ function PointsImage({
       viewBox="-50 -50 100 100"
       ref={ref}
     >
-      {animation && <AnimationStyle name={animation} text={text} />}
+      {animation && <AnimationStyle name={animation} text={text} withClass />}
       {showRose && <Rose version={version} debug={debug} />}
 
       {debug && (

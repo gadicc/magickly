@@ -17,6 +17,7 @@ export type { DrawingSource };
 
 const EQUINOX = "crowley-equinox_202110";
 const REGARDIE_3 = "IsraelRegardie-TheGoldenDawn-Vol3-1939";
+const REGARDIE_4 = "IsraelRegardie-TheGoldenDawn-Vol4-1940";
 
 /** Each version's note, by its id. */
 export const ROSE_VERSION_NOTES: Readonly<
@@ -58,7 +59,10 @@ export const ROSE_VERSION_NOTES: Readonly<
       "The earlier figures have Tau before Kaph, which keeps indigo before " +
       "violet among the petals, and later editors have treated Regardie's " +
       "order as a transposition. Sigils that pass through Kaph or Tau are " +
-      "drawn differently on this rose.",
+      "drawn differently on this rose. Regardie's own sigils, in vol. 4 " +
+      "(1940), are not drawn on it: his Shabbathai (p. 60) runs from Shin " +
+      "to Tau as far as the Golden Dawn's order sets them apart, not this " +
+      "one's.",
     sources: [
       {
         text:
@@ -71,6 +75,13 @@ export const ROSE_VERSION_NOTES: Readonly<
           "Israel Regardie, The Golden Dawn, vol. 3 (Aries Press, Chicago, " +
           "1939), Diagram 20, p. 56 (archive.org leaf n49)",
         url: archiveLeaf(REGARDIE_3, 49),
+      },
+      {
+        text:
+          "Israel Regardie, The Golden Dawn, vol. 4 (Aries Press, Chicago, " +
+          "1940), the sigils of p. 60, Shabbathai among them (archive.org " +
+          "leaf n54)",
+        url: archiveLeaf(REGARDIE_4, 54),
       },
     ],
   },

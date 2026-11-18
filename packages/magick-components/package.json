@@ -63,6 +63,7 @@
     "./gd/TableOfShewbread": "./src/gd/TableOfShewbread.tsx",
     "./kabbalah/fieldPath": "./src/kabbalah/fieldPath.ts",
     "./kabbalah/TreeOfLife": "./src/kabbalah/TreeOfLife.tsx",
+    "./sigil/ink": "./src/sigil/ink.ts",
     "./sigil/placeSigil": "./src/sigil/placeSigil.ts",
     "./sigil/planSigil": "./src/sigil/planSigil.ts",
     "./sigil/SigilImage": "./src/sigil/SigilImage.tsx",
@@ -166,6 +167,10 @@
       "./kabbalah/TreeOfLife": {
         "types": "./lib/kabbalah/TreeOfLife.d.ts",
         "default": "./lib/kabbalah/TreeOfLife.js"
+      },
+      "./sigil/ink": {
+        "types": "./lib/sigil/ink.d.ts",
+        "default": "./lib/sigil/ink.js"
       },
       "./sigil/placeSigil": {
         "types": "./lib/sigil/placeSigil.d.ts",

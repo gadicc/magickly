@@ -4,7 +4,9 @@ import type { ComponentExamples } from "./types.ts";
 
 /**
  * Sigils of three divine names, as `/gd/sigils` draws them, and one on
- * Regardie's rose of 1939.
+ * Regardie's rose of 1939: Kether, through Kaph and Tau, which that rose
+ * exchanges. (Not Shabbathai: Regardie's own figure of it, vol. 4, p. 60,
+ * is drawn on the Golden Dawn's order.)
  */
 export const RoseSigil: ComponentExamples<
   ComponentProps<typeof RoseSigilComponent>
@@ -22,8 +24,8 @@ export const RoseSigil: ComponentExamples<
       props: { text: "אגלא", animate: false },
     },
     {
-      title: "Shabbathai, on Regardie's rose",
-      props: { text: "שבתאי", version: "regardie1939" },
+      title: "Kether, on Regardie's rose",
+      props: { text: "כתר", version: "regardie1939" },
     },
   ],
 };
