@@ -158,10 +158,18 @@ export const LABELS = {
      * What a request will use: of a signed-in reader's own allowance, or of
      * the pool signed-out readers share, with the cap on one client.
      */
-    uses: (units: number, signedIn: boolean, limit: number, cap: number) =>
-      signedIn
-        ? `uses ${units} of today’s ${limit}`
-        : `uses ${units} of today’s allowance shared by readers not signed in, at most ${cap} a day for each address`,
+    uses: (
+      units: number,
+      signedIn: boolean,
+      limit: number,
+      cap: number,
+      atMost = false,
+    ) =>
+      `uses ${atMost ? "at most " : ""}${units} of today’s ${
+        signedIn
+          ? limit
+          : `allowance shared by readers not signed in, at most ${cap} a day for each address`
+      }`,
     againNote: "a new reading, which replaces this one",
     heading: "AI reading",
     who: "GPT-6.1 Terra, each word checked against our data",
@@ -180,6 +188,7 @@ export const LABELS = {
         "too few of its words are in the word readings or our data.",
       "too long": "it is far longer than your text.",
       link: "it holds a link.",
+      unreadable: "it has letters or symbols our check can’t read.",
     } as Record<string, string>,
     wordsLabel: "Each word",
     state: {
@@ -205,14 +214,28 @@ export const LABELS = {
       timeout: "the model took too long.",
       failed: "the model failed.",
       "not read": "not sent.",
+      unavailable: "not sent: something went wrong on our side.",
       off: "not sent: AI readings were turned off.",
     } as Record<string, string>,
     lost: "The reading stopped arriving.",
+    /**
+     * After the answer stopped (S8): the route's calls go on without the
+     * reader, so the rest may still be read and kept, and a retry then
+     * costs less, or nothing. Sure the text was sent once a part arrived;
+     * before then, it may have been. The keeping is said as the AI
+     * reading's limitation says it.
+     */
+    lostSent: (sure: boolean) =>
+      `${
+        sure
+          ? "Your text was sent for this reading, and the rest of it"
+          : "Your text may have been sent for this reading, and if so it"
+      } may still be read. Our server keeps the text and its reading for a day and deletes them within two days, so trying again may use less, or none.`,
     /** After a part the gateway didn't route as asked (S5): no retry. */
     stoppedRouting:
       "The reading stopped because the provider’s privacy terms (OpenAI, keeping no copy) couldn’t be confirmed, and nothing more was sent.",
     refusal: {
-      busy: "This text is being read for someone else just now. Try again shortly.",
+      busy: "This text is being read just now. Try again shortly.",
       off: "AI readings are turned off for now.",
       ceiling: (time: string) =>
         `AI readings have stopped for everyone today: the day’s spending limit is reached. They start again at ${time}.`,

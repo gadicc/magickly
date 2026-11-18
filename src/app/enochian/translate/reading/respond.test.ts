@@ -20,7 +20,12 @@ import { createTranslator } from "../lookup.ts";
 import { clientSubject } from "./client.ts";
 import type { ReadingDatabase } from "./database.ts";
 import { DAILY_CEILING_MICRO_USD } from "./ledger.ts";
-import type { ReadingCall, ReadingModel, ReadingReply } from "./model.ts";
+import {
+  type ReadingCall,
+  ReadingCallError,
+  type ReadingModel,
+  type ReadingReply,
+} from "./model.ts";
 import { worstCaseMicroUsd } from "./prices.ts";
 import { buildReadingPrompt, outputCap, partRequest } from "./request.ts";
 import {
@@ -868,7 +873,8 @@ describe("the review's scenarios (2D review)", () => {
     });
     const { events } = await send({ text: TWO }, run);
     expect(run.model).not.toHaveBeenCalled();
-    expect(states(events)).toEqual(["1:failed", "done:failed"]);
+    // Our side failed, not the model: "unavailable" (2H).
+    expect(states(events)).toEqual(["1:unavailable", "done:failed"]);
     expect(events.at(-1)).toMatchObject({ units: 0 });
     expect(await counters()).toEqual({});
     expect(await spent()).toBe(0);
@@ -1065,6 +1071,140 @@ describe("the review's scenarios (2D review)", () => {
       expect(response.status).toBe(400);
       expect(pulled).toBeLessThan(MAX_BODY_BYTES + 4 * 1024);
     }
+  });
+});
+
+describe("the final review's fixes (2H)", () => {
+  it("S1: gives the units back when the ceiling's hold fails with an error", async () => {
+    let throws = 1;
+    const flaky = new Proxy(db, {
+      get(target, key) {
+        const value = Reflect.get(target, key);
+        if (key === "insert")
+          return (table: unknown) => {
+            if (table === enochianReadingSpend && throws > 0) {
+              throws--;
+              throw new Error("connection lost");
+            }
+            return (value as (t: unknown) => unknown).call(target, table);
+          };
+        return typeof value === "function" ? value.bind(target) : value;
+      },
+    });
+    const run = setup({ db: flaky });
+    const { status, events } = await send({ text: TWO }, run);
+    expect(status).toBe(503);
+    expect(events).toEqual([{ type: "refused", state: "unavailable" }]);
+    expect(run.model).not.toHaveBeenCalled();
+    expect(await counters()).toEqual({});
+    expect(await spent()).toBe(0);
+    expect(await rows()).toEqual([]);
+    // The next request reads, the lease given back.
+    const next = await send({ text: TWO }, setup({ db: flaky }));
+    expect(next.events.at(-1)).toMatchObject({ type: "done", units: 1 });
+  });
+
+  it.each([401, 403, 404, 429])(
+    "S4: settles a call the gateway refused with %i to nothing",
+    async (statusCode) => {
+      const run = setup();
+      run.model.mockImplementation(async () => {
+        throw new ReadingCallError("GatewayError", statusCode, true);
+      });
+      const { events } = await send({ text: TWO }, run);
+      expect(events[0]).toMatchObject({ status: "failed", state: "failed" });
+      expect(await spent()).toBe(0);
+      // The units stay counted: a call was made.
+      expect(events.at(-1)).toMatchObject({ units: 1 });
+    },
+  );
+
+  it.each([
+    ["a 500", new ReadingCallError("GatewayError", 500, true)],
+    ["a 429 after output", new ReadingCallError("GatewayError", 429, false)],
+    [
+      "a 429 not known to come before output",
+      Object.assign(new Error("limited"), { statusCode: 429 }),
+    ],
+  ])("S4: keeps the hold of a call that failed with %s", async (_, error) => {
+    const run = setup();
+    run.model.mockImplementation(async () => {
+      throw error;
+    });
+    await send({ text: TWO }, run);
+    const call = partRequest(prompt, {
+      text: TWO,
+      input: "[1] VORSG [2] SONF",
+      words: 2,
+    });
+    expect(await spent()).toBe(
+      worstCaseMicroUsd(call.chars, call.maxOutputTokens),
+    );
+  });
+
+  it.each([
+    ["timed out", "timeout", new DOMException("late", "TimeoutError")],
+    ["failed", "failed", new ReadingCallError("GatewayError", 500, true)],
+    [
+      "failed after output",
+      "failed",
+      new ReadingCallError("GatewayError", 429, false),
+    ],
+  ])(
+    "sends no second part after the first %s, its routing unconfirmed",
+    async (_, state, error) => {
+      const run = setup();
+      run.model.mockImplementationOnce(async () => {
+        throw error;
+      });
+      const { events } = await send({ text: LONG }, run);
+      expect(run.model).toHaveBeenCalledOnce();
+      expect(events.slice(0, 2)).toMatchObject([
+        { part: 1, status: "failed", state },
+        { part: 2, status: "failed", state: "not read" },
+      ]);
+    },
+  );
+
+  it("sends the second part after the gateway refused the first before any output", async () => {
+    const run = setup();
+    run.model
+      .mockImplementationOnce(async () => {
+        throw new ReadingCallError("GatewayRateLimitError", 429, true);
+      })
+      .mockImplementationOnce(async (call) => answer(call));
+    const { events } = await send({ text: LONG }, run);
+    expect(run.model).toHaveBeenCalledTimes(2);
+    expect(events.slice(0, 2)).toMatchObject([
+      { state: "failed" },
+      { status: "read" },
+    ]);
+  });
+
+  it("sends no second part after a stream cut short with no routing confirmed", async () => {
+    const run = setup();
+    run.model.mockImplementation(async (call) =>
+      answer(call, { finishReason: "other", routing: {} }),
+    );
+    const { events } = await send({ text: LONG }, run);
+    expect(run.model).toHaveBeenCalledOnce();
+    expect(events.slice(0, 2)).toMatchObject([
+      { part: 1, status: "failed", state: "failed" },
+      { part: 2, status: "failed", state: "not read" },
+    ]);
+    // With routing confirmed, a cut stream doesn't stop the next part.
+    const confirmed = setup();
+    confirmed.model
+      .mockImplementationOnce(async (call) =>
+        answer(call, { finishReason: "other" }),
+      )
+      .mockImplementationOnce(async (call) => answer(call));
+    const next = await send({ text: LONG }, confirmed);
+    expect(confirmed.model).toHaveBeenCalledTimes(2);
+    expect(next.events.slice(0, 2)).toMatchObject([
+      { state: "failed" },
+      { status: "read" },
+    ]);
   });
 });
 

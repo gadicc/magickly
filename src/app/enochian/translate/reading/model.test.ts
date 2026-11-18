@@ -13,6 +13,10 @@ import { READING_MODEL, readingRouting } from "./prompt.ts";
 // it was sent and answers with a fixed final step, or a stream error.
 const sent: Record<string, unknown>[] = [];
 let streamError: unknown;
+/** Whether some of the model's output arrives before the error. */
+let outputFirst = false;
+/** Whether some of the model's output arrives after the error. */
+let outputAfter = false;
 vi.mock("ai", () => ({
   streamText: (options: Record<string, unknown>) => {
     sent.push(options);
@@ -22,8 +26,10 @@ vi.mock("ai", () => ({
           type: "start-step",
           providerMetadata: { gateway: { generationId: "gen_01synthetic" } },
         };
+        if (outputFirst) yield { type: "text-delta", id: "1", text: "Th" };
         if (streamError !== undefined)
           yield { type: "error", error: streamError };
+        if (outputAfter) yield { type: "text-delta", id: "1", text: "Th" };
       })(),
       text: Promise.resolve("reply"),
       usage: Promise.resolve({
@@ -49,6 +55,8 @@ vi.mock("ai", () => ({
 afterEach(() => {
   sent.length = 0;
   streamError = undefined;
+  outputFirst = false;
+  outputAfter = false;
 });
 
 const routing = readingRouting(READING_MODEL);
@@ -105,6 +113,32 @@ describe("the reading's gateway call (plan 081, S5)", () => {
     expect(failure.kind).toBe("GatewayInternalServerError");
     expect(failure.message).not.toContain("ZIR");
     expect(failure.status).toBeUndefined();
+  });
+
+  it("says whether a failure came before any output (2H review)", async () => {
+    streamError = Object.assign(new Error("limited"), {
+      name: "GatewayRateLimitError",
+      statusCode: 429,
+    });
+    expect(
+      await gatewayReadingModel(call).catch((error) => error),
+    ).toMatchObject({
+      kind: "GatewayRateLimitError",
+      status: 429,
+      beforeContent: true,
+    });
+    outputFirst = true;
+    expect(
+      await gatewayReadingModel(call).catch((error) => error),
+    ).toMatchObject({ status: 429, beforeContent: false });
+    // Output after the error part counts too.
+    outputFirst = false;
+    outputAfter = true;
+    expect(
+      await gatewayReadingModel(call).catch((error) => error),
+    ).toMatchObject({ status: 429, beforeContent: false });
+    // Unknown, as for an error from anywhere else: not before.
+    expect(callError(new Error("x")).beforeContent).toBe(false);
   });
 
   it("keeps a failed call's HTTP status, from the error or its cause", async () => {
@@ -181,5 +215,34 @@ describe("reading a reply", () => {
     expect(
       readReply({ ...answer({}), text: "No block at all." }, routing),
     ).toEqual({ ok: false, state: "unreadable" });
+  });
+
+  it("fails a stream cut short as a failed call, not a routing failure (2H)", () => {
+    // The real `streamText` ends a stream with no finish part as "other",
+    // with no routing reported.
+    for (const finishReason of ["other", "error"])
+      for (const reported of [
+        {},
+        { provider: "openai", zeroDataRetention: true },
+      ])
+        expect(
+          readReply(
+            answer({ items: [item] }, { finishReason, routing: reported }),
+            routing,
+          ),
+        ).toEqual({ ok: false, state: "failed" });
+    // Routing reported and wrong is still a routing failure.
+    expect(
+      readReply(
+        answer(
+          { items: [item] },
+          {
+            finishReason: "other",
+            routing: { provider: "azure", zeroDataRetention: true },
+          },
+        ),
+        routing,
+      ),
+    ).toEqual({ ok: false, state: "routing" });
   });
 });

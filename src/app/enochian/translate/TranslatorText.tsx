@@ -14,8 +14,8 @@ export default function TranslatorText() {
         Enochian, and Enochian into English. It looks in Dee&apos;s nineteen
         Keys first, where every Enochian word stands beside Dee&apos;s own
         English, then in our dictionary of 1,917 words. It doesn&apos;t
-        understand sentences, and it never invents a word: every word it gives
-        has a source, and the source is shown.
+        understand sentences, and the lookup never invents a word: every word it
+        gives has a source, and the source is shown.
       </p>
       <p>
         Type in either box. The first takes English or Enochian in Latin
@@ -80,11 +80,14 @@ export default function TranslatorText() {
         only in the Keys opens the places Dee uses it.
       </p>
       <p>
-        A passage of two words or more can also be read with AI, if you ask: a
-        language model gives a sentence and reads each word, and each
-        word&apos;s reading is checked against our data and marked as confirmed
-        or not. The sentence isn&apos;t checked, and the reading can be wrong.
-        It uses your daily allowance, as the chat does.
+        A passage can also be read with AI, if you ask: a language model gives a
+        sentence and reads each word, and each word&apos;s reading is checked
+        against our data and marked as confirmed or not. It is offered for 2 to
+        150 words of Enochian in the letters A to Z, up to 1,200 characters,
+        when no more than one word in five, and no more than ten in all, are
+        missing from our data, and the words aren&apos;t only Dee&apos;s own
+        lines. The sentence isn&apos;t checked, and the reading can be wrong. It
+        uses your daily allowance, as the chat does.
       </p>
       <H2>Your text stays with you</H2>
       <p>

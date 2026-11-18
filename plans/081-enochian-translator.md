@@ -6,8 +6,12 @@ adversarially reviewed by Fable, spiked, and revised after the spike
 Leitch's spellings as input ("Confirmed with Gadi"), and said to
 build it. Stage 1 was built on `gate/enochian-translator` in steps B
 to G (13 and 14 November 2026); "Build notes" records what the build
-settled and changed, and "Follow-ups" what is left. Read
-[current status](000-current-status.md) first.
+settled and changed, and "Follow-ups" what is left. Stage 2, the AI
+reading, the gap hints and related words, was designed with Gadi on
+15 and 16 November and built in steps 2B to 2H (16 to 18 November
+2026), each a gated commit; its build notes and "The stage-2 review
+and 2H" record it. Read [current status](000-current-status.md)
+first.
 
 [Plan 077](077-enochian-translator-experiment.md) asked whether an LLM
 with our data could translate Enochian. Its answer, and round 2's
@@ -593,8 +597,9 @@ S11. **Gap hints and related words** (no reader-triggered call). A
     fails a test. The table is committed with SCOWL's notice and a
     hash-pinned source in a README, and AGENTS.md's generated-data rule
     is extended to name it (Gadi, 16 November). The page loads it
-    lazily for a gap; a gap shows one hint, "related: RNAH 'sunrise'",
-    never in the sentence. Each dictionary entry gets related words
+    lazily for a gap (as built, with the first English-into-Enochian
+    result, gap or none: see 2F's build notes); a gap shows one hint,
+    "related: RNAH 'sunrise'", never in the sentence. Each dictionary entry gets related words
     the same way (hub words removed, identical glosses merged).
 S12. **Not in stage 2.** English into Enochian by a model; a
     part-of-speech tagger for "do" (a follow-up); root families as
@@ -775,7 +780,8 @@ the store (`store.ts`), the ceiling and switch (`ledger.ts`), the
 allowance (`allowance.ts`), the client's bucket (`client.ts`) and the
 daily deletions (`purge.ts`). The experiment imports the first three;
 its 469 requests (plan 077's folds and arms, the new text's, the round
-trip's, A3s's) were hashed against the code before the move and match.
+trip's, A3s's; 2D's commit message says 470, and the count itself
+wasn't kept, so which is right is unrecorded) were hashed against the code before the move and match.
 `stage2b.test.ts` builds one passage both ways and compares
 instructions, context, grammar notes, the user message and routing byte
 for byte, and sends both through the AI SDK (faked) to hold the app's
@@ -1055,8 +1061,9 @@ The script is `scripts/enochian-hints/` (`pnpm enochian:hints`, and
 `pnpm enochian:hints:run` for the paid mode, through `loom env`); the
 table is `src/app/enochian/translate/hints/table.json`, with its README
 (SCOWL's source, SHA-256 and notice in full, what we changed, the run
-and the judging, how to rebuild); AGENTS.md's generated-data exception
-names this table alone, the served JSON carries a short `notice`
+and the judging, how to rebuild); AGENTS.md's generated-data exception,
+widened in the same commit to openly licensed sources in general,
+names this table as its example, the served JSON carries a short `notice`
 naming SCOWL and pointing to the README, and the About page credits
 SCOWL (Kevin Atkinson) beside GeoNames.
 
@@ -1122,37 +1129,6 @@ SCOWL (Kevin Atkinson) beside GeoNames.
   default level. The gloss hash covers the recipe and every candidate
   gloss's text, wording and forms; `table.test.ts` fails on a change,
   naming the commands.
-- **The shipped table, at z >= 6.75**: 472 entries, 664 items, in 373
-  rows, 18,598 bytes served, 7,116 gzipped. The two samples drawn at
-  6.0 before the number rule no longer match it and are kept, in
-  `.private/`, as they are.
-- **Judging and the cut-off**: three judgings, in order, each by a
-  separate fresh model judge with the spike's rubric (good, loose or
-  wrong, for the related word against the entry's meanings), shown no
-  z-scores (2F's judges saw them). (1) Seed 1 at z >= 6.0, the cut-off
-  chosen from the z distribution before drawing: 126 good, 65 loose, 9
-  wrong (95.5% good or loose, 4.5% wrong), passing. (2) Seed 2 at 6.0,
-  drawn to confirm the thin margin: 120 good, 65 loose, 15 wrong (92.5%,
-  7.5% wrong), failing; `score` put its pass at 6.557. Together, at
-  6.75: 216 rows, 3.7% wrong. (3) Then 6.75 was chosen from both, the
-  number rule added, the table rebuilt, and seed 3 drawn at 6.75 and
-  held out: 141 good, 55 loose, 4 wrong (98.0% good or loose, 2.0%
-  wrong), passing. It is committed as
-  `related/judged-z6.75-seed3.tsv`, and `related.test.ts` checks the
-  table is the one it was drawn from (each pair is the table's, and the
-  table redraws the same 200 with seed 3). Its wrong rows: CORS "such,
-  work" and VAUL "to work" (the judge's least certain), HCOMA "water
-  name, tablet of union" and TOANT "union", UGEG and NOAR "is become",
-  and UGEG "strong" and GOSA "strange". The cost of the margin is
-  coverage: 687 entries had related words at 6.0, 472 have them at
-  6.75.
-- **Weak rows the judgings noticed**, left in: "Son of Light" against
-  "Son of Son of Light" (loose); near-inflections whose form is a
-  prefix or an extension of the entry's own (about 160 of 1,201 at
-  6.0, judged good as inflections); and two likely data errors, LUIAHE
-  glossed both "a son of" and "a Song of honour" (a mis-split "Song"),
-  and GESCO carrying both "is not the fourth" and "but with the holy
-  Pentagram". Candidates for the dictionary's fixes.
 - **Loading**: a force-static route, `/enochian/translate/hints.json`,
   as the Keys table's, fetched once, with the first English-into-
   Enochian result shown, gap or none (after the review; at first it was
@@ -1266,6 +1242,37 @@ it is, the recipe, the judging, how to rebuild).
   the entry, its meanings, the related form(s) and gloss, z and
   verdict; `readVerdicts` now reads its columns from the header line
   (2F's files read as before).
+- **The shipped table, at z >= 6.75**: 472 entries, 664 items, in 373
+  rows, 18,598 bytes served, 7,116 gzipped. The two samples drawn at
+  6.0 before the number rule no longer match it and are kept, in
+  `.private/`, as they are.
+- **Judging and the cut-off**: three judgings, in order, each by a
+  separate fresh model judge with the spike's rubric (good, loose or
+  wrong, for the related word against the entry's meanings), shown no
+  z-scores (2F's judges saw them). (1) Seed 1 at z >= 6.0, the cut-off
+  chosen from the z distribution before drawing: 126 good, 65 loose, 9
+  wrong (95.5% good or loose, 4.5% wrong), passing. (2) Seed 2 at 6.0,
+  drawn to confirm the thin margin: 120 good, 65 loose, 15 wrong (92.5%,
+  7.5% wrong), failing; `score` put its pass at 6.557. Together, at
+  6.75: 216 rows, 3.7% wrong. (3) Then 6.75 was chosen from both, the
+  number rule added, the table rebuilt, and seed 3 drawn at 6.75 and
+  held out: 141 good, 55 loose, 4 wrong (98.0% good or loose, 2.0%
+  wrong), passing. It is committed as
+  `related/judged-z6.75-seed3.tsv`, and `related.test.ts` checks the
+  table is the one it was drawn from (each pair is the table's, and the
+  table redraws the same 200 with seed 3). Its wrong rows: CORS "such,
+  work" and VAUL "to work" (the judge's least certain), HCOMA "water
+  name, tablet of union" and TOANT "union", UGEG and NOAR "is become",
+  and UGEG "strong" and GOSA "strange". The cost of the margin is
+  coverage: 687 entries had related words at 6.0, 472 have them at
+  6.75.
+- **Weak rows the judgings noticed**, left in: "Son of Light" against
+  "Son of Son of Light" (loose); near-inflections whose form is a
+  prefix or an extension of the entry's own (about 160 of 1,201 at
+  6.0, judged good as inflections); and two likely data errors, LUIAHE
+  glossed both "a son of" and "a Song of honour" (a mis-split "Song"),
+  and GESCO carrying both "is not the fourth" and "but with the holy
+  Pentagram". Candidates for the dictionary's fixes.
 - **The table**: rows `[wording, [forms]]` (a form as its entry's key,
   or `[form, key]` where they differ), and `related`, each entry's key
   to its rows, best first; no scores. Its gloss hash covers the recipe
@@ -1292,6 +1299,126 @@ it is, the recipe, the judging, how to rebuild).
 - **Lingui**: the dictionary's text isn't marked for Lingui yet, so the
   new labels follow `labels.ts` and the page text `DictionaryText.tsx`
   as they are, unmarked.
+
+### The stage-2 review and 2H (18 November 2026)
+
+Fable reviewed all of stage 2 on main (2B to 2G), adversarially, with
+probes and fuzzing but no paid call. It found no path by which a
+reader's text leaves the browser except the reading's POST body:
+zero retention and OpenAI-only routing are sent on every call, nothing
+of the text reaches a log, and the hints' and related words' fetches
+carry nothing of it. The allowance, the ceiling and the store held up,
+and both tables rebuild byte for byte from the cache. What it found,
+and what became of it (a fresh Opus review then checked the fixes, and
+its findings were fixed too, as were a third, narrower review's of
+those fixes):
+
+- **The check confirmed text it never read** (must fix). Words are
+  read as `[a-z0-9']` only, so "ΝΟΤ reign", "не reign" or "reign ≠ ¬"
+  were confirmed for SONF and shown as written. A row whose English has
+  a letter or symbol outside A to Z, digits, apostrophes, white space,
+  "&" (read as "and") and ordinary punctuation is now never confirmed
+  (it shows as not confirmed, the state for what the check can't
+  settle); a sentence with one is withheld, "it has letters or symbols
+  our check can't read".
+- **A dropped negation was confirmed** (must fix): IPURAN "shall not
+  see" read "shall see" was confirmed, as were six more Key rows. A
+  confirmed row now needs the same negations as the sense of the gloss
+  it matches (the comma, semicolon or "[or]" part; the whole gloss only
+  when no one sense holds every content word), so Dee's "rest not [or]
+  labour still" confirms "labour still" but not "labour not"; English
+  that is a negated sense without its negation ("measured" for "not to
+  be measured") is refused; and "without" counts as a negation. All
+  1,106 Key rows still confirm with their own English.
+- **Lengths**: a row's English is cut at 120 characters and marked as
+  cut; a sentence of more than 12 characters a word is withheld as too
+  long.
+- **The sentence's evidence** is now confirmed rows and the lookup's
+  glosses only. Before, the model's own guesses counted: two coined
+  readings of non-words let "Your account is locked: telephone 555 0100
+  now." be shown, and from the shared store to anyone pressing the
+  button on a crafted link.
+- **Money**: units are given back when the spend hold fails after the
+  allowance was taken; a call that fails with 401, 403, 404 or 429
+  before any content settles its hold to 0 (anything else keeps the
+  full hold), so an outage no longer closes readings for the day with
+  nothing spent. The hint script's spend guard treats a reported 0
+  tokens as unknown and counts the estimate.
+- **A cut stream** (ending without its finish part) was called a
+  routing failure, blaming privacy terms; it is now a failed part. The
+  parts after a cut stream or a call that throws are not sent ("not
+  read"), since the first's routing was never confirmed, unless it
+  failed with a 401, 403, 404 or 429 before any output; "Try again" is
+  still offered then, as it is unless a part is routing or refused. A switch that can't be read is "unavailable", not "the
+  model failed".
+- **The card**: no "Try again" once any part is routing, not read or
+  refused; a refused or lost "Read again" keeps the reading shown; busy
+  reads "This text is being read just now. Try again shortly.", with
+  no price; a lost answer says the text was (or may have been) sent and
+  that the reading may still finish and be kept, and prices the retry
+  "at most"; the card gives up after the route's maxDuration plus 15
+  seconds; long strings wrap at 360 px; state names from the server are
+  looked up with `Object.hasOwn`.
+- **Admission** counts typed words and characters before running the
+  lookup. A text over 150 typed words is refused even when Crowley's
+  spaced forms would make it 150 tokens.
+- **Versions**: `CHECK_VERSION` is 2, and the store's version pins now
+  cover every file the verdicts depend on (the lookup, its data and
+  spelling code, Leitch's spellings, the Keys table's builder,
+  `normalise.ts`, `sentence.ts`, and `words`, `stem` and
+  `foldSpelling`), so a change there can't serve old verdicts. Data
+  changes bump the prompt's version, and with it the store's, except
+  Crowley's markers, the English splits and the Aethyrs table, which
+  aren't in the prompt: a change there needs `CHECK_VERSION` bumped by
+  hand.
+  `PARTS_VERSION` is unchanged: admission only refuses earlier.
+- **Page text**: the description scoped the AI reading to Enochian
+  ("…with an AI reading of Enochian checked against them"); "the
+  lookup never invents a word" (the page now shows the model's
+  guesses); and when the reading is offered, exactly. Site search's
+  vectors were republished for it.
+- **Keys rows that disagree with the dictionary** (FAAIP "understand",
+  CAOSG "continually", PILD "on the earth", VGEG "become strange", OZOL
+  "their hands"): the review took them for data errors, but each is as
+  Casaubon prints it, checked at full size on 10 November with a note
+  on the row, and Dee's own list glosses CAOSG "continually" too. The
+  Keys stay as printed; the check confirms against them and the tables
+  follow them. A question in [plan 082](082-enochian-expert-questions.md).
+- **The tables**: "tablet of union" joined the gloss denylist (it
+  related the five tablet names to TOANT "union"), and a reviewed word
+  denylist, `word-denylist.txt`, takes 58 words' hints out: another
+  sense of a homonym ("liquor" by "spirits", "railway" by "train") or
+  only a likeness of spelling ("pump" by "pomp", "hart" by "the
+  heart"). A denied word gets no hint, not its next best. Rebuilt from
+  the cache at the same cut-offs: hints 1,670 words under 424 glosses,
+  11,356 bytes gzipped; related 464 entries, 655 items, 370 rows, 7,052
+  gzipped (it only lost pairs: the five, and four the shifted z-scores
+  put under 6.75). The hint table changed, so a fresh sample was drawn,
+  seed 91 at 7.0, and judged held out by a fresh model judge shown no
+  z-scores: 84 good, 112 loose, 4 wrong (98.0% good or loose, 2.0%
+  wrong), passing with room this time (2F's passed at exactly 5%). Its
+  wrong rows ("breathers" by "breath", "eightieths" by "eight", "fifth"
+  by "not the fifth", "ghost" by "the holy ghost") stay, as the sample
+  counted them. The related table keeps seed 3's judging: four of its
+  200 were among the nine removed, the other 196 still pass (140, 53,
+  3), and `related.test.ts` redraws the 200 from the table with the
+  nine put back. `table.test.ts` now checks the hint table is the one
+  its sample was drawn from (it didn't, though 2F's notes said so),
+  that each denied word is a gap, and, where the private cache is at
+  hand, that the denied gloss is each word's best.
+- **Found in passing**: "In the Keys" no longer prefetches the Keys
+  page, which sent the dictionary's `?q=` as the Referer.
+
+Left as they are, by decision or as known limits (see "Follow-ups"):
+grammar words beside a content word aren't compared, so "be friendly
+from me" confirms for ZORGE "be friendly unto me" (S6 as designed);
+76 to 99 words are two calls for one unit (S4's formula); the store
+answers free for a text already read once the allowance is spent
+(S7); the link rule passes "evil dot com" (the card makes no links);
+deletion "within two days" relies on the 00:07 cron; the hints cover
+1,670 of 38,645 gap words (4.3%), against the "about 30% of content
+gaps" the decision assumed; and the foot still says the text went to
+OpenAI when a call failed after sending.
 
 ## The stage-1 review (Fable, 13 November 2026)
 
@@ -1488,7 +1615,7 @@ Known limits, none of them hidden by the page:
 
 ## Out of scope
 
-- Stage 2's design and build.
+- Stage 2's design and build (stage 1's scope; stage 2 is above).
 - A page for the grammar notes (chips use a popover).
 - Any change to plan 074's ranking beyond the new group.
 - Editing the dictionary's text beyond decision 22.
@@ -1579,7 +1706,32 @@ This plan's questions for an expert, with plan 077's, are in
 - An expert's review of a sample of English into Enochian
   ([plan 082](082-enochian-expert-questions.md)), which decides how
   far the notice can be softened.
-- Stage 2, designed separately.
+- Stage 2 (2H, 18 November 2026):
+  - Gadi's first live AI reading, with 2D's checklist: routing and
+    cost through the real Gateway, the token inside `after()`, part by
+    part flushing, `maxDuration` 300 on the plan, and the Gateway's
+    error shapes (a hold is zeroed only for a 401, 403, 404 or 429
+    that came before any output).
+  - The row lock in `returnDailyUsage` on native PostgreSQL (PGlite
+    runs transactions one at a time).
+  - The Keys rows where Casaubon's English and the dictionary part ways
+    ([plan 082](082-enochian-expert-questions.md)).
+  - The dictionary's likely data slips: LUIAHE's "a Song of honour",
+    GESCO's two glosses, and the related words' name-like glosses
+    ("king/prince of heptarchy" for CARMARA and HAGONEL; "first, second
+    and third aethyr" missed by the name rule).
+  - Borderline hints left in, for the next re-judging: "girders" by
+    "beams", the telephone senses of "call", "execution", "sirloin",
+    "manifesto", number words stretched (eighty, ninety, fourteenth),
+    and the seed-91 sample's four wrong rows.
+  - The translator's and the dictionary's text aren't marked for Lingui
+    (2E's, 2F's and 2G's text followed the files as they are).
+  - The dictionary page's other links and the app bar's sign-in
+    prefetch send the page's address, `?q=` included, as the Referer to
+    our own server; no `Referrer-Policy` is set. The server already
+    sees `?q=` when such a page is loaded (plan 074).
+  - The foot says the text went to OpenAI whenever a call was made,
+    though some calls fail.
 
 Done after the build:
 

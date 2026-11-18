@@ -579,6 +579,17 @@ Follow-ups are separate from the completed migration work:
   (`dictionary.json5` lines 1624, 7152, 9337, 9531, 13711, 13941,
   17073) and HXGSD's "FIR E OF AIR"; "Childrenof the Light" (IHEHUDZ)
   and "living braeth" (GIGIPAH).
+- 16 to 18 November 2026: plan 081's stage 2 built in steps 2B to 2H,
+  each gated: "Read with AI" on Enochian into English (GPT-6.1 Terra
+  through the AI Gateway, OpenAI only, zero retention), checked word by
+  word against our data on the server, on the reader's daily allowance
+  with a $10 daily ceiling and a switch; a related-word hint for a gap
+  in English into Enochian (SCOWL's words matched to our glosses by
+  embedding, judged before shipping); and "Related by meaning" on
+  dictionary entries. A final review by Fable and its fixes are 2H's
+  ([plan 081](081-enochian-translator.md#the-stage-2-review-and-2h-18-november-2026)).
+  TODO: Gadi's first live reading with 2D's checklist, and the rest of
+  [plan 081's follow-ups](081-enochian-translator.md#follow-ups).
 - Released on 10 November 2026: location for the planetary hours, the
   moon and the geomancy reading comes from Vercel's request headers
   through `/api/geo` instead of get.geojs.io, and the reader can choose

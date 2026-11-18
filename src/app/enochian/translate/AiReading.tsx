@@ -14,7 +14,7 @@ import type {
   CheckedWord,
   ReadingSource,
 } from "./reading/check";
-import { CLIENT_DAILY_UNITS } from "./reading/limits";
+import { CLIENT_DAILY_UNITS, READING_DEADLINE_MS } from "./reading/limits";
 import {
   type Admitted,
   admitReading,
@@ -48,6 +48,16 @@ interface Run {
   parts: readonly (PartEvent | undefined)[];
   done?: DoneEvent;
   refusal?: ReadingRefusal;
+  /** Whether it was "Read again", which a refusal's retry repeats. */
+  again: boolean;
+  /**
+   * The parts shown are the reading "Read again" would replace, kept until
+   * the new one's first part lands, and kept for good when it is refused
+   * or lost before then.
+   */
+  replacing?: boolean;
+  /** Whether a line of this request's parts showed its text was sent. */
+  arrived?: boolean;
 }
 
 /**
@@ -61,7 +71,38 @@ const RETRIED: ReadonlySet<PartFailure> = new Set([
   "unreadable",
   "timeout",
   "failed",
+  "unavailable",
 ]);
+
+/**
+ * Failures after which no retry is offered, whatever else failed: the
+ * gateway's routing (resending repeats it) and the provider refusing
+ * (likely to refuse again, at a cost). A part not sent after another's
+ * failure is retried with it.
+ */
+const NOT_RETRIED: ReadonlySet<PartFailure> = new Set(["routing", "refused"]);
+
+/**
+ * Failures that mean a model call was made, so the text was sent: not the
+ * parts the route never sent ("not read", "off", "unavailable").
+ */
+const CALLED: ReadonlySet<PartFailure> = new Set([
+  "truncated",
+  "unreadable",
+  "routing",
+  "refused",
+  "timeout",
+  "failed",
+]);
+
+/** Whether a part's line shows that its text went to the model. */
+const sentToModel = (event: PartEvent) =>
+  event.status === "read" ? event.from === "model" : CALLED.has(event.state);
+
+/** A label for text from the server, only when it is the label's own key. */
+function own<T>(labels: Readonly<Record<string, T>>, key: string) {
+  return Object.hasOwn(labels, key) ? labels[key] : undefined;
+}
 
 const isRead = (part: PartEvent | undefined): part is ReadEvent =>
   part?.status === "read";
@@ -113,8 +154,13 @@ const styles = {
   },
   "& .ai-who": { fontSize: 12, color: "text.secondary", mb: 1 },
   "& .ai-label": { display: "block", fontSize: 12, color: "text.secondary" },
-  "& .ai-sentence": { fontSize: 18, lineHeight: 1.5, margin: "0 0 10px" },
-  "& .ai-note": { fontSize: 14, margin: "0 0 10px" },
+  "& .ai-sentence": {
+    fontSize: 18,
+    lineHeight: 1.5,
+    margin: "0 0 10px",
+    overflowWrap: "anywhere",
+  },
+  "& .ai-note": { fontSize: 14, margin: "0 0 10px", overflowWrap: "anywhere" },
   "& .ai-words": {
     listStyle: "none",
     margin: "4px 0 10px",
@@ -153,8 +199,13 @@ const styles = {
   "& .ai-none": { color: "text.secondary", fontStyle: "italic" },
   "& .ai-source, & .ai-sep": { color: "text.secondary" },
   "& .ai-failed": { fontStyle: "italic" },
-  "& .ai-status": { fontSize: 14, margin: "6px 0" },
-  "& .ai-foot": { fontSize: 12.5, color: "text.secondary", margin: "8px 0" },
+  "& .ai-status": { fontSize: 14, margin: "6px 0", overflowWrap: "anywhere" },
+  "& .ai-foot": {
+    fontSize: 12.5,
+    color: "text.secondary",
+    margin: "8px 0",
+    overflowWrap: "anywhere",
+  },
   "& .ai-limits": {
     margin: "4px 0 0",
     paddingLeft: "20px",
@@ -186,7 +237,9 @@ function WordRow({ word }: { word: CheckedWord }) {
     <li>
       <span className="ai-word">{word.word}</span>
       {english && ` ${english}`}{" "}
-      <span className={`ai-state ai-${word.state}`}>{L.state[word.state]}</span>
+      <span className={`ai-state ai-${word.state}`}>
+        {own<string>(L.state, word.state)}
+      </span>
       {word.sources.length > 0 && (
         <>
           <span className="ai-sep" aria-hidden>
@@ -221,7 +274,7 @@ function Sentences({ parts }: { parts: readonly (PartEvent | undefined)[] }) {
         reading.sentence.shown ? null : (
           <p className="ai-note" key={part}>
             {L.withheld(
-              L.withheldReason[reading.sentence.withheld] ?? "",
+              own(L.withheldReason, reading.sentence.withheld) ?? "",
               parts.length > 1 ? part : undefined,
             )}
           </p>
@@ -245,7 +298,7 @@ function Words({ parts }: { parts: readonly (PartEvent | undefined)[] }) {
               // biome-ignore lint/suspicious/noArrayIndexKey: the passage's own order
               <WordRow key={`${at}-${index}`} word={word} />
             ));
-          const text = L.failure[part.state] ?? L.failure.failed;
+          const text = own(L.failure, part.state) ?? L.failure.failed;
           return (
             // biome-ignore lint/suspicious/noArrayIndexKey: the parts' own order
             <li key={at} className="ai-failed">
@@ -358,30 +411,57 @@ function Reading({
   /**
    * Sends the text. A retry keeps the parts already read: the route serves
    * them from its store and reads only the rest, at the cost of those.
+   * "Read again" keeps the reading shown until the new one's first part
+   * lands, and keeps it when the new one is refused or lost before then.
    */
   const start = (again: boolean) => {
     controller.current?.abort();
     const mine = new AbortController();
     controller.current = mine;
-    const kept = again
-      ? []
-      : (run?.parts ?? []).map((part) => (isRead(part) ? part : undefined));
-    setRun({ status: "loading", parts: kept });
+    const kept = (run?.parts ?? []).map((part) =>
+      isRead(part) ? part : undefined,
+    );
+    setRun({
+      status: "loading",
+      parts: kept,
+      again,
+      replacing: again && kept.some(Boolean),
+    });
     setAnnounced(L.starting);
     /** Whether the answer's last line (done, or a refusal) came. */
     let ended = false;
+    const current = () => controller.current === mine;
     const update = (change: (was: Run) => Run) =>
-      setRun((was) => (was && !mine.signal.aborted ? change(was) : was));
+      setRun((was) =>
+        was && current() && !mine.signal.aborted ? change(was) : was,
+      );
+    const lose = () =>
+      setRun((was) => (was && current() ? { ...was, status: "lost" } : was));
+    // The route's own limit and a little more: a stalled answer ends as
+    // lost, not "Reading…" for ever.
+    const deadline = setTimeout(() => {
+      if (ended || !current()) return;
+      ended = true;
+      lose();
+      setAnnounced(L.lost);
+      mine.abort();
+    }, READING_DEADLINE_MS);
     requestReading(text, {
       again,
       signal: mine.signal,
       onEvent: (event) => {
         if (event.type === "part") {
           update((was) => {
-            const next = [...was.parts];
+            // The new reading's first part replaces the old one whole.
+            const next = was.replacing ? [] : [...was.parts];
             next.length = Math.max(next.length, event.parts);
             next[event.part - 1] = event;
-            return { ...was, parts: next };
+            return {
+              ...was,
+              parts: next,
+              replacing: false,
+              arrived: was.arrived || sentToModel(event),
+            };
           });
           setAnnounced(
             event.status === "read"
@@ -392,7 +472,7 @@ function Reading({
                   event.reading.words.length,
                 )
               : L.partFailed(
-                  L.failure[event.state] ?? L.failure.failed,
+                  own(L.failure, event.state) ?? L.failure.failed,
                   event.part,
                   event.parts,
                 ),
@@ -410,14 +490,15 @@ function Reading({
       .then(() => {
         // An answer that ended with no last line was cut short.
         if (ended || mine.signal.aborted) return;
-        update((was) => ({ ...was, status: "lost" }));
+        lose();
         setAnnounced(L.lost);
       })
       .catch(() => {
         if (mine.signal.aborted) return;
-        update((was) => ({ ...was, status: "lost" }));
+        lose();
         setAnnounced(L.lost);
-      });
+      })
+      .finally(() => clearTimeout(deadline));
   };
   // The card's heading takes the focus from the button it replaces.
   const [asked, setAsked] = React.useState(0);
@@ -430,10 +511,16 @@ function Reading({
     if (asked) heading.current?.focus();
   }, [asked]);
 
-  const uses = (units: number) =>
+  const uses = (units: number, atMost = false) =>
     signedIn === undefined
       ? undefined
-      : L.uses(units, signedIn, USER_DAILY_CHAT_LIMIT, CLIENT_DAILY_UNITS);
+      : L.uses(
+          units,
+          signedIn,
+          USER_DAILY_CHAT_LIMIT,
+          CLIENT_DAILY_UNITS,
+          atMost,
+        );
 
   // In the page from the start, empty and in the same place whether the
   // offer or the card shows, so its first words are spoken.
@@ -463,20 +550,26 @@ function Reading({
   const missing = shown.flatMap((part, at) =>
     isRead(part) ? [] : [parts[at]?.words ?? 0],
   );
-  const retryUnits = readingUnits(missing.reduce((sum, n) => sum + n, 0));
+  const failed = (states: ReadonlySet<PartFailure>) =>
+    shown.some((part) => part?.status === "failed" && states.has(part.state));
+  const lost = run.status === "lost";
+  // Never after a routing failure or the provider refusing, whatever else
+  // failed; else after the model's failures, or an answer that stopped.
   const retryable =
-    run.status === "lost" ||
-    (run.status === "finished" &&
-      shown.some(
-        (part) => part?.status === "failed" && RETRIED.has(part.state),
-      ));
+    !failed(NOT_RETRIED) &&
+    (lost || (run.status === "finished" && failed(RETRIED)));
+  // A failed or lost "Read again" retries as a plain request, which may be
+  // served the old reading (or the new one) from the store free, or, if
+  // neither is stored, read the whole text: priced "at most" the whole.
+  // The route stores none of a new reading until all of it is read.
+  const retryUnits = run.again
+    ? admission.units
+    : readingUnits(missing.reduce((sum, n) => sum + n, 0));
   const refusal = run.refusal;
   const retryRefusal =
     refusal && (refusal.state === "busy" || refusal.state === "unavailable");
   const fromStore =
     read.length > 0 && read.every((part) => part.from === "store");
-  const failed = (states: ReadonlySet<PartFailure>) =>
-    shown.some((part) => part?.status === "failed" && states.has(part.state));
   const routing = failed(new Set(["routing"]));
   // The text went out: a part was read outside the store, or units were
   // kept (the route refunds them only when no call was made, so a failed
@@ -495,13 +588,16 @@ function Reading({
         <div className="ai-who">{L.who}</div>
         <Sentences parts={shown} />
         <Words parts={shown} />
-        {run.status === "loading" && next !== -1 && (
+        {run.status === "loading" && (run.replacing || next !== -1) && (
           <p className="ai-status">
-            {shown.some(Boolean) ? L.readingPart(next + 1, total) : L.starting}
+            {shown.some(Boolean) && !run.replacing
+              ? L.readingPart(next + 1, total)
+              : L.starting}
           </p>
         )}
         {refusal && <p className="ai-status">{refusalText(refusal)}</p>}
-        {run.status === "lost" && <p className="ai-status">{L.lost}</p>}
+        {lost && <p className="ai-status">{L.lost}</p>}
+        {lost && <p className="ai-foot">{L.lostSent(Boolean(run.arrived))}</p>}
         {run.status === "finished" && routing && (
           <p className="ai-status">{L.stoppedRouting}</p>
         )}
@@ -512,14 +608,22 @@ function Reading({
               L.used(run.done?.units ?? 0, signedIn, USER_DAILY_CHAT_LIMIT)}
           </p>
         )}
-        {(retryable || retryRefusal) && (
+        {retryRefusal && (
+          <Offer
+            label={L.retry}
+            // Busy: the reading in hand may be stored by then, free.
+            note={refusal.state === "busy" ? undefined : uses(admission.units)}
+            onClick={() => begin(run.again)}
+          />
+        )}
+        {retryable && (
           <Offer
             label={
               run.status === "finished" && read.length > 0
                 ? L.retryFailed
                 : L.retry
             }
-            note={uses(retryRefusal ? admission.units : retryUnits)}
+            note={uses(retryUnits, lost || run.again)}
             onClick={() => begin(false)}
           />
         )}

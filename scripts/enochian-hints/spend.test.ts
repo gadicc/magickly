@@ -42,8 +42,18 @@ describe("the paid run's price and cap (plan 081, S11)", () => {
 
   it("counts a reply without a usable token count at its conservative estimate", () => {
     expect(batchTokens(512, 900)).toBe(512);
-    expect(batchTokens(0, 900)).toBe(0);
-    for (const reported of [undefined, null, "512", Number.NaN, -1, Infinity])
+    expect(batchTokens(1, 900)).toBe(1);
+    // A reported 0 is unknown, not free: text always costs tokens.
+    for (const reported of [
+      undefined,
+      null,
+      "512",
+      Number.NaN,
+      -1,
+      0,
+      -0,
+      Infinity,
+    ])
       expect(batchTokens(reported, 900)).toBe(900);
     expect(conservativeTokens("abcd")).toBe(2);
     expect(conservativeTokens("abcde")).toBe(3);
@@ -118,6 +128,28 @@ describe("embedding within the cap", () => {
     ).rejects.toThrow(/cap/);
     expect(counted).toEqual([500, 500, 500]);
     expect(counted.every(Number.isFinite)).toBe(true);
+  });
+
+  it("counts a reported 0 conservatively, so zeros can't let it pass the cap", async () => {
+    let calls = 0;
+    const counted: number[] = [];
+    // As above, but every reply says 0 tokens: were 0 taken as the count,
+    // all 20 batches would be embedded, at a counted cost of nothing.
+    await expect(
+      embedWithinCap({
+        inputs,
+        price: 1e-4,
+        batchSize: 10,
+        cap: 0.16,
+        embed: async (batch) => {
+          calls++;
+          return reply(batch, 0);
+        },
+        keep: (_, __, tokens) => counted.push(tokens),
+      }),
+    ).rejects.toThrow(/cap/);
+    expect(calls).toBe(3);
+    expect(counted).toEqual([500, 500, 500]);
   });
 
   it("refuses a reply with the wrong number of vectors", async () => {

@@ -8,6 +8,7 @@ import {
 } from "./allowance.ts";
 import { type CheckedReading, checkReading } from "./check.ts";
 import type { ReadingDatabase } from "./database.ts";
+import { routingProblems } from "./gateway.ts";
 import {
   ceilingRoom,
   type Hold,
@@ -15,6 +16,7 @@ import {
   readingsOff,
   settleSpend,
 } from "./ledger.ts";
+import { READING_MAX_DURATION } from "./limits.ts";
 import { callError, type ReadingModel, readReply } from "./model.ts";
 import {
   type AdmissionRefusal,
@@ -60,8 +62,7 @@ import {
  * generation ids, and a failed call's class and HTTP status (S10).
  */
 
-/** How long a reading's model calls may take, together (seconds). */
-export const READING_MAX_DURATION = 300;
+export { READING_MAX_DURATION };
 
 /** How long one call may take before it is aborted. */
 export const CALL_TIMEOUT_MS = 120_000;
@@ -193,6 +194,14 @@ const NDJSON = {
 };
 
 const line = (event: ReadingEvent) => `${JSON.stringify(event)}\n`;
+
+/**
+ * HTTP statuses a failed call's error may carry when no generation ran:
+ * the gateway refused the call (authentication, permission, an unknown
+ * model, a rate limit) before any model read the text, so it cost nothing
+ * and its hold is settled to nothing. Any other failure keeps its hold.
+ */
+const NO_GENERATION: ReadonlySet<number> = new Set([401, 403, 404, 429]);
 
 /** An error's class, for the log. */
 const errorClass = (error: unknown) =>
@@ -400,6 +409,8 @@ export async function respondToReading(
     toRead.length === parts.length
       ? admission.units
       : readingUnits(toRead.reduce((sum, at) => sum + parts[at].words, 0));
+  /** Whether the units are taken, so a failure before any call returns them. */
+  let reserved = false;
   try {
     for (const at of toRead) requests.set(at, partRequest(prompt, parts[at]));
     // Every call's worst case, held at once, so a reading never stops
@@ -437,10 +448,12 @@ export async function respondToReading(
         { "Retry-After": allowance.resetAt.toUTCString() },
       );
     }
+    reserved = true;
     const held = await holdSpend(db, total, now);
     if (!held.ok) {
       // Another request took the room meanwhile. No call was made, so the
       // units go back.
+      reserved = false;
       await returnReading(db, who, units, now);
       await giveBack();
       return ceiling();
@@ -449,6 +462,11 @@ export async function respondToReading(
       holds.set(at, { day: held.hold.day, microUsd: worst[i] }),
     );
   } catch (error) {
+    // No call was made: the units go back with the lease and any hold.
+    if (reserved)
+      await returnReading(db, who, units, now).catch((failure) =>
+        log({ event: "error", state: "return", error: errorClass(failure) }),
+      );
     await giveBack();
     return unavailable(error);
   }
@@ -550,16 +568,22 @@ async function readParts(run: {
         if (await readingsOff(db)) stop = "off";
       } catch (error) {
         log({ event: "error", state: "switch", error: errorClass(error) });
-        stop = "failed";
+        // Our side failed and nothing was sent: not the model's failure.
+        stop = "unavailable";
       }
     if (!stop) called = true;
-    const outcome: { part: StoredPart & object; cost?: number } = stop
+    const outcome: Awaited<ReturnType<typeof readPart>> = stop
       ? { part: { status: "failed", state: stop }, cost: 0 }
       : await readPart(run, at);
     await settle(at, outcome.cost);
     mine[at] = outcome.part;
-    // After a part routed other than asked, send no more text.
-    if (outcome.part.status === "failed" && outcome.part.state === "routing")
+    // After a part routed other than asked, or a failed call whose routing
+    // the gateway never confirmed (a stream cut short, an error, a timeout;
+    // not a refusal before any output), send no more text.
+    if (
+      outcome.part.status === "failed" &&
+      (outcome.part.state === "routing" || outcome.unconfirmed)
+    )
       stop = "not read";
     if (outcome.part.status === "read") {
       if (!run.replacing) await store();
@@ -608,11 +632,18 @@ async function readParts(run: {
   run.push({ type: "done", state, from: "model", units });
 }
 
-/** One model call, its reply read and checked; never throws. */
+/**
+ * One model call, its reply read and checked; never throws. `unconfirmed`
+ * says a reply came back without the routing asked for confirmed.
+ */
 async function readPart(
   run: Parameters<typeof readParts>[0],
   at: number,
-): Promise<{ part: StoredPart & object; cost?: number }> {
+): Promise<{
+  part: StoredPart & object;
+  cost?: number;
+  unconfirmed?: boolean;
+}> {
   const { deps, log, prompt } = run;
   const request = run.requests.get(at) as PartRequest;
   const started = Date.now();
@@ -648,7 +679,11 @@ async function readPart(
       generation: reply.generationId,
     });
     if (!read.ok)
-      return { part: { status: "failed", state: read.state }, cost };
+      return {
+        part: { status: "failed", state: read.state },
+        cost,
+        unconfirmed: routingProblems(prompt.routing, reply.routing).length > 0,
+      };
     const reading = checkReading(run.translator, {
       passage: run.parts[at].text,
       items: read.items,
@@ -671,6 +706,20 @@ async function readPart(
       error: failure.kind,
       ...(failure.status !== undefined ? { status: failure.status } : {}),
     });
-    return { part: { status: "failed", state }, cost };
+    // Refused before any generation ran: it cost nothing, so its hold is
+    // given back rather than kept as a worst case (S4). Only when the error
+    // came before any output: one after it may follow a generation.
+    const refusedBefore =
+      failure.beforeContent &&
+      failure.status !== undefined &&
+      NO_GENERATION.has(failure.status);
+    if (cost === undefined && refusedBefore) cost = 0;
+    // Otherwise the text may have reached a provider whose routing was
+    // never confirmed, so no more is sent.
+    return {
+      part: { status: "failed", state },
+      cost,
+      unconfirmed: !refusedBefore,
+    };
   }
 }

@@ -48,12 +48,14 @@ export function refuseOverCap(estimateUsd: number, cap = CAP_USD): void {
 /**
  * The tokens to count for a batch: the Gateway's reported count, or the
  * batch's conservative estimate when the reply has none, or not a
- * number, so the running total is never NaN.
+ * positive number. A batch of text can't cost no tokens, so a reported 0
+ * is read as unknown, as a missing count is, and the running total is
+ * never NaN.
  */
 export function batchTokens(reported: unknown, conservative: number): number {
   return typeof reported === "number" &&
     Number.isFinite(reported) &&
-    reported >= 0
+    reported > 0
     ? reported
     : conservative;
 }

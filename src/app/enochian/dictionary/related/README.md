@@ -21,9 +21,11 @@ are left out as garbled; none of their words is in this table.
   after their cleanup and `englishOnly`: each exact gloss of the lookup
   in its commonest tokenised wording, glosses worded alike merged; no
   grammar-only glosses, names, notes, denylisted glosses or hub forms
-  (DE, CHIS, NONCF, Q, LAP, GEH, BRINTS). On 17 November 2026, 1,286
+  (DE, CHIS, NONCF, Q, LAP, GEH, BRINTS). On 18 November 2026, 1,285
   glosses, every one already in the gap hints' vector cache, so a build
-  embeds nothing: it stops, naming them, if any vector is missing.
+  embeds nothing: it stops, naming them, if any vector is missing. (The
+  gap hints' word denylist plays no part here: it denies English words
+  a hint, and none of those words is in this table.)
 - **The relation**: each gloss's cosine to every other gloss, with the
   gap hints' model and prompt ("similarity/bare"), z-scored against
   that gloss's own cosines to all the others (mean and standard
@@ -43,9 +45,10 @@ are left out as garbled; none of their words is in this table.
 - **Numbers** (after the first judging, whose most regular wrong
   verdicts were "nineteen" related to "nine" and "not the fourth" to
   "not the fifth"): a related word is dropped, taking no place, when it
-  and the entry's gloss its best z came from both name numbers, and not
-  share none (sharing one keeps them: "one" and "first" have senses
-  that aren't numbers, as in "the third arrives first"). Numerals, cardinal and ordinal words count by value
+  and the entry's gloss its best z came from both name numbers and
+  share none of them (sharing one keeps them: "one" and "first" have
+  senses that aren't numbers, as in "the third arrives first").
+  Numerals, cardinal and ordinal words count by value
   ("nine" and "ninth" are 9, "twenty eight" 28) and simple fractions as
   fractions ("half", "a quarter", "one fourth"); `numbersIn` and
   `differentNumbers` in `scripts/enochian-hints/related.ts`. At z ≥ 6.75
@@ -72,12 +75,25 @@ saw them):
    numbers as the most regular wrong verdict), the table rebuilt, and
    then this sample drawn: 141 good, 55 loose, 4 wrong (98.0% good or
    loose, 2.0% wrong), passing. It is committed beside this file as
-   `judged-z6.75-seed3.tsv`, and `scripts/enochian-hints/related.test.ts`
-   checks the table is the one it was drawn from.
+   `judged-z6.75-seed3.tsv`.
+
+**The 2H rebuild** (18 November 2026, after the final review): "tablet
+of union" joined the gap hints' denylist, since it related the tablet
+names BITOM, EXARP, HCOMA, NANTA and NN to TOANT "union". The table
+was rebuilt at the same cut-off and only lost pairs: those five, and
+four that the z-scores, moved slightly by one gloss fewer, put just
+under it (ARCHADS "the Daughter of Light is spread amongst the third",
+OBZa and OBZA "two", VLLA "the ends"). Four of the nine were in the
+seed-3 sample (ARCHADS good, HCOMA wrong, OBZa and VLLA loose); its
+other 196 still pass, 140 good, 53 loose and 3 wrong (1.5% wrong).
+`scripts/enochian-hints/related.test.ts` checks the table, with those
+nine put back, is the one the sample was drawn from (it redraws the
+same 200 with seed 3).
 
 Its wrong rows: CORS "such, work" and VAUL "to work" (the judge's least
-certain), HCOMA "water name, tablet of union" and TOANT "union", UGEG
-and NOAR "is become", UGEG "strong" and GOSA "strange". Weak rows the
+certain), HCOMA "water name, tablet of union" and TOANT "union" (gone
+since 2H), UGEG and NOAR "is become", UGEG "strong" and GOSA
+"strange". Weak rows the
 judgings noticed, left in: "Son of Light" against "Son of Son of Light"
 (loose); near-inflections whose form is a prefix or an extension of the
 entry's own (about 160 of 1,201 at 6.0, judged good as inflections);
@@ -85,9 +101,10 @@ and two likely data errors, LUIAHE glossed both "a son of" and "a Song
 of honour" (a mis-split "Song"), and GESCO carrying both "is not the
 fourth" and "but with the holy Pentagram".
 
-**The shipped table**, at z ≥ 6.75: 472 entries with related words,
-664 items, in 373 rows, 18,598 bytes served, 7,116 gzipped. The cost of
-the margin is coverage: 687 entries had related words at 6.0. A later
+**The shipped table**, at z ≥ 6.75: 464 entries with related words,
+655 items, in 370 rows, 18,351 bytes served, 7,052 gzipped. The cost of
+the margin is coverage: at 6.0, with the number rule, 679 entries
+would have related words. A later
 re-judging, or a dictionary change that alters the glosses, should run
 the held-out check again.
 

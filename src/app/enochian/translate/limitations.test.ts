@@ -66,3 +66,17 @@ describe("plan 077's limitations, for its record", () => {
     ).toEqual(EXPERIMENT_LIMITATIONS.map(flat));
   });
 });
+
+describe("the model the AI reading names (2H)", () => {
+  it("is the one it calls, in the card and the limitations", async () => {
+    const { READING_MODEL } = await import("./reading/prompt.ts");
+    const { LABELS } = await import("./labels.ts");
+    // "openai/gpt-6.1-terra" is "GPT-6.1 Terra".
+    const [family, version, ...name] = READING_MODEL.replace(/^[^/]*\//, "")
+      .split("-")
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1));
+    const shown = `${family.toUpperCase()}-${version} ${name.join(" ")}`;
+    expect(LABELS.reading.who).toContain(shown);
+    expect(TRANSLATOR_LIMITATIONS.ai[0]).toContain(`(${shown})`);
+  });
+});

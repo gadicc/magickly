@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import dictionary from "magick-data/enochian/dictionary";
@@ -15,20 +15,39 @@ import {
   glossOptions,
 } from "../../src/app/enochian/translate/lookup.ts";
 import { fold } from "../../src/app/enochian/translate/lookupData.ts";
+import { readCache } from "./cache.ts";
 import {
   DENYLIST,
   englishOnly,
   glossHash,
   HUB_FORMS,
   hintGlosses,
+  isDeniedHint,
   isEditorialGloss,
   isGrammarGloss,
   isNameGloss,
   MAX_FORMS,
+  parseWordDenylist,
+  WORD_DENYLIST,
 } from "./glosses.ts";
-import { HINT_RECIPE } from "./recipe.ts";
-import { HINT_TABLE_FILE, readVerdicts, score } from "./table.ts";
-import { needsHint } from "./words.ts";
+import { cacheKey, embeddingText, HINT_RECIPE } from "./recipe.ts";
+import {
+  readLists,
+  SCOWL_RELEASE,
+  scowlWords,
+  WORD_CHECK_LISTS,
+} from "./scowl.ts";
+import {
+  drawSample,
+  HINT_TABLE_FILE,
+  readVerdicts,
+  SAMPLE_SIZE,
+  type Scored,
+  score,
+  scoreWords,
+  withoutDenied,
+} from "./table.ts";
+import { hintWords, needsHint } from "./words.ts";
 
 const root = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -153,6 +172,112 @@ describe("the glosses a word can be close to", () => {
   });
 });
 
+describe("the word denylist", () => {
+  it("reads words and the gloss they are denied, and refuses a line it can't read", () => {
+    const denied = parseWordDenylist(
+      "# a note\n\nliquor liquors: spirits  # drink\npump: pomp # pump\n",
+    );
+    expect([...denied].map(([word, texts]) => [word, [...texts]])).toEqual([
+      ["liquor", ["spirits"]],
+      ["liquors", ["spirits"]],
+      ["pump", ["pomp"]],
+    ]);
+    expect(isDeniedHint("liquor", "spirits", denied)).toBe(true);
+    expect(isDeniedHint("ghosts", "spirits", denied)).toBe(false);
+    expect(isDeniedHint("liquor", "drink", denied)).toBe(false);
+    for (const bad of ["liquor spirits", "Liquor: spirits", ": spirits"])
+      expect(() => parseWordDenylist(bad), bad).toThrow(/Can't read/);
+  });
+
+  it("names only candidate glosses, by the text embedded", () => {
+    const texts = new Set(glosses.map((one) => one.text));
+    expect(WORD_DENYLIST.size).toBeGreaterThan(0);
+    for (const [word, denied] of WORD_DENYLIST)
+      for (const text of denied)
+        expect(texts.has(text), `${word}: ${text}`).toBe(true);
+  });
+
+  it("takes the word's hint away rather than offering its next best", () => {
+    const glossesHere = [
+      { text: "spirits", shown: "spirits", forms: ["GAH"] },
+      { text: "drink", shown: "drink", forms: ["X"] },
+    ];
+    const scored: Scored[] = [
+      { word: "liquor", gloss: 0, cosine: 0.9, z: 9 },
+      { word: "ghosts", gloss: 0, cosine: 0.9, z: 9 },
+      { word: "wine", gloss: 1, cosine: 0.9, z: 9 },
+    ];
+    const denied = parseWordDenylist("liquor wine: spirits\n");
+    expect(
+      withoutDenied(scored, glossesHere, denied).map((one) => one.word),
+    ).toEqual(["ghosts", "wine"]);
+  });
+
+  it("names only words the lookup shows as a gap", () => {
+    for (const word of WORD_DENYLIST.keys())
+      expect(needsHint(translator, word), word).toBe(true);
+  });
+
+  /** SCOWL's extracted lists and the vector cache, which only a build has. */
+  const work = path.join(root, ".private/enochian-hints");
+  const release = path.join(work, "scowl", SCOWL_RELEASE.root);
+  const cacheFile = path.join(work, "vectors.jsonl");
+  const built =
+    existsSync(path.join(release, "final")) && existsSync(cacheFile);
+
+  // Without `.private/` (CI, a fresh checkout) this is skipped: it needs
+  // the build's lists and vectors, read from the cache alone.
+  it.skipIf(!built)(
+    "denies each word the gloss that is its best, so no line does nothing",
+    () => {
+      const english = new Set(scowlWords(readLists(release, WORD_CHECK_LISTS)));
+      const scoredGlosses = englishOnly(glosses, english);
+      const words = hintWords(translator, scowlWords(readLists(release)));
+      const denied = [...WORD_DENYLIST.keys()];
+      // Each is one of the words the build scores.
+      for (const word of denied) expect(words, word).toContain(word);
+      const cache = readCache(cacheFile, HINT_RECIPE.profile.dimensions);
+      const vectorOf = (text: string) => {
+        const vector = cache.vectors.get(
+          cacheKey(HINT_RECIPE, embeddingText(HINT_RECIPE, text)),
+        );
+        if (!vector) throw new Error(`No vector for ${text}`);
+        return vector;
+      };
+      for (const one of scoreWords(
+        denied,
+        scoredGlosses,
+        vectorOf,
+        HINT_RECIPE.profile.dimensions,
+      ))
+        expect(
+          isDeniedHint(one.word, scoredGlosses[one.gloss].text),
+          `${one.word}'s best is ${scoredGlosses[one.gloss].text}`,
+        ).toBe(true);
+    },
+    120_000,
+  );
+
+  it("is counted in the gloss hash", () => {
+    expect(glossHash(HINT_RECIPE, glosses)).not.toBe(
+      glossHash(HINT_RECIPE, glosses, new Map()),
+    );
+    expect(glossHash(HINT_RECIPE, glosses, new Map())).not.toBe(
+      glossHash(HINT_RECIPE, glosses, parseWordDenylist("pump: pomp")),
+    );
+  });
+
+  it("leaves no denied hint in the committed table", () => {
+    const textOf = new Map(glosses.map((one) => [one.shown, one.text]));
+    for (const [gloss, , words] of table.hints)
+      for (const word of words.split(" "))
+        expect(
+          isDeniedHint(word, textOf.get(gloss) as string),
+          `${word}: ${gloss}`,
+        ).toBe(false);
+  });
+});
+
 describe("the committed hint table", () => {
   it("was built from today's glosses", () => {
     expect(
@@ -187,41 +312,68 @@ describe("the committed hint table", () => {
   });
 });
 
-describe("the judged sample the table shipped on", () => {
-  /** The held-out sample, judged after its cut-off was chosen (README). */
-  const judgedFile = readFileSync(
+describe("the held-out sample the table ships on", () => {
+  /**
+   * The held-out sample, drawn after the cut-off was chosen (README): the
+   * table it is drawn from is the one committed, and it is judged before
+   * the table ships.
+   */
+  const sampleText = readFileSync(
     path.join(
       path.dirname(path.join(root, HINT_TABLE_FILE)),
-      "judged-z7-seed90.tsv",
+      "judged-z7-seed91.tsv",
     ),
     "utf8",
   );
-  const drawnAt = Number(/table at z >= ([\d.]+)\./.exec(judgedFile)?.[1]);
+  const drawnAt = Number(/table at z >= ([\d.]+)\./.exec(sampleText)?.[1]);
+  const seed = Number(/\(seed (\d+)\)/.exec(sampleText)?.[1]);
+  /** Every drawn hint, judged or not: the word, the hint, its z. */
+  const drawn = sampleText
+    .split("\n")
+    .filter((line) => line && !line.startsWith("#") && !line.startsWith("n\t"))
+    .map((line) => {
+      const [, word, hint, z] = line.split("\t");
+      return { word, hint, z: Number(z) };
+    });
 
   it("was drawn at the committed table's cut-off", () => {
     expect(drawnAt).toBe(7);
+    expect(seed).toBe(91);
     expect(table.cutoff).toBe(drawnAt);
     expect(table.asked).toBe(drawnAt);
   });
 
-  it("passes S11's bar, and every hint in it is the table's hint for its word", () => {
-    const { judged, unjudged } = readVerdicts(judgedFile);
-    expect(unjudged).toBe(0);
-    expect(judged).toHaveLength(200);
-    expect(score(judged).all).toEqual({
-      n: 200,
-      good: 111,
-      loose: 79,
-      wrong: 10,
-      passes: true,
-    });
+  it("holds 200 of the table's hints, each the table's hint for its word", () => {
+    expect(drawn).toHaveLength(SAMPLE_SIZE);
     const hintOf = new Map<string, string>();
     for (const [gloss, forms, words] of table.hints)
       for (const word of words.split(" "))
         hintOf.set(word, `related: ${forms.join(", ")} ‘${gloss}’`);
-    for (const one of judged) {
+    for (const one of drawn) {
       expect(hintOf.get(one.word), one.word).toBe(one.hint);
       expect(one.z).toBeGreaterThanOrEqual(drawnAt);
     }
+  });
+
+  it("is the sample the table draws with its seed", () => {
+    // The build draws among the kept words, ordered by word, which are
+    // exactly the table's words.
+    const words = table.hints.flatMap(([, , list]) => list.split(" "));
+    expect(drawSample(words, (word) => word, SAMPLE_SIZE, seed)).toEqual(
+      drawn.map((one) => one.word),
+    );
+  });
+
+  it("passes S11's bar", () => {
+    const { judged, unjudged } = readVerdicts(sampleText);
+    expect(unjudged).toBe(0);
+    expect(judged).toHaveLength(SAMPLE_SIZE);
+    expect(score(judged).all).toEqual({
+      n: 200,
+      good: 84,
+      loose: 112,
+      wrong: 4,
+      passes: true,
+    });
   });
 });

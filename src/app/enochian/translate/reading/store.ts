@@ -41,8 +41,13 @@ export type PartFailure =
   | "timeout"
   /** The call failed otherwise. */
   | "failed"
-  /** Not sent: an earlier part was routed other than asked. */
+  /**
+   * Not sent: an earlier part was routed other than asked, or failed with
+   * its routing unconfirmed.
+   */
   | "not read"
+  /** Not sent: our side failed (the switch couldn't be read). */
+  | "unavailable"
   /** Not sent: readings were turned off before it (the switch). */
   | "off";
 

@@ -59,14 +59,26 @@ export class ReadingCallError extends Error {
     readonly kind: string,
     /** The HTTP status the SDK's error carries, if any. */
     readonly status?: number,
+    /**
+     * Known to have failed before any of the model's output arrived, so no
+     * generation ran: only then may a refusal's status (S4) settle the
+     * call's hold to nothing. False when unknown.
+     */
+    readonly beforeContent = false,
   ) {
     super("The model call failed");
     this.name = "ReadingCallError";
   }
 }
 
-/** An error's class and HTTP status, looking through its causes. */
-export function callError(error: unknown): ReadingCallError {
+/**
+ * An error's class and HTTP status, looking through its causes; and
+ * whether it is known to have come before any output (`beforeContent`).
+ */
+export function callError(
+  error: unknown,
+  beforeContent = false,
+): ReadingCallError {
   if (error instanceof ReadingCallError) return error;
   let status: number | undefined;
   for (let one = error, depth = 0; one && depth < 5; depth++) {
@@ -82,6 +94,7 @@ export function callError(error: unknown): ReadingCallError {
   return new ReadingCallError(
     error instanceof Error ? error.name : typeof error,
     status,
+    beforeContent,
   );
 }
 
@@ -111,6 +124,17 @@ export function readingCallSettings(call: Omit<ReadingCall, "signal">) {
 }
 
 /**
+ * Stream parts that carry none of the model's output: a stream whose error
+ * comes after only these failed before any generation ran.
+ */
+const BEFORE_CONTENT: ReadonlySet<string> = new Set([
+  "start",
+  "start-step",
+  "raw",
+  "abort",
+]);
+
+/**
  * The real call, through Vercel AI Gateway (the `ai` package's default
  * provider): streamed, so a long think never leaves the connection idle,
  * and read to its end; no retries (`maxRetries: 0`), so none is billed
@@ -121,6 +145,8 @@ export function readingCallSettings(call: Omit<ReadingCall, "signal">) {
 export const gatewayReadingModel: ReadingModel = async (call) => {
   const { streamText } = await import("ai");
   let generationId: string | undefined;
+  /** Whether any part of the model's output has arrived. */
+  let content = false;
   const seen = (metadata: unknown) => {
     const id = gatewayField(metadata, "generationId");
     if (!generationId && typeof id === "string" && id) generationId = id;
@@ -135,8 +161,10 @@ export const gatewayReadingModel: ReadingModel = async (call) => {
     for await (const part of result.stream) {
       seen((part as { providerMetadata?: unknown }).providerMetadata);
       if (part.type === "error") failed ??= part.error ?? "error";
+      // Any output, even after an error part, means a generation ran.
+      else if (!BEFORE_CONTENT.has(part.type)) content = true;
     }
-    if (failed !== undefined) throw callError(failed);
+    if (failed !== undefined) throw callError(failed, !content);
     const [text, usage, step, finishReason] = await Promise.all([
       result.text,
       result.usage,
@@ -156,7 +184,7 @@ export const gatewayReadingModel: ReadingModel = async (call) => {
       cachedTokens: usage.inputTokenDetails?.cacheReadTokens,
     };
   } catch (error) {
-    throw callError(error);
+    throw callError(error, !content);
   }
 };
 
@@ -166,13 +194,28 @@ export type ReadReply =
   | { ok: false; state: PartFailure };
 
 /**
+ * Finish reasons of a stream that ended without its finish part: the AI
+ * SDK gives "other" for a stream cut short, and "error" for one that broke.
+ */
+const CUT_SHORT: ReadonlySet<string> = new Set(["other", "error"]);
+
+/**
  * Reads a reply (S5): routing other than asked (OpenAI, zero retention),
  * the provider's refusal, an answer cut at the cap, or one with no
- * readable json block each fail the part; the reply is then discarded.
+ * readable json block each fail the part; the reply is then discarded. A
+ * stream cut short reports no routing, having lost the metadata that
+ * carries it, so it fails as the call did (`failed`), not as a routing
+ * failure; routing the gateway did report and got wrong is still one.
  */
 export function readReply(reply: ReadingReply, asked: Routing): ReadReply {
+  const cut = CUT_SHORT.has(reply.finishReason ?? "");
+  const reported =
+    reply.routing.provider !== undefined ||
+    reply.routing.zeroDataRetention !== undefined;
+  if (cut && !reported) return { ok: false, state: "failed" };
   if (routingProblems(asked, reply.routing).length)
     return { ok: false, state: "routing" };
+  if (cut) return { ok: false, state: "failed" };
   if (reply.finishReason === "content-filter")
     return { ok: false, state: "refused" };
   if (reply.finishReason === "length") return { ok: false, state: "truncated" };

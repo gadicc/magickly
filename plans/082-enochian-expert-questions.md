@@ -69,6 +69,16 @@ G21 and G33, its splits G26, G27 and G30, and a form that carries "in"
   plausible, or do they only look like Enochian?
 - **Glosses where Leitch and Dee's English disagree:** about 55 of the
   550 Key words we could compare (plan 077).
+- **Key words where Casaubon's English and the dictionary part ways**
+  (plan 081's 2H): Key 2's FAAIP "understand" (Casaubon prints
+  "understand" on FAAIP's line and nothing against OM; the dictionary
+  has OM "understand" and FAAIP "your voices"); Key 3's CAOSG
+  "continually" and PILD "on the earth" (Casaubon's numbers and Dee's
+  list; the dictionary has them the other way round); Key 8's VGEG
+  "become strange" (Casaubon; Crowley has "strong"); Key 9's OZOL "their
+  hands" (the dictionary has "their heads"). The AI reading's check,
+  the gap hints and the related words follow the Keys as printed.
+  Which pairing should a translator use?
 
 ## Plan 077's new text
 

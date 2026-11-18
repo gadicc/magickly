@@ -154,6 +154,49 @@ export const DENYLIST: ReadonlySet<string> = new Set(
 );
 
 /**
+ * Reads the word denylist's lines, "words: gloss  # why", into each
+ * word's denied glosses (by `text`); throws on a line it can't read.
+ */
+export function parseWordDenylist(
+  text: string,
+): Map<string, ReadonlySet<string>> {
+  const denied = new Map<string, Set<string>>();
+  for (const raw of text.split("\n")) {
+    const line = raw.replace(/#.*/, "").trim();
+    if (!line) continue;
+    const match = /^([a-z]+(?: [a-z]+)*): ([a-z' -]+)$/.exec(line);
+    if (!match) throw new Error(`Can't read this word denylist line: ${raw}`);
+    const gloss = match[2].trim();
+    for (const word of match[1].split(" ")) {
+      const glosses = denied.get(word) ?? new Set<string>();
+      glosses.add(gloss);
+      denied.set(word, glosses);
+    }
+  }
+  return denied;
+}
+
+/**
+ * Hints a gloss denylist can't remove without losing good ones: each
+ * English word's glosses (by `text`) it is never hinted by, a homonym's
+ * other sense or a likeness of spelling, each reviewed and given its
+ * reason in `word-denylist.txt`. Such a word gets no hint.
+ */
+export const WORD_DENYLIST: ReadonlyMap<
+  string,
+  ReadonlySet<string>
+> = parseWordDenylist(
+  readFileSync(new URL("./word-denylist.txt", import.meta.url), "utf8"),
+);
+
+/** Whether `word`'s hint by the gloss embedded as `text` is denied. */
+export const isDeniedHint = (
+  word: string,
+  text: string,
+  denied: ReadonlyMap<string, ReadonlySet<string>> = WORD_DENYLIST,
+) => denied.get(word)?.has(text) ?? false;
+
+/**
  * How a hit words its meaning: the dictionary's gloss, or Dee's English
  * for the row, with runs of spaces closed up and the punctuation, quote
  * marks and dashes at its edges off ("—appear", "'to charge'").
@@ -280,16 +323,26 @@ export function englishOnly<T extends HintGloss>(
 }
 
 /**
- * The SHA-256 the table records: the recipe and every candidate gloss's
- * text, wording and forms (before `englishOnly`, which needs SCOWL), so a dictionary or Keys change that alters any of them fails
- * the table's test.
+ * The SHA-256 the table records: the recipe, every candidate gloss's
+ * text, wording and forms (before `englishOnly`, which needs SCOWL) and
+ * the denied word–gloss pairs, so a dictionary or Keys change that
+ * alters any of them, or an edit to the word denylist, fails the
+ * table's test.
  */
-export function glossHash(recipe: HintRecipe, glosses: readonly HintGloss[]) {
+export function glossHash(
+  recipe: HintRecipe,
+  glosses: readonly HintGloss[],
+  denied: ReadonlyMap<string, ReadonlySet<string>> = WORD_DENYLIST,
+) {
+  const pairs = [...denied]
+    .flatMap(([word, texts]) => [...texts].map((text) => `${word}: ${text}`))
+    .sort();
   return createHash("sha256")
     .update(
       JSON.stringify([
         recipe.id,
         glosses.map((one) => [one.text, one.shown, !!one.dee, one.forms]),
+        pairs,
       ]),
     )
     .digest("hex");

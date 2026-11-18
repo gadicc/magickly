@@ -72,7 +72,11 @@ export default function InTheKeys({ word }: { word: string }) {
       <ul className="entry-uses">
         {shown.map((use) => (
           <li key={`${use.key}-${use.aethyr}-${use.row}`}>
-            <Link href={keysLink(use)}>{LABELS.place(use)}</Link>
+            {/* No prefetch: it would send this page's address, its ?q=
+                included, as the referrer (plan 081, 2H). */}
+            <Link href={keysLink(use)} prefetch={false}>
+              {LABELS.place(use)}
+            </Link>
             {use.part && (
               <span className="entry-source">{LABELS.inPart(use.part)}</span>
             )}

@@ -15,6 +15,7 @@ import { TRANSLATOR_LIMITATIONS } from "./limitations";
 import { forgetTranslator } from "./load";
 import { KEYS_TABLE_URL } from "./lookup";
 import type { CheckedReading, WordState } from "./reading/check";
+import { READING_DEADLINE_MS } from "./reading/limits";
 import type { ReadingEvent } from "./reading/respond";
 import { READING_URL } from "./readingRequest";
 import { lookupRuleNotes } from "./ruleNotes.server";
@@ -570,9 +571,11 @@ describe("the card's states (plan 081, S7)", () => {
   it("says the text is being read already, and offers to try again", async () => {
     expect(
       await ask(SHORT, lines(409, { type: "refused", state: "busy" })),
-    ).toBe(
-      "This text is being read for someone else just now. Try again shortly.",
-    );
+    ).toBe("This text is being read just now. Try again shortly.");
+    // No price: the reading in hand may be stored by then, free.
+    expect(
+      said(within(card()).getByRole("button", { name: "Try again" })),
+    ).toBe("Try again");
     answers.push(
       lines(200, part(1, 1, SHORT_READING, "store"), {
         type: "done",
@@ -669,9 +672,14 @@ describe("the card's states (plan 081, S7)", () => {
       "The reading stopped arriving.",
     );
     expect(live().textContent).toBe("The reading stopped arriving.");
+    // A part came, so the text was sent; the rest may still be read and
+    // kept, so the retry is priced at most (2H, S8).
+    expect(card().querySelector(".ai-foot")?.textContent).toBe(
+      "Your text was sent for this reading, and the rest of it may still be read. Our server keeps the text and its reading for a day and deletes them within two days, so trying again may use less, or none.",
+    );
     expect(
-      within(card()).getByRole("button", { name: "Try again" }),
-    ).toBeTruthy();
+      said(within(card()).getByRole("button", { name: "Try again" })),
+    ).toBe("Try again | uses at most 1 of today’s 100");
   });
 
   it("says the answer was lost when a line is cut short", async () => {
@@ -779,17 +787,28 @@ describe("the card's states (plan 081, S7)", () => {
     arrive(LONG);
     await waitFor(() => expect(offer()).not.toBeNull());
     // The route's answer when the switch can't be read before the first
-    // part: the parts fail, no call is made, and the units come back.
+    // part: the parts aren't sent, no call is made, and the units come back.
+    const unsent = (n: number): ReadingEvent => ({
+      type: "part",
+      part: n,
+      parts: 2,
+      status: "failed",
+      state: "unavailable",
+    });
     answers.push(
-      lines(
-        200,
-        { type: "part", part: 1, parts: 2, status: "failed", state: "failed" },
-        { type: "part", part: 2, parts: 2, status: "failed", state: "failed" },
-        { type: "done", state: "failed", from: "model", units: 0 },
-      ),
+      lines(200, unsent(1), unsent(2), {
+        type: "done",
+        state: "failed",
+        from: "model",
+        units: 0,
+      }),
     );
     fireEvent.click(offer() as HTMLElement);
     await screen.findByRole("button", { name: "Try again" });
+    expect(rows()).toEqual([
+      "Part 1 of 2: Not sent: something went wrong on our side.",
+      "Part 2 of 2: Not sent: something went wrong on our side.",
+    ]);
     expect(card().querySelector(".ai-foot")).toBeNull();
   });
 
@@ -847,5 +866,275 @@ describe("the card's states (plan 081, S7)", () => {
     );
     await waitFor(() => expect(offer()).not.toBeNull());
     expect(screen.queryByRole("region", { name: "AI reading" })).toBeNull();
+  });
+});
+
+describe("the final review's fixes (2H)", () => {
+  const failedPart = (n: number, of: number, state: string): ReadingEvent =>
+    ({
+      type: "part",
+      part: n,
+      parts: of,
+      status: "failed",
+      state,
+    }) as ReadingEvent;
+
+  it.each([
+    ["timeout", "routing"],
+    ["refused", "timeout"],
+    ["timeout", "refused"],
+  ])("offers no retry after [%s, %s]", async (one, two) => {
+    arrive(LONG);
+    await waitFor(() => expect(offer()).not.toBeNull());
+    answers.push(
+      lines(200, failedPart(1, 2, one), failedPart(2, 2, two), {
+        type: "done",
+        state: "failed",
+        from: "model",
+        units: 1,
+      }),
+    );
+    fireEvent.click(offer() as HTMLElement);
+    await waitFor(() =>
+      expect(card().querySelector(".ai-foot")).not.toBeNull(),
+    );
+    expect(rows()).toHaveLength(2);
+    expect(within(card()).queryByRole("button")).toBeNull();
+  });
+
+  it('keeps the shown reading through a refused "Read again"', async () => {
+    arrive(SHORT);
+    await waitFor(() => expect(offer()).not.toBeNull());
+    const done = {
+      type: "done",
+      state: "read",
+      from: "model",
+      units: 1,
+    } as const;
+    answers.push(lines(200, part(1, 1, SHORT_READING), done));
+    fireEvent.click(offer() as HTMLElement);
+    const again = await screen.findByRole("button", { name: "Read again" });
+    const before = rows();
+    expect(before).toHaveLength(5);
+    // Kept while the new reading starts…
+    const stream = answer(429);
+    answers.push(stream);
+    fireEvent.click(again);
+    await waitFor(() =>
+      expect(card().querySelector(".ai-status")?.textContent).toBe(
+        "Reading with AI…",
+      ),
+    );
+    expect(rows()).toEqual(before);
+    // …and when it is refused.
+    await act(async () => {
+      stream.send({
+        type: "refused",
+        state: "allowance",
+        scope: "user",
+        units: 1,
+        left: 0,
+        limit: 100,
+        resetAt: RESET,
+      });
+      stream.end();
+    });
+    await waitFor(() =>
+      expect(card().querySelector(".ai-status")?.textContent).toBe(
+        `This reading needs 1, and you have 0 of today’s 100 left. They renew at ${at(RESET)}.`,
+      ),
+    );
+    expect(rows()).toEqual(before);
+    expect(card().querySelector(".ai-sentence")?.textContent).toContain(
+      "Move, and show yourselves unto the earth.",
+    );
+  });
+
+  it("offers a retry for a part not sent after another's failure (2H review 2)", async () => {
+    arrive(LONG);
+    await waitFor(() => expect(offer()).not.toBeNull());
+    answers.push(
+      lines(200, failedPart(1, 2, "timeout"), failedPart(2, 2, "not read"), {
+        type: "done",
+        state: "failed",
+        from: "model",
+        units: 1,
+      }),
+    );
+    fireEvent.click(offer() as HTMLElement);
+    const retry = await within(card()).findByRole("button", {
+      name: "Try again",
+    });
+    expect(rows()).toEqual([
+      "Part 1 of 2: The model took too long.",
+      "Part 2 of 2: Not sent.",
+    ]);
+    // Nothing blames the privacy terms.
+    expect(card().textContent).not.toMatch(/privacy/);
+    expect(said(retry)).toBe("Try again | uses 1 of today’s 100");
+  });
+
+  it("says the text may have been sent when only stored parts came before the answer stopped", async () => {
+    arrive(SHORT);
+    await waitFor(() => expect(offer()).not.toBeNull());
+    answers.push(lines(200, part(1, 2, SHORT_READING, "store")));
+    fireEvent.click(offer() as HTMLElement);
+    await waitFor(() =>
+      expect(card().querySelector(".ai-status")?.textContent).toBe(
+        "The reading stopped arriving.",
+      ),
+    );
+    expect(card().querySelector(".ai-foot")?.textContent).toMatch(
+      /^Your text may have been sent for this reading,/,
+    );
+  });
+
+  it("says the text may have been sent when the answer stops before any part", async () => {
+    arrive(SHORT);
+    await waitFor(() => expect(offer()).not.toBeNull());
+    answers.push(lines(200));
+    fireEvent.click(offer() as HTMLElement);
+    await waitFor(() =>
+      expect(card().querySelector(".ai-status")?.textContent).toBe(
+        "The reading stopped arriving.",
+      ),
+    );
+    expect(card().querySelector(".ai-foot")?.textContent).toBe(
+      "Your text may have been sent for this reading, and if so it may still be read. Our server keeps the text and its reading for a day and deletes them within two days, so trying again may use less, or none.",
+    );
+    expect(
+      said(within(card()).getByRole("button", { name: "Try again" })),
+    ).toBe("Try again | uses at most 1 of today’s 100");
+  });
+
+  it('prices a retry after a failed "Read again" at most the whole text', async () => {
+    arrive(LONGER);
+    await waitFor(() => expect(offer()).not.toBeNull());
+    const first = reading([["MADRIAX", "confirmed", "heavens"]], "Heavens.");
+    answers.push(
+      lines(200, part(1, 2, first), part(2, 2, first), {
+        type: "done",
+        state: "read",
+        from: "model",
+        units: 2,
+      }),
+    );
+    fireEvent.click(offer() as HTMLElement);
+    const again = await screen.findByRole("button", { name: "Read again" });
+    answers.push(
+      lines(200, failedPart(1, 2, "timeout"), part(2, 2, first), {
+        type: "done",
+        state: "partial",
+        from: "model",
+        units: 2,
+      }),
+    );
+    fireEvent.click(again);
+    const retry = await screen.findByRole("button", {
+      name: "Try the failed part again",
+    });
+    expect(said(retry)).toBe(
+      "Try the failed part again | uses at most 2 of today’s 100",
+    );
+  });
+
+  it('repeats "Read again" when it was busy, and replaces the reading as it lands', async () => {
+    arrive(SHORT);
+    await waitFor(() => expect(offer()).not.toBeNull());
+    const done = {
+      type: "done",
+      state: "read",
+      from: "model",
+      units: 1,
+    } as const;
+    answers.push(lines(200, part(1, 1, SHORT_READING), done));
+    fireEvent.click(offer() as HTMLElement);
+    const again = await screen.findByRole("button", { name: "Read again" });
+    answers.push(lines(409, { type: "refused", state: "busy" }));
+    fireEvent.click(again);
+    const retry = await within(card()).findByRole("button", {
+      name: "Try again",
+    });
+    expect(card().querySelector(".ai-status")?.textContent).toBe(
+      "This text is being read just now. Try again shortly.",
+    );
+    expect(rows()).toHaveLength(5);
+    answers.push(
+      lines(
+        200,
+        part(1, 1, reading([["ZACAR", "confirmed", "move on"]], "Move on.")),
+        done,
+      ),
+    );
+    fireEvent.click(retry);
+    await waitFor(() => expect(sent()).toHaveLength(3));
+    expect(sent().map((one) => one.again)).toEqual([false, true, true]);
+    await waitFor(() =>
+      expect(rows()).toEqual(["ZACAR move on confirmed · , Key 3.14 ZACAR"]),
+    );
+  });
+
+  it("ends a stalled answer as lost at its deadline", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      arrive(SHORT);
+      await waitFor(() => expect(offer()).not.toBeNull());
+      const stream = answer();
+      answers.push(stream);
+      fireEvent.click(offer() as HTMLElement);
+      await act(async () => {
+        stream.send(part(1, 2, SHORT_READING));
+      });
+      await waitFor(() => expect(rows()).toHaveLength(5));
+      await act(async () => {
+        vi.advanceTimersByTime(READING_DEADLINE_MS - 1000);
+      });
+      expect(card().querySelector(".ai-status")?.textContent).toBe(
+        "Reading part 2 of 2…",
+      );
+      await act(async () => {
+        vi.advanceTimersByTime(2000);
+      });
+      await waitFor(() =>
+        expect(card().querySelector(".ai-status")?.textContent).toBe(
+          "The reading stopped arriving.",
+        ),
+      );
+      expect(card().querySelector(".ai-foot")?.textContent).toMatch(
+        /^Your text was sent for this reading,/,
+      );
+      expect(live().textContent).toBe("The reading stopped arriving.");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("shows server text that names no label of ours as no label", async () => {
+    arrive(LONG);
+    await waitFor(() => expect(offer()).not.toBeNull());
+    const odd = reading([["MADRIAX", "confirmed", "heavens"]]);
+    answers.push(
+      lines(
+        200,
+        part(1, 2, {
+          ...odd,
+          sentence: {
+            shown: false,
+            withheld: "constructor",
+            contentWords: 1,
+            supported: 0,
+          } as unknown as CheckedReading["sentence"],
+        }),
+        failedPart(2, 2, "constructor"),
+        { type: "done", state: "partial", from: "model", units: 1 },
+      ),
+    );
+    fireEvent.click(offer() as HTMLElement);
+    await waitFor(() => expect(rows()).toHaveLength(2));
+    expect(rows()[1]).toBe("Part 2 of 2: The model failed.");
+    expect(card().textContent).not.toMatch(/function|native code/);
+    expect(card().querySelector(".ai-note")?.textContent).toBe(
+      "The model’s sentence for part 1 is withheld: ",
+    );
   });
 });

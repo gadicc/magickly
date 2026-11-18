@@ -483,6 +483,25 @@ describe("the related words on our glosses", () => {
   });
 });
 
+/**
+ * The pairs the seed-3 sample was drawn among that the 2H rebuild took
+ * out, and none added: denylisting "tablet of union" took the tablet
+ * names' "union" away, and the slightly different z-scores without it
+ * put four other pairs just under the cut-off. So the table the sample
+ * was drawn from is today's with these put back.
+ */
+const REMOVED_IN_2H: readonly (readonly [string, string])[] = [
+  ["ARCHADS", "ARCHAS ‘the Daughter of Light is spread amongst the third’"],
+  ["BITOM", "TOANT ‘union’"],
+  ["EXARP", "TOANT ‘union’"],
+  ["HCOMA", "TOANT ‘union’"],
+  ["NANTA", "TOANT ‘union’"],
+  ["NN", "TOANT ‘union’"],
+  ["OBZa", "PALA, POLA ‘two’"],
+  ["OBZA", "PALA, POLA ‘two’"],
+  ["VLLA", "UL, VLS, GALVAH ‘the ends’"],
+];
+
 describe("the judged sample the related words shipped on", () => {
   /** The held-out sample, judged after its cut-off was chosen (README). */
   const judgedFile = readFileSync(
@@ -506,7 +525,7 @@ describe("the judged sample the related words shipped on", () => {
     expect(table.asked).toBe(drawnAt);
   });
 
-  it("passes the bar, and every pair in it is the table's", () => {
+  it("passes the bar, and every pair in it is the table's or one 2H removed", () => {
     expect(unjudged).toBe(0);
     expect(judged).toHaveLength(SAMPLE_SIZE);
     expect(score(judged).all).toEqual({
@@ -519,15 +538,29 @@ describe("the judged sample the related words shipped on", () => {
     const index = relatedIndex(table);
     const text = (item: RelatedItem) =>
       `${item.forms.map((one) => one.form).join(", ")} ‘${item.gloss}’`;
-    for (const one of judged) {
+    const removed = new Set(REMOVED_IN_2H.map((one) => one.join("\t")));
+    const kept = judged.filter(
+      (one) => !removed.has(`${one.word}\t${one.hint}`),
+    );
+    // Four of the 200 were among the removed; the rest still pass.
+    expect(score(kept).all).toEqual({
+      n: 196,
+      good: 140,
+      loose: 53,
+      wrong: 3,
+      passes: true,
+    });
+    for (const one of kept) {
       expect((index.get(one.word) ?? []).map(text), one.word).toContain(
         one.hint,
       );
       expect(one.z).toBeGreaterThanOrEqual(drawnAt);
     }
+    for (const [entry, hint] of REMOVED_IN_2H)
+      expect((index.get(entry) ?? []).map(text), entry).not.toContain(hint);
   });
 
-  it("is the sample the table draws with its seed", () => {
+  it("is the sample the table, with 2H's removed pairs, draws with its seed", () => {
     // The draw orders pairs by entry, then by the gloss's place among the
     // glosses; the build's places are those after `englishOnly`, which
     // keeps the candidates' order, so the candidates' places order them
@@ -543,6 +576,12 @@ describe("the judged sample the related words shipped on", () => {
         hint: `${item.forms.map((one) => one.form).join(", ")} ‘${item.gloss}’`,
       })),
     );
+    for (const [entry, hint] of REMOVED_IN_2H)
+      pairs.push({
+        entry,
+        gloss: place.get(/‘(.*)’$/.exec(hint)?.[1] ?? "") as number,
+        hint,
+      });
     for (const pair of pairs) expect(pair.gloss, pair.hint).toBeDefined();
     const drawn = sampleRelated(pairs, SAMPLE_SIZE, seed);
     expect(drawn.map((one) => [one.entry, one.hint])).toEqual(

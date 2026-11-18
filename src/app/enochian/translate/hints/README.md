@@ -52,9 +52,18 @@ the Keys, as the lookup indexes them.
   for", "also", "noun", "shortened" and the like:
   `isEditorialGloss` in `scripts/enochian-hints/glosses.ts`); the
   reviewed `denylist.txt` there, for what rules can't catch ("air name",
-  "to vanne the earth"); and, at build time, any gloss with a word
-  outside SCOWL's lists to size 70 ("squar", "sangef", "not-ing"). On
-  17 November 2026: 1,366 candidates, 1,286 in English words.
+  "tablet of union", "to vanne the earth"); and, at build time, any
+  gloss with a word outside SCOWL's lists to size 70 ("squar",
+  "sangef", "not-ing"). On 18 November 2026: 1,365 candidates, 1,285
+  in English words.
+- **Denied hints**: the reviewed `word-denylist.txt` beside it names
+  English words never hinted by a particular gloss, each with its
+  reason: another sense of a homonym ("liquor" by "spirits", "railway"
+  by "train") or only a likeness of spelling ("pump" by "pomp", "hart"
+  by "the heart"). Denying the gloss would lose its good hints too
+  ("ghosts" by "spirits"). Such a word gets no hint, not its next best,
+  which no one has judged. On 18 November 2026 it denies 58 words under
+  36 glosses.
 - **The wording shown**: the dictionary's own wording of the meaning
   ("appear", "a bitter sting"), or, where only the Keys have it, Dee's
   ("to the terrour"); not the tokenised core that was embedded.
@@ -91,9 +100,19 @@ spike's rubric (good, loose or wrong, for the English word alone):
    glosses): 53 good, 126 loose, 21 wrong (10.5% wrong), failing.
    `score`: z ≥ 6.669 would pass on it.
 3. **Seed 90, z ≥ 7.0**, held out: 111 good, 79 loose, 10 wrong (95.0%
-   good or loose, 5.0% wrong), passing. It is committed beside this
-   file as `judged-z7-seed90.tsv`, and `table.test.ts` checks the table
-   is the one it was drawn from.
+   good or loose, 5.0% wrong), passing.
+4. **Seed 91, z ≥ 7.0**, after the final review (18 November 2026):
+   "tablet of union" denied as a gloss and the word denylist added,
+   which took 58 hints out; the slightly different z-scores without the
+   one gloss took out "aphorisms" and brought in "loudly", "ghost" and
+   "antidotes". The table changed, so seed 90's sample no longer
+   matched it; a fresh one was drawn, held out, from the rebuilt table,
+   and judged by a fresh model judge shown no z-scores: 84 good, 112
+   loose, 4 wrong (98.0% good or loose, 2.0% wrong), passing. Its wrong
+   rows: "breathers" by "breath", "eightieths" by "eight", "fifth" by
+   "not the fifth" and "ghost" by "the holy ghost". It is committed beside this file as `judged-z7-seed91.tsv`, and
+   `scripts/enochian-hints/table.test.ts` checks the table is the one it
+   was drawn from (it redraws the same 200 with seed 91).
 
 **Why 7.0**: the first two samples were each used to pick a cut-off
 (6.24, then 6.67), so neither is a fair test of the cut-off it picked.
@@ -105,16 +124,18 @@ from the spike's (its population kept grammar and hub glosses; SCOWL
 brings inflections), which is why the cut-off was judged here rather
 than taken from the spike.
 
-**The shipped table**, at z ≥ 7.0: 1,726 words under 439 glosses,
-28,539 bytes served, 11,701 gzipped. The cost of the margin is
-coverage: 3,650 words had a hint at 6.25, 1,726 have one at 7.0.
+**The shipped table**, at z ≥ 7.0: 1,670 words under 424 glosses,
+27,685 bytes served, 11,356 gzipped (before the 2H changes, 1,726
+under 439). The cost of the margin is coverage: 3,650 words had a hint
+at 6.25, 1,670 have one at 7.0.
 
 ## Format
 
 One JSON object (`format` 2): `notice` (SCOWL's credit), `source` (the
 release and lists), `recipe` (model, dimensions, revision and prompt
-version), `asked`, `cutoff`, `glossHash` (SHA-256 of the recipe and
-every candidate gloss's text, wording and forms), `rows` (words with a
+version), `asked`, `cutoff`, `glossHash` (SHA-256 of the recipe, every
+candidate gloss's text, wording and forms, and the word denylist's
+pairs), `rows` (words with a
 hint) and `hints`, one gloss to a line: `[wording, [forms], "word word
 …"]`, words sorted. `format.ts` documents it; the file is outside
 Biome's formatter so each gloss stays on its own line. The same cache
@@ -136,8 +157,9 @@ it is verified against its pinned SHA-256 either way. `run` checks the
 Gateway's public price for the model first, refuses when a
 conservative estimate (one token per two bytes) is over $0.25, and
 stops before any batch that could take the tokens counted so far past
-it; a reply without a usable token count is counted at its
-conservative estimate (`scripts/enochian-hints/spend.ts`). It caches
+it; a reply without a usable token count (none, not a number, or 0,
+since text never costs nothing) is counted at its conservative
+estimate (`scripts/enochian-hints/spend.ts`). It caches
 each vector in `.private/enochian-hints/vectors.jsonl`, keyed by its
 exact input and the model, so a rerun embeds only new glosses or words,
 and `build` (a new cut-off, say) costs nothing. SCOWL's lists are
@@ -155,7 +177,8 @@ counted exactly as the table built there would keep them. A build keeps
 the committed table's `asked` unless `--cutoff` is given.
 
 `scripts/enochian-hints/table.test.ts` fails when a dictionary or Keys
-change alters the candidate glosses, their wording or their forms:
+change alters the candidate glosses, their wording or their forms, or
+when either denylist changes:
 rebuild with `build`, after `run` when there are new glosses to embed,
 then judge a fresh sample if many hints changed.
 

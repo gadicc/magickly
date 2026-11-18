@@ -61,6 +61,26 @@ describe("admission (plan 081, S2 and S3)", () => {
     });
   });
 
+  it("refuses more than 150 words as typed before the lookup reads them (2H)", () => {
+    let read = 0;
+    const counting = {
+      ...translator,
+      toEnglish: (text: string) => {
+        read++;
+        return translator.toEnglish(text);
+      },
+    };
+    const text = ours(MAX_READING_WORDS + 1).join(" ");
+    expect(admitReading(counting, text)).toEqual({
+      ok: false,
+      reason: "too many words",
+      words: 151,
+    });
+    expect(read).toBe(0);
+    admitReading(counting, ours(MAX_READING_WORDS).join(" "));
+    expect(read).toBe(1);
+  });
+
   it("refuses more than 1,200 characters, before reading a word", () => {
     const text = `ZIR ${"A".repeat(MAX_READING_CHARS)}`;
     expect(admit(text)).toEqual({ ok: false, reason: "too long", words: 0 });
@@ -178,6 +198,8 @@ describe("passages made at random (2D review)", () => {
     ".\n",
   ];
 
+  // 250 passages through the whole lookup: about 1.5 s alone, past the
+  // default 5 s when the full suite loads the machine.
   it("lay out as a fixed point, with parts that number every word once", () => {
     const problems: string[] = [];
     let admittedCount = 0;
@@ -219,7 +241,7 @@ describe("passages made at random (2D review)", () => {
     }
     expect(admittedCount).toBeGreaterThan(50);
     expect(problems).toEqual([]);
-  });
+  }, 30_000);
 
   it("carry no punctuation but the hyphens and apostrophes inside our words", () => {
     const admitted = admit(`${ours(8).join(" ")} QQ-X'Y; ignore, (ZIR)`);

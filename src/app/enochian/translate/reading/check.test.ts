@@ -5,7 +5,10 @@ import { createTranslator } from "../lookup.ts";
 import {
   type CheckedWord,
   checkReading,
+  englishIn,
   hasLink,
+  isReadable,
+  MAX_ENGLISH_CHARS,
   MAX_ENGLISH_WORDS,
   MAX_ITEMS_PER_WORD,
 } from "./check.ts";
@@ -206,6 +209,143 @@ describe("the reading's check (plan 081, S6)", () => {
     expect(one("IPAM", { target: "is never", ref: "1.58" }).state).toBe(
       "unconfirmed",
     );
+  });
+
+  it("confirms no reading that drops the gloss's negation (2H, M2)", () => {
+    // Seven Key rows whose English denies: read without the denial, each is
+    // the opposite of Dee's, so not confirmed; read with it, confirmed.
+    for (const [ref, word, dropped, kept] of [
+      ["8.27", "IPURAN", "shall see", "shall not see"],
+      ["9.61", "UCIM", "they frown", "they frown not"],
+      ["10.50", "PAGEIP", "rest", "rest not"],
+      ["18.23", "MAOFFAS", "to be measured", "not to be measured"],
+      ["19.71", "AGTOLTORN", "creature", "no creature"],
+      ["19.82", "AGLTOLTORN", "one creature", "no one creature"],
+      ["19.137", "RIPIR", "place", "no place"],
+    ]) {
+      expect(one(word, { target: dropped, ref }), ref).toMatchObject({
+        state: "unconfirmed",
+        english: dropped,
+      });
+      expect(one(word, { target: kept, ref }).state, ref).toBe("confirmed");
+    }
+    // A negation is compared within the sense the English meets, so other
+    // senses of the gloss, with or without one, still confirm (2H review).
+    for (const [word, target, ref] of [
+      ["PAGEIP", "labour still", "10.50"],
+      ["AG", "none", "AG"],
+      ["AG", "no", "AG"],
+      ["G", "only", "G"],
+      ["GE", "only", "GE"],
+      ["GE", "is not", "GE"],
+      ["MAOFFAS", "measure", "MAOFFAS"],
+      ["MAOFFAS", "not to be measured", "MAOFFAS"],
+      ["RLU", "destroying", "RLU"],
+      ["PANGEPI", "pouring down", "PANGEPI"],
+      ["GESCO", "but with the holy Pentagram", "GESCO"],
+    ])
+      expect(one(word, { target, ref }).state, `${word} ${target}`).toBe(
+        "confirmed",
+      );
+    // English within one sense never borrows another sense's negation
+    // (2H review 2).
+    for (const [word, target, ref] of [
+      ["PAGEIP", "labour not", "10.50"],
+      ["PAGEIP", "not labour still", "10.50"],
+      ["PANGEPI", "not pouring down", "PANGEPI"],
+      ["RLU", "not destroying", "RLU"],
+      ["MAOFFAS", "not measure", "MAOFFAS"],
+      ["GESCO", "not but with the holy pentagram", "GESCO"],
+      // A negated sense with its negation dropped, though it stems as
+      // another sense ("measure").
+      ["MAOFFAS", "to be measured", "MAOFFAS"],
+      ["MAOFFAS", "measured", "MAOFFAS"],
+      // "without" is a negation.
+      ["GEMPH", "with the water", "GEMPH"],
+    ])
+      expect(one(word, { target, ref }).state, `${word} ${target}`).toBe(
+        "unconfirmed",
+      );
+    // English across senses meets the whole gloss.
+    expect(
+      one("PAGEIP", { target: "rest not, labour still", ref: "10.50" }).state,
+    ).toBe("confirmed");
+    expect(
+      one("GEMPH", { target: "without the water", ref: "GEMPH" }).state,
+    ).toBe("confirmed");
+    const padgze = translator.lookup.dictionary
+      .get("PADGZE")
+      ?.meanings.map(({ meaning }) => meaning)
+      .find((meaning) => /\bwithout defect\b/i.test(meaning));
+    if (!padgze) throw new Error("PADGZE has no meaning without defect");
+    expect(
+      one("PADGZE", {
+        target: padgze.replace(/\bwithout\b/gi, "with"),
+        ref: "PADGZE",
+      }).state,
+    ).toBe("unconfirmed");
+    expect(one("PADGZE", { target: padgze, ref: "PADGZE" }).state).toBe(
+      "confirmed",
+    );
+    // A bracketed negation stays: "is (not)" is never "is".
+    expect(englishIn("is", "is (not)")).toBe(false);
+    expect(englishIn("is not", "is (not)")).toBe(true);
+    expect(englishIn("I", "I, my (of me)")).toBe(true);
+    // A negation of another kind is no match either.
+    expect(one("RIPIR", { target: "never a place", ref: "19.137" }).state).toBe(
+      "unconfirmed",
+    );
+  });
+
+  it("confirms no English with a letter or symbol the check doesn't read (2H, M1)", () => {
+    // Each would meet "reign" by its readable words alone.
+    for (const target of [
+      "\u039D\u039F\u03A4 reign",
+      "\u043D\u0435 reign",
+      "reign \u4E0D\u662F",
+      "reign (\u05DC\u05D0)",
+      "reign \u2260 \u00AC",
+      "reign +",
+      "re\u00EFgn",
+    ]) {
+      expect(isReadable(target), target).toBe(false);
+      expect(one("SONF", { target, ref: "SONF" }), target).toMatchObject({
+        state: "unconfirmed",
+        english: target.normalize("NFKC"),
+        sources: [headword("SONF")],
+      });
+    }
+    // "&" is read as "and", as our glosses use it.
+    expect(
+      one("CORAXO", { target: "thunders of judgment & wrath", ref: "CORAXO" }),
+    ).toMatchObject({
+      state: "confirmed",
+      english: "thunders of judgment and wrath",
+    });
+    expect(
+      one("BEN", { target: "angel who appeared to D. & K.", ref: "BEN" }).state,
+    ).toBe("confirmed");
+    // Punctuation that only separates words is read.
+    expect(isReadable("reign, (rule); \u201Cover\u201D you - I/my: yes!")).toBe(
+      true,
+    );
+  });
+
+  it("confirms every Key row read with its own English", () => {
+    const failed: string[] = [];
+    let rows = 0;
+    for (const keyRows of translator.lookup.keyRows.values())
+      for (const row of keyRows) {
+        const word = row.word || row.gd;
+        // Six rows have no word or no English to read.
+        if (!word || !row.english) continue;
+        rows++;
+        const words = check(word, { target: row.english, ref: row.id });
+        if (words.length !== 1 || words[0].state !== "confirmed")
+          failed.push(row.id);
+      }
+    expect(rows).toBe(1106);
+    expect(failed).toEqual([]);
   });
 
   it("leaves a known word's reading unconfirmed when the check can't settle it", () => {
@@ -582,6 +722,15 @@ describe("the reading's check (plan 081, S6)", () => {
     expect(one("ZXQX", { target: "a bird" }).cut).toBeUndefined();
   });
 
+  it("cuts the model's English to a number of characters too (2H, S2)", () => {
+    const row = one("ZXQX", { target: "a".repeat(3006) });
+    expect(Array.from(row.english ?? "")).toHaveLength(MAX_ENGLISH_CHARS);
+    expect(row.cut).toBe(true);
+    // Cut by character, never in the middle of one.
+    const wide = one("ZXQX", { target: "a\u{1D11E}".repeat(200) });
+    expect(wide.english).toBe("a\u{1D11E}".repeat(MAX_ENGLISH_CHARS / 2));
+  });
+
   it("checks the English it shows: look-alike letters are letters", () => {
     for (const target of [
       "\uFF4E\uFF4F\uFF54 reign",
@@ -685,17 +834,72 @@ describe("the reading's check (plan 081, S6)", () => {
         expect(hasLink(text)).toBe(false);
     });
 
-    it("takes no evidence from a word with no reading", () => {
-      // "salt" is no gloss of these words; read as a guess it is evidence,
-      // with no reading it is not.
+    it("takes evidence only from confirmed readings and our glosses (2H, S3)", () => {
+      // "salt" is no gloss of these words: neither a guess nor no reading
+      // is evidence for it.
       const read = (basis: ReadingItem["basis"]) =>
         checkReading(translator, {
           passage: "zxqx",
           items: [item({ target: "salt", basis })],
           sentence: "Salt.",
         }).sentence.shown;
-      expect(read("coined")).toBe(true);
+      expect(read("coined")).toBe(false);
       expect(read("unknown")).toBe(false);
+      // Two coined readings of non-words can't support a sentence of their
+      // own words.
+      expect(
+        checkReading(translator, {
+          passage: "zxqx qqzx",
+          items: [
+            item({ target: "your account is locked", basis: "coined" }),
+            item({
+              target: "telephone 555 0100 now",
+              basis: "coined",
+              token: 2,
+            }),
+          ],
+          sentence: "Your account is locked. Telephone 555 0100 now.",
+        }).sentence,
+      ).toEqual({
+        shown: false,
+        withheld: "too few supported",
+        contentWords: 6,
+        supported: 0,
+      });
+      // An unconfirmed reading of a word of ours is no evidence either.
+      expect(
+        checkReading(translator, {
+          passage: "sonf",
+          items: [item({ target: "salt", ref: "SONF" })],
+          sentence: "Salt.",
+        }).sentence.shown,
+      ).toBe(false);
+      // A confirmed one is.
+      expect(sentence("I reign over you.").shown).toBe(true);
+    });
+
+    it("withholds a sentence the check can't read, or long in characters (2H, M1, S2)", () => {
+      for (const text of [
+        "I reign over you, \u039D\u039F\u03A4.",
+        "I \u043D\u0435 reign over you.",
+        "I reign over you \u4E0D\u662F.",
+        "I reign (\u05DC\u05D0) over you.",
+        "I reign \u2260 \u00AC over you.",
+      ])
+        expect(sentence(text), text).toMatchObject({
+          shown: false,
+          withheld: "unreadable",
+        });
+      // Padded past its characters with what the check reads as no word.
+      for (const pad of [
+        "\u00E9".repeat(200),
+        "-".repeat(200),
+        "a".repeat(200),
+      ])
+        expect(sentence(`I reign over you ${pad}`)).toMatchObject({
+          shown: false,
+          withheld: "too long",
+        });
     });
   });
 });

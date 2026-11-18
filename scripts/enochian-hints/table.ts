@@ -13,7 +13,7 @@ import {
   type HintTable,
 } from "../../src/app/enochian/translate/hints/format.ts";
 import { LABELS } from "../../src/app/enochian/translate/labels.ts";
-import type { HintGloss } from "./glosses.ts";
+import { type HintGloss, isDeniedHint, WORD_DENYLIST } from "./glosses.ts";
 import { type Best, bestGloss } from "./recipe.ts";
 
 /** Where the committed table lives, from the repository's root. */
@@ -49,6 +49,20 @@ export function scoreWords(
     word,
     ...bestGloss(vectorOf(word), matrix, dimensions),
   }));
+}
+
+/**
+ * The scored words less those whose best gloss the word denylist denies
+ * them (`isDeniedHint`): such a word gets no hint, not its next best.
+ */
+export function withoutDenied(
+  scored: readonly Scored[],
+  glosses: readonly HintGloss[],
+  denied: ReadonlyMap<string, ReadonlySet<string>> = WORD_DENYLIST,
+): Scored[] {
+  return scored.filter(
+    (one) => !isDeniedHint(one.word, glosses[one.gloss].text, denied),
+  );
 }
 
 /** What the table records about how it was made. */

@@ -146,8 +146,8 @@ const linesText = (
 
 /**
  * Whether the reading takes a text (S2, S3): at most 1,200 characters, A to
- * Z and the admitted separators only, no word over 30 letters; from 2 to 150
- * words, of which at least 80% and all but 10 are ours (any reading the
+ * Z and the admitted separators only, no word over 30 letters, at most 150
+ * words as typed; from 2 to 150 words as the lookup reads them, of which at least 80% and all but 10 are ours (any reading the
  * lookup has: a Key word, a headword, a Golden Dawn or Leitch spelling, a
  * join the rule splits); and at least one word outside a run of Dee's Key
  * rows, so it is never offered and then refused.
@@ -160,6 +160,11 @@ export function admitReading(translator: Translator, text: string): Admission {
   const typed: readonly string[] = text.match(WORD) ?? [];
   if (typed.some((word) => word.replace(/['-]/g, "").length > MAX_WORD_LETTERS))
     return { ok: false, reason: "long word", words: 0 };
+  // Counted as typed before the lookup reads any: a token is one typed word
+  // or more (Crowley's "das iod"), so no text refused here has 150 tokens
+  // or fewer but by a spaced form, and an oversized text costs no lookup.
+  if (typed.length > MAX_READING_WORDS)
+    return { ok: false, reason: "too many words", words: typed.length };
   const { tokens, lines } = layout(translator, text);
   const words = tokens.length;
   const refuse = (reason: AdmissionRefusal): Admission => ({

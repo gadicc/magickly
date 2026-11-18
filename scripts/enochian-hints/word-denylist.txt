@@ -1,0 +1,48 @@
+# English words never given a gap's hint by one gloss (plan 081, S11),
+# for what the gloss denylist can't say without losing good hints too:
+# a word whose nearest gloss is another sense of a homonym ("liquor" by
+# "spirits"), or only a likeness of spelling ("pump" by "pomp"). One
+# line a gloss: the words, `:`, the gloss as embedded (its `text`, the
+# lookup's tokenised wording), then `#` and why. A word denied its best
+# gloss gets no hint at all, not its next best, which no one has judged.
+# Reviewed by hand; changing it changes the gloss hash.
+
+# Another sense of the gloss's word.
+liquor liquors: spirits  # drink, not GAH's spirits
+autumn autumns: fall  # the season, not LONCHO's falling
+locomotive railroad railway: train  # the railway's, not FAFEN's "to train"
+curriculum syllabus: course  # a course of study, not ELZAP's way
+viola violas violins: viols  # instruments; EFAFAFE's "Viols" are vials
+duvet: comforter  # bedding, not BIGLIAD's comforter
+unionise unionised unionises unionising unionize unionized unionizes unionizing: union  # trade unions, not TOANT's love or union
+chargeable overcharge overcharged overcharging: to charge  # a price, not LRS's charge
+bedridden: laid up  # ill in bed; MAASI's is stored
+wingers: wings  # players on a wing, not VPAAH's wings
+ships: vessels  # boats; ZIZOP's are containers
+quarterlies: quarter  # periodicals, not ES's quarter
+scalier: scale  # a fish's scales; PIAP's is a balance
+waxier waxiest: wax strong  # wax the substance, not UGEG's growing
+crossest: across  # cross as angry, not A-DEUNE's across
+
+# Only a likeness of spelling.
+pump: pomp  # pump, not AVAVOX's pomp
+sine: sin  # trigonometry
+hart harts: heart  # a deer
+warring: warning  # war
+kinder: children  # kind, comparative
+redder: savior  # red, comparative
+sole soled soles soling: sol  # a shoe's sole or the fish, not AVE's sol
+specking: speaking  # speck
+moos: moss  # a cow's
+pares: pair  # pare, to trim
+tings: things  # a bell's sound
+cornier: corners  # corny
+wounder: wonder  # one who wounds
+ridding: of riding  # rid
+shinning: shines  # shin, to climb
+fliest: flew  # fly, smart
+mantel: coat  # a fireplace's shelf, not a mantle
+understating: understand  # understate
+hood: self hood  # a head's covering
+momentous: of moment  # important; OANIO's is "of a moment"
+swordfish: sword  # a fish

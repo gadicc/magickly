@@ -4,6 +4,7 @@ import { parseRef, type ReadingItem } from "./item.ts";
 import {
   contentStems,
   englishWords,
+  FUNCTION_WORDS,
   isFunctionOnly,
   sameEnglish,
 } from "./normalise.ts";
@@ -69,7 +70,9 @@ export type SentenceWithheld =
   | "no content words"
   | "too few supported"
   | "too long"
-  | "link";
+  | "link"
+  /** It has a letter or symbol the check doesn't read (`isReadable`). */
+  | "unreadable";
 
 /**
  * What the card may do with the model's sentence. Withheld, it carries no
@@ -112,10 +115,17 @@ export interface ReadingInput {
  * `sentence.ts`) can change a verdict, so no reading checked the old way is
  * served after the change is deployed.
  */
-export const CHECK_VERSION = 1;
+export const CHECK_VERSION = 2;
 
 /** The most words of the model's English a row shows (S6). */
 export const MAX_ENGLISH_WORDS = 10;
+
+/**
+ * The most characters of the model's English a row shows, however few its
+ * words: ten words of English run to about 60, and a "word" of thousands
+ * of unbroken letters is still one word.
+ */
+export const MAX_ENGLISH_CHARS = 120;
 
 /**
  * The most items one word may have and still be checked: more than any
@@ -138,14 +148,23 @@ export const SENTENCE_WORDS_PER_WORD = 4;
 export const SENTENCE_FLOOR_WORDS = 12;
 
 /**
+ * The longest sentence shown in characters, for each word it may have:
+ * about twice an English word with its space, so padding the check reads
+ * as no word (a run of letters, or punctuation) can't make it long.
+ */
+export const SENTENCE_CHARS_PER_WORD = 12;
+
+/**
  * Text as plain text: NFKC (so fullwidth, mathematical or circled letters
  * and ligatures are the letters they look like), controls and format
- * characters out, spaces collapsed.
+ * characters out, "&" read as "and" (as our glosses use it: CORAXO's
+ * "judgment & wrath"), spaces collapsed.
  */
 function plain(text: string): string {
   return text
     .normalize("NFKC")
     .replace(/[\p{Cc}\p{Cf}]/gu, " ")
+    .replace(/&/g, " and ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -162,6 +181,25 @@ const LINK =
 export function hasLink(text: string): boolean {
   // NFKC first, so a fullwidth dot ("evil．com") is a dot.
   return LINK.test(text.normalize("NFKC"));
+}
+
+/**
+ * English the check reads whole, after `plain`: the letters A to Z, digits
+ * and apostrophes (all the dictionary search's `words` keeps), white space,
+ * and punctuation that only separates words. Any other letter or symbol
+ * (Greek, Cyrillic, Hebrew, CJK, an accent, "≠", "¬", "+") is text the check
+ * never reads, so "ΝΟΤ reign" would meet "reign". ("&" is read as "and"
+ * before this, by `plain`.)
+ */
+const READABLE = /^[A-Za-z0-9\s'’‘"“”.,;:!?()[\]\-–—/]*$/;
+
+/**
+ * Whether the check reads all of a text (`READABLE`). One it doesn't is
+ * never confirmed, nor a sentence shown: the check can't settle what it
+ * can't read.
+ */
+export function isReadable(text: string): boolean {
+  return READABLE.test(text.normalize("NFKC"));
 }
 
 /** Whether an item reads its word: a basis other than unknown, and English. */
@@ -249,11 +287,13 @@ const NEGATIONS: ReadonlySet<string> = new Set([
   "never",
   "none",
   "neither",
+  "without",
 ]);
 
 /**
- * A text's negations: its words in `NEGATIONS`, with "-n't" and "cannot"
- * as "not". Plan 077's normalising takes "not" and "no" as grammar words,
+ * A text's negations: its words in `NEGATIONS` ("without" among them, so
+ * "with the water" is not GEMPH's "without the water"), with "-n't" and
+ * "cannot" as "not". Plan 077's normalising takes "not" and "no" as grammar words,
  * so without this "not reign" would meet "reign".
  */
 function negations(text: string): Set<string> {
@@ -262,32 +302,90 @@ function negations(text: string): Set<string> {
   return out;
 }
 
+/** Whether two texts have the same negations (`negations`). */
+function sameNegations(a: string, b: string): boolean {
+  const left = negations(a);
+  const right = negations(b);
+  return left.size === right.size && [...left].every((one) => right.has(one));
+}
+
+/**
+ * A gloss's senses: its comma-, semicolon- or "[or]"-separated pieces, as
+ * Dee's "rest not [or] labour still" and the dictionary's "no, none" give
+ * several.
+ */
+const senses = (gloss: string) => gloss.split(/[,;]|\[or\]/i);
+
+/**
+ * A text's words of sense as written: folded but not stemmed, grammar words
+ * and negations left out, so "measured" is not "measure".
+ */
+const senseWords = (text: string) =>
+  new Set(
+    englishWords(text).filter(
+      (one) => !FUNCTION_WORDS.has(one) && !NEGATIONS.has(one),
+    ),
+  );
+
+const sameSet = (a: ReadonlySet<string>, b: ReadonlySet<string>) =>
+  a.size === b.size && [...a].every((one) => b.has(one));
+
+/**
+ * Whether the English is a negated sense of the gloss with its negation
+ * dropped: the same words of sense as written (MAOFFAS's "to be measured"
+ * or "measured" for its "not to be measured"), unless a sense without that
+ * negation has them too. Stemming would otherwise let it meet another
+ * sense ("measure").
+ */
+function dropsNegation(english: string, parts: readonly string[]): boolean {
+  const words = senseWords(english);
+  if (!words.size) return false;
+  const same = parts.filter((part) => sameSet(words, senseWords(part)));
+  return (
+    same.some((part) => !sameNegations(english, part)) &&
+    !same.some((part) => sameNegations(english, part))
+  );
+}
+
 /**
  * Whether the model's English is in a gloss (S6): every content word of
- * it, stemmed and with Dee's spellings folded; or, for English of grammar
- * words only, the same words as the gloss, or as a comma- or
- * semicolon-separated piece of a gloss made only of grammar words ("I"
- * meets "I, my"; "of the" does not meet "earth, of the"). Either way a
- * negation in the English must be in the gloss too.
+ * it, stemmed and with Dee's spellings folded, in one sense of the gloss
+ * (`senses`), or, only when no one sense holds them all, in the whole
+ * gloss; or, for English of grammar words only, the same words as the
+ * gloss, or as a comma- or semicolon-separated piece of a gloss made only
+ * of grammar words ("I" meets "I, my"; "of the" does not meet "earth, of
+ * the"). Either way the English has the same negations as the text it
+ * meets: one in the English must be there, and one there in the English,
+ * so "shall see" doesn't meet "shall not see", and "labour not" doesn't
+ * meet "rest not [or] labour still", whose "not" is another sense's. Nor
+ * may it be a negated sense with its negation dropped (`dropsNegation`).
  */
-function englishIn(english: string, gloss: string): boolean {
-  const denied = negations(english);
-  if (denied.size) {
-    const glossDenies = negations(gloss);
-    if (![...denied].every((one) => glossDenies.has(one))) return false;
-  }
+export function englishIn(english: string, gloss: string): boolean {
   if (isFunctionOnly(english)) {
-    if (sameEnglish(english, gloss)) return true;
+    const meets = (text: string) =>
+      sameEnglish(english, text) && sameNegations(english, text);
+    if (meets(gloss)) return true;
     if (!isFunctionOnly(gloss)) return false;
+    const pieces = gloss.split(/[,;]/);
+    // Brackets are dropped only when they hold no negation: "is (not)" is
+    // never "is".
     const bare = gloss.replace(/\([^)]*\)|\[[^\]]*\]/g, " ");
-    return [...gloss.split(/[,;]/), ...bare.split(/[,;]/)].some((piece) =>
-      sameEnglish(english, piece),
-    );
+    if (sameNegations(gloss, bare)) pieces.push(...bare.split(/[,;]/));
+    return pieces.some(meets);
   }
   const wanted = contentStems(english);
   if (!wanted.length) return false;
-  const have = new Set(contentStems(gloss));
-  return wanted.every((one) => have.has(one));
+  const parts = senses(gloss);
+  if (dropsNegation(english, parts)) return false;
+  const holds = (text: string) => {
+    const have = new Set(contentStems(text));
+    return wanted.every((one) => have.has(one));
+  };
+  const holding = parts.filter(holds);
+  // Within a sense, never borrowing another sense's negation.
+  if (holding.length)
+    return holding.some((part) => sameNegations(english, part));
+  return holds(gloss) && sameNegations(english, gloss);
 }
 
 /** An Aethyr the lookup reads in Key 19's slot, in place of LIL. */
@@ -384,10 +482,14 @@ function isPart(source: Resolved, part: Part): boolean {
     : part.entries.has(source.folded ?? "");
 }
 
-/** Whether an item reads its source's gloss as a confirmed part may. */
+/**
+ * Whether an item reads its source's gloss as a confirmed part may: all of
+ * its English read (`isReadable`) and in the gloss.
+ */
 function partHolds(item: ReadingItem, source: Resolved) {
   return (
     (item.basis === "attested" || item.basis === "derived") &&
+    isReadable(item.target) &&
     source.glosses.some((gloss) => englishIn(item.target, gloss))
   );
 }
@@ -467,20 +569,29 @@ function judge(
   };
 }
 
-/** The model's English for a word, plain and cut (S6). */
-function englishOf(items: readonly ReadingItem[]) {
+/**
+ * The model's English for a word, plain and cut (S6): to
+ * `MAX_ENGLISH_WORDS` words, then to `MAX_ENGLISH_CHARS` characters.
+ */
+function englishOf(items: readonly ReadingItem[]): {
+  english: string;
+  cut?: true;
+} {
   const all = plain(
     items
       .filter(hasReading)
       .map((one) => one.target)
       .join(" "),
   ).split(" ");
-  return all.length > MAX_ENGLISH_WORDS
-    ? {
-        english: all.slice(0, MAX_ENGLISH_WORDS).join(" "),
-        cut: true as const,
-      }
-    : { english: all.join(" ") };
+  const english = all.slice(0, MAX_ENGLISH_WORDS).join(" ");
+  // By code point, so no character is split in two.
+  const chars = Array.from(english);
+  if (chars.length > MAX_ENGLISH_CHARS)
+    return {
+      english: chars.slice(0, MAX_ENGLISH_CHARS).join("").trimEnd(),
+      cut: true,
+    };
+  return all.length > MAX_ENGLISH_WORDS ? { english, cut: true } : { english };
 }
 
 /** One word, checked: its state, English and sources. */
@@ -498,9 +609,11 @@ function checkWord(
 }
 
 /**
- * S7 on the model's sentence: shown only as plain text, no longer than a
- * few times the passage (`SENTENCE_WORDS_PER_WORD`), with no link, and
- * when `sentenceRule` finds most of its content words in the evidence.
+ * S7 on the model's sentence: shown only as plain text the check reads
+ * whole (`isReadable`), no longer than a few times the passage in words
+ * (`SENTENCE_WORDS_PER_WORD`) and in characters
+ * (`SENTENCE_CHARS_PER_WORD`), with no link, and when `sentenceRule` finds
+ * most of its content words in the evidence.
  */
 function checkSentence(
   sentence: string | undefined,
@@ -517,14 +630,18 @@ function checkSentence(
     SENTENCE_FLOOR_WORDS,
     SENTENCE_WORDS_PER_WORD * passageWords,
   );
-  // A link or a length the card won't show is withheld whatever the rule says.
+  // A link, a length the card won't show or text the check can't read is
+  // withheld whatever the rule says.
   const withheld: SentenceWithheld | undefined = !text
     ? "no sentence"
     : hasLink(text)
       ? "link"
-      : englishLength(text) > most
+      : englishLength(text) > most ||
+          Array.from(text).length > most * SENTENCE_CHARS_PER_WORD
         ? "too long"
-        : verdict.withheld;
+        : !isReadable(text)
+          ? "unreadable"
+          : verdict.withheld;
   return withheld || !text
     ? { shown: false, withheld: withheld ?? "no sentence", ...counts }
     : { shown: true, text, ...counts };
@@ -557,9 +674,13 @@ export function checkReading(
   const words = tokens.map((token, at) =>
     checkWord(translator.lookup, token, byToken[at]),
   );
-  // S7's evidence: the readings shown, as shown, and the lookup's glosses.
+  // S7's evidence: the confirmed readings, as shown, and the lookup's
+  // glosses; never the model's own unconfirmed readings or guesses, which
+  // would let a sentence be supported by what the model alone said.
   const evidence = [
-    ...words.flatMap((one) => (one.english ? [one.english] : [])),
+    ...words.flatMap((one) =>
+      one.state === "confirmed" && one.english ? [one.english] : [],
+    ),
     ...tokenGlosses(translator, tokens),
   ];
   const passageWords = tokens.at(-1)?.span[1] ?? 0;

@@ -115,6 +115,7 @@ import {
   score,
   scoreWords,
   servedBytes,
+  withoutDenied,
   writeNewSample,
 } from "./table.ts";
 import { hintWords } from "./words.ts";
@@ -292,7 +293,10 @@ async function embed(prepared: Prepared) {
   );
 }
 
-/** Each word's best gloss, from the cache alone. */
+/**
+ * Each word's best gloss, from the cache alone, less the hints the word
+ * denylist denies.
+ */
 function scoreAll(prepared: Prepared): Scored[] {
   const { words, glosses, inputs, cache, missing } = prepared;
   if (missing.length)
@@ -305,7 +309,10 @@ function scoreAll(prepared: Prepared): Scored[] {
     if (!vector) throw new Error(`No vector for ${text}`);
     return vector;
   };
-  return scoreWords(words, glosses, vectorOf, HINT_RECIPE.profile.dimensions);
+  return withoutDenied(
+    scoreWords(words, glosses, vectorOf, HINT_RECIPE.profile.dimensions),
+    glosses,
+  );
 }
 
 /** The cut-off to build at: --cutoff, or the committed table's, or 5.5. */

@@ -8,6 +8,7 @@ air name  # EXARP: a tablet's name, not a meaning
 earth name  # NANTA: a tablet's name, not a meaning
 fire name  # BITOM: a tablet's name, not a meaning
 water name  # HCOMA: a tablet's name, not a meaning
+tablet of union  # BITOM, EXARP, HCOMA, NANTA, NN: the tablet these name, not a meaning
 formed named  # GAZAVAA: garbled ("a formed named")
 eyes need only to  # GE-OOEEON: a fragment
 in god of stretch forth and conquer  # MADZILODARP: a name
