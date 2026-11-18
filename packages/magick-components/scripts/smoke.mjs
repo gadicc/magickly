@@ -657,7 +657,9 @@ const { ROSE_SIGIL_PROFILE, roseSigilLayout } = await import("magick-components/
 const row = { a: { x: -20, y: 0 }, b: { x: 0, y: 0 }, c: { x: 20, y: 0 } };
 const layout = { place: (t) => (t in row ? t : null), anchor: (p) => row[p], slack: () => 4, placeAt: () => null, unit: 1, places: Object.keys(row) };
 const own = renderToStaticMarkup(h(SigilImage, { text: "ab ca", layout, profile: { id: "row", nooseTolerance: 1 } }));
-if (!own.includes('viewBox="-102 -34 136 68"') || (own.match(/<path /g) ?? []).length !== 1) throw new Error("the engine on its own layout: " + own);
+// Ink is one path per subpath, in drawing order (so the draw-on runs in
+// order): each of the two words is its circle and stroke, then its bar.
+if (!own.includes('viewBox="-102 -34 136 68"') || (own.match(/<path /g) ?? []).length !== 4) throw new Error("the engine on its own layout: " + own);
 const plan = planSigil(sigilWords("מטטרון"), roseSigilLayout(), ROSE_SIGIL_PROFILE);
 if (JSON.stringify(plan[0].map((v) => v.marks)) !== JSON.stringify([["start"], ["crook"], ["noose"], [], ["end"]])) throw new Error("the plan: " + JSON.stringify(plan));
 if (placeSigil(plan, roseSigilLayout(), ROSE_SIGIL_PROFILE)[0].length !== 5) throw new Error("the placed plan");
