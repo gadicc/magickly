@@ -13,7 +13,9 @@
  * 3. Cast the shapes every way they fit: a loop with a stroke leaving its
  *    rim as the start circle; every other loop as a noose on a line it is
  *    tangent to (within 0.4 units); a line centred across another's end as
- *    the bar.
+ *    the bar, unless other ink runs into it (closer than half a stroke
+ *    width). Ink that close to a crook's cups, on their side, makes the
+ *    word unreadable.
  * 4. Build a graph: line ends, wave ends, noose feet and points where one
  *    line's end lies on another are nodes; crossings are not, so the trace
  *    goes straight through them.
@@ -43,6 +45,7 @@ import {
 import {
   angleBetween,
   barCandidates,
+  barIntrusion,
   dist,
   dot,
   type InkEnd,
@@ -56,6 +59,7 @@ import {
   type Segment,
   SHAPE_TOLERANCE,
   sub,
+  waveIntrusions,
 } from "./figureShapes.ts";
 
 /** One reading of a word: its vertices as a plan word, and where each was drawn. */
@@ -91,6 +95,12 @@ const READ = {
   nooseGap: 0.4,
   /** A bar may be this far, in degrees, from perpendicular. */
   barSkew: 15,
+  /**
+   * Ink closer than this, in units, to a bar or a crook's cups runs into
+   * it: their inks overlap by half a stroke width and a reader cannot tell
+   * the mark from the crossing.
+   */
+  touch: 0.5,
 } as const;
 
 interface Edge {
@@ -138,10 +148,20 @@ function choices(
   shapes: InkShapes,
   unit: number,
   problems: string[],
+  strict: boolean,
 ): Choice[] {
   const ends = inkEnds(shapes);
-  const bars = barCandidates(shapes, unit, READ.barSkew);
-  if (bars.length === 0) problems.push("no end bar");
+  const candidates = barCandidates(shapes, unit, READ.barSkew);
+  const bars = candidates.filter(
+    (bar) =>
+      !strict ||
+      barIntrusion(shapes, bar, unit, FIGURE_GRAMMAR.strokeWidth * unit)
+        .distance >=
+        READ.touch * unit,
+  );
+  if (candidates.length > 0 && bars.length === 0)
+    problems.push("the end bar runs into other ink");
+  else if (bars.length === 0) problems.push("no end bar");
   const starts = shapes.loops.flatMap((loop, i) => {
     const rims = rimEnds(loop, ends, unit).map((rim) => ({ start: i, rim }));
     const lone = bars.some(
@@ -374,10 +394,15 @@ function toWord(
   return vertices;
 }
 
-/** Every reading of one word's shapes. */
+/** Every reading of one word's shapes (O3). */
 export function readWordShapes(
   shapes: InkShapes,
   layout: SigilGeometry,
+  /**
+   * False reads past ink run into a bar or a crook, for O2, which reports
+   * that itself and still wants the figure's vertices.
+   */
+  strict = true,
 ): WordReadBack {
   const unit = layout.unit;
   const problems: string[] = [];
@@ -387,10 +412,18 @@ export function readWordShapes(
     );
   const mixed = shapes.waves.find((w) => !w.sidesAgree);
   if (mixed) problems.push(`a wave at ${fmt(mixed.a)} has cups on both sides`);
+  // Measured from a stroke width along its own strokes, as O2 measures.
+  const crossed = strict
+    ? waveIntrusions(shapes, unit, FIGURE_GRAMMAR.strokeWidth * unit).find(
+        (touch) => touch.distance < READ.touch * unit,
+      )
+    : undefined;
+  if (crossed)
+    problems.push(`ink runs through the crook at ${fmt(crossed.at)}`);
   if (problems.length) return { readings: [], problems };
 
   const readings = new Map<string, WordReading>();
-  for (const choice of choices(shapes, unit, problems)) {
+  for (const choice of choices(shapes, unit, problems, strict)) {
     if (choice.rim === null) {
       // A one-vertex word: circle, bar, and perhaps a wave leaving the rim.
       const extra = shapes.lines.length - 1;

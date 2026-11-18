@@ -1,8 +1,9 @@
 /**
  * The oracle's corpus beyond the hand-written cases (plan 088, "The
  * corpus"): the 72 names as magick-data gives them, every two- and
- * three-letter text on each rose, and the kamea stubs. The hand fixtures
- * and templates are in `fixtures.ts` and `templates.ts`.
+ * three-letter text on each rose, a seeded random corpus of longer words,
+ * and the kamea stubs. The hand fixtures and templates are in
+ * `fixtures.ts` and `templates.ts`.
  */
 
 import angels from "magick-data/kabbalah/seventyTwoAngels";
@@ -11,6 +12,7 @@ import {
   type RoseVersionId,
   roseRings,
 } from "../../gd/roseSigilInternals.ts";
+import { FIGURE_GRAMMAR } from "./figure.ts";
 import { KAMEA_FIXTURES } from "./fixtures.ts";
 
 /** One of the 72 names, by its number in Lenain's order. */
@@ -59,3 +61,96 @@ export const KAMEA_STUBS = KAMEA_FIXTURES.map(({ id, planet, numbers }) => ({
   planet,
   numbers,
 }));
+
+/**
+ * A small seeded generator (xorshift32), so the random corpus is the same
+ * on every run and engine: never `Math.random`.
+ */
+export function seededRandom(seed: number): () => number {
+  let state = seed >>> 0 || 1;
+  return () => {
+    state ^= state << 13;
+    state >>>= 0;
+    state ^= state >>> 17;
+    state ^= state << 5;
+    state >>>= 0;
+    return state / 2 ** 32;
+  };
+}
+
+/**
+ * Whether a word of rose letters is within the figure grammar's domain:
+ * no run longer than `maxCrooks + 1` letters, and no place visited more
+ * than `maxVisits` times (a run is one visit).
+ */
+export function inGrammarDomain(word: string): boolean {
+  const runs: { letter: string; length: number }[] = [];
+  for (const letter of word) {
+    const last = runs[runs.length - 1];
+    if (last && last.letter === letter) last.length++;
+    else runs.push({ letter, length: 1 });
+  }
+  if (runs.some((r) => r.length > FIGURE_GRAMMAR.crook.maxCrooks + 1))
+    return false;
+  const visits = new Map<string, number>();
+  for (const r of runs) visits.set(r.letter, (visits.get(r.letter) ?? 0) + 1);
+  return [...visits.values()].every((n) => n <= FIGURE_GRAMMAR.maxVisits);
+}
+
+/** The random corpus's settings: what CI runs. */
+export const RANDOM_CORPUS = {
+  seed: 88,
+  /** Words of each length from `minLength` to `maxLength`, per rose. */
+  perLength: 40,
+  minLength: 4,
+  maxLength: 12,
+} as const;
+
+/**
+ * Random one-word texts beyond the triples (plan 088 allows 32 letters):
+ * `perLength` words of each length. Each letter repeats the last with
+ * chance 0.15, returns to an earlier one with chance 0.15, and is
+ * otherwise drawn uniformly from the rose's 22; a letter that would take
+ * the word outside the grammar's domain is drawn again.
+ * Deterministic for a seed; the same words on every rose version.
+ */
+export function randomRoseTexts({
+  seed,
+  perLength,
+  minLength,
+  maxLength,
+}: {
+  seed: number;
+  perLength: number;
+  minLength: number;
+  maxLength: number;
+} = RANDOM_CORPUS): string[] {
+  const letters = roseRings("gd").flat();
+  const next = seededRandom(seed);
+  const texts: string[] = [];
+  for (let length = minLength; length <= maxLength; length++)
+    for (let n = 0; n < perLength; n++) {
+      let word = "";
+      while (word.length < length) {
+        // Uniform letters seldom repeat or return; weight both, so crooks
+        // (R3) and returns (F1) are exercised.
+        const roll = next();
+        const pool = word ? [...word] : letters;
+        const letter =
+          roll < 0.15 && word
+            ? pool[pool.length - 1]
+            : roll < 0.3 && word
+              ? pool[Math.floor(next() * pool.length)]
+              : letters[Math.floor(next() * letters.length)];
+        if (inGrammarDomain(word + letter)) word += letter;
+      }
+      texts.push(word);
+    }
+  return texts;
+}
+
+/**
+ * Words at the edge of the domain the random corpus seldom reaches: four
+ * visits to one place, with and without crooks.
+ */
+export const DOMAIN_EDGE_TEXTS = ["אבאגאדא", "ללהללהללהל"] as const;

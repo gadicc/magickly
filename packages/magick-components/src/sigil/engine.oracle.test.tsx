@@ -7,20 +7,26 @@
  *
  * The whole corpus runs here, in CI: the hand fixtures, the templates, the
  * 72 names and every pair and triple of letters on both roses (22,524
- * figures, about 7 s), and the kamea stubs. `KNOWN_FAILURES` lists the
- * figures the engine is known to draw wrongly; it is empty, and may only
- * shrink.
+ * figures, about 7 s), a seeded random corpus of 4- to 12-letter words on
+ * both roses, and the kamea stubs. `KNOWN_FAILURES`
+ * (`oracle/engineKnownFailures.ts`) lists the figures the engine is known
+ * to draw wrongly, with the checks each fails, and may only shrink.
  */
 
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ROSE_SIGIL_PROFILE, roseSigilLayout } from "../gd/roseSigilLayout.ts";
+import { svgCoordinate } from "../svgCoordinate.ts";
 import { sigilFrame, sigilPathData, sigilViewBox } from "./ink.ts";
+import { kameaUnroundedAnchor, roseUnroundedAnchor } from "./oracle/anchors.ts";
 import {
   CORPUS_ROSE_VERSIONS,
+  DOMAIN_EDGE_TEXTS,
+  randomRoseTexts,
   roseTexts,
   SEVENTY_TWO_NAMES,
 } from "./oracle/corpus.ts";
+import { ENGINE_KNOWN_FAILURES } from "./oracle/engineKnownFailures.ts";
 import { HAND_FIXTURES, KAMEA_FIXTURES } from "./oracle/fixtures.ts";
 import {
   checkInvariants,
@@ -30,14 +36,15 @@ import {
 import { KAMEA_STUB_PROFILE, planetKameaLayout } from "./oracle/kameaLayout.ts";
 import { mirroredLayout } from "./oracle/mutants.ts";
 import { checkReadBack } from "./oracle/readBack.ts";
+import { referencePlan, referenceWords } from "./oracle/referencePlan.ts";
 import { PLAN_TEMPLATES } from "./oracle/templates.ts";
 import { placeSigil } from "./placeSigil.ts";
 import { planSigil, sigilWords } from "./planSigil.ts";
 import { SigilImage } from "./SigilImage.tsx";
 import type { SigilLayout, SigilPlan, SigilProfile } from "./types.ts";
 
-/** Figures the engine draws wrongly, by version and text, with the reason for each. */
-const KNOWN_FAILURES: Readonly<Record<string, string>> = {};
+/** Figures the engine draws wrongly, by version and text, with the checks each fails. */
+const KNOWN_FAILURES: Readonly<Record<string, string>> = ENGINE_KNOWN_FAILURES;
 
 /** `text` drawn by the engine on a rose layout, as the image route would. */
 const draw = (text: string, layout: SigilLayout<string>): string =>
@@ -74,7 +81,20 @@ function judge(
   ];
 }
 
-/** The texts of `cases` that fail O2 or O3, with their first failure. */
+/** The checks `svg` fails, as `KNOWN_FAILURES` names them; empty when it passes. */
+function checksFailed(
+  svg: string,
+  plan: SigilPlan,
+  layout: SigilLayout<string> | SigilLayout<number>,
+): string {
+  const checks: string[] = [
+    ...new Set(checkInvariants(svg, plan, layout).map((f) => f.check)),
+  ].sort();
+  if (!checkReadBack(svg, plan, layout).ok) checks.push("O3");
+  return checks.join(" ");
+}
+
+/** The texts of `cases` that fail O2 or O3, with the checks they fail. */
 function failing(
   cases: Iterable<{ text: string; version: string }>,
 ): Record<string, string> {
@@ -82,8 +102,8 @@ function failing(
   for (const { text, version } of cases) {
     const layout = roseSigilLayout(version);
     const plan = planSigil(sigilWords(text), layout, ROSE_SIGIL_PROFILE);
-    const problems = judge(draw(text, layout), plan, layout);
-    if (problems.length) failed[`${version} ${text}`] = problems[0];
+    const checks = checksFailed(draw(text, layout), plan, layout);
+    if (checks) failed[`${version} ${text}`] = checks;
   }
   return failed;
 }
@@ -107,7 +127,10 @@ describe("the engine against O2 and O3", () => {
     // The figures' plans are the hand-written ones, not just the planner's.
     for (const fixture of HAND_FIXTURES) {
       const rose = roseSigilLayout();
-      expect(judge(draw(fixture.text, rose), fixture.plan, rose)).toEqual([]);
+      expect([
+        fixture.id,
+        checksFailed(draw(fixture.text, rose), fixture.plan, rose),
+      ]).toEqual([fixture.id, KNOWN_FAILURES[`gd ${fixture.text}`] ?? ""]);
     }
   });
 
@@ -116,8 +139,11 @@ describe("the engine against O2 and O3", () => {
       const layout = roseSigilLayout(template.version);
       expect([
         template.id,
-        judge(draw(template.text, layout), template.plan, layout),
-      ]).toEqual([template.id, []]);
+        checksFailed(draw(template.text, layout), template.plan, layout),
+      ]).toEqual([
+        template.id,
+        KNOWN_FAILURES[`${template.version} ${template.text}`] ?? "",
+      ]);
     }
   });
 
@@ -138,6 +164,28 @@ describe("the engine against O2 and O3", () => {
       );
     }, 60_000);
 
+  // Words of 4 to 12 letters within the grammar's domain, from a fixed
+  // seed, and four-visit words at its edge.
+  const random = [...randomRoseTexts(), ...DOMAIN_EDGE_TEXTS];
+  for (const version of CORPUS_ROSE_VERSIONS)
+    it(`plans and draws ${random.length} random words on the ${version} rose`, () => {
+      const layout = roseSigilLayout(version);
+      // O1: the planner against the blind reference.
+      const misplanned = random.filter(
+        (text) =>
+          JSON.stringify(
+            planSigil(sigilWords(text), layout, ROSE_SIGIL_PROFILE),
+          ) !==
+          JSON.stringify(
+            referencePlan(referenceWords(text), layout, ROSE_SIGIL_PROFILE),
+          ),
+      );
+      expect(misplanned).toEqual([]);
+      expect(failing(random.map((text) => ({ text, version })))).toEqual(
+        expectedFailures(version, random),
+      );
+    }, 60_000);
+
   it("draws the kamea stubs, so nothing in it is the rose's", () => {
     for (const fixture of KAMEA_FIXTURES) {
       const layout = planetKameaLayout(fixture.planet);
@@ -147,7 +195,10 @@ describe("the engine against O2 and O3", () => {
         KAMEA_STUB_PROFILE,
       );
       expect(plan).toEqual(fixture.plan);
-      expect([fixture.id, judge(svg, plan, layout)]).toEqual([fixture.id, []]);
+      expect([fixture.id, checksFailed(svg, plan, layout)]).toEqual([
+        fixture.id,
+        KNOWN_FAILURES[`kamea ${fixture.id}`] ?? "",
+      ]);
     }
   });
 
@@ -206,16 +257,25 @@ describe("the engine's drawings, broken, are caught", () => {
 });
 
 describe("the engine under a one-ulp nudge (O2)", () => {
-  const rose = roseSigilLayout();
   it("draws the 72 names and the fixtures identically", async () => {
     const unstable: string[] = [];
     for (const text of [
       ...SEVENTY_TWO_NAMES.map((n) => n.text),
       ...HAND_FIXTURES.map((f) => f.text),
     ])
-      for (const layout of [rose, roseSigilLayout("regardie1939")])
-        if (!(await checkStability(draw, text, layout)).stable)
-          unstable.push(text);
+      for (const version of CORPUS_ROSE_VERSIONS) {
+        // Nudged before the layout rounds its anchors, where engines' trig
+        // differs; a nudge of the rounded anchors is rounded away again.
+        const source = {
+          unrounded: roseUnroundedAnchor(version),
+          quantise: svgCoordinate,
+        };
+        if (
+          !(await checkStability(draw, text, roseSigilLayout(version), source))
+            .stable
+        )
+          unstable.push(`${version} ${text}`);
+      }
     expect(unstable).toEqual([]);
   });
 
@@ -224,12 +284,12 @@ describe("the engine under a one-ulp nudge (O2)", () => {
       const drawNumbers: SigilDraw<number> = (text, layout) =>
         drawTokens([text.split(",").map(Number)], layout, KAMEA_STUB_PROFILE)
           .svg;
+      const layout = planetKameaLayout(fixture.planet);
       expect(
-        await checkStability(
-          drawNumbers,
-          fixture.numbers.join(","),
-          planetKameaLayout(fixture.planet),
-        ),
+        await checkStability(drawNumbers, fixture.numbers.join(","), layout, {
+          unrounded: kameaUnroundedAnchor(Math.sqrt(layout.places.length)),
+          quantise: svgCoordinate,
+        }),
       ).toEqual({ stable: true, changed: [] });
     }
   });

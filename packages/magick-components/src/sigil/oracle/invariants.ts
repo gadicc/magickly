@@ -7,6 +7,7 @@
  */
 
 import type { PlaceId, Point, SigilLayout, SigilPlan } from "../types.ts";
+import type { UnroundedAnchor } from "./anchors.ts";
 import {
   figureWords,
   fmt,
@@ -18,6 +19,7 @@ import {
 import {
   angleBetween,
   barCandidates,
+  barIntrusion,
   dist,
   dot,
   inkEnds,
@@ -32,6 +34,7 @@ import {
   sub,
   toLine,
   toSegment,
+  waveIntrusions,
 } from "./figureShapes.ts";
 import { readWordShapes } from "./readBack.ts";
 
@@ -48,6 +51,8 @@ export type InvariantCheck =
   | "slack"
   | "overlap"
   | "clearance"
+  | "bar-clearance"
+  | "crook-clearance"
   | "domain";
 
 /** One broken invariant. */
@@ -369,6 +374,24 @@ function checkWord(
     );
   const strokes = drawn.lines.filter((s) => !onBar(s));
 
+  // Nothing but the last stroke near the bar, nothing but its own strokes near a crook.
+  if (bars.length > 0) {
+    const touch = barIntrusion(merged, bars[0], unit, G.barClearance * unit);
+    if (touch.distance < (G.barClearance - SIZE_TOLERANCE) * unit)
+      fail(
+        "bar-clearance",
+        `other ink comes ${touch.distance.toFixed(2)} from the end bar at ${fmt(touch.at)}`,
+        last.place,
+      );
+  }
+  for (const touch of waveIntrusions(merged, unit, G.crookClearance * unit))
+    if (touch.distance < (G.crookClearance - SIZE_TOLERANCE) * unit)
+      fail(
+        "crook-clearance",
+        `other ink comes ${touch.distance.toFixed(2)} from the crook at ${fmt(touch.at)}`,
+        placeNear(touch.at, places, layout) ?? undefined,
+      );
+
   // No two strokes lying on each other.
   for (let i = 0; i < strokes.length; i++)
     for (let j = i + 1; j < strokes.length; j++) {
@@ -391,7 +414,7 @@ function checkWord(
     }
 
   // The drawn vertices: from the reading that matches the plan, else any reading, else the ink's corners.
-  const read = readWordShapes(merged, layout);
+  const read = readWordShapes(merged, layout, false);
   const matching = read.readings.find(
     (r) =>
       r.word.length === word.length &&
@@ -479,8 +502,22 @@ function checkWord(
     // A stroke into or out of a revisit may pass the place's earlier visit
     // (Regardie's יהוה, p. 59, crosses just beside the shared place); that
     // cannot be misread as another letter.
+    // Its places are its vertices', not where its ink stops: the first
+    // stroke stops at the start circle's rim, and a crooked stroke at its
+    // wave, either of which may lie outside the vertex's slack.
+    const vertexPoints = (end: Point): Point[] => {
+      const points = [end];
+      if (
+        startLoop &&
+        rimEnds(startLoop, ends, unit).some((e) => dist(e.point, end) <= join)
+      )
+        points.push(startLoop.center);
+      for (const w of waveAt(end)) points.push(w.a, w.b);
+      return points;
+    };
     const ownPlaces = new Set(
       [s.a, s.b]
+        .flatMap(vertexPoints)
         .map((p) => placeNear(p, places, layout))
         .filter((p) => p !== null),
     );
@@ -567,24 +604,49 @@ export function nextDouble(x: number, sign: 1 | -1): number {
   return float[0];
 }
 
-/** A layout whose anchors are moved by one ulp, each axis and place its own way. */
+/** Where the 1-ulp check nudges: after a layout's rounding, or before it. */
+export interface NudgeSource {
+  /**
+   * The anchors before the layout rounded them (`anchors.ts`). Given, the
+   * nudge moves these and `quantise` rounds the result, as the layout
+   * does; a nudge then changes a drawing only where an anchor lies at a
+   * rounding boundary, which is where engines' trig can disagree.
+   */
+  unrounded: UnroundedAnchor;
+  /** The layout's own rounding of a coordinate. */
+  quantise: (value: number) => number;
+}
+
+/**
+ * A layout whose anchors are moved by one ulp, each axis and place its own
+ * way: the rounded anchors, or with `source` the unrounded ones, rounded
+ * again afterwards.
+ */
 export function nudgedLayout<Token>(
   layout: SigilLayout<Token>,
   sign: (place: number, axis: 0 | 1) => 1 | -1,
+  source?: NudgeSource,
 ): SigilLayout<Token> {
   const index = new Map(layout.places.map((p, i) => [p, i]));
+  // One ulp of zero is a subnormal, which no engine's trig produces
+  // (cos(π/2) is 6e-17) and which aborts nlopt; zero moves by one ulp of
+  // the layout's unit instead.
+  const nudge = (x: number, s: 1 | -1) =>
+    x === 0 ? s * Number.EPSILON * layout.unit : nextDouble(x, s);
   return {
     ...layout,
     place: (token) => layout.place(token),
     anchor(place) {
-      const a = layout.anchor(place);
       const i = index.get(place) ?? 0;
-      // One ulp of zero is a subnormal, which no engine's trig produces
-      // (cos(π/2) is 6e-17) and which aborts today's optimiser; zero moves
-      // by one ulp of the layout's unit instead.
-      const nudge = (x: number, s: 1 | -1) =>
-        x === 0 ? s * Number.EPSILON * layout.unit : nextDouble(x, s);
-      return { x: nudge(a.x, sign(i, 0)), y: nudge(a.y, sign(i, 1)) };
+      if (!source) {
+        const a = layout.anchor(place);
+        return { x: nudge(a.x, sign(i, 0)), y: nudge(a.y, sign(i, 1)) };
+      }
+      const u = source.unrounded(place);
+      return {
+        x: source.quantise(nudge(u.x, sign(i, 0))),
+        y: source.quantise(nudge(u.y, sign(i, 1))),
+      };
     },
     slack: (place) => layout.slack(place),
     placeAt: (point) => layout.placeAt(point),
@@ -621,19 +683,31 @@ export const NUDGES: readonly {
  * O2's 1-ulp check: `draw` must give the identical SVG when every anchor
  * of `layout` moves by one ulp, each way. Engines differ in the last bit
  * of trig; a drawing that changes under a one-ulp nudge differs between
- * them.
+ * them. A layout that rounds its anchors erases a nudge of the rounded
+ * value, so give `source` to nudge before the rounding; `anchors.ts`
+ * checks separately that no unrounded anchor sits near a boundary.
  */
 export async function checkStability<Token>(
   draw: SigilDraw<Token>,
   text: string,
   layout: SigilLayout<Token>,
+  source?: NudgeSource,
 ): Promise<StabilityResult> {
+  if (source)
+    for (const place of layout.places) {
+      const u = source.unrounded(place);
+      const a = layout.anchor(place);
+      if (source.quantise(u.x) !== a.x || source.quantise(u.y) !== a.y)
+        throw new Error(
+          `checkStability: the unrounded anchor of ${place} does not round to the layout's`,
+        );
+    }
   const reference = await draw(text, layout);
   const changed: string[] = [];
   for (const nudge of NUDGES) {
     let svg: string;
     try {
-      svg = await draw(text, nudgedLayout(layout, nudge.sign));
+      svg = await draw(text, nudgedLayout(layout, nudge.sign, source));
     } catch (error) {
       changed.push(`${nudge.name} (threw: ${String(error).slice(0, 80)})`);
       continue;

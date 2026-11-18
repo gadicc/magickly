@@ -157,9 +157,9 @@ describe("inkShapes", () => {
       rose,
     );
     const shapes = inkShapes(words[0], 1, true);
-    const radii = shapes.loops.map((l) => l.radius).sort();
-    expect(radii[0]).toBeCloseTo(1.25, 1);
-    expect(radii[1]).toBeCloseTo(1.5, 1);
+    // The start circle and Resh's noose, both 1.25 in the simple drawer.
+    for (const loop of shapes.loops) expect(loop.radius).toBeCloseTo(1.25, 1);
+    expect(shapes.loops).toHaveLength(2);
     expect(shapes.waves.map((w) => w.cups.length)).toEqual([2]);
     expect(shapes.unknown).toEqual([]);
   });

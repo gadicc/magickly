@@ -588,3 +588,165 @@ export function nooseContacts(
   });
   return contacts.sort((x, y) => x.gap - y.gap);
 }
+
+/** Least distance between two segments: 0 where they cross. */
+export function segmentDistance(p: Segment, q: Segment): number {
+  const d1 = cross(sub(p.b, p.a), sub(q.a, p.a));
+  const d2 = cross(sub(p.b, p.a), sub(q.b, p.a));
+  const d3 = cross(sub(q.b, q.a), sub(p.a, q.a));
+  const d4 = cross(sub(q.b, q.a), sub(p.b, q.a));
+  if (d1 * d2 < 0 && d3 * d4 < 0) return 0;
+  return Math.min(
+    toSegment(p.a, q).d,
+    toSegment(p.b, q).d,
+    toSegment(q.a, p).d,
+    toSegment(q.b, p).d,
+  );
+}
+
+/**
+ * `s` without the stretch within `skip` of each of `ends` it starts or
+ * finishes at, so ink meeting a mark at its own vertex is not measured
+ * where it must touch; `null` when nothing is left.
+ */
+function clipped(
+  s: Segment,
+  ends: readonly Point[],
+  skip: number,
+  join: number,
+): Segment | null {
+  const l = length(s);
+  const dir = norm(sub(s.b, s.a));
+  let t0 = 0;
+  let t1 = l;
+  for (const e of ends) {
+    if (dist(e, s.a) <= join) t0 = Math.max(t0, skip);
+    if (dist(e, s.b) <= join) t1 = Math.min(t1, l - skip);
+  }
+  if (t1 <= t0) return null;
+  return {
+    a: { x: s.a.x + t0 * dir.x, y: s.a.y + t0 * dir.y },
+    b: { x: s.a.x + t1 * dir.x, y: s.a.y + t1 * dir.y },
+  };
+}
+
+function pointsToSegment(points: readonly Point[], s: Segment): number {
+  let d = Number.POSITIVE_INFINITY;
+  for (const p of points) d = Math.min(d, toSegment(p, s).d);
+  return d;
+}
+
+function pointsToPoints(a: readonly Point[], b: readonly Point[]): number {
+  let d = Number.POSITIVE_INFINITY;
+  for (const p of a) for (const q of b) d = Math.min(d, dist(p, q));
+  return d;
+}
+
+/** How close other ink comes to a mark, and where. */
+export interface Intrusion {
+  distance: number;
+  at: Point;
+}
+
+/**
+ * How close ink that is not its own comes to the bar on `bar.line`. Its
+ * own ink is the last stroke, which it crosses at its middle (measured
+ * from `skip` away from it), and on a one-vertex word the start circle it
+ * runs through; everything else counts, start circle and nooses included.
+ */
+export function barIntrusion(
+  shapes: InkShapes,
+  bar: BarCandidate,
+  unit: number,
+  skip: number,
+): Intrusion {
+  const join = SHAPE_TOLERANCE.join * unit;
+  const s = shapes.lines[bar.line];
+  let distance = Number.POSITIVE_INFINITY;
+  shapes.lines.forEach((line, i) => {
+    if (i === bar.line) return;
+    const part = clipped(line, [bar.at], skip, join);
+    if (part) distance = Math.min(distance, segmentDistance(part, s));
+  });
+  for (const loop of shapes.loops) {
+    if (bar.end === null && dist(loop.center, bar.at) <= 0.3 * unit) continue;
+    distance = Math.min(distance, pointsToSegment(loop.points, s));
+  }
+  for (const wave of shapes.waves) {
+    // A crook at the last vertex ends where the bar crosses: its own.
+    if (dist(wave.a, bar.at) <= join || dist(wave.b, bar.at) <= join) continue;
+    for (const cup of wave.cups)
+      distance = Math.min(distance, pointsToSegment(cup.points, s));
+  }
+  return { distance, at: bar.at };
+}
+
+/** `s` cut to the half-plane where `side(p) ≥ 0`, or null if none of it is there. */
+function halfPlane(s: Segment, side: (p: Point) => number): Segment | null {
+  const da = side(s.a);
+  const db = side(s.b);
+  if (da < 0 && db < 0) return null;
+  if (da >= 0 && db >= 0) return s;
+  const t = da / (da - db);
+  const cut = {
+    x: s.a.x + t * (s.b.x - s.a.x),
+    y: s.a.y + t * (s.b.y - s.a.y),
+  };
+  return da >= 0 ? { a: s.a, b: cut } : { a: cut, b: s.b };
+}
+
+/**
+ * How close ink that is not its own comes to each wave's cups, on the side
+ * they bulge to: ink there runs through them and wipes them out, while a
+ * narrow return along the far side of their line (F1's wedge at a crooked
+ * vertex) leaves them standing. Its own ink is the stroke it lies on and
+ * the stroke leaving its vertex (measured from `skip` away from the
+ * wave's ends), the start circle whose rim it leaves, and a bar centred
+ * on its end.
+ */
+export function waveIntrusions(
+  shapes: InkShapes,
+  unit: number,
+  skip: number,
+): Intrusion[] {
+  const join = SHAPE_TOLERANCE.join * unit;
+  return shapes.waves.map((wave, w) => {
+    const points = wave.cups.flatMap((cup) => cup.points);
+    const ends = [wave.a, wave.b];
+    const chord = Math.max(dist(wave.a, wave.b), Number.EPSILON);
+    const v = sub(wave.b, wave.a);
+    const bulge = wave.cups[0].side;
+    const side = (p: Point) => (bulge * cross(v, sub(p, wave.a))) / chord;
+    const onSide = (ps: readonly Point[]) => ps.filter((p) => side(p) >= 0);
+    let distance = Number.POSITIVE_INFINITY;
+    for (const line of shapes.lines) {
+      const mid = {
+        x: (line.a.x + line.b.x) / 2,
+        y: (line.a.y + line.b.y) / 2,
+      };
+      if (ends.some((e) => dist(e, mid) <= 0.3 * unit)) continue;
+      const own = clipped(line, ends, skip, join);
+      const part = own && halfPlane(own, side);
+      if (part) distance = Math.min(distance, pointsToSegment(points, part));
+    }
+    for (const loop of shapes.loops) {
+      const onRim = ends.some(
+        (e) => Math.abs(dist(e, loop.center) - loop.radius) <= 0.15 * unit,
+      );
+      if (!onRim)
+        distance = Math.min(
+          distance,
+          pointsToPoints(points, onSide(loop.points)),
+        );
+    }
+    shapes.waves.forEach((other, o) => {
+      if (o === w) return;
+      for (const cup of other.cups)
+        distance = Math.min(
+          distance,
+          pointsToPoints(points, onSide(cup.points)),
+        );
+    });
+    return { distance, at: wave.b };
+  });
+}

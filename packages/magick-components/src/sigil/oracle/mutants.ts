@@ -27,6 +27,8 @@ import {
   placeSimply,
   round,
 } from "./figureDrawer.ts";
+import { norm, sub } from "./figureShapes.ts";
+import type { InvariantCheck } from "./invariants.ts";
 import { KAMEA_STUB_PROFILE, planetKameaLayout } from "./kameaLayout.ts";
 import { referencePlan, referenceWords } from "./referencePlan.ts";
 
@@ -175,6 +177,14 @@ function lamedLamed(): JudgedFigure {
   });
 }
 
+/** מאאפש with Pe moved `dy` units down from its anchor. */
+function crookedFigure(dy: number): JudgedFigure {
+  const pe = rose.anchor("פ");
+  return simple("מאאפש", {
+    overrides: [[undefined, undefined, { x: pe.x, y: pe.y + dy }]],
+  });
+}
+
 /** Figures that follow the grammar and must pass O2 and O3. */
 export const KNOWN_GOOD: readonly { id: string; figure: () => JudgedFigure }[] =
   [
@@ -190,6 +200,10 @@ export const KNOWN_GOOD: readonly { id: string; figure: () => JudgedFigure }[] =
     { id: "he-he-he", figure: () => simple("הההאל") },
     { id: "lamed-lamed", figure: lamedLamed },
     { id: "aleph", figure: () => simple("א") },
+    // A word ending beside its start, its bar clear of the start circle.
+    { id: "vau-aleph-vau", figure: () => simple("ואו") },
+    // Pe moved down within its slack, so Pe→Shin clears Aleph's cups.
+    { id: "mem-aleph-aleph-pe-shin", figure: () => crookedFigure(4) },
     {
       id: "zazel-kamea",
       figure: () => {
@@ -208,10 +222,16 @@ export const KNOWN_GOOD: readonly { id: string; figure: () => JudgedFigure }[] =
 export interface Mutant {
   id: string;
   caughtBy: readonly ("O2" | "O3")[];
+  /** The O2 check that names the fault, where one was written for it. */
+  check?: InvariantCheck;
   figure: () => JudgedFigure;
 }
 
-/** Plan 088's mutants, each a known-good figure broken one way. */
+/**
+ * Plan 088's mutants, each a known-good figure broken one way, and two
+ * the review of the engine asked for: a bar through the start circle and
+ * a stroke through a crook.
+ */
 export const MUTANTS: readonly Mutant[] = [
   {
     id: "no bar",
@@ -266,5 +286,26 @@ export const MUTANTS: readonly Mutant[] = [
     id: "a start circle at the wrong end",
     caughtBy: ["O2", "O3"],
     figure: () => simple("מטטרון", { faults: { startAtEnd: true } }),
+  },
+  {
+    id: "the end bar through the start circle",
+    caughtBy: ["O2", "O3"],
+    check: "bar-clearance",
+    // The return to Vau two units from its first visit, not four: the bar
+    // at the end crosses the start circle.
+    figure: () => {
+      const vau = rose.anchor("ו");
+      const aleph = rose.anchor("א");
+      const across = norm(sub(aleph, vau));
+      const back = { x: vau.x - across.y * 2, y: vau.y + across.x * 2 };
+      return simple("ואו", { overrides: [[undefined, undefined, back]] });
+    },
+  },
+  {
+    id: "a stroke through a crook",
+    caughtBy: ["O2", "O3"],
+    check: "crook-clearance",
+    // Pe moved up instead of down: Pe→Shin runs through Aleph's cups.
+    figure: () => crookedFigure(-4),
   },
 ];

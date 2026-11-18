@@ -1,10 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { roseLetters } from "../../gd/roseSigilInternals.ts";
+import { roseLetters, roseRings } from "../../gd/roseSigilInternals.ts";
 import {
   CORPUS_ROSE_VERSIONS,
+  DOMAIN_EDGE_TEXTS,
+  inGrammarDomain,
   KAMEA_STUBS,
+  RANDOM_CORPUS,
+  randomRoseTexts,
   roseTexts,
   SEVENTY_TWO_NAMES,
+  seededRandom,
 } from "./corpus.ts";
 
 describe("oracle corpus", () => {
@@ -56,5 +61,43 @@ describe("oracle corpus", () => {
         numbers: [40, 8, 40, 20, 40, 20, 40],
       },
     ]);
+  });
+});
+
+describe("the random corpus", () => {
+  it("is the same words on every run, from a seeded generator", () => {
+    expect(randomRoseTexts()).toEqual(randomRoseTexts());
+    const a = seededRandom(7);
+    const b = seededRandom(7);
+    expect([a(), a(), a()]).toEqual([b(), b(), b()]);
+    expect(randomRoseTexts({ ...RANDOM_CORPUS, seed: 89 })).not.toEqual(
+      randomRoseTexts(),
+    );
+  });
+
+  it("has words of 4 to 12 rose letters, all within the grammar's domain", () => {
+    const texts = randomRoseTexts();
+    const { perLength, minLength, maxLength } = RANDOM_CORPUS;
+    expect(texts).toHaveLength(perLength * (maxLength - minLength + 1));
+    const letters = new Set(roseRings("gd").flat());
+    for (const text of texts) {
+      const chars = [...text];
+      expect(chars.length).toBeGreaterThanOrEqual(minLength);
+      expect(chars.length).toBeLessThanOrEqual(maxLength);
+      expect(chars.every((c) => letters.has(c))).toBe(true);
+      expect(inGrammarDomain(text)).toBe(true);
+    }
+    // Repeats and revisits do occur, so crooks and returns are exercised.
+    expect(texts.some((t) => /(.)\1\1/u.test(t))).toBe(true);
+    expect(texts.some((t) => /(.).+\1/u.test(t))).toBe(true);
+  });
+
+  it("knows the domain's edges", () => {
+    expect(inGrammarDomain("אאא")).toBe(true);
+    expect(inGrammarDomain("אאאא")).toBe(false);
+    expect(inGrammarDomain("אבאגאדא")).toBe(true);
+    expect(inGrammarDomain("אבאגאדאהא")).toBe(false);
+    for (const text of DOMAIN_EDGE_TEXTS)
+      expect(inGrammarDomain(text)).toBe(true);
   });
 });

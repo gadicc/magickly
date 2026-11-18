@@ -92,7 +92,24 @@
  *   through places outside the name are free (F2). A stroke into or out of a
  *   revisit may pass the same place's earlier visit (Regardie's יהוה, p. 59,
  *   crosses beside the shared place); that cannot be misread as another
- *   letter.
+ *   letter. A stroke's places are its vertices', not where its ink stops:
+ *   the first stroke stops at the start circle's rim and a crooked stroke
+ *   at its wave, either of which may lie outside the vertex's slack.
+ * - **Bar clearance.** No ink but the last stroke comes within 1 unit (a
+ *   stroke width: the inks would touch) of the end bar; the last stroke is
+ *   measured from a stroke width away from the bar. A bar touching the
+ *   start circle, a noose or another stroke reads as a crossing, not an
+ *   end, which is what a word ending beside its start risks: the return
+ *   must sit at least start radius + half the bar + 1 unit (3.75 with the
+ *   smallest marks) from the first visit. On a one-vertex word the bar
+ *   runs through its own start circle, as R5 and R1 together draw it.
+ * - **Crook clearance.** No ink but the crook's own comes within 1 unit of
+ *   its cups on the side they bulge to: a cup is a unit or two deep, and a
+ *   stroke through it wipes it out. Its own ink is the stroke it lies on
+ *   and the stroke leaving its vertex (measured from a stroke width away),
+ *   the start circle whose rim it leaves and a bar at its vertex. A narrow
+ *   return along the far side of its line, F1's wedge at a crooked vertex,
+ *   leaves the cups standing and passes.
  * - **Outer bound.** Every mark of a word lies within its layout's outer
  *   bound: for the rose the disc of radius 40, its outer ring (letters at 35,
  *   slack 4.6). For any layout, unless one is supplied, the disc about the
@@ -193,6 +210,18 @@ export const FIGURE_GRAMMAR = {
   vertexClearance: 2,
   /** No stroke touches another vertex's loop (start circle or noose): one stroke width. */
   markClearance: 1,
+  /**
+   * No ink but the last stroke comes within one stroke width of the end
+   * bar: a bar touching a start circle, a noose or another stroke reads
+   * as a crossing, not an end.
+   */
+  barClearance: 1,
+  /**
+   * No ink but the crook's own strokes comes within one stroke width of
+   * its cups: a cup is only a unit or two deep, and a stroke through it
+   * wipes it out.
+   */
+  crookClearance: 1,
   /**
    * Visits to one place a word may make and still read (the grammar's
    * domain): four points two units apart fit in the rose's 4.6-unit slack,

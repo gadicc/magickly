@@ -27,10 +27,14 @@ describe("the oracle's known-good figures", () => {
 });
 
 describe("the oracle's mutants", () => {
-  for (const { id, caughtBy, figure } of MUTANTS)
+  for (const { id, caughtBy, check, figure } of MUTANTS)
     it(`catches ${id} with ${caughtBy.join(" and ")}`, () => {
       const { svg, plan, layout } = figure();
       expect(judge(svg, plan, layout)).toEqual(caughtBy);
       expect(judge(scrambleSvg(svg, 3), plan, layout)).toEqual(caughtBy);
+      if (check)
+        expect(
+          checkInvariants(svg, plan, layout).map((f) => f.check),
+        ).toContain(check);
     });
 });

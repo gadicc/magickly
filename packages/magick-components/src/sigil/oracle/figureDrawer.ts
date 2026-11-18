@@ -16,14 +16,18 @@ import { type SigilGeometry, sigilFrame, wordOffset } from "./figure.ts";
 
 /** The simple drawer's sizes, in units: each inside `FIGURE_GRAMMAR`'s ranges. */
 export const SIMPLE_SIZES = {
-  startRadius: 1.5,
+  startRadius: 1.25,
   cupChord: 2,
   /** Half the chord: a semicircle. */
   cupDepth: 1,
   nooseRadius: 1.25,
-  barLength: 4,
-  /** How far a revisit moves sideways from its anchor, per visit. */
-  revisitOffset: 3,
+  barLength: 3,
+  /**
+   * How far a revisit moves sideways from its anchor, per visit: far
+   * enough that a word ending beside its start keeps its bar a stroke
+   * width clear of the start circle (1.25 + 1.5 + 1 = 3.75 units).
+   */
+  revisitOffset: 4,
 } as const;
 
 export const round = (p: Point): Point => ({
@@ -47,8 +51,9 @@ const left = (d: Point): Point => ({ x: d.y, y: -d.x });
 /**
  * A plan placed the simple way: anchors, rounded as SVG coordinates are so
  * a one-ulp nudge cannot move them; a revisit `revisitOffset × visit`
- * units to the left of its incoming stroke; a noose on the chord between
- * its neighbours' points. `overrides[word][vertex]` places a vertex by hand.
+ * units sideways of its incoming stroke, towards the layout's centre; a
+ * noose on the chord between its neighbours' points.
+ * `overrides[word][vertex]` places a vertex by hand.
  */
 export function placeSimply(
   plan: SigilPlan,
@@ -56,6 +61,7 @@ export function placeSimply(
   overrides: readonly (readonly (Point | undefined)[] | undefined)[] = [],
 ): PlacedWord[] {
   const unit = layout.unit;
+  const centre = sigilFrame(layout).center;
   return plan.map((word, w) => {
     const points: Point[] = [];
     word.forEach((v, i) => {
@@ -66,7 +72,11 @@ export function placeSimply(
       }
       const anchor = round(layout.anchor(v.place));
       if (v.visit > 0 && i > 0) {
-        const side = left(unitVector(points[i - 1], anchor));
+        // Sideways, towards the layout's centre, so it stays inside the ring.
+        const l = left(unitVector(points[i - 1], anchor));
+        const inward =
+          (centre.x - anchor.x) * l.x + (centre.y - anchor.y) * l.y >= 0;
+        const side = inward ? l : { x: -l.x, y: -l.y };
         points.push(
           round(
             along(anchor, side, SIMPLE_SIZES.revisitOffset * v.visit * unit),
@@ -140,8 +150,9 @@ export function drawPlaced(
         // The circle through both ends and the cup's deepest point.
         const r = ((c * c) / 4 + h * h) / (2 * h);
         const large = h > c / 2 ? 1 : 0;
-        // Sweep 0 bulges to the left of d in SVG's y-down coordinates.
-        const sweep = side.x * left(d).x + side.y * left(d).y > 0 ? 0 : 1;
+        // Sweep 1 runs clockwise on screen, which in SVG's y-down coordinates
+        // bulges to the left of d.
+        const sweep = side.x * left(d).x + side.y * left(d).y > 0 ? 1 : 0;
         out += ` A ${svgCoordinate(r)},${svgCoordinate(r)} 0 ${large},${sweep} ${pair(q)}`;
         p = q;
       }
@@ -186,7 +197,13 @@ export function drawPlaced(
           -2 * word[i].crooks * s.cupChord * unit,
         );
         d += ` L ${pair(start)}`;
-        const c = cups(start, dir, count, left(dir));
+        // Away from where the line turns next, so the outgoing stroke clears them.
+        const out = i + 1 < n ? unitVector(pts[i], pts[i + 1]) : dir;
+        const turnsLeft = out.x * left(dir).x + out.y * left(dir).y > 0;
+        const side = turnsLeft
+          ? { x: -left(dir).x, y: -left(dir).y }
+          : left(dir);
+        const c = cups(start, dir, count, side);
         d += c.d;
         if (count < word[i].crooks * 2) d += ` L ${pair(pts[i])}`;
       } else d += ` L ${pair(pts[i])}`;
