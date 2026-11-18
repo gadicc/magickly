@@ -18,6 +18,7 @@ import { svgCoordinate } from "../svgCoordinate.ts";
 import {
   add,
   along,
+  cross,
   direction,
   dist,
   dot,
@@ -26,7 +27,6 @@ import {
   type Segment,
   scale,
   sub,
-  toSegment,
 } from "./geometry.ts";
 import type {
   PlacedWord,
@@ -77,11 +77,15 @@ export interface InkLoop {
 /** A crook's wave: `2 × crooks` cups in a row on a stroke. */
 export interface InkWave {
   vertex: number;
+  /** The stroke it lies on (vertex `stroke` to `stroke + 1`). */
+  stroke: number;
   from: Point;
   to: Point;
   /** The side the cups bulge to, as a unit normal. */
   side: Point;
   depth: number;
+  /** Points along the cups, for measuring how close other ink comes. */
+  points: Point[];
 }
 
 /** A straight piece of a stroke, with the stroke it belongs to (vertex `i` to `i + 1`). */
@@ -91,30 +95,14 @@ export interface InkLine extends Segment {
 
 /** One word's ink as shapes, and as path commands in drawing order. */
 export interface WordInk {
+  /** One per stroke, in order. */
   lines: InkLine[];
   loops: InkLoop[];
   waves: InkWave[];
   bar: Segment;
   commands: InkCommand[];
-  /** How short a cup's chord had to be on each stroke, where shorter than the profile's widest. */
+  /** Strokes whose cups had to be narrower than the profile's narrowest. */
   cramped: number[];
-}
-
-/** The side of the line from `from` along `d` with more room from `others`; the + side on a tie. */
-function roomierSide(
-  at: Point,
-  d: Point,
-  reach: number,
-  others: readonly Segment[],
-): 1 | -1 {
-  const n = normal(d);
-  const room = (s: 1 | -1) => {
-    const probe = along(at, n, s * reach);
-    let min = Number.POSITIVE_INFINITY;
-    for (const o of others) min = Math.min(min, toSegment(probe, o).d);
-    return min;
-  };
-  return room(-1) > room(1) ? -1 : 1;
 }
 
 /** A circle as four quarter arcs from `start`, round `center`, back to `start`. */
@@ -141,32 +129,77 @@ function circleCommands(
   return commands;
 }
 
-/** `count` cups from `from` along `d`, bulging to `side`, each `chord` wide. */
-function cupCommands(
+/** Samples along each cup, for measuring clearance (plenty at a cup's size). */
+export const CUP_SAMPLES = 16;
+
+/**
+ * `count` cups from `from` along `d`, bulging to `side`, each `chord`
+ * wide, as path commands and as points along them.
+ */
+function cups(
   from: Point,
   d: Point,
   side: Point,
   count: number,
   chord: number,
   depth: number,
-): InkCommand[] {
+): { commands: InkCommand[]; points: Point[] } {
   // A cubic whose control points stand over its ends at 4/3 of the depth
   // peaks at the depth, with tangents square to the line: a cusp where
   // two cups meet.
   const lift = (depth * 4) / 3;
   const commands: InkCommand[] = [];
+  const points: Point[] = [from];
   let p = from;
   for (let k = 0; k < count; k++) {
     const q = along(p, d, chord);
-    commands.push({
-      type: "C",
-      c1: along(p, side, lift),
-      c2: along(q, side, lift),
-      to: q,
-    });
+    const c1 = along(p, side, lift);
+    const c2 = along(q, side, lift);
+    commands.push({ type: "C", c1, c2, to: q });
+    for (let j = 1; j <= CUP_SAMPLES; j++) {
+      const t = j / CUP_SAMPLES;
+      const u = 1 - t;
+      const a = u * u * u;
+      const b = 3 * u * u * t;
+      const c = 3 * u * t * t;
+      const e = t * t * t;
+      points.push({
+        x: a * p.x + b * c1.x + c * c2.x + e * q.x,
+        y: a * p.y + b * c1.y + c * c2.y + e * q.y,
+      });
+    }
     p = q;
   }
-  return commands;
+  return { commands, points };
+}
+
+/** +1 or −1: the side of a turn from `d1` to `d2` its outside lies on. */
+function outside(d1: Point, d2: Point): 1 | -1 {
+  return cross(d1, d2) > 0 ? -1 : 1;
+}
+
+/**
+ * The side, ±1 of `normal` of its line, a crook or noose at vertex `i` is
+ * drawn on unless placement chose (`PlacedVertex.side`): a crook's cups on
+ * the outside of the turn at its vertex, where the next stroke does not
+ * go (at the first vertex, the turn at the second); a noose on the
+ * outside of the next turn, or of the one before; a lone word's cups
+ * towards the middle of the layout.
+ */
+export function defaultSide(
+  points: readonly Point[],
+  i: number,
+  bound?: { center: Point },
+): 1 | -1 {
+  const n = points.length;
+  const d = (k: number) => direction(points[k], points[k + 1]);
+  if (n === 1) return bound && points[0].y > bound.center.y ? -1 : 1;
+  if (i === 0) return n > 2 ? outside(d(0), d(1)) : 1;
+  if (i === n - 1) return 1;
+  // A noose's line runs from i − 1 to i + 1 straight; a crook's turns at i.
+  if (i + 1 < n - 1) return outside(d(i), d(i + 1));
+  if (i - 1 > 0) return outside(d(i - 2), d(i - 1));
+  return outside(d(i - 1), d(i));
 }
 
 /**
@@ -189,11 +222,7 @@ export function wordInk(
   const waves: InkWave[] = [];
   const commands: InkCommand[] = [];
   const cramped: number[] = [];
-  const strokes: Segment[] = [];
-  for (let i = 1; i < n; i++) strokes.push({ a: pts[i - 1], b: pts[i] });
-  /** Every stroke (vertex k to k + 1) but those `skip` names. */
-  const away = (skip: (k: number) => boolean) =>
-    strokes.filter((_, k) => !skip(k));
+  const sideOf = (i: number) => word[i].side ?? defaultSide(pts, i, bound);
 
   const x = { x: 1, y: 0 };
   const d0 = n > 1 ? direction(pts[0], pts[1]) : x;
@@ -206,11 +235,10 @@ export function wordInk(
   const chordOn = (s: number) => {
     const cupsAtStart = s === 0 ? 2 * word[0].crooks : 0;
     const cupsAtEnd = 2 * word[s + 1].crooks;
-    const cups = cupsAtStart + cupsAtEnd;
-    if (cups === 0) return 0;
+    const count = cupsAtStart + cupsAtEnd;
     const room =
       dist(pts[s], pts[s + 1]) - (s === 0 ? rs : 0) - m.minStraight * unit;
-    const chord = Math.min(m.cupChord * unit, room / cups);
+    const chord = Math.min(m.cupChord * unit, room / count);
     if (chord < m.cupMinChord * unit) cramped.push(s);
     return Math.max(chord, m.cupMinChord * unit);
   };
@@ -220,14 +248,16 @@ export function wordInk(
    * ring they narrow to stay inside it.
    */
   const loneChord = () => {
-    const cups = 2 * word[0].crooks;
+    const count = 2 * word[0].crooks;
     if (!bound) return m.cupChord * unit;
     // How far +x from the rim the bound is: |rim + λx − centre| = radius.
     const w = sub(rim, bound.center);
     const room =
       -w.x +
-      Math.sqrt(Math.max(0, w.x * w.x - (dot(w, w) - bound.radius ** 2)));
-    const chord = Math.min(m.cupChord * unit, (room - 0.02 * unit) / cups);
+      Math.sqrt(
+        Math.max(0, w.x * w.x - (dot(w, w) - bound.radius * bound.radius)),
+      );
+    const chord = Math.min(m.cupChord * unit, (room - 0.02 * unit) / count);
     if (chord < m.cupMinChord * unit) cramped.push(0);
     return Math.max(chord, m.cupMinChord * unit);
   };
@@ -236,23 +266,19 @@ export function wordInk(
   if (word[0].crooks > 0) {
     const chord = n > 1 ? chordOn(0) : loneChord();
     const count = 2 * word[0].crooks;
-    const side = scale(
-      normal(d0),
-      n > 1
-        ? roomierSide(
-            along(rim, d0, (count * chord) / 2),
-            d0,
-            depth,
-            away((k) => k === 0),
-          )
-        : // Alone, towards the middle of the layout, away from its edge.
-          bound && pts[0].y > bound.center.y
-          ? -1
-          : 1,
-    );
+    const side = scale(normal(d0), sideOf(0));
+    const wave = cups(rim, d0, side, count, chord, depth);
     const end = along(rim, d0, count * chord);
-    commands.push(...cupCommands(rim, d0, side, count, chord, depth));
-    waves.push({ vertex: 0, from: rim, to: end, side, depth });
+    commands.push(...wave.commands);
+    waves.push({
+      vertex: 0,
+      stroke: 0,
+      from: rim,
+      to: end,
+      side,
+      depth,
+      points: wave.points,
+    });
     pen = end;
   }
 
@@ -266,17 +292,18 @@ export function wordInk(
       const start = along(p, d, -count * chord);
       lines.push({ a: pen, b: start, stroke: i - 1 });
       commands.push({ type: "L", to: start });
-      const side = scale(
-        normal(d),
-        roomierSide(
-          along(start, d, (count * chord) / 2),
-          d,
-          depth,
-          away((k) => k === i - 1),
-        ),
-      );
-      commands.push(...cupCommands(start, d, side, count, chord, depth));
-      waves.push({ vertex: i, from: start, to: p, side, depth });
+      const side = scale(normal(d), sideOf(i));
+      const wave = cups(start, d, side, count, chord, depth);
+      commands.push(...wave.commands);
+      waves.push({
+        vertex: i,
+        stroke: i - 1,
+        from: start,
+        to: p,
+        side,
+        depth,
+        points: wave.points,
+      });
     } else {
       lines.push({ a: pen, b: p, stroke: i - 1 });
       commands.push({ type: "L", to: p });
@@ -284,12 +311,7 @@ export function wordInk(
     pen = p;
     if (v.marks.includes("noose") && i < n - 1) {
       const r = m.nooseRadius * unit;
-      const s = roomierSide(
-        p,
-        d,
-        r,
-        away((k) => k === i - 1 || k === i),
-      );
+      const s = sideOf(i);
       const center = along(p, normal(d), s * r);
       loops.push({ vertex: i, kind: "noose", center, radius: r });
       commands.push(...circleCommands(center, p, r, s > 0));

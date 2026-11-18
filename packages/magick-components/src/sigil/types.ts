@@ -79,6 +79,13 @@ export type SigilPlan = readonly SigilWord[];
 /** A vertex with the point it is drawn at. */
 export interface PlacedVertex extends SigilVertex {
   point: Point;
+  /**
+   * For a crook or a noose, the side of its line it is drawn on: +1 is
+   * the line's direction turned a quarter clockwise on the page, −1 the
+   * other way. Placement chooses it; without it the renderer's default
+   * (`defaultSide`) applies.
+   */
+  side?: 1 | -1;
 }
 
 /** A word with its vertices placed. */
@@ -140,6 +147,10 @@ export interface SigilPlacementSettings {
   steps: readonly number[];
   /** Kept between a moved vertex and the edge of its place's slack. */
   slackMargin: number;
-  /** Candidate positions tried, over a whole word, before placement settles for the fewest failures. */
+  /**
+   * How much checking work placement may do on one word before it keeps
+   * the best figure found: one unit per element looked at or pair of
+   * elements checked. It bounds the time a long word takes.
+   */
   budget: number;
 }

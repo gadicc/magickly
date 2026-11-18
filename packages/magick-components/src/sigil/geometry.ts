@@ -146,3 +146,84 @@ export function overlapLength(a: Segment, b: Segment, within: number): number {
     ba ? (ba[1] - ba[0]) * dist(b.a, b.b) : 0,
   );
 }
+
+/** Least distance between two segments: 0 where they cross. */
+export function segmentDistance(p: Segment, q: Segment): number {
+  const d1 = cross(sub(p.b, p.a), sub(q.a, p.a));
+  const d2 = cross(sub(p.b, p.a), sub(q.b, p.a));
+  const d3 = cross(sub(q.b, q.a), sub(p.a, q.a));
+  const d4 = cross(sub(q.b, q.a), sub(p.b, q.a));
+  if (d1 * d2 < 0 && d3 * d4 < 0) return 0;
+  return Math.min(
+    toSegment(p.a, q).d,
+    toSegment(p.b, q).d,
+    toSegment(q.a, p).d,
+    toSegment(q.b, p).d,
+  );
+}
+
+/**
+ * `s` without `skipA` at its start and `skipB` at its end, or null when
+ * nothing is left.
+ */
+export function trimmed(
+  s: Segment,
+  skipA: number,
+  skipB: number,
+): Segment | null {
+  const l = dist(s.a, s.b);
+  if (skipA + skipB >= l) return null;
+  const d = direction(s.a, s.b);
+  return { a: along(s.a, d, skipA), b: along(s.a, d, l - skipB) };
+}
+
+/**
+ * The part of `s` where `side(p) ≥ 0`, for a `side` linear in `p`, or
+ * null if none of it is there.
+ */
+export function halfPlane(
+  s: Segment,
+  side: (p: Point) => number,
+): Segment | null {
+  const da = side(s.a);
+  const db = side(s.b);
+  if (da < 0 && db < 0) return null;
+  if (da >= 0 && db >= 0) return s;
+  const t = da / (da - db);
+  const cut = {
+    x: s.a.x + t * (s.b.x - s.a.x),
+    y: s.a.y + t * (s.b.y - s.a.y),
+  };
+  return da >= 0 ? { a: s.a, b: cut } : { a: cut, b: s.b };
+}
+
+/**
+ * Where segments `p` and `q` cross, as the parameter (0–1) along each, or
+ * null where they do not.
+ */
+export function crossing(
+  p: Segment,
+  q: Segment,
+): { s: number; t: number } | null {
+  const r = sub(p.b, p.a);
+  const u = sub(q.b, q.a);
+  const den = cross(r, u);
+  if (den === 0) return null;
+  const w = sub(q.a, p.a);
+  const s = cross(w, u) / den;
+  const t = cross(w, r) / den;
+  return s >= 0 && s <= 1 && t >= 0 && t <= 1 ? { s, t } : null;
+}
+
+/**
+ * How far apart two segments are, negative where they cross: minus how
+ * far the crossing would have to move along either to clear its ends, so
+ * that a search can tell a deep crossing from a shallow one.
+ */
+export function signedSegmentDistance(p: Segment, q: Segment): number {
+  const c = crossing(p, q);
+  if (!c) return segmentDistance(p, q);
+  const lp = dist(p.a, p.b);
+  const lq = dist(q.a, q.b);
+  return -Math.min(Math.min(c.s, 1 - c.s) * lp, Math.min(c.t, 1 - c.t) * lq);
+}

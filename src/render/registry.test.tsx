@@ -369,12 +369,14 @@ describe("component image registry", () => {
       12_725,
       "8f865a3ef15cf599b2dc6f60117c507cdc0e6d1f63269a075d3c0fba07cc3721",
     ],
-    // Two words, two sigils, right to left (R2).
+    // Two words, two sigils, right to left (R2); 25,639 bytes, ab904163…,
+    // before placement kept the bar and crooks clear of other ink.
+    // Reviewed as rasterised.
     [
       "rose-sigil",
       "text=יהוה אלהים",
-      25_639,
-      "ab9041638de848fb3b2087f372b0ec84a15b87037cc444d211707ccd71e6e285",
+      25_921,
+      "c295b1d3102db6f1f6ea7e31eee30184307affd5128cb141b545348655b20cc7",
     ],
   ] as const)(
     "pins the reviewed bytes of %s?%s so a silent font fallback fails",
