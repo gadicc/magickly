@@ -129,6 +129,18 @@ describe("/gd/sigils' words and debug view", () => {
     ).toEqual([]);
   });
 
+  it("says when a figure could not be drawn with every mark clear", () => {
+    const note = /could not be drawn so that every mark stands clear/;
+    render(<Sigils initial={{ text: "גדי", rose: true, version: "gd" }} />);
+    expect(screen.queryByText(note)).toBeNull();
+    // A-B-A-B-A across the rose: placement finds no clear figure (it is a
+    // known failure of the engine's oracle suite).
+    fireEvent.change(screen.getByPlaceholderText("Sigil text"), {
+      target: { value: "פלפלפ" },
+    });
+    expect(screen.getByText(note)).toBeTruthy();
+  });
+
   it("shows the engine's plan and placement in the debug view", () => {
     const { container } = render(
       <Sigils initial={{ text: "מטטרון", rose: true, version: "gd" }} />,
@@ -139,11 +151,11 @@ describe("/gd/sigils' words and debug view", () => {
     );
     // Metatron: a circle at Mem, a crook at Teth, a noose at Resh, a bar at Nun.
     expect(rows.map((row) => [row[2], row[5]])).toEqual([
-      ["מ", "circle"],
+      ["מ", "start circle"],
       ["ט", "crook"],
       ["ר", "noose"],
       ["ו", ""],
-      ["נ", "bar"],
+      ["נ", "end bar"],
     ]);
     // The rose's 22 slack discs are not drawn, only the name's five places'.
     expect(

@@ -20,6 +20,11 @@ import {
   ROSE_VERSIONS,
   type RoseVersionId,
 } from "magick-components/gd/roseSigilGeometry";
+import {
+  ROSE_SIGIL_PROFILE,
+  roseSigilLayout,
+} from "magick-components/gd/roseSigilLayout";
+import { sigilFigure } from "magick-components/sigil/SigilImage";
 import React from "react";
 import { VersionNote, VersionSelect } from "@/drawings/DrawingVersion";
 import Ink from "@/drawings/Ink";
@@ -64,6 +69,20 @@ export default function Sigils({
   ).length;
   const tooLong = letterCount > SIGIL_MAX_LETTERS;
   const isValid = charsValid.indexOf(false) === -1 && !tooLong;
+  const drawn = isValid ? rectified : "";
+
+  // Words beyond the tested domain are drawn best effort; the engine says
+  // when a figure fails its own checks, and the page says so too. Placed
+  // words are cached, so this costs RoseSigil nothing more.
+  const unclear = React.useMemo(
+    () =>
+      sigilFigure(
+        drawn,
+        roseSigilLayout(version),
+        ROSE_SIGIL_PROFILE,
+      ).failures.some((failures) => failures.length > 0),
+    [drawn, version],
+  );
 
   // Links only exist for text the server contract accepts, which collapses
   // the whitespace between words; the text is the user's own, so the
@@ -230,20 +249,29 @@ export default function Sigils({
           {debug ? (
             <DebugSigil
               ref={ref}
-              text={isValid ? rectified : ""}
+              text={drawn}
               showRose={showRose}
               version={version}
             />
           ) : (
             <RoseSigil
               ref={ref}
-              text={isValid ? rectified : ""}
+              text={drawn}
               showRose={showRose}
               version={version}
               animate={animate}
             />
           )}
         </Ink>
+        {unclear && (
+          <div>
+            <UiText
+              message={
+                /*i18n*/ "This sigil could not be drawn so that every mark stands clear; it may be hard to read."
+              }
+            />
+          </div>
+        )}
         <ExportControls
           target={ref}
           filename={`RoseSigil-${rectified.trim().split(/\s+/).join("-")}${version === DEFAULT_ROSE_VERSION ? "" : `-${version}`}`}

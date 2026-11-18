@@ -24,20 +24,24 @@ const ANCHOR = "#aa0";
 /** Where placement drew each vertex. */
 const PLACED = "#06c";
 
-/** What each mark of the plan is called in the table. */
+/**
+ * What each mark of the plan is called in the table. The messages are
+ * full names, not bare words like "bar", so that a catalogue entry shared
+ * with another page cannot give them another sense.
+ */
 const MARK_NAMES: Record<SigilMark, string> = {
-  start: /*i18n*/ "circle",
+  start: /*i18n*/ "start circle",
   crook: /*i18n*/ "crook",
   noose: /*i18n*/ "noose",
-  end: /*i18n*/ "bar",
+  end: /*i18n*/ "end bar",
 };
 
-/** The table's columns. */
+/** The table's columns, named as fully as the marks. */
 const HEADINGS = [
-  /*i18n*/ "Word",
+  /*i18n*/ "Sigil word",
   /*i18n*/ "Vertex",
-  /*i18n*/ "Letter",
-  /*i18n*/ "Visit",
+  /*i18n*/ "Rose letter",
+  /*i18n*/ "Visit to its place",
   /*i18n*/ "Crooks",
   /*i18n*/ "Marks",
   /*i18n*/ "Moved",

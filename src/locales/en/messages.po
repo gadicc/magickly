@@ -1296,8 +1296,8 @@ msgstr "Loading offline rituals"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "circle"
-msgstr "circle"
+msgid "start circle"
+msgstr "start circle"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
@@ -1311,13 +1311,13 @@ msgstr "noose"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "bar"
-msgstr "bar"
+msgid "end bar"
+msgstr "end bar"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "Word"
-msgstr "Word"
+msgid "Sigil word"
+msgstr "Sigil word"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
@@ -1326,13 +1326,13 @@ msgstr "Vertex"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "Letter"
-msgstr "Letter"
+msgid "Rose letter"
+msgstr "Rose letter"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "Visit"
-msgstr "Visit"
+msgid "Visit to its place"
+msgstr "Visit to its place"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
@@ -1393,6 +1393,11 @@ msgstr "Debug"
 #: src/app/gd/sigils/sigils.tsx
 msgid "Rectified text:"
 msgstr "Rectified text:"
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/sigils.tsx
+msgid "This sigil could not be drawn so that every mark stands clear; it may be hard to read."
+msgstr "This sigil could not be drawn so that every mark stands clear; it may be hard to read."
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/DocLoader.tsx
