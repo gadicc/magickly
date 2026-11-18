@@ -25,6 +25,7 @@ import { VersionNote, VersionSelect } from "@/drawings/DrawingVersion";
 import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiRichText from "@/i18n/UiRichText";
 import UiText from "@/i18n/UiText";
 import { parseComponentImageRequest } from "@/render/componentImageRequest";
 import { rectifySigilText } from "@/render/contracts/roseSigil";
@@ -133,9 +134,11 @@ export default function Sigils({
             }
           />
         </div>
+        {/* The two labels search has always read as the page's prose go
+            through UiRichText, the adapter it reads (src/search). */}
         {!isValid && (
           <div>
-            <UiText message={/*i18n*/ "Invalid characters:"} />{" "}
+            <UiRichText message={/*i18n*/ "Invalid characters:"} />{" "}
             {charsValid.map((valid, i) => (
               <span key={i} style={{ color: valid ? "" : "red" }}>
                 {sigilText[i]}
@@ -183,7 +186,7 @@ export default function Sigils({
 
         {rectified !== sigilText && (
           <div>
-            <UiText message={/*i18n*/ "Rectified text:"} /> {rectified}
+            <UiRichText message={/*i18n*/ "Rectified text:"} /> {rectified}
           </div>
         )}
 
