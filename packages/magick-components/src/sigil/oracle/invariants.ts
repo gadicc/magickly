@@ -561,7 +561,9 @@ export function nextDouble(x: number, sign: 1 | -1): number {
   if (Number.isNaN(x) || !Number.isFinite(x)) return x;
   if (x === 0) return sign * Number.MIN_VALUE;
   float[0] = x;
-  bits[0] += x > 0 === sign > 0 ? 1n : -1n;
+  // BigInt(), not a 1n literal: the app's tsconfig targets ES2018 and
+  // type-checks this file through the package's source.
+  bits[0] += BigInt(x > 0 === sign > 0 ? 1 : -1);
   return float[0];
 }
 
