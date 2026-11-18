@@ -33,11 +33,16 @@
     "src/gd/lamenGrades.ts",
     "src/gd/RoseSigil.tsx",
     "src/gd/roseSigilGeometry.ts",
+    "src/gd/roseSigilLayout.ts",
     "src/gd/RoseSigilImage.tsx",
     "src/gd/roseSigilOptimizer.ts",
     "src/gd/SevenBranchedCandlestick.tsx",
     "src/gd/TableOfShewbread.tsx",
     "src/kabbalah/fieldPath.ts",
-    "src/kabbalah/TreeOfLife.tsx"
+    "src/kabbalah/TreeOfLife.tsx",
+    "src/sigil/placeSigil.ts",
+    "src/sigil/planSigil.ts",
+    "src/sigil/SigilImage.tsx",
+    "src/sigil/types.ts"
   ]
 }

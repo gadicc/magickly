@@ -133,6 +133,11 @@ assembled graph, so they import magick-data's root entry, every table.
 | `gd/RoseSigil` | The rose-cross sigil of a Hebrew text, drawn on in the browser (`"use client"`) |
 | `gd/RoseSigilImage` | The same sigil with no hooks, for the server |
 | `gd/roseSigilGeometry` | The rose's letters and where a text's letters stand on it, on either version of the rose: `ROSE_LETTERS`, `roseRings()`, `roseLetters()`, `letterPoint()` and `sigilPoints()`, with `ROSE_VERSIONS` and `ROSE_VERSION_NOTES` |
+| `gd/roseSigilLayout` | The rose as a sigil layout, `roseSigilLayout()`, and the Golden Dawn's rules for it, `ROSE_SIGIL_PROFILE`, for the engine below |
+| `sigil/types` | The sigil engine's contract ([below](#a-sigil-on-your-own-layout)): `SigilLayout`, `SigilProfile`, `SigilPlan` and the placed words' types |
+| `sigil/planSigil` | `planSigil()`, what each vertex of a text's sigil says (its place, visit, crooks and marks), and `sigilWords()`, which splits a text into words |
+| `sigil/placeSigil` | `placeSigil()`, where each vertex of a plan is drawn, by rule |
+| `sigil/SigilImage` | `SigilImage`, a text's sigil planned, placed and drawn on any layout, with no hooks, and `sigilFigure()`, the same worked out without drawing |
 | `gd/roseSigilOptimizer` | `optimizeSigilPoints()`, the old layout optimiser (nlopt, compiled to WASM), which nothing draws with any more; it is to be removed |
 | `gd/SevenBranchedCandlestick` | The seven-branched candlestick, with its planets, in two versions: *The Equinox*'s figure of 1909 (the default) and the modern arrangement (`CANDLESTICK_VERSIONS`, `CANDLESTICK_VERSION_NOTES`) |
 | `gd/TableOfShewbread` | The table of shewbread, with the signs and the tribes |
@@ -473,6 +478,28 @@ default), and Regardie's of 1939 (`version="regardie1939"`).
 `ROSE_VERSION_NOTES`, from `gd/roseSigilGeometry`, names each and says
 where it comes from.
 
+### A sigil on your own layout
+
+The rules know nothing of the rose. A layout (`SigilLayout`, from
+`sigil/types`) says where each token is drawn and how far a visit may
+stray from its place; a profile says how the rules are tuned (how close
+to a line a letter must lie to be "passed through", the marks' sizes).
+`sigil/SigilImage` draws any text on any layout, the rose among them:
+
+```tsx
+import { ROSE_SIGIL_PROFILE, roseSigilLayout } from "magick-components/gd/roseSigilLayout";
+import { SigilImage } from "magick-components/sigil/SigilImage";
+
+export const Sigil = ({ text }: { text: string }) => (
+  <SigilImage text={text} layout={roseSigilLayout()} profile={ROSE_SIGIL_PROFILE} />
+);
+```
+
+`planSigil()` and `placeSigil()` are the two steps it takes, for a page
+that draws the figure its own way: the plan says what each vertex is
+(its place, which visit to that place, its crooks and its marks), and
+placement says where it is drawn.
+
 ## What you supply
 
 - **An Enochian font.** `Tablet` draws the Latin transliteration unless you
@@ -593,7 +620,7 @@ package's entries.
 | The Watchtowers' sigils (`enochian/Tablet`) | Drawn in code from lines, arcs and curves. The plain sigils, and the form of Air's in colour, after *The Equinox* I(7) (1912), Plate X (archive.org `crowley-equinox_202110`, "The Equinox Vol. 1, No. 7", leaf n256); the coloured Water and Fire sigils from Regardie's description, *The Golden Dawn*, vol. 4 (1940); Earth's a cross in four colours | 2026-11-14 |
 | The Air sigil's four Yods (`enochian/Tablet`) | Regardie, *The Golden Dawn*, vol. 4 (1940), p. 307 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaf n299) describes a Tau with four Yods above it; drawn as small flames after Plate X (above), hand-placed curves in code, not traced. That the Yods stand for the 4 over the T of Dee's Sigillum Dei Aemeth (*The Equinox* I(7), Plate II, leaf n238) is our inference, not a source's. They replace two fonts' glyphs, which the repository's history keeps | 2026-11-14 |
 | The kameas (`astrology/Kamea`) | A grid drawn in code around magick-data's squares (`magick-data/astrology/kameas`), which are Agrippa's, *De occulta philosophia* (Cologne, 1533), book II, ch. 22, pp. CXLIX–CLIII (archive.org `DeOccultaPhilosophiaLoc1533`, leaves n164–n168), checked cell by cell; where the 1533 printing repeats a number (Venus, row 4: 45 for 43, which its Hebrew table gives; the Moon, row 1: 45 for 54) the square has the number that makes it magic | 2026-11-14 |
-| The rose-cross sigil (`gd/RoseSigil`, `gd/RoseSigilImage`, `gd/roseSigilGeometry`, `gd/roseSigilOptimizer`) | Drawn in code. The rose's construction, three rings of letters at equal angles, is Gadi Cohen's original geometry, written out in `gd/roseSigilGeometry`, and the sigil's path is laid out by the optimiser over it. The order of the letters is in two versions. The Golden Dawn's (`gd`, the default) is the figure Crowley printed in *The Equinox* I(3) (1910), Diagram 63, plate facing p. 210 (archive.org `crowley-equinox_202110`, "The Equinox Vol. 1, No. 3", leaf n220), and the colour key to the rose in "The Complete Symbol of the Tarot", *The Equinox* I(8) (1912), plate facing p. 145 (the same item, "The Equinox Vol. 1, No. 8", leaf n174). Regardie's (`regardie1939`), which exchanges Kaph and Tau, is *The Golden Dawn*, vol. 3 (Aries Press, Chicago, 1939), p. 53 and Diagram 20, p. 56 (archive.org `IsraelRegardie-TheGoldenDawn-Vol3-1939`, leaves n46 and n49) | 2026-11-14 |
+| The rose-cross sigil (`gd/RoseSigil`, `gd/RoseSigilImage`, `gd/roseSigilGeometry`, `gd/roseSigilLayout`, `gd/roseSigilOptimizer`, `sigil/types`, `sigil/planSigil`, `sigil/placeSigil`, `sigil/SigilImage`) | Drawn in code. The rose's construction, three rings of letters at equal angles, is Gadi Cohen's original geometry, written out in `gd/roseSigilGeometry`, and the sigil is planned and placed over it by rule, our code, after the rules Regardie gives in *The Golden Dawn*, vol. 4 (Aries Press, Chicago, 1940), p. 57 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaf n51), from which only the rules are taken. The order of the letters is in two versions. The Golden Dawn's (`gd`, the default) is the figure Crowley printed in *The Equinox* I(3) (1910), Diagram 63, plate facing p. 210 (archive.org `crowley-equinox_202110`, "The Equinox Vol. 1, No. 3", leaf n220), and the colour key to the rose in "The Complete Symbol of the Tarot", *The Equinox* I(8) (1912), plate facing p. 145 (the same item, "The Equinox Vol. 1, No. 8", leaf n174). Regardie's (`regardie1939`), which exchanges Kaph and Tau, is *The Golden Dawn*, vol. 3 (Aries Press, Chicago, 1939), p. 53 and Diagram 20, p. 56 (archive.org `IsraelRegardie-TheGoldenDawn-Vol3-1939`, leaves n46 and n49) | 2026-11-14 |
 | The temple halls' art (`gd/hall`, `gd/hall/presets`, `gd/hall/tags`, `gd/hall/editor`) | Our own art, in code. The halls' layouts are facts from Regardie, *The Golden Dawn*, vol. 2 (Aries Press, Chicago, 1938), cited for each hall by page and archive.org leaf (`IsraelRegardie-TheGoldenDawn-Vol2-1938`); no drawing of his is copied. Venus' and the Moon's seals follow Agrippa's woodcuts (1533), book II, ch. 22, pp. CLI and CLIII (archive.org `DeOccultaPhilosophiaLoc1533`, leaves n166 and n168), their geometry only. Each art records its source in its `provenance` | 2026-11-17 |
 | The halls' fonts (`fonts/*`) | Subsets of Noto Serif and Frank Ruhl Libre under the SIL Open Font License 1.1, made from google/fonts at a pinned commit; [fonts/SOURCES.md](./fonts/SOURCES.md) gives the files, their hashes and how they are made | 2026-11-14 |
 | The Moon (`astrology/Moon`, `astrology/MoonWidget`) | The paths of the lit part and the disc adapt `phase_junk()` from moon-phase, Copyright © 2012 Regents of the University of California, under the BSD 3-Clause License, at a pinned commit (see [Licences](#licences)); the phase comes from lune (Apache-2.0, a dependency). The tile draws no picture of its own | 2026-11-14 |

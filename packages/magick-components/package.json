@@ -57,12 +57,17 @@
     "./gd/lamenGrades": "./src/gd/lamenGrades.ts",
     "./gd/RoseSigil": "./src/gd/RoseSigil.tsx",
     "./gd/roseSigilGeometry": "./src/gd/roseSigilGeometry.ts",
+    "./gd/roseSigilLayout": "./src/gd/roseSigilLayout.ts",
     "./gd/RoseSigilImage": "./src/gd/RoseSigilImage.tsx",
     "./gd/roseSigilOptimizer": "./src/gd/roseSigilOptimizer.ts",
     "./gd/SevenBranchedCandlestick": "./src/gd/SevenBranchedCandlestick.tsx",
     "./gd/TableOfShewbread": "./src/gd/TableOfShewbread.tsx",
     "./kabbalah/fieldPath": "./src/kabbalah/fieldPath.ts",
     "./kabbalah/TreeOfLife": "./src/kabbalah/TreeOfLife.tsx",
+    "./sigil/placeSigil": "./src/sigil/placeSigil.ts",
+    "./sigil/planSigil": "./src/sigil/planSigil.ts",
+    "./sigil/SigilImage": "./src/sigil/SigilImage.tsx",
+    "./sigil/types": "./src/sigil/types.ts",
     "./fonts/*": "./fonts/*"
   },
   "publishConfig": {
@@ -139,6 +144,10 @@
         "types": "./lib/gd/roseSigilGeometry.d.ts",
         "default": "./lib/gd/roseSigilGeometry.js"
       },
+      "./gd/roseSigilLayout": {
+        "types": "./lib/gd/roseSigilLayout.d.ts",
+        "default": "./lib/gd/roseSigilLayout.js"
+      },
       "./gd/RoseSigilImage": {
         "types": "./lib/gd/RoseSigilImage.d.ts",
         "default": "./lib/gd/RoseSigilImage.js"
@@ -162,6 +171,22 @@
       "./kabbalah/TreeOfLife": {
         "types": "./lib/kabbalah/TreeOfLife.d.ts",
         "default": "./lib/kabbalah/TreeOfLife.js"
+      },
+      "./sigil/placeSigil": {
+        "types": "./lib/sigil/placeSigil.d.ts",
+        "default": "./lib/sigil/placeSigil.js"
+      },
+      "./sigil/planSigil": {
+        "types": "./lib/sigil/planSigil.d.ts",
+        "default": "./lib/sigil/planSigil.js"
+      },
+      "./sigil/SigilImage": {
+        "types": "./lib/sigil/SigilImage.d.ts",
+        "default": "./lib/sigil/SigilImage.js"
+      },
+      "./sigil/types": {
+        "types": "./lib/sigil/types.d.ts",
+        "default": "./lib/sigil/types.js"
       },
       "./fonts/*": "./fonts/*"
     }

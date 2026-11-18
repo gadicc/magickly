@@ -20,8 +20,9 @@
  * 2. which built files carry `"use client"`, first: MercuryWidget,
  *    MoonWidget and RoseSigil, and no other;
  * 3. every entry loaded in plain Node, and the Tree, a hall and the rose
- *    sigil's image rendered with `renderToStaticMarkup`, no bundler, and
- *    a hall written as tags drawn as its `hallFromTags` data is;
+ *    sigil's image rendered with `renderToStaticMarkup`, no bundler, a
+ *    hall written as tags drawn as its `hallFromTags` data is, and the
+ *    sigil engine planning, placing and drawing on a layout of its own;
  * 4. a strict consumer type-checked under `bundler` and `nodenext`, with
  *    `skipLibCheck` off, and a prop the types must refuse, with the
  *    README's TSX and TS examples; it writes a hall with the tags;
@@ -651,6 +652,18 @@ if (data.diagnostics.length || data.hall.children?.[0]?.children?.[0]?.type !== 
 if (renderToStaticMarkup(tags) !== renderToStaticMarkup(h(GdHall, { hall: data.hall }))) throw new Error("the hall drawn from tags differs from its data's");
 const rose = renderToStaticMarkup(h(RoseSigilImage, { text: "שלום", showRose: true, debug: false, points: sigilPoints("שלום") }));
 if (!rose.includes('stroke="red"')) throw new Error("the rose sigil: " + rose.slice(0, 200));
+// The sigil engine on a layout of the consumer's own: three places in a row.
+const { SigilImage } = await import("magick-components/sigil/SigilImage");
+const { planSigil, sigilWords } = await import("magick-components/sigil/planSigil");
+const { placeSigil } = await import("magick-components/sigil/placeSigil");
+const { ROSE_SIGIL_PROFILE, roseSigilLayout } = await import("magick-components/gd/roseSigilLayout");
+const row = { a: { x: -20, y: 0 }, b: { x: 0, y: 0 }, c: { x: 20, y: 0 } };
+const layout = { place: (t) => (t in row ? t : null), anchor: (p) => row[p], slack: () => 4, placeAt: () => null, unit: 1, places: Object.keys(row) };
+const own = renderToStaticMarkup(h(SigilImage, { text: "ab ca", layout, profile: { id: "row", nooseTolerance: 1 } }));
+if (!own.includes('viewBox="-102 -34 136 68"') || (own.match(/<path /g) ?? []).length !== 1) throw new Error("the engine on its own layout: " + own);
+const plan = planSigil(sigilWords("מטטרון"), roseSigilLayout(), ROSE_SIGIL_PROFILE);
+if (JSON.stringify(plan[0].map((v) => v.marks)) !== JSON.stringify([["start"], ["crook"], ["noose"], [], ["end"]])) throw new Error("the plan: " + JSON.stringify(plan));
+if (placeSigil(plan, roseSigilLayout(), ROSE_SIGIL_PROFILE)[0].length !== 5) throw new Error("the placed plan");
 console.log(entries.length, "entries;", tree.length, hall.length, rose.length, "bytes of markup");
 `,
     );
@@ -708,6 +721,11 @@ import RoseSigil from "magick-components/gd/RoseSigil";
 import { RoseSigilImage } from "magick-components/gd/RoseSigilImage";
 import { sigilPoints } from "magick-components/gd/roseSigilGeometry";
 import { optimizeSigilPoints } from "magick-components/gd/roseSigilOptimizer";
+import { ROSE_SIGIL_PROFILE, roseSigilLayout } from "magick-components/gd/roseSigilLayout";
+import { SigilImage } from "magick-components/sigil/SigilImage";
+import { planSigil, sigilWords } from "magick-components/sigil/planSigil";
+import { placeSigil } from "magick-components/sigil/placeSigil";
+import type { PlacedWord, SigilLayout, SigilPlan, SigilProfile } from "magick-components/sigil/types";
 import Tablet from "magick-components/enochian/Tablet";
 import MercuryWidget from "magick-components/astrology/MercuryWidget";
 import { MoonWidget } from "magick-components/astrology/MoonWidget";
@@ -743,6 +761,19 @@ const onCellClick = ({ id, row, column, expected }: FylfotCellClick) =>
 const hall: HallNode | undefined = hallPreset("neophyte")?.hall;
 const end: string | undefined = currentOrNextRetrograde(new Date())?.end.toISOString();
 export const points: Promise<{ x: number; y: number }[]> = optimizeSigilPoints(sigilPoints("אב"));
+const cells: Record<number, { x: number; y: number }> = { 1: { x: 0, y: 0 }, 7: { x: 10, y: 0 }, 3: { x: 0, y: 10 } };
+const square: SigilLayout<number> = {
+  place: (n) => (n in cells ? String(n) : null),
+  anchor: (place) => cells[Number(place)],
+  slack: () => 2,
+  placeAt: () => null,
+  unit: 0.5,
+  places: ["1", "7", "3"],
+};
+const zazel: SigilProfile = { id: "kamea", nooseTolerance: 1 };
+export const plan: SigilPlan = planSigil([[7, 1, 7, 3]], square, zazel);
+export const placed: PlacedWord[] = placeSigil(plan, square, zazel);
+export const words: string[][] = sigilWords("יהוה אלהים");
 
 export const page = (
   <>
@@ -758,6 +789,9 @@ export const page = (
     <RoseSigil text="שלום" animate={false} />
     <RoseSigilImage text="אב" showRose debug={false} points={[]} />
     <RoseSigilImage text="אב" points={sigilPoints("אב")} />
+    <SigilImage text="יהוה אלהים" layout={roseSigilLayout("regardie1939")} profile={ROSE_SIGIL_PROFILE} stroke="black" />
+    {/* @ts-expect-error: a layout of numbers cannot draw a text */}
+    <SigilImage text="אב" layout={square} profile={zazel} />
     <Chakras activeChakra="heart" />
     <Chakras activeChakra={null} />
     {/* @ts-expect-error: the chakra is activeChakra, as the Tree's sphere is activeSephirah */}
