@@ -59,7 +59,7 @@ const PAGES: Record<ComponentName, ComponentPage> = {
     title: "Rose Cross Sigil",
     description:
       "A React component that draws the Rose Cross sigil of a Hebrew word or " +
-      "name, traced through its letters on the rose and spread by an optimiser.",
+      "name, traced through its letters on the rose by the Golden Dawn's rules.",
     dark: "roseSigil",
   },
   SevenBranchedCandlestick: {

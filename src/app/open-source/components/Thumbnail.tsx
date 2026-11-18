@@ -39,7 +39,7 @@ const LIVE_TILES: Partial<Record<string, ComponentType<any>>> = {
 /**
  * A component's tile picture (plan 080, the note under the stages): the
  * image route's drawing where the component has a contract, so the index
- * loads neither the sigil's optimiser nor an ephemeris; the published hall
+ * loads neither the sigil's engine nor an ephemeris; the published hall
  * for the halls; Mercury's picture without its dates, which need
  * `astronomy-engine`; and the rest drawn live from their first example.
  */

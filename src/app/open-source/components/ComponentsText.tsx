@@ -42,8 +42,7 @@ export default function ComponentsText() {
         <li>
           <b>Most render on the server</b> as plain SVG, with no client code.
           The Rose Cross sigil, the Moon and Mercury run in the browser: the
-          sigil spreads its letters with an optimiser, and the other two work
-          from today&apos;s date.
+          sigil draws itself on, and the other two work from today&apos;s date.
         </li>
       </List>
     </PageText>

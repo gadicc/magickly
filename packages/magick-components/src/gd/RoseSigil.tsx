@@ -5,7 +5,7 @@ import { type RoseVersionId, roseLetters } from "./roseSigilGeometry.ts";
 
 export interface RoseSigilProps {
   /**
-   * The text to draw. Whitespace separates words, each its own sigil (R2).
+   * The text to draw. Whitespace separates words, each its own sigil.
    * Final forms are drawn as their base letters, and anything else not one
    * of the 22 letters (points, Latin) is left out.
    */
@@ -27,10 +27,10 @@ export interface RoseSigilProps {
 
 /**
  * The rose-cross sigil of a Hebrew text, drawn through the letters' places
- * on the rose by plan 088's rules, placed by rule: the server and the
- * browser draw the same figure, with nothing to wait for. In the browser
- * the path is drawn on. A client component: the server-safe drawing is
- * `RoseSigilImage`.
+ * on the rose by the Golden Dawn's rules (Regardie, *The Golden Dawn*,
+ * vol. 4, p. 57): the server and the browser draw the same figure, and in
+ * the browser the path is drawn on. A client component: the server-safe
+ * drawing is `RoseSigilImage`.
  */
 export function RoseSigil({
   text,

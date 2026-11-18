@@ -338,13 +338,13 @@
     ]
   },
   "RoseSigil": {
-    "description": "The rose-cross sigil of a Hebrew text, drawn through the letters' places\non the rose. It renders the letter centres first, on the server too, then\nspreads repeated and aligned letters with the optimiser once in the\nbrowser, and draws the path on. A client component: the server-safe\ndrawing is `RoseSigilImage`.",
+    "description": "The rose-cross sigil of a Hebrew text, drawn through the letters' places\non the rose by the Golden Dawn's rules (Regardie, *The Golden Dawn*,\nvol. 4, p. 57): the server and the browser draw the same figure, and in\nthe browser the path is drawn on. A client component: the server-safe\ndrawing is `RoseSigilImage`.",
     "props": [
       {
         "name": "text",
         "type": "string",
         "required": true,
-        "description": "The text to draw. Final forms are drawn as their base letters, and\nanything not one of the 22 letters (spaces, points, Latin) is left out.",
+        "description": "The text to draw. Whitespace separates words, each its own sigil.\nFinal forms are drawn as their base letters, and anything else not one\nof the 22 letters (points, Latin) is left out.",
         "control": { "kind": "text" }
       },
       {
@@ -352,7 +352,7 @@
         "type": "boolean",
         "required": false,
         "default": "true",
-        "description": "Draws the connecting path on, once the layout is optimised.",
+        "description": "Draws the sigil's path on after it renders.",
         "control": { "kind": "switch" }
       },
       {
