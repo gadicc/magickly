@@ -162,8 +162,8 @@ Follow-ups are separate from the completed migration work:
 - 18 November 2026: rose sigils drawn by rule (plan 088, stage S2), on
   `gate/rose-sigil-oracle`, not merged: the package plans and places a
   sigil by the Golden Dawn's rules; the oracle passes all 72 names and
-  every figure of its corpus but 126 listed known failures (mostly
-  A‑B‑A‑B‑A words with far-apart letters); the page, the image route
+  every figure of its corpus but 190 listed known failures (mostly
+  A‑B‑A‑B‑A words with far-apart letters), each flagged by the engine; the page, the image route
   (under its own profile, `magickli-rose-sigil-image-v1`) and the debug view draw with it, each
   word its own sigil. The COBYLA optimiser is retired: its source is kept
   as `roseSigilOptimizer.ts.old`, `gd/roseSigilOptimizer` and `nlopt-js`

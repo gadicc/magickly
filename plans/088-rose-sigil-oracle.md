@@ -263,8 +263,9 @@ tightened oracle's bar and crook checks need other vertices moved too.
   from vertices and loops, the bar's and the crooks' clearance from other
   ink, loops' clearance from each other, unmarked corners under 12°, a
   crook without room, ink outside the outer ring, a vertex outside its
-  slack. A stroke may pass its own place's other visit at 0.5 units, no
-  stricter than O2, which exempts it. The score is one per failure
+  slack. A vertex stays a stroke width (1 unit) from strokes of its own
+  place, as O2's same-place floor requires; a stroke into or out of a
+  noose must keep to the chord (0.01 units). The score is one per failure
   plus how far it misses; a stroke crossing a crook or the bar counts how
   far the crossing must move to clear.
 - **Search.** While a check fails, each round tries every move of every
@@ -272,7 +273,9 @@ tightened oracle's bar and crook checks need other vertices moved too.
   step of 1.5 or 3 units or to the slack's edge (less 0.05) square to
   its incoming stroke either way, back and forward along it, and on the
   four diagonals. A noose vertex does not move itself; its failures
-  involve its neighbours. The move that lowers the score most is made,
+  involve its neighbours, and a run of nooses in a row is settled
+  together onto the chord between the run's outer neighbours, in order
+  and spaced for their loops. The move that lowers the score most is made,
   the earliest on a tie, if it gains at least 0.01; otherwise the search
   ends. If failures remain, it starts again from up to ten starts —
   revisits beside, on the other side and towards the layout's centre, at
@@ -283,13 +286,17 @@ tightened oracle's bar and crook checks need other vertices moved too.
 - **Budget.** Checking is incremental (the figure's elements are judged
   by pair, and a move re-checks only what it changed), and a budget of
   300,000 units of that work (an element looked at or a pair checked,
-  weighted by cups) bounds every word, and a text's words share twice one
-  word's budget. Placed words are cached (256 per layout and profile, and
-  only when placed on the full budget, so a text always draws the same
-  figure), so identical words place once and a keystroke re-places only
-  the word it changes. The worst text found, three of the known failures
-  in 32 letters, renders through the image route in 157 ms cold (about
-  110 ms of it placement), and 45–52 ms warm.
+  weighted by cups) bounds every word. A text's words share twice one
+  word's budget, every new word getting at least an eighth of a budget
+  (ללהאל needs about 4%), and a word met again in the same text costs
+  nothing; so a text is bounded by two budgets and an eighth for each
+  further word. Placed words are cached, frozen, 256 per layout and
+  profile (by object identity, so a layout or profile must not change
+  after first use) and keyed by the budget they were given, so a text
+  draws the same figure cold or warm and a keystroke re-places only the
+  word it changes. The worst text found, three of the known failures in
+  32 letters, renders through the image route in 147 ms cold and 4–18 ms
+  warm.
 - **Failures.** A figure carries the checks each word still fails
   (`SigilFigure.failures`); the page then says the sigil is drawn best
   effort and may be hard to read (decision 8). The image route draws it
@@ -298,18 +305,22 @@ tightened oracle's bar and crook checks need other vertices moved too.
   1.5, cups 2.6 wide (down to 2 on a short stroke) and 1.2 deep, noose
   radius 1.25, bar 4 long, a unit of straight line beside marks. Deeper
   or wider cups read barely better at 125 px and cost feasibility: with
-  cups 1.5 deep 12 corpus figures fail, 3 wide and 1.5 deep 17, against 9.
+  cups 1.5 deep 12 corpus figures fail, 3 wide and 1.5 deep 17, against 9
+  at the time.
 - Only `+ − × ÷ √` and comparisons, on inputs quantised to the SVG's
   0.001, so every engine draws the same figure. No continuous optimiser
   and no randomness.
 
-Of the oracle's 24,264 figures (fixtures, templates, the 72 names, every
+Of the report's 24,271 figures (fixtures, templates, the 72 names, every
 pair and triple, the seeded random words of 4–12 letters, every
-A‑B‑A‑B‑A, on both roses, and the two kamea stubs), 216 fail, every one a
-listed known failure (126 entries in `oracle/engineKnownFailures.ts`, a
-failing gd word also counting on Regardie's rose when it has no Kaph or
-Tau). All 72 names, the fixtures and the 4–12-letter random words but a
-handful pass. The failures:
+A‑B‑A‑B‑A, on both roses, and the two kamea stubs), 217 fail, every one a
+listed known failure, and the engine itself flags each one
+(`SigilFigure.failures`). CI also runs the 3,174 words of 4–6 letters
+around the six collinear runs of the rose (במכק, גשפו, האדל and their
+reverses), 64 of them known failures. `oracle/engineKnownFailures.ts`
+holds 190 entries (a failing gd word also counts on Regardie's rose
+when it has no Kaph or Tau). All 72 names and the fixtures pass, and all
+but 7 of the 720 random words. The failures:
 
 - **A‑B‑A‑B‑A with A and B at least 55 units apart** (116 entries). Each
   of the three wedges must open about 7° to keep touching ink under
@@ -319,6 +330,9 @@ handful pass. The failures:
   random search with 1,500 starts per word found figures for 2 of 21
   sampled, so the class is mostly infeasible under the grammar, not
   proven so.
+- **A return along a diameter past its own nooses** (64 entries, all
+  vertex clearance): האדלה, הלדאה, כבמכקא; like ללהאל's return with two
+  nooses in the way. A random search found a figure for 1 of 6 sampled.
 - **Ten others**: four or more visits to one place with crooks among them
   (ללהללהללהל, ללקלטטחללעל), a stroke from a revisit through the crook at
   the place's earlier visit (פגפבאאאפסממ, תזעטצשעעותתת), two returns along
@@ -328,7 +342,9 @@ handful pass. The failures:
 
 Words of 13–32 letters, beyond the tested domain, pass in 85 of 100 at
 13–17 letters, 26 at 18–22, 1 at 23–27 and none at 28–32 (the report's
-seeded set, both roses).
+seeded set, both roses). The 72 names' and the templates' drawings are
+pinned by a digest under the image profile, so any change to them must
+bump `ROSE_SIGIL_IMAGE_PROFILE`.
 
 The optimiser leaves the drawing path and the package (decision 7). Should
 a solver ever return, its preconditions are: quantised inputs, an
@@ -530,6 +546,16 @@ passed the hand fixtures; it then matched the reference on every text.
   counts here, Vaughan figure numbers in this plan, and image pins not
   tied to the image profile. All taken (`80e69757`–`cebccdcc`, and this
   revision) except the Provenance date, left for Gadi to re-sign.
+- **Second Fable 5.2 (high) review** of the delta to `232a0a9a`. Nothing
+  high; the earlier high fixed. Medium: two nooses in a row drew a bent
+  line the engine reported clear (1,048 of 3,174 short words around the
+  collinear runs failed the oracle silently); same-place clearance,
+  relaxed to 0.5, rescued nothing and drew corners into strokes; the
+  text budget could leave a later word none (ללהאל drawn broken after two
+  hard words). Low: the cache handed out its own objects, the image pins
+  covered four drawings, comments and README stale, a margin in units
+  unscaled in the oracle, bare i18n ids. All taken (`a3e3721a`–`c54bde0f`
+  and this revision).
 
 Still unchecked: Safari and Firefox (headless Chromium only, for the
 draw-on); the side-by-side sheet against Vaughan; Regardie's renewal
