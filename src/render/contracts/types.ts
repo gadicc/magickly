@@ -108,6 +108,12 @@ export interface ComponentImageContract<Props extends ImageDimensions> {
    * size, which existing saved Tree references depend on.
    */
   readonly rasterDefault: { width: number; height: number } | null;
+  /**
+   * The PNG size for these props when the request names neither axis, for
+   * a component whose drawings differ in shape (`viewBoxOf`); the default
+   * is `rasterDefault`.
+   */
+  rasterDefaultOf?(props: Props): { width: number; height: number } | null;
   /** Query keys the component accepts, besides `fmt`, `width` and `height`. */
   readonly keys: readonly string[];
   /** Carries user-authored state; links need explicit consent and responses are not indexed. */
@@ -131,4 +137,14 @@ export function contractViewBox<Props extends ImageDimensions>(
   props: Props,
 ): readonly [number, number, number, number] {
   return contract.viewBoxOf?.(props) ?? contract.viewBox;
+}
+
+/** The PNG size a contract draws these props at when no axis is named. */
+export function contractRasterDefault<Props extends ImageDimensions>(
+  contract: ComponentImageContract<Props>,
+  props: Props,
+): { width: number; height: number } | null {
+  return contract.rasterDefaultOf
+    ? contract.rasterDefaultOf(props)
+    : contract.rasterDefault;
 }

@@ -1,8 +1,6 @@
 import "server-only";
 import Tablet from "magick-components/enochian/Tablet";
 import { RoseSigilImage } from "magick-components/gd/RoseSigilImage";
-import { sigilPoints } from "magick-components/gd/roseSigilGeometry";
-import { optimizeSigilPoints } from "magick-components/gd/roseSigilOptimizer";
 import SevenBranchedCandlestick, {
   CANDLESTICK_PLANETS,
 } from "magick-components/gd/SevenBranchedCandlestick";
@@ -29,6 +27,14 @@ import {
   type ServerFontFile,
   TREE_IMAGE_PROFILE,
 } from "./outlineTreeImage";
+
+/**
+ * The renderer's identity for the rose sigil's images; moves only when the
+ * drawing does. Until plan 088 the sigil was drawn through COBYLA's points
+ * and published under the shared `COMPONENT_IMAGE_PROFILE`; v1 is the
+ * sigil planned and placed by rule, with each word its own sigil.
+ */
+export const ROSE_SIGIL_IMAGE_PROFILE = "magickli-rose-sigil-image-v1";
 
 export interface ComponentImageRegistration<S extends ComponentImageSlug> {
   /** Trusted JSX for validated props; never caller-supplied markup. */
@@ -258,22 +264,20 @@ export const COMPONENT_IMAGE_REGISTRY: {
     inputs: SHEWBREAD_INPUTS,
   },
   "rose-sigil": {
-    // The same bounded optimiser as the page, so the link reproduces the drawn sigil.
-    render: async (props) => (
+    // Planned and placed by rule (plan 088), as the page draws it, so the
+    // link reproduces the drawn sigil; each word its own sigil.
+    render: (props) => (
       <RoseSigilImage
         text={props.text}
         showRose={props.rose}
         version={props.version}
-        debug={false}
-        points={
-          await optimizeSigilPoints(sigilPoints(props.text, props.version))
-        }
       />
     ),
-    profile: COMPONENT_IMAGE_PROFILE,
+    profile: ROSE_SIGIL_IMAGE_PROFILE,
     // The rose's letters are geometry, written out in roseSigilGeometry.ts
     // for each version; this image reads no table, and no data edit can
-    // move its identity.
+    // move its identity. The drawing's rules are code, so the profile
+    // moves when they do.
     inputs: [],
   },
   "gd-hall": {

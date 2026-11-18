@@ -1,7 +1,10 @@
 import { WATCHTOWER_VIEWBOX } from "magick-components/enochian/Tablet";
+import RoseSigilImage from "magick-components/gd/RoseSigilImage";
 import { ROSE_VERSIONS } from "magick-components/gd/roseSigilGeometry";
 import { CANDLESTICK_VERSIONS } from "magick-components/gd/SevenBranchedCandlestick";
 import { TABLET_VERSIONS } from "magick-data/enochian/tablets";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { parseComponentImageRequest } from "../componentImageRequest";
 import { componentImageQuery } from "../componentImageUrl";
@@ -19,13 +22,17 @@ import {
   isComponentImageSlug,
 } from "./index";
 import {
+  canonicalSigilText,
   ROSE_IMAGE_VERSIONS,
   rectifySigilText,
   SIGIL_MAX_LETTERS,
+  sigilRasterDefault,
+  sigilViewBox,
 } from "./roseSigil";
 import { CANDLESTICK_IMAGE_VERSIONS } from "./sevenBranchedCandlestick";
 import {
   type ComponentImageContract,
+  contractRasterDefault,
   contractViewBox,
   DIMENSION_LIMITS,
   type ImageDimensions,
@@ -88,6 +95,8 @@ describe("component image contracts", () => {
       "text=שלום&width=50",
       "text=שבתאי&version=regardie1939",
       "text=כתר&rose=false&version=regardie1939&width=50",
+      "text=יהוה אלהים",
+      "text=יוד הא ואו הא&rose=false&height=100",
     ],
     // Sizes are PNG-only, so they round-trip in gdHall.test.ts.
     "gd-hall": ["", "hall=zelator-1", "hall=portal-2"],
@@ -192,10 +201,14 @@ describe("component image contracts", () => {
     for (const query of [
       "",
       "text=",
+      "text= ",
       "text=abc",
-      "text=א ב",
       "text=א,ב",
+      "text=א-ב",
+      "text=א־ב",
       `text=${"א".repeat(SIGIL_MAX_LETTERS + 1)}`,
+      `text=${"א ".repeat(SIGIL_MAX_LETTERS + 1)}`,
+      `text=${"א".repeat(SIGIL_MAX_LETTERS)} ב`,
       "text=א&rose=0",
       "text=א&debug=true",
       "text=א&animate=true",
@@ -211,6 +224,67 @@ describe("component image contracts", () => {
     ).toBe("rose-sigil-גדי");
   });
 
+  it("takes several words, each its own sigil (plan 088, R2)", () => {
+    // Any whitespace between words, collapsed to one space and trimmed.
+    expect(parse("rose-sigil", "text=יהוה  אלהים").text).toBe("יהוה אלהימ");
+    expect(
+      parse(
+        "rose-sigil",
+        `text=${encodeURIComponent(" יוד\tהא\nואו\u00a0הא ")}`,
+      ).text,
+    ).toBe("יוד הא ואו הא");
+    expect(canonicalSigilText("יהוה אלהים")).toBe("יהוה אלהימ");
+    expect(canonicalSigilText("  ")).toBeNull();
+    // The bound counts letters, not spaces.
+    const many = Array(SIGIL_MAX_LETTERS).fill("א").join(" ");
+    expect(parse("rose-sigil", `text=${many}`).text).toBe(many);
+    expect(
+      componentImageQuery({
+        slug: "rose-sigil",
+        props: parse("rose-sigil", "text=יהוה  אלהים"),
+      }).toString(),
+    ).toBe(new URLSearchParams({ text: "יהוה אלהימ" }).toString());
+    expect(
+      CONTRACTS["rose-sigil"].filename(parse("rose-sigil", "text=יהוה אלהים")),
+    ).toBe("rose-sigil-יהוה-אלהימ");
+  });
+
+  it("frames each word as the package draws it, right to left", () => {
+    const contract = CONTRACTS[
+      "rose-sigil"
+    ] as unknown as ComponentImageContract<ImageDimensions & { text: string }>;
+    for (const [text, viewBox] of [
+      ["גדי", [-50, -50, 100, 100]],
+      ["יהוה אלהים", [-150, -50, 200, 100]],
+      ["יוד הא ואו הא", [-350, -50, 400, 100]],
+    ] as const) {
+      const props = parse("rose-sigil", `text=${text}`);
+      expect(contractViewBox(contract, props)).toEqual(viewBox);
+      // The contract writes the package's frame out; they must agree.
+      expect(
+        renderToStaticMarkup(
+          createElement(RoseSigilImage, { text: props.text }),
+        ),
+      ).toContain(`viewBox="${viewBox.join(" ")}"`);
+    }
+    expect(sigilViewBox(1)).toEqual([-50, -50, 100, 100]);
+    // A size's other axis follows the words' aspect.
+    expect(
+      parse("rose-sigil", "text=יהוה אלהים&width=400").height,
+    ).toBeUndefined();
+    expect(() =>
+      parse("rose-sigil", `text=${"א ".repeat(8).trim()}&height=1024`),
+    ).toThrow(InvalidComponentImageRequest);
+    // The PNG's default: 1,024 a word, inside 4,096 a side.
+    expect(sigilRasterDefault(1)).toEqual({ width: 1024, height: 1024 });
+    expect(sigilRasterDefault(4)).toEqual({ width: 4096, height: 1024 });
+    expect(sigilRasterDefault(8)).toEqual({ width: 4096, height: 512 });
+    expect(sigilRasterDefault(32)).toEqual({ width: 4096, height: 128 });
+    expect(
+      contractRasterDefault(contract, parse("rose-sigil", "text=א ב")),
+    ).toEqual({ width: 2048, height: 1024 });
+  });
+
   it("never accepts download as a render key, so saved references cannot carry it", () => {
     for (const slug of COMPONENT_IMAGE_SLUGS) {
       const query = slug === "rose-sigil" ? "text=א&download=1" : "download=1";
@@ -219,9 +293,10 @@ describe("component image contracts", () => {
   });
 
   it("takes each request's viewBox from viewBoxOf, else the fixed one", () => {
-    // The other contracts draw one shape and keep their fixed viewBox.
+    // The other contracts draw one shape and keep their fixed viewBox;
+    // the halls and the sigil's words are not one shape.
     for (const slug of COMPONENT_IMAGE_SLUGS.filter(
-      (slug) => slug !== "gd-hall",
+      (slug) => slug !== "gd-hall" && slug !== "rose-sigil",
     )) {
       const contract = CONTRACTS[
         slug

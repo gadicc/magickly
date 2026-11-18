@@ -6,7 +6,7 @@ import {
   parseComponentImageRequest,
 } from "./componentImageRequest";
 import { CONTRACTS, type ComponentImageSlug } from "./contracts";
-import { contractViewBox } from "./contracts/types";
+import { contractRasterDefault, contractViewBox } from "./contracts/types";
 import { outlineComponentImage } from "./outlineTreeImage";
 import { COMPONENT_IMAGE_REGISTRY, componentInputsHash } from "./registry";
 
@@ -70,9 +70,12 @@ export async function renderComponentImage(
   if (request.format === "png") {
     const { width, height } = request.props;
     const image = sharp(bytes, { limitInputPixels: 4_194_304 });
+    const raster = contractRasterDefault(
+      contract as Parameters<typeof contractRasterDefault>[0],
+      request.props,
+    );
     if (width || height) image.resize(width, height);
-    else if (contract.rasterDefault)
-      image.resize(contract.rasterDefault.width, contract.rasterDefault.height);
+    else if (raster) image.resize(raster.width, raster.height);
     bytes = await image
       .png(registration.palette ? { palette: true } : undefined)
       .toBuffer();

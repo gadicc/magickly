@@ -10,12 +10,17 @@ import type { ReactElement } from "react";
 import { createRitualSvgValidator } from "@/files/validateRitualSvg";
 import { renderComponentImage } from "./componentImage";
 import { COMPONENT_IMAGE_SLUGS, CONTRACTS } from "./contracts";
+import { contractViewBox } from "./contracts/types";
 import { IMAGE_INPUTS_PROFILE } from "./dataInputs";
 import {
   COMPONENT_IMAGE_PROFILE,
   TREE_IMAGE_PROFILE,
 } from "./outlineTreeImage";
-import { COMPONENT_IMAGE_REGISTRY, componentInputsHash } from "./registry";
+import {
+  COMPONENT_IMAGE_REGISTRY,
+  componentInputsHash,
+  ROSE_SIGIL_IMAGE_PROFILE,
+} from "./registry";
 
 const hash = (bytes: Uint8Array) =>
   createHash("sha256").update(bytes).digest("hex");
@@ -32,6 +37,29 @@ describe("component image registry", () => {
     expect(COMPONENT_IMAGE_REGISTRY["tree-of-life"].profile).toBe(
       TREE_IMAGE_PROFILE,
     );
+  });
+
+  it("re-identifies the rose sigil, drawn by rule, and no other image", () => {
+    // Every link's drawing changed when placement by rule replaced the
+    // optimiser (plan 088), and the inputs hash cannot move (it reads no
+    // table), so the profile must: an offline copy or catalog entry made
+    // under the optimiser's drawing must not pass for the new one.
+    expect(ROSE_SIGIL_IMAGE_PROFILE).toBe("magickli-rose-sigil-image-v1");
+    expect(COMPONENT_IMAGE_REGISTRY["rose-sigil"].profile).toBe(
+      ROSE_SIGIL_IMAGE_PROFILE,
+    );
+    expect(ROSE_SIGIL_IMAGE_PROFILE).not.toBe(COMPONENT_IMAGE_PROFILE);
+    // The other components still publish under the shared profile, so
+    // their identities did not move with the sigil's.
+    for (const slug of [
+      "astro-geomancy-chart",
+      "enochian-tablet",
+      "seven-branched-candlestick",
+      "table-of-shewbread",
+    ] as const)
+      expect(COMPONENT_IMAGE_REGISTRY[slug].profile).toBe(
+        COMPONENT_IMAGE_PROFILE,
+      );
   });
 
   // The other half of an image's identity: the data it draws (plan 032,
@@ -158,12 +186,17 @@ describe("component image registry", () => {
     ["table-of-shewbread", "", 1024, 1024, 130],
     ["rose-sigil", "text=גדי", 1024, 1024, 26],
     ["rose-sigil", "text=שלום&rose=false&width=200", 200, 200, 1],
+    // Words side by side (plan 088, R2): 1,024 pixels a word, then scaled
+    // to the route's 4,096 a side.
+    ["rose-sigil", "text=יהוה אלהים", 2048, 1024, 52],
+    ["rose-sigil", "text=יוד הא ואו הא&rose=false", 4096, 1024, 1],
+    ["rose-sigil", `text=${"א ".repeat(8).trim()}&rose=false`, 4096, 512, 1],
   ] as const)(
     "renders %s?%s as validated outlined SVG and a %dx%d PNG",
     async (slug, query, width, height, minimumPaths) => {
       const svg = await render(slug, query);
       expect(svg.contentType).toBe("image/svg+xml");
-      expect(svg.identity.profile).toBe(COMPONENT_IMAGE_PROFILE);
+      expect(svg.identity.profile).toBe(COMPONENT_IMAGE_REGISTRY[slug].profile);
       // The query is the third part of the identity, not part of the inputs.
       expect(svg.identity.inputs).toEqual({
         spec: IMAGE_INPUTS_PROFILE,
@@ -174,7 +207,9 @@ describe("component image registry", () => {
       expect((text.match(/<path/g) ?? []).length).toBeGreaterThanOrEqual(
         minimumPaths,
       );
-      expect(text).toContain(`viewBox="${CONTRACTS[slug].viewBox.join(" ")}"`);
+      expect(text).toContain(
+        `viewBox="${contractViewBox(CONTRACTS[slug] as never, svg.request.props).join(" ")}"`,
+      );
       expect(await validate(svg.bytes)).toMatchObject({ status: "validated" });
       const again = await render(slug, query);
       expect(again.sha256).toBe(svg.sha256);
@@ -310,17 +345,20 @@ describe("component image registry", () => {
       44_251,
       "a6f69235cd10092063a5a24572819d6bb7fecc489560f6f6b8a2b99ed91fa557",
     ],
+    // The rose sigil drawn by rule (plan 088): 13,454 bytes, 6edd6bd2…;
+    // 707, ef44185a…; and 13,416, f0cee48b…, while COBYLA placed the
+    // points. Reviewed again as rasterised, with two words beside them.
     [
       "rose-sigil",
       "text=גדי",
-      13_454,
-      "6edd6bd2b48b513facf72cd6a9d5e036338f4d698df6f24967163e5ee340e137",
+      12_570,
+      "7afa313a0e90c1317a91b6791443285b59ac671de8a7e2f629700000dd7b9501",
     ],
     [
       "rose-sigil",
       "text=שלום&rose=false",
-      707,
-      "ef44185a356b72d97765be00496d220c081000e1db734398748b643f8bef96d4",
+      495,
+      "33210ea14ad97950493991b852199c2aeb5f5dd61113fa076d4887be758c536f",
     ],
     // Shabbathai on Regardie's rose of 1939, through Tau where Kaph is on
     // the default rose (plan 080, "The rose's and the candlestick's
@@ -328,8 +366,15 @@ describe("component image registry", () => {
     [
       "rose-sigil",
       "text=שבתאי&version=regardie1939",
-      13_416,
-      "f0cee48b841170777cb539592daa0ad9def91dde18f39d23989bdf051ccde852",
+      12_725,
+      "8f865a3ef15cf599b2dc6f60117c507cdc0e6d1f63269a075d3c0fba07cc3721",
+    ],
+    // Two words, two sigils, right to left (R2).
+    [
+      "rose-sigil",
+      "text=יהוה אלהים",
+      25_639,
+      "ab9041638de848fb3b2087f372b0ec84a15b87037cc444d211707ccd71e6e285",
     ],
   ] as const)(
     "pins the reviewed bytes of %s?%s so a silent font fallback fails",
