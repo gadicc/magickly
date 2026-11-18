@@ -838,6 +838,10 @@ is preserved, and the i18n branch/worktree are retained for follow-up work.
 
 ## Follow-up: routine translations and drawer control
 
+The remaining page inventory and ordered implementation batches are in
+[Remaining Hebrew translation batches](086-translation-batches.md). Hebrew SEO
+remains disabled throughout that rollout.
+
 User-approved follow-up after the initial local main review:
 
 - Move the language control into the drawer using its existing styling, with

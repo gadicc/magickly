@@ -139,6 +139,10 @@ translations are later bounded slices, not invented storage in this change.
 
 ## Routine maintenance and final SEO launch
 
+See the [remaining translation inventory and batches](../../plans/086-translation-batches.md)
+for every current route, known English fallbacks, implementation order and
+acceptance criteria. All batches keep Hebrew search discovery disabled.
+
 Follow the translation workflow in `AGENTS.md` and
 `scripts/i18n/README.md`: extract, translate the delta, review, check, compile and
 verify the affected screens. CI runs `pnpm i18n:check` without AI credentials.
