@@ -395,7 +395,7 @@ function checkWord(
       );
 
   // No two loops touching: a noose through the start circle is one mark.
-  for (const touch of loopContacts(merged))
+  for (const touch of loopContacts(merged, unit))
     if (touch.distance < (G.loopClearance - SIZE_TOLERANCE) * unit)
       fail(
         "loop-clearance",

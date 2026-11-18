@@ -423,7 +423,9 @@ export function readWordShapes(
     problems.push(`ink runs through the crook at ${fmt(crossed.at)}`);
   // Touching loops are one interlocked mark, not a start circle and a noose.
   const locked = strict
-    ? loopContacts(shapes).find((touch) => touch.distance < READ.touch * unit)
+    ? loopContacts(shapes, unit).find(
+        (touch) => touch.distance < READ.touch * unit,
+      )
     : undefined;
   if (locked)
     problems.push(`two loops touch at ${fmt(shapes.loops[locked.a].center)}`);
