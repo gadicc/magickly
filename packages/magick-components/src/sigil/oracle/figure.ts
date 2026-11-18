@@ -92,7 +92,8 @@
  *   through places outside the name are free (F2). A stroke into or out of a
  *   revisit may pass the same place's earlier visit (Regardie's יהוה, p. 59,
  *   crosses beside the shared place); that cannot be misread as another
- *   letter. A stroke's places are its vertices', not where its ink stops:
+ *   letter, though no nearer than a stroke width, where the visit's corner
+ *   would run into the stroke. A stroke's places are its vertices', not where its ink stops:
  *   the first stroke stops at the start circle's rim and a crooked stroke
  *   at its wave, either of which may lie outside the vertex's slack.
  * - **Bar clearance.** No ink but the last stroke comes within 1 unit (a
@@ -215,6 +216,11 @@ export const FIGURE_GRAMMAR = {
   vertexClearance: 2,
   /** No stroke touches another vertex's loop (start circle or noose): one stroke width. */
   markClearance: 1,
+  /**
+   * A stroke may pass another visit to one of its own places, but no
+   * nearer than one stroke width: nearer, the visit's corner runs into it.
+   */
+  samePlaceClearance: 1,
   /**
    * No ink but the last stroke comes within one stroke width of the end
    * bar: a bar touching a start circle, a noose or another stroke reads

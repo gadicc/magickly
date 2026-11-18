@@ -535,9 +535,12 @@ function checkWord(
     for (const v of vertices) {
       if (incident(v)) continue;
       const place = placeNear(v, places, layout);
-      if (place !== null && ownPlaces.has(place)) continue;
+      // A vertex of the stroke's own place may stand beside it, but its
+      // corner must not run into the stroke: a stroke width at least.
+      const own = place !== null && ownPlaces.has(place);
       const d = toSegment(v, s).d;
-      if (d < G.vertexClearance * unit - SIZE_TOLERANCE * unit)
+      const min = own ? G.samePlaceClearance : G.vertexClearance;
+      if (d < min * unit - SIZE_TOLERANCE * unit)
         fail(
           "clearance",
           `a stroke from ${fmt(s.a)} passes ${d.toFixed(2)} from the vertex at ${fmt(v)}`,
