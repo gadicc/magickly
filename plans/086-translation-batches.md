@@ -75,8 +75,9 @@ data. This work belongs to the first batch that needs the capability.
 
 ## Ordered batches
 
-All T batches are pending. Route counts refer to the existing templates in the
-ledger, not the future Hebrew entrypoints. Each sub-batch is a reviewable unit;
+T1 is implemented on `codex/hebrew-translations`; T2–T11 remain pending.
+Route counts refer to the existing templates in the ledger, not future Hebrew
+entrypoints. Each sub-batch is a reviewable unit;
 do not turn a whole reference section into one large translation commit.
 
 | Batch | Existing templates | Concrete delivery | Dependencies |
@@ -322,6 +323,67 @@ validation results. Keep training data, identifiers and server diagnostics
 distinct. Verify unauthorized/admin views and failed/retried operations without
 changing grants. Do not include private research or send training material to
 the site-copy translation task.
+
+## T1 implementation checkpoint — 18 November 2026
+
+Implemented in `f3f8fa79` on `codex/hebrew-translations`, based on main
+`d7f3824e`, in the retained worktree `/home/dragon/.codex/worktrees/2b19/magickli`. It translates the remaining
+shared shell/search/sign-in and temple/member/admin/forum UI. There are 114
+newly translated Hebrew messages, 448 active messages per catalog, and no
+missing/fuzzy entries. The baseline's 41 explicit English blocks are down to
+17; the remaining blocks belong to T2 and T11, not an implicit source-text
+exemption. Public edition availability and Hebrew SEO remain unchanged.
+
+Whole rich messages replace membership/sign-in fragments while keeping
+code-owned links and isolating interpolated names. Known temple/form/forum
+feedback is translated at render time, including sync counters and skip reasons;
+unknown URL/provider messages use a generic translated fallback. The legacy
+English action transport is preserved. When changing its owned feedback, update
+`src/app/temples/feedback.ts` too; do not translate arbitrary transport strings.
+Search suggestions have translated labels but retain their English query values,
+and results keep their original language. Search failures and capped/plural
+counts are translated; English search artifacts/provider settings are unchanged.
+
+The documentation capture now waits for the existing local sign-in button to
+be enabled after browser-storage recovery, instead of clicking while disabled.
+Screenshots remain synthetic and English for the existing English help page;
+T3 owns adding Hebrew guide assets. The temporary local browser-check hook is
+not part of the committed capture tool.
+
+Coordination with the ritual participants/translation chat confirmed that its
+new format and runtime remain disabled and no public `/he/doc` contract is
+ready. UI locale stays independent of content locale and participant titles,
+pronouns and agreement. This batch changes no authored ritual, edition storage,
+format/protocol, grants or source/visual host integration. Editor UI overlap
+must be coordinated before T2; the later adapter still waits for that chat's
+concrete resolver/revision/access/bundle contract.
+
+Validation completed so far: catalog extraction/strict compilation and ICU/tag
+checks; formatting/lint (28 existing warnings), project/package types, Loom
+wiring and skill checks; both production builds; webpack's 18 and Turbopack's
+16 HTTP/worker checks with real-browser locale navigation. Separate production
+browser checks cover Hebrew mobile/desktop search, dark mode, original English
+query/result language and the disabled SEO gate. Synthetic authenticated checks
+preserve the membership field's DOM node and unsubmitted value across English
+and Hebrew, and visually confirm the complete 14-day removal warning. The local
+capture environment's account-language endpoint returns 503; the existing retry
+warning is visible, and no successful account-preference write is claimed.
+
+All 19 documentation shots were regenerated, with timed-out captures retried.
+Only the join-code image (ephemeral local URL) and delete warning image (current
+retention date) differ from the baseline; both were inspected. A dictionary
+interaction test timed out while a production build and suite ran concurrently,
+then passed all 36 isolated cases. The final run without a concurrent build
+passed 662 test files and 12,737 tests (three files and 18 tests intentionally
+skipped), with all existing per-file coverage thresholds met. Statement/branch/
+function/line coverage is 98.54% / 96.94% / 99.72% / 99.43%.
+
+The ritual chat's follow-up confirmed that current existing editor UI files may
+be localized for T2 without changing props, branches, transport values or literal
+authoring syntax. Its source-only V2 host/reading components remain isolated and
+have no production callers. Source grammar examples, Frater/Soror tokens and MF2
+selectors remain outside interface translation. Future shell activation overlap
+will be flagged by that chat before integration.
 
 ## Source works, ritual editions and intentionally isolated documents
 

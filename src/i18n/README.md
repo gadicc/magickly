@@ -76,9 +76,10 @@ language and preserves the original reading direction until the other project
 supplies an explicit edition locale. Hebrew headings/short labels use Frank
 Ruhl Libre; running text uses the existing self-hosted Noto Sans Hebrew.
 
-The initial catalog covers navigation and core sign-in, temple, editor and
-offline controls. Untranslated explanatory and advanced recovery copy remains
-explicitly English through `EnglishText`/`UiText` fallbacks. Translate complete
+Shared shell/search/sign-in and temple membership/admin/forum copy is translated,
+including known form errors and forum sync feedback. Core editor and offline
+controls are translated; advanced editor, explanatory and recovery copy still
+uses explicit English fallbacks until the later batches. Translate complete
 sentences with ICU interpolation/plurals in later batches, rather than
 assembling translated sentence fragments. Public pages share their components and whole-message Lingui copy between
 English and Hebrew. `UiRichText` keeps links/formatting in code-owned React
@@ -147,8 +148,8 @@ Follow the translation workflow in `AGENTS.md` and
 `scripts/i18n/README.md`: extract, translate the delta, review, check, compile and
 verify the affected screens. CI runs `pnpm i18n:check` without AI credentials.
 The homepage, About and Books index are the initial shared-component batch;
-other public articles and advanced interface copy still need localization in
-later batches. A translated navigation shell never implies a translated source
+T1 completes shared/sign-in/temple interface copy. Other public articles and
+advanced interface copy still need localization in later batches. A translated navigation shell never implies a translated source
 work or ritual.
 
 Search launch is the final, separately requested step, after the intended page
