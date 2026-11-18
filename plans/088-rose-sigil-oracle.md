@@ -1,8 +1,9 @@
 # Rose sigil rules and oracle — 18 November 2026
 
-Status: decided 18 November 2026 ([decisions](#decisions)), being built
-on `gate/rose-sigil-oracle`. Reviewed by Fable 5.2 on 18 November 2026
-([below](#review-18-november-2026)) and revised on its findings. Read
+Status: S0–S2 built on `gate/rose-sigil-oracle` (18 November 2026), not
+merged; S3 in part ([stages](#stages)). Decided with Gadi
+([decisions](#decisions)); the design and the build each reviewed
+adversarially ([below](#review-18-november-2026)). Read
 `packages/magick-components/src/gd/roseSigilInternals.ts` (the path rules
 and the optimiser's objective) and [plan 080](080-open-source-packages.md)
 (decision 7: why the optimiser is its own module) first.
@@ -35,7 +36,7 @@ Binah on pp. 59–60 (leaves n53, n54). Vol. 3 (1939), p. 53, defers to it;
 was renewed is unverified, so we cite the pages and take facts from them,
 nothing more. No modern source was checked.
 
-| # | Rule | Source | Our engine |
+| # | Rule | Source | The engine before this plan (`f63f14eb`) |
 | --- | --- | --- | --- |
 | R1 | A small circle at the first letter | p. 57; every figure | Done |
 | R2 | Straight lines letter to letter, in order, until **the word** ends; several words are several sigils, side by side, each with its circle and bar | p. 57; p. 59 (יהוה אלהים, two), p. 60 (יוד הא ואו הא, four) | `RoseSigil` joins words (`roseLetters` drops spaces); the page and the image contract reject a space |
@@ -99,15 +100,14 @@ repository, not even as crops, and neither do per-figure annotations or the
 side-by-side sheet, which is never published as an artifact or attached to
 a PR. It stays in `~/Documents/Magick/RoseSigils/`.
 
-He draws on the GD rose (Kaph's place in #7) with points placed by hand,
-so his geometry is no reference. His conventions, checked at native
-resolution:
+He draws on the GD rose's places (Kaph's place in #7) with points placed
+by hand, so his geometry is no reference. His conventions, checked at
+native resolution:
 
 - Start circle, end bar, a bead tangent to the line on a straight pass.
 - **One two-lobed wave per adjacent pair**, as Regardie's crook: two lobes
-  for every double checked (#6, 12, 19, 24, 29, 30, 40, 52, 53 twice, 57,
-  58, 62, 71), four for the triples יייאל and הההאל. A first-letter repeat
-  is the start circle followed by the wave.
+  for every double checked, four for the triples יייאל and הההאל. A
+  first-letter repeat is the start circle followed by the wave.
 - A doubled letter on a straight pass (#26 האאיה) is **two beads** on an
   unbent line, not a wave.
 - His "straight pass" is not consistent: beads at 4.5–6 units off the chord
@@ -115,8 +115,8 @@ resolution:
   tolerance.
 
 His spellings are his own: 10 of the 72 differ from the triads of Exodus
-14:19–21 (#24, 33, 34, 38, 51, 59, 64, 68 have He for Cheth; #30 is ומאאל
-for אומאל; #66 ends יה for אל), and his figures follow his spellings.
+14:19–21 (eight have He for Cheth; one reorders its letters; one ends יה
+for אל), and his figures follow his spellings.
 
 ### S0: the annotations (18 November 2026)
 
@@ -135,8 +135,8 @@ figures. What they found:
   revisit (36, in 32 figures) is drawn beside the earlier visit, never on
   it; every wave has two lobes per repeat except #43 (one arch); the two
   triples are four lobes in a row; 13 beads in 12 figures.
-- His slips: from #53 on, Nun is drawn at Gimel's place (#53, 54, 57, 63,
-  66; earlier Nuns are in place), and #70 is drawn י מ ב י ה.
+- His slips: in five figures from #53 on, Nun is drawn at Gimel's place
+  (earlier Nuns are in place), and #70 visits its letters out of order.
 
 Marks compared with the reference plan of each of his spellings (a
 preview of S3; placement is not compared): at a 1-unit tolerance 67 of
@@ -261,8 +261,10 @@ tightened oracle's bar and crook checks need other vertices moved too.
   outside of the turn.
 - **Checks.** Placement judges the figure as O2 does: overlap, clearance
   from vertices and loops, the bar's and the crooks' clearance from other
-  ink, unmarked corners under 12°, a crook without room, ink outside the
-  outer ring, a vertex outside its slack. The score is one per failure
+  ink, loops' clearance from each other, unmarked corners under 12°, a
+  crook without room, ink outside the outer ring, a vertex outside its
+  slack. A stroke may pass its own place's other visit at 0.5 units, no
+  stricter than O2, which exempts it. The score is one per failure
   plus how far it misses; a stroke crossing a crook or the bar counts how
   far the crossing must move to clear.
 - **Search.** While a check fails, each round tries every move of every
@@ -272,14 +274,26 @@ tightened oracle's bar and crook checks need other vertices moved too.
   four diagonals. A noose vertex does not move itself; its failures
   involve its neighbours. The move that lowers the score most is made,
   the earliest on a tie, if it gains at least 0.01; otherwise the search
-  ends. If failures remain, it starts again with revisits on the other
-  side, then towards the layout's centre, then those three at the
-  slack's edge, and keeps the best figure.
+  ends. If failures remain, it starts again from up to ten starts —
+  revisits beside, on the other side and towards the layout's centre, at
+  3 units and at the slack's edge; then, at the edge, the first letter
+  of a revisited place, or a first letter with crooks, drawn 3 units
+  ahead or back along its first stroke — skipping a start whose
+  positions repeat an earlier one, and keeps the best figure.
 - **Budget.** Checking is incremental (the figure's elements are judged
   by pair, and a move re-checks only what it changed), and a budget of
   300,000 units of that work (an element looked at or a pair checked,
-  weighted by cups) bounds every word: the corpus's worst, ללהללהללהל,
-  takes about 80 ms, 32 random letters about 33 ms.
+  weighted by cups) bounds every word, and a text's words share twice one
+  word's budget. Placed words are cached (256 per layout and profile, and
+  only when placed on the full budget, so a text always draws the same
+  figure), so identical words place once and a keystroke re-places only
+  the word it changes. The worst text found, three of the known failures
+  in 32 letters, renders through the image route in 157 ms cold (about
+  110 ms of it placement), and 45–52 ms warm.
+- **Failures.** A figure carries the checks each word still fails
+  (`SigilFigure.failures`); the page then says the sigil is drawn best
+  effort and may be hard to read (decision 8). The image route draws it
+  as it is.
 - **Sizes** (`DEFAULT_SIGIL_MARKS`, sigil units): start circle radius
   1.5, cups 2.6 wide (down to 2 on a short stroke) and 1.2 deep, noose
   radius 1.25, bar 4 long, a unit of straight line beside marks. Deeper
@@ -289,10 +303,32 @@ tightened oracle's bar and crook checks need other vertices moved too.
   0.001, so every engine draws the same figure. No continuous optimiser
   and no randomness.
 
-Of 23,255 corpus figures (fixtures, templates, the 72 names, every pair
-and triple, and the random corpus, on both roses) and the two kamea
-stubs, 9 fail, five long random words at the edge of the grammar's
-domain, listed with reasons in `oracle/engineKnownFailures.ts`.
+Of the oracle's 24,264 figures (fixtures, templates, the 72 names, every
+pair and triple, the seeded random words of 4–12 letters, every
+A‑B‑A‑B‑A, on both roses, and the two kamea stubs), 216 fail, every one a
+listed known failure (126 entries in `oracle/engineKnownFailures.ts`, a
+failing gd word also counting on Regardie's rose when it has no Kaph or
+Tau). All 72 names, the fixtures and the 4–12-letter random words but a
+handful pass. The failures:
+
+- **A‑B‑A‑B‑A with A and B at least 55 units apart** (116 entries). Each
+  of the three wedges must open about 7° to keep touching ink under
+  8 units, which puts the far ends 5.7 units or more apart inside 9.2-unit
+  slack discs, and the start circle, the bar and the last stroke then
+  conflict. Every closer pair passes and four pairs at 58 units do; a
+  random search with 1,500 starts per word found figures for 2 of 21
+  sampled, so the class is mostly infeasible under the grammar, not
+  proven so.
+- **Ten others**: four or more visits to one place with crooks among them
+  (ללהללהללהל, ללקלטטחללעל), a stroke from a revisit through the crook at
+  the place's earlier visit (פגפבאאאפסממ, תזעטצשעעותתת), two returns along
+  long diagonals overlapping 8.8 units against 8 (לולוסצצרפ), and one
+  crossed crook (וווגוכהז) that a random search can draw but placement's
+  starts do not reach.
+
+Words of 13–32 letters, beyond the tested domain, pass in 85 of 100 at
+13–17 letters, 26 at 18–22, 1 at 23–27 and none at 28–32 (the report's
+seeded set, both roses).
 
 The optimiser leaves the drawing path and the package (decision 7). Should
 a solver ever return, its preconditions are: quantised inputs, an
@@ -352,23 +388,31 @@ that directory.
   the centre; through a letter outside the name; one-letter and multi-word
   texts.
 - **Exhaustive**: all 22² pairs and 22³ triples through O1–O3 on both
-  roses. The current solver did all 10,648 triples in 3.5 s and the 72
-  names in 92 ms (median 200 evaluations, never near the 20,000 cap), so
-  nothing needs sampling.
+  roses, and every A‑B‑A‑B‑A (462 pairs; on Regardie's rose only those
+  with Kaph or Tau, the rest being the same figures). The old solver did
+  all 10,648 triples in 3.5 s, so nothing needs sampling.
+- **Seeded random words** of 4–12 letters (40 a length, seed 88, runs of
+  at most three and at most four visits to a place, with repeats and
+  returns weighted up) and two domain-edge words, in CI; 13–32 letters in
+  the report only, as beyond the tested domain.
 - **Kamea stubs**: a grid layout with Zazel (7, 1, 7, 3) and
   Taphthartharath (40, 8, 40, 20, 40, 20, 40) from vol. 4, pp. 79–80
   (leaves n73–n74; the figures are on p. 81, n75, and p. 85, n79), so
   the layout-agnostic claim is tested in S1, not asserted.
-- **Domain**: the contract accepts up to 32 letters; the invariants cover
-  at most N visits per place (N fixed in S1 from what still reads).
+- **Domain**: the contract accepts up to 32 letters; the grammar covers
+  at most 2 crooks at a vertex and 4 visits to a place, and the tested
+  domain is words of up to 12 letters (decision 8).
 
 ### Measuring accuracy
 
-`pnpm sigils:oracle` runs every check over the corpus and writes a report
-to the scratch directory: per rule, how many cases it applies to and how
-many pass; per name, which checks fail; a contact sheet of our 72. With
-`SIGIL_ORACLE_EXTERNAL` set it adds O4 and a side-by-side sheet in that
-directory only. The Vitest suites carry a known-failures list that may
+`pnpm sigils:oracle` runs every check over the whole corpus and writes a
+report to `output/sigil-oracle/` (gitignored): per rule, how many cases
+it applies to and how many pass; per name, which checks fail; each
+failure as a known failure or a regression, and known failures that now
+pass; the beyond-domain words apart; contact sheets of the 72, the
+hardest triples and R4's borderline vertices. With
+`SIGIL_ORACLE_EXTERNAL` set it adds O4, writing its per-figure comparison
+in that directory only. The Vitest suites carry a known-failures list that may
 only shrink. Plan entries record counts and a few decisive examples, never
 per-figure annotations of Vaughan's work.
 
@@ -376,10 +420,10 @@ per-figure annotations of Vaughan's work.
 
 | Stage | What | Gate |
 | --- | --- | --- |
-| S0 | Vaughan's figures annotated twice, independently, at native resolution (crops, as `scripts/seventyTwoAngels/hebrew.ts` learned for Lenain's Hebrew), and reconciled; `names.json`'s #45 (Samekh, not Shin) fixed | Gadi |
-| S1 | Oracle first: layout interface with the rose and a kamea stub, hand fixtures, corpus, O1 reference (written blind), O2 with fixed thresholds and a feasibility proof for the worst case (ללהאל: two strokes and a noose within the slack at Aleph), O3 ink decoder, mutation suite, report script | The oracle flags every row of "What is wrong today" and every mutant, and passes the hand fixtures |
-| S2 | `planSigil`, rule placement, renderer; R2 (words) in the package, page and contract; the golden tests that pin today's squiggles and one COBYLA layout (`roseSigilGeometry.test.ts:101-113`, `147-156`, `291-306`) replaced by O1–O3; `points` deprecated, the optimiser retired (decision 7); a contact sheet of every corpus vertex 0.5–3 units off its chord, drawn at 1 unit, for judging R4's tolerance | O1–O3 green on the exhaustive corpus, O2 including the 1-ulp check; the image route's cache key changes with the drawing |
-| S3 | O4 against Vaughan; disagreements classified and counted here | Gadi reviews the side-by-side sheet locally |
+| S0 (done) | Vaughan's figures annotated twice, independently, at native resolution (crops, as `scripts/seventyTwoAngels/hebrew.ts` learned for Lenain's Hebrew), and reconciled; `names.json`'s #45 (Samekh, not Shin) fixed | Gadi |
+| S1 (done) | Oracle first: layout interface with the rose and a kamea stub, hand fixtures, corpus, O1 reference (written blind), O2 with fixed thresholds and a feasibility proof for the worst case (ללהאל: two strokes and a noose within the slack at Aleph), O3 ink decoder, mutation suite, report script | The oracle flags every row of "What is wrong today" and every mutant, and passes the hand fixtures |
+| S2 (done) | `planSigil`, rule placement, renderer; R2 (words) in the package, page and contract; the golden tests that pin today's squiggles and one COBYLA layout (`roseSigilGeometry.test.ts:101-113`, `147-156`, `291-306`) replaced by O1–O3; `points` deprecated, the optimiser retired (decision 7); a contact sheet of every corpus vertex 0.5–3 units off its chord, drawn at 1 unit, for judging R4's tolerance | O1–O3 green on the exhaustive corpus, O2 including the 1-ulp check; the image route's cache key changes with the drawing |
+| S3 (in part) | O4 against Vaughan; disagreements classified and counted here. Marks compared (67 of 72 agree, [S0](#s0-the-annotations-18-november-2026)); the side-by-side sheet is not built | Gadi reviews the side-by-side sheet locally |
 | S4 (later) | The 72 angels pages: sigils rendered at build, cached, linked to `/gd/sigils?text=…`; caching and SEO decided then | Its own section |
 | S5 (later) | Kamea profile and layout on `Kamea`. What S1 found: Zazel's figure (p. 81) has a circle at both ends and no bar, Taphthartharath's (p. 85) neither circle nor bar, and both draw a return to a cell as a rounded U beside the outgoing stroke; p. 85's printed Mercury square swaps three pairs of cells against Agrippa's (none the name uses); a 1-unit noose tolerance is 0.1 cell, which on a 9×9 square catches near-diagonal passes | Its own plan |
 
@@ -390,13 +434,18 @@ per-figure annotations of Vaughan's work.
 Settled 18 November 2026. Gadi chose 1, 2 and 7 and said to proceed on
 the rest as recommended.
 
-1. **Placement by rule**, with the small candidate search above, replaces
-   the optimiser on the drawing path.
+1. **Placement by rule**, with the bounded search described under
+   [Placement](#placement-by-rule-not-by-solver), replaces the optimiser
+   on the drawing path. (Proposed as a few candidates for revisits; built
+   as a larger search, still discrete and deterministic, because ללהאל and
+   the clearance checks need other vertices moved.)
 2. **Noose tolerance (R4): 1 unit, provisional.** A profile setting. At
    about 1 unit only the seven names ending האל qualify, at Aleph, which
    matches the one attested case (0.23 units); at 5 units מומיה, דמביה and יבמיה join,
    two of them 47° corners. Judged on S2's contact sheet, by us and then
-   by Gadi, before it is final.
+   by Gadi, before it is final. Our reading of the sheet: below 1 unit
+   the line is visibly straight with its noose; above it, placement turns
+   the pass into a corner of at least 12°, so no figure falls in between.
 3. **Runs of three or more**: one crook per adjacent pair (Vaughan's
    reading, consistent with R3).
 4. **A doubled letter on a straight pass**: a crook on the unbent line,
@@ -413,6 +462,10 @@ the rest as recommended.
    the `gd/roseSigilOptimizer` export go, which is a breaking change for
    the published `magick-components` (0.x, so its next release is 0.4.0).
    `RoseSigilImage`'s `points` prop is kept, deprecated.
+8. **Tested domain: words of up to 12 letters.** The contract and the page
+   take 32 letters in all; a longer word is drawn best effort, and the page
+   says when a figure fails its own checks. (Orchestrator's call, 18
+   November, on the beyond-domain rates above; Gadi to confirm.)
 
 ## Review (18 November 2026)
 
@@ -440,6 +493,44 @@ code. The findings, all taken:
   annotations kept out of the plan, an archived snapshot for the PDF's
   URL, "inside the rose" undefined, the Shabbathai spelling.
 
-Not checked by anyone yet: six of Vaughan's ten variant spellings on the
-figures themselves; about 50 of his figures; Regardie's renewal status;
-real Chromium output (the 1-ulp nudge is a proxy).
+Not checked by anyone yet at that point: six of Vaughan's ten variant
+spellings on the figures themselves; about 50 of his figures; Regardie's
+renewal status; real Chromium output (the 1-ulp nudge is a proxy). S0 has
+since annotated all 72 figures twice.
+
+### Reviews of the build
+
+The oracle (S1) was written by two agents before the engine, the blind
+reference planner by an author who never saw `planSigil`, and the engine
+by a third agent barred from reading the reference until its own planner
+passed the hand fixtures; it then matched the reference on every text.
+
+- **Independent review (Opus 5.5 high)** of the engine at `be06d7f2`.
+  High: the end bar ran into the start circle in seven of the 72 names
+  (a word ending beside its start), and strokes could cross a crook or the
+  bar, because neither placement nor O2 checked the bar or the cups
+  against other ink. Medium: the search was not the one proposed here;
+  placement cost grew quadratically (618 ms for 32 letters); the 1-ulp
+  check nudged already-rounded anchors and could not fail; nothing tested
+  words longer than five letters. The oracle was tightened first
+  (`c24f41b8`: bar, crook and loop clearance, nudges before rounding with
+  a rounding-margin check on every layout's anchors, a seeded random
+  corpus), which put 628 figures on the known-failures list; the engine
+  round (`a22744bf`–`c54bcfe3`) brought that to 9, made checking
+  incremental with a work budget, and drew each subpath in order, which
+  headless Chromium showed the single path had not (the dash restarts at
+  every subpath).
+- **Final adversarial review (Fable 5.2 high)** of the branch at
+  `bd5077d5`. High: a noose drawn through the start circle (אבהאל) passed
+  placement, O2 and O3. Medium: short words and A‑B‑A‑B‑A failing outside
+  the corpus; the report hiding the known failures; the package's
+  Provenance row rewritten under Gadi's old sign-off date. Low: per-word
+  cost and caching, `FAR` unscaled, loose ends in the published API,
+  stale coverage config, two i18n wordings, R7 not acted on, stale
+  counts here, Vaughan figure numbers in this plan, and image pins not
+  tied to the image profile. All taken (`80e69757`–`cebccdcc`, and this
+  revision) except the Provenance date, left for Gadi to re-sign.
+
+Still unchecked: Safari and Firefox (headless Chromium only, for the
+draw-on); the side-by-side sheet against Vaughan; Regardie's renewal
+status.

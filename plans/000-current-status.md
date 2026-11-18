@@ -161,9 +161,10 @@ Follow-ups are separate from the completed migration work:
   ([plan 084](084-composable-jsx-halls.md)).
 - 18 November 2026: rose sigils drawn by rule (plan 088, stage S2), on
   `gate/rose-sigil-oracle`, not merged: the package plans and places a
-  sigil by the Golden Dawn's rules and the oracle passes every figure of
-  its corpus; the page, the image route (under its own profile,
-  `magickli-rose-sigil-image-v1`) and the debug view draw with it, each
+  sigil by the Golden Dawn's rules; the oracle passes all 72 names and
+  every figure of its corpus but 126 listed known failures (mostly
+  A‑B‑A‑B‑A words with far-apart letters); the page, the image route
+  (under its own profile, `magickli-rose-sigil-image-v1`) and the debug view draw with it, each
   word its own sigil. The COBYLA optimiser is retired: its source is kept
   as `roseSigilOptimizer.ts.old`, `gd/roseSigilOptimizer` and `nlopt-js`
   are gone from the package and the app (a breaking change; the next
@@ -177,10 +178,17 @@ Follow-ups are separate from the completed migration work:
   [plan 066](066-october-dependency-refresh.md#13-november-2026-dependabot-alerts),
   with when to drop the overrides.
 
+- TODO: rose sigils after plan 088's S2: Gadi to re-sign the rose sigil's
+  Provenance row in `packages/magick-components/README.md` (its content
+  changed under the 14 November date) before releasing 0.4.0; S3's
+  side-by-side sheet against Vaughan (local only); S4, the 72 angels'
+  sigils on their pages, with caching and SEO; S5, the kamea profile;
+  and the A‑B‑A‑B‑A class the engine cannot place
+  ([plan 088](088-rose-sigil-oracle.md#stages)).
 - TODO: rate limiting for the public component image routes
   (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through
-  WASM on request, and `/api/render/rose-sigil`'s placement by rule takes
-  up to about 600 ms of CPU for a 32-letter word chosen to stress it
+  WASM on request, and `/api/render/rose-sigil` takes up to about 160 ms
+  of CPU for a 32-letter text chosen to stress its placement by rule
   (18 November, plan 088), so the edge cache offers no protection against
   varied requests. Nothing in the app rate-limits today; see
   [plan 027](027-component-exports.md#adversarial-review).
