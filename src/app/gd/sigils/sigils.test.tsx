@@ -152,8 +152,8 @@ describe("/gd/sigils' words and debug view", () => {
     // Metatron: a circle at Mem, a crook at Teth, a noose at Resh, a bar at Nun.
     expect(rows.map((row) => [row[2], row[5]])).toEqual([
       ["מ", "start circle"],
-      ["ט", "crook"],
-      ["ר", "noose"],
+      ["ט", "crook for a doubled letter"],
+      ["ר", "noose on a straight pass"],
       ["ו", ""],
       ["נ", "end bar"],
     ]);

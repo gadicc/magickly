@@ -1301,13 +1301,13 @@ msgstr "עיגול פתיחה"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "crook"
-msgstr "עיקול"
+msgid "crook for a doubled letter"
+msgstr "עיקול לאות כפולה"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "noose"
-msgstr "לולאה"
+msgid "noose on a straight pass"
+msgstr "לולאה במעבר ישר"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
@@ -1321,8 +1321,8 @@ msgstr "מילה בסיגיל"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "Vertex"
-msgstr "קודקוד"
+msgid "Vertex of the sigil"
+msgstr "קודקוד בסיגיל"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
@@ -1336,18 +1336,18 @@ msgstr "ביקור במקומה"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "Crooks"
-msgstr "עיקולים"
+msgid "Crooks at the vertex"
+msgstr "עיקולים בקודקוד"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "Marks"
-msgstr "סימנים"
+msgid "Marks at the vertex"
+msgstr "סימנים בקודקוד"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "Moved"
-msgstr "הוזז"
+msgid "Moved from its letter"
+msgstr "הוזז ממקום האות"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/sigils.tsx

@@ -1301,13 +1301,13 @@ msgstr "start circle"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "crook"
-msgstr "crook"
+msgid "crook for a doubled letter"
+msgstr "crook for a doubled letter"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "noose"
-msgstr "noose"
+msgid "noose on a straight pass"
+msgstr "noose on a straight pass"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
@@ -1321,8 +1321,8 @@ msgstr "Sigil word"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "Vertex"
-msgstr "Vertex"
+msgid "Vertex of the sigil"
+msgstr "Vertex of the sigil"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
@@ -1336,18 +1336,18 @@ msgstr "Visit to its place"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "Crooks"
-msgstr "Crooks"
+msgid "Crooks at the vertex"
+msgstr "Crooks at the vertex"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "Marks"
-msgstr "Marks"
+msgid "Marks at the vertex"
+msgstr "Marks at the vertex"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx
-msgid "Moved"
-msgstr "Moved"
+msgid "Moved from its letter"
+msgstr "Moved from its letter"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/sigils.tsx

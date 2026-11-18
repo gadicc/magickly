@@ -5,9 +5,16 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
+import {
+  ROSE_SIGIL_PROFILE,
+  roseSigilLayout,
+} from "magick-components/gd/roseSigilLayout";
 import { TreeOfLifeSvg } from "magick-components/kabbalah/TreeOfLife";
+import { sigilFigure } from "magick-components/sigil/SigilImage";
 import type { ReactElement } from "react";
 import { createRitualSvgValidator } from "@/files/validateRitualSvg";
+import { SEVENTY_TWO_NAMES } from "../../packages/magick-components/src/sigil/oracle/corpus";
+import { PLAN_TEMPLATES } from "../../packages/magick-components/src/sigil/oracle/templates";
 import { renderComponentImage } from "./componentImage";
 import { COMPONENT_IMAGE_SLUGS, CONTRACTS } from "./contracts";
 import { contractViewBox } from "./contracts/types";
@@ -409,6 +416,36 @@ describe("component image registry", () => {
           "and pin the reviewed bytes under the new profile; never re-pin a shipped profile.",
       ).toEqual([byteSize, sha256]);
     }
+  });
+
+  // A digest of the drawing itself, by the same profile: the path data
+  // of the 72 names and every template, on both roses. A change to the
+  // engine that moves any of them, even one the four pinned images above
+  // do not show, must come with a new profile.
+  const ROSE_SIGIL_DRAWING_DIGESTS: Record<string, string> = {
+    "magickli-rose-sigil-image-v1":
+      "7c970cc0f61526531e8d428b9f2d2d905bd7c6fc65ff871bb6d30136b77d9f37",
+  };
+
+  it("pins a digest of the rose sigil's drawings under its image profile", () => {
+    const texts = [
+      ...new Set([
+        ...SEVENTY_TWO_NAMES.map((n) => n.text),
+        ...PLAN_TEMPLATES.map((t) => t.text),
+      ]),
+    ];
+    const drawings = (["gd", "regardie1939"] as const).flatMap((version) =>
+      texts.map(
+        (text) =>
+          `${version} ${text}\n${sigilFigure(text, roseSigilLayout(version), ROSE_SIGIL_PROFILE).paths.join("\n")}`,
+      ),
+    );
+    expect(
+      createHash("sha256").update(drawings.join("\n\n")).digest("hex"),
+      `the rose sigil's drawings differ from those ${ROSE_SIGIL_IMAGE_PROFILE} was reviewed with. ` +
+        "If the drawing changed on purpose, bump ROSE_SIGIL_IMAGE_PROFILE in registry.tsx " +
+        "and record the new digest under the new profile; never re-pin a shipped profile.",
+    ).toBe(ROSE_SIGIL_DRAWING_DIGESTS[ROSE_SIGIL_IMAGE_PROFILE]);
   });
 
   it("draws different geomancy readings and sigils differently", async () => {

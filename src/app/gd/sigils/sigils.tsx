@@ -72,8 +72,10 @@ export default function Sigils({
   const drawn = isValid ? rectified : "";
 
   // Words beyond the tested domain are drawn best effort; the engine says
-  // when a figure fails its own checks, and the page says so too. Placed
-  // words are cached, so this costs RoseSigil nothing more.
+  // when a figure fails its own checks, and the page says so too. The
+  // engine keeps every word it places (keyed by the budget it was given,
+  // so the same text always gets the same figure), so RoseSigil's own
+  // placement of this text finds each word already placed.
   const unclear = React.useMemo(
     () =>
       sigilFigure(

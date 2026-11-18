@@ -31,20 +31,20 @@ const PLACED = "#06c";
  */
 const MARK_NAMES: Record<SigilMark, string> = {
   start: /*i18n*/ "start circle",
-  crook: /*i18n*/ "crook",
-  noose: /*i18n*/ "noose",
+  crook: /*i18n*/ "crook for a doubled letter",
+  noose: /*i18n*/ "noose on a straight pass",
   end: /*i18n*/ "end bar",
 };
 
 /** The table's columns, named as fully as the marks. */
 const HEADINGS = [
   /*i18n*/ "Sigil word",
-  /*i18n*/ "Vertex",
+  /*i18n*/ "Vertex of the sigil",
   /*i18n*/ "Rose letter",
   /*i18n*/ "Visit to its place",
-  /*i18n*/ "Crooks",
-  /*i18n*/ "Marks",
-  /*i18n*/ "Moved",
+  /*i18n*/ "Crooks at the vertex",
+  /*i18n*/ "Marks at the vertex",
+  /*i18n*/ "Moved from its letter",
 ];
 
 /** The rose's rings and letters, centred on the origin. */
