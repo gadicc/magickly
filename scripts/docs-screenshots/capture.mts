@@ -306,7 +306,13 @@ const helpers = `
 async function signIn(b: Browser, persona: Persona) {
   await b.clearSiteData();
   await b.goto(`${base}/signin`);
-  await b.click("button", persona === "creator" ? "Creator" : "Reader");
+  const label = persona === "creator" ? "Creator" : "Reader";
+  // Recovery verifies browser storage before enabling local test sign-in.
+  await b.waitFor(`(() => {
+    const button = [...document.querySelectorAll('button')].find(b => b.textContent.trim() === ${text(label)});
+    return button && !button.disabled;
+  })()`);
+  await b.click("button", label);
   await b.waitFor(`location.pathname !== '/signin'`);
   await sleep(1500);
 }

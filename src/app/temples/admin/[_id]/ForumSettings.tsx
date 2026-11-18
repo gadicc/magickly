@@ -3,9 +3,10 @@
 import { Alert, Button, Stack, TextField, Typography } from "@mui/material";
 import Link from "next/link";
 import { useActionState } from "react";
-import EnglishText from "@/i18n/EnglishText";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
+import UiRichText from "@/i18n/UiRichText";
 import UiText from "@/i18n/UiText";
+import TempleFeedback from "../../TempleFeedback";
 import { type ForumSettingsState, saveTempleForumAction } from "./actions";
 
 const initialState: ForumSettingsState = { status: "idle", message: "" };
@@ -48,18 +49,15 @@ export function ForumSettings({
         <UiText message={/*i18n*/ "Forum"} />
       </Typography>
       <Typography>
-        <EnglishText>Connect this temple to its own</EnglishText>{" "}
-        <a href="https://www.discourse.org/">
-          <UiText message={/*i18n*/ "Discourse"} />
-        </a>{" "}
-        <EnglishText>
-          forum to give each member the forum group, title and badge for their
-          grade.
-        </EnglishText>{" "}
-        <Link href="/help/temples#forum">
-          <UiText message={/*i18n*/ "What the sync does"} />
-        </Link>
-        .
+        <UiRichText
+          message={
+            /*i18n*/ "Connect this temple to its own <0>Discourse</0> forum to give each member the forum group, title and badge for their grade. <1>What the sync does</1>."
+          }
+          components={{
+            0: <a href="https://www.discourse.org/" />,
+            1: <Link href="/help/temples#forum" />,
+          }}
+        />
       </Typography>
       {!canStoreKeys ? (
         <Alert severity="info">
@@ -90,7 +88,7 @@ export function ForumSettings({
               size="small"
               required
               defaultValue={state.values?.origin ?? kept?.origin ?? ""}
-              slotProps={{ htmlInput: { maxLength: 255 } }}
+              slotProps={{ htmlInput: { maxLength: 255, dir: "ltr" } }}
             />
             <TextField
               name="apiUsername"
@@ -102,7 +100,7 @@ export function ForumSettings({
               helperText={translateUi(
                 /*i18n*/ "The forum administrator the key acts as; usually system.",
               )}
-              slotProps={{ htmlInput: { maxLength: 60 } }}
+              slotProps={{ htmlInput: { maxLength: 60, dir: "ltr" } }}
             />
             <TextField
               name="apiKey"
@@ -113,10 +111,15 @@ export function ForumSettings({
               required={!kept}
               helperText={
                 kept
-                  ? `A key ending ${kept.apiKeyHint || "…"} is saved. Leave blank to keep it; enter it again if you change the address.`
-                  : "A global API key from the forum's admin area. It is stored encrypted and not shown again."
+                  ? translateUi(
+                      /*i18n*/ "A key ending {hint} is saved. Leave blank to keep it; enter it again if you change the address.",
+                      { hint: kept.apiKeyHint || "…" },
+                    )
+                  : translateUi(
+                      /*i18n*/ "A global API key from the forum's admin area. It is stored encrypted and not shown again.",
+                    )
               }
-              slotProps={{ htmlInput: { maxLength: 512 } }}
+              slotProps={{ htmlInput: { maxLength: 512, dir: "ltr" } }}
             />
             <Typography variant="body2" color="textSecondary">
               <UiText
@@ -144,7 +147,9 @@ export function ForumSettings({
                   onClick={(event) => {
                     if (
                       !window.confirm(
-                        "Disconnect this forum? The saved key is deleted.",
+                        translateUi(
+                          /*i18n*/ "Disconnect this forum? The saved key is deleted.",
+                        ),
                       )
                     )
                       event.preventDefault();
@@ -159,7 +164,7 @@ export function ForumSettings({
       )}
       {state.status !== "idle" ? (
         <Alert severity={state.status === "error" ? "error" : "success"}>
-          {state.message}
+          <TempleFeedback text={state.message} />
         </Alert>
       ) : null}
     </Stack>

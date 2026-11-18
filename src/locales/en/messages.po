@@ -28,8 +28,69 @@ msgstr "Search the site"
 
 #. js-lingui-explicit-id
 #: src/search/SearchDialog.tsx
+msgid "Planetary hours"
+msgstr "Planetary hours"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+#: src/search/SearchDialog.tsx
+msgid "Tree of Life"
+msgstr "Tree of Life"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Enochian calls"
+msgstr "Enochian calls"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Temple floor plans"
+msgstr "Temple floor plans"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search request rejected."
+msgstr "Search request rejected."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Enter between 2 and 300 characters."
+msgstr "Enter between 2 and 300 characters."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search by meaning is unavailable. Text results are still shown."
+msgstr "Search by meaning is unavailable. Text results are still shown."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search by meaning has reached today's limit. Text results are still shown."
+msgstr "Search by meaning has reached today's limit. Text results are still shown."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search by meaning could not finish. Text results are still shown."
+msgstr "Search by meaning could not finish. Text results are still shown."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search could not load. Connect to the internet and try again."
+msgstr "Search could not load. Connect to the internet and try again."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search Magick.ly"
+msgstr "Search Magick.ly"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
 msgid "Close search"
 msgstr "Close search"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search currently covers English pages. Use English words; results keep their original language."
+msgstr "Search currently covers English pages. Use English words; results keep their original language."
 
 #. js-lingui-explicit-id
 #: src/search/SearchDialog.tsx
@@ -58,6 +119,31 @@ msgstr "Search by meaning"
 #: src/search/SearchDialog.tsx
 msgid "Retry"
 msgstr "Retry"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Explore the tools, names and texts on the site."
+msgstr "Explore the tools, names and texts on the site."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Searching…"
+msgstr "Searching…"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "{count}{more} {count, plural, one {related page} other {related pages}}"
+msgstr "{count}{more} {count, plural, one {related page} other {related pages}}"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "{count}{more} {count, plural, one {matching page} other {matching pages}}"
+msgstr "{count}{more} {count, plural, one {matching page} other {matching pages}}"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "No matching pages. Try a shorter phrase or another spelling."
+msgstr "No matching pages. Try a shorter phrase or another spelling."
 
 #. js-lingui-explicit-id
 #: src/search/SearchDialog.tsx
@@ -331,11 +417,6 @@ msgid "72 Angels"
 msgstr "72 Angels"
 
 #. js-lingui-explicit-id
-#: src/app/pathnames.ts
-msgid "Tree of Life"
-msgstr "Tree of Life"
-
-#. js-lingui-explicit-id
 #: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Open source"
@@ -516,8 +597,48 @@ msgstr "sign in"
 
 #. js-lingui-explicit-id
 #: src/app/MyAppBar.tsx
+msgid "User avatar"
+msgstr "User avatar"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Pentagram"
+msgstr "Pentagram"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
 msgid "Home"
 msgstr "Home"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Breadcrumb"
+msgstr "Breadcrumb"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Saved account data could not be locked. Retry sign-out."
+msgstr "Saved account data could not be locked. Retry sign-out."
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "The server could not sign out this session. Retry sign-out."
+msgstr "The server could not sign out this session. Retry sign-out."
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Check out \"{title}\" on magick.ly, the open source magick app!"
+msgstr "Check out \"{title}\" on magick.ly, the open source magick app!"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "The page could not be shared. Try again."
+msgstr "The page could not be shared. Try again."
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Sharing not supported on this platform."
+msgstr "Sharing not supported on this platform."
 
 #. js-lingui-explicit-id
 #: src/app/MyAppBar.tsx
@@ -616,6 +737,312 @@ msgid "Checking this browser for offline work before allowing sign-in…"
 msgstr "Checking this browser for offline work before allowing sign-in…"
 
 #. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Check the submitted values and try again."
+msgstr "Check the submitted values and try again."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Sign in and try again."
+msgstr "Sign in and try again."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Your signed-in account changed. Switch back and try again."
+msgstr "Your signed-in account changed. Switch back and try again."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "You do not have permission to manage this temple."
+msgstr "You do not have permission to manage this temple."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The temple or membership was not found."
+msgstr "The temple or membership was not found."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+#: src/app/temples/feedback.ts
+msgid "No temple matches that slug and join code."
+msgstr "No temple matches that slug and join code."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "A temple needs an administrator. Make another member an administrator first."
+msgstr "A temple needs an administrator. Make another member an administrator first."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The temple service is temporarily unavailable. Try again."
+msgstr "The temple service is temporarily unavailable. Try again."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Enter a valid slug and join code."
+msgstr "Enter a valid slug and join code."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Enter a temple name of 1–200 characters and retry with a valid request."
+msgstr "Enter a temple name of 1–200 characters and retry with a valid request."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Sign in before creating a temple."
+msgstr "Sign in before creating a temple."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Your signed-in account changed. Switch back before retrying this request."
+msgstr "Your signed-in account changed. Switch back before retrying this request."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The pending creation request changed. Restore the original request before retrying."
+msgstr "The pending creation request changed. Restore the original request before retrying."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "This temple address is already in use. Change the name, or join your existing temple."
+msgstr "This temple address is already in use. Change the name, or join your existing temple."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Temple creation is busy. Please retry."
+msgstr "Temple creation is busy. Please retry."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "We could not confirm whether the temple was created. Retry to check its status."
+msgstr "We could not confirm whether the temple was created. Retry to check its status."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The temple was not found."
+msgstr "The temple was not found."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "This server cannot protect forum keys yet, so forum connections are switched off."
+msgstr "This server cannot protect forum keys yet, so forum connections are switched off."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The forum settings could not be saved. Try again."
+msgstr "The forum settings could not be saved. Try again."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The saved API key can no longer be read. Enter the API key again."
+msgstr "The saved API key can no longer be read. Enter the API key again."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Could not reach that forum."
+msgstr "Could not reach that forum."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The forum did not accept that key as an administrator's for that username."
+msgstr "The forum did not accept that key as an administrator's for that username."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The API username may use letters, numbers, dots, dashes and underscores."
+msgstr "The API username may use letters, numbers, dots, dashes and underscores."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "That does not look like an API key."
+msgstr "That does not look like an API key."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "That is the Magick.ly forum, which site administrators sync for you."
+msgstr "That is the Magick.ly forum, which site administrators sync for you."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Enter the API key again when you change the forum address."
+msgstr "Enter the API key again when you change the forum address."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Enter the forum's API key."
+msgstr "Enter the forum's API key."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Enter the forum's web address, such as https://forum.example.org."
+msgstr "Enter the forum's web address, such as https://forum.example.org."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The forum address must use https."
+msgstr "The forum address must use https."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Remove the username and password from the address."
+msgstr "Remove the username and password from the address."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Use only the forum's address, without a path."
+msgstr "Use only the forum's address, without a path."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Use the forum's standard https port."
+msgstr "Use the forum's standard https port."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Use the forum's public web address."
+msgstr "Use the forum's public web address."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "That address could not be found."
+msgstr "That address could not be found."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The sync request is invalid."
+msgstr "The sync request is invalid."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Temple administrator access is required."
+msgstr "Temple administrator access is required."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "This server cannot read forum keys at the moment. Try again later."
+msgstr "This server cannot read forum keys at the moment. Try again later."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "This temple's forum key can no longer be read. Enter the API key again."
+msgstr "This temple's forum key can no longer be read. Enter the API key again."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Add this temple's forum details first."
+msgstr "Add this temple's forum details first."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Discourse sync is not configured."
+msgstr "Discourse sync is not configured."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The forum connection was removed."
+msgstr "The forum connection was removed."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The forum connection was saved."
+msgstr "The forum connection was saved."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Sync stopped because your administrator access changed."
+msgstr "Sync stopped because your administrator access changed."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Sync stopped because a forum identity link changed. No existing link was overwritten."
+msgstr "Sync stopped because a forum identity link changed. No existing link was overwritten."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Sync stopped because temple membership data changed. Run it again to use the current membership."
+msgstr "Sync stopped because temple membership data changed. Run it again to use the current membership."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Discourse sync stopped after a forum operation failed. Check forum availability before retrying."
+msgstr "Discourse sync stopped after a forum operation failed. Check forum availability before retrying."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Forum grade groups are ready."
+msgstr "Forum grade groups are ready."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Discourse sync completed."
+msgstr "Discourse sync completed."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: membership changed."
+msgstr "Skipped member {member}: membership changed."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: grade is outside 0–6."
+msgstr "Skipped member {member}: grade is outside 0–6."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: an established forum link no longer resolves; the link was retained."
+msgstr "Skipped member {member}: an established forum link no longer resolves; the link was retained."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: there is no verified email available."
+msgstr "Skipped member {member}: there is no verified email available."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: a verified email matches multiple forum accounts."
+msgstr "Skipped member {member}: a verified email matches multiple forum accounts."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: the verified emails match different forum accounts."
+msgstr "Skipped member {member}: the verified emails match different forum accounts."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: the matched forum account changed during reconciliation."
+msgstr "Skipped member {member}: the matched forum account changed during reconciliation."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: a forum username could not be derived."
+msgstr "Skipped member {member}: a forum username could not be derived."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: forum account creation had an unresolved outcome; reconciliation is required before retrying."
+msgstr "Skipped member {member}: forum account creation had an unresolved outcome; reconciliation is required before retrying."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Synced member {member} of {total}."
+msgstr "Synced member {member} of {total}."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Sync completed with {count, plural, one {# member skipped} other {# members skipped}}."
+msgstr "Sync completed with {count, plural, one {# member skipped} other {# members skipped}}."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Removed {count, plural, one {# former member} other {# former members}} from forum grade groups."
+msgstr "Removed {count, plural, one {# former member} other {# former members}} from forum grade groups."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The temple action returned an unrecognized result. Refresh the page and try again."
+msgstr "The temple action returned an unrecognized result. Refresh the page and try again."
+
+#. js-lingui-explicit-id
 #: src/app/temples/CreateTempleForm.tsx
 msgid "New temple name"
 msgstr "New temple name"
@@ -632,7 +1059,6 @@ msgstr "Create temple"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
-#: src/app/temples/admin/[_id]/ForumSettings.tsx
 msgid "Discourse"
 msgstr "Discourse"
 
@@ -663,8 +1089,8 @@ msgstr "Discourse sync results"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/ForumSettings.tsx
-msgid "What the sync does"
-msgstr "What the sync does"
+msgid "Connect this temple to its own <0>Discourse</0> forum to give each member the forum group, title and badge for their grade. <1>What the sync does</1>."
+msgstr "Connect this temple to its own <0>Discourse</0> forum to give each member the forum group, title and badge for their grade. <1>What the sync does</1>."
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/ForumSettings.tsx
@@ -703,6 +1129,16 @@ msgstr "API key"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "A key ending {hint} is saved. Leave blank to keep it; enter it again if you change the address."
+msgstr "A key ending {hint} is saved. Leave blank to keep it; enter it again if you change the address."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "A global API key from the forum's admin area. It is stored encrypted and not shown again."
+msgstr "A global API key from the forum's admin area. It is stored encrypted and not shown again."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
 msgid "Syncing sends each member’s name, motto, grade and verified email addresses to this forum, which creates an account for anyone it does not already know. Only connect a forum you run."
 msgstr "Syncing sends each member’s name, motto, grade and verified email addresses to this forum, which creates an account for anyone it does not already know. Only connect a forum you run."
 
@@ -718,6 +1154,11 @@ msgstr "Connect forum"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Disconnect this forum? The saved key is deleted."
+msgstr "Disconnect this forum? The saved key is deleted."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
 msgid "Disconnect"
 msgstr "Disconnect"
 
@@ -729,6 +1170,16 @@ msgstr "Join code"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Hide join code"
+msgstr "Hide join code"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Show join code"
+msgstr "Show join code"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
 msgid "Save join code"
 msgstr "Save join code"
 
@@ -736,6 +1187,11 @@ msgstr "Save join code"
 #: src/app/temples/admin/[_id]/InviteManager.tsx
 msgid "Clear the code and save to disable new invitations."
 msgstr "Clear the code and save to disable new invitations."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Join {temple}"
+msgstr "Join {temple}"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/InviteManager.tsx
@@ -766,6 +1222,11 @@ msgstr "Continue with Google"
 #: src/app/signin/SignInButton.tsx
 msgid "Local development"
 msgstr "Local development"
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Uses the fixed identities prepared by <0>pnpm {command}</0>."
+msgstr "Uses the fixed identities prepared by <0>pnpm {command}</0>."
 
 #. js-lingui-explicit-id
 #: src/app/signin/SignInButton.tsx
@@ -1384,11 +1845,6 @@ msgstr "Attach an image to a ritual"
 #. js-lingui-explicit-id
 #: src/app/(private)/chat/train/page.tsx
 #: src/app/(private)/gd/rituals/deleted/page.tsx
-#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
-#: src/app/(private)/temples/admin/[_id]/page.tsx
-#: src/app/(private)/temples/admin/page.tsx
-#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
-#: src/app/(private)/temples/page.tsx
 #: src/app/(private)/upload/page.tsx
 msgid "Sign in"
 msgstr "Sign in"
@@ -1410,18 +1866,43 @@ msgstr "My Temples"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/page.tsx
+msgid "<0>Sign in</0> to see your temple memberships or join an organization."
+msgstr "<0>Sign in</0> to see your temple memberships or join an organization."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
 msgid "You are not currently a member of any temples."
 msgstr "You are not currently a member of any temples."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/page.tsx
-msgid "admin"
-msgstr "admin"
+msgid "<0>{temple}</0> (grade {grade}, <1>admin</1>)"
+msgstr "<0>{temple}</0> (grade {grade}, <1>admin</1>)"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "<0>{temple}</0> (grade {grade})"
+msgstr "<0>{temple}</0> (grade {grade})"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/page.tsx
 msgid "Leave"
 msgstr "Leave"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Leave {temple}?"
+msgstr "Leave {temple}?"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Leave temple"
+msgstr "Leave temple"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "You will lose access to <0>{temple}</0>’s private rituals at once. Copies downloaded to your devices are deleted the next time those devices connect. You can only come back with a join code from one of its administrators."
+msgstr "You will lose access to <0>{temple}</0>’s private rituals at once. Copies downloaded to your devices are deleted the next time those devices connect. You can only come back with a join code from one of its administrators."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/page.tsx
@@ -1482,8 +1963,18 @@ msgstr "Join Temple"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
-msgid "No temple matches that slug and join code."
-msgstr "No temple matches that slug and join code."
+msgid "<0>Sign in</0> to review and confirm this invitation."
+msgstr "<0>Sign in</0> to review and confirm this invitation."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "You are already a member of <0>{temple}</0> Temple."
+msgstr "You are already a member of <0>{temple}</0> Temple."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "Confirm that you want to join <0>{temple}</0> Temple. Your membership will begin at grade 0."
+msgstr "Confirm that you want to join <0>{temple}</0> Temple. Your membership will begin at grade 0."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
@@ -1507,6 +1998,11 @@ msgstr "Temple Administration"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/page.tsx
+msgid "<0>Sign in</0> to create or administer a temple."
+msgstr "<0>Sign in</0> to create or administer a temple."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
 msgid "Temples you administer"
 msgstr "Temples you administer"
 
@@ -1522,13 +2018,18 @@ msgstr "Your global administrator grant allows you to manage every temple."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/page.tsx
-msgid "My Temples page"
-msgstr "My Temples page"
+msgid "This creates a separate organization and makes you its first administrator. To join an existing temple, use its slug and join code on the <0>My Temples page</0>."
+msgstr "This creates a separate organization and makes you its first administrator. To join an existing temple, use its slug and join code on the <0>My Temples page</0>."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/page.tsx
 msgid "Manage Temple"
 msgstr "Manage Temple"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "<0>Sign in</0> to administer this temple."
+msgstr "<0>Sign in</0> to administer this temple."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/page.tsx
@@ -1543,6 +2044,11 @@ msgstr "Back to temple administration"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "<0>{temple}</0> Temple"
+msgstr "<0>{temple}</0> Temple"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
 msgid "The member has been removed."
 msgstr "The member has been removed."
 
@@ -1550,6 +2056,11 @@ msgstr "The member has been removed."
 #: src/app/(private)/temples/admin/[_id]/page.tsx
 msgid "Members"
 msgstr "Members"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "{temple} members"
+msgstr "{temple} members"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
@@ -1580,13 +2091,33 @@ msgstr "Temple administrator"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Edit {member}"
+msgstr "Edit {member}"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Recently deleted rituals ({count})"
+msgstr "Recently deleted rituals ({count})"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
 msgid "Join information"
 msgstr "Join information"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Temple slug: <0>{slug}</0>"
+msgstr "Temple slug: <0>{slug}</0>"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
 msgid "Temple Membership"
 msgstr "Temple Membership"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "<0>Sign in</0> to edit this membership."
+msgstr "<0>Sign in</0> to edit this membership."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
@@ -1597,6 +2128,11 @@ msgstr "This membership was not found, or you cannot manage its temple."
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
 msgid "Edit Membership"
 msgstr "Edit Membership"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "<0>{member}</0> in <1>{temple}</1> Temple"
+msgstr "<0>{member}</0> in <1>{temple}</1> Temple"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
@@ -1627,6 +2163,21 @@ msgstr "Save membership"
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
 msgid "Remove from temple"
 msgstr "Remove from temple"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Remove {member}?"
+msgstr "Remove {member}?"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Remove member"
+msgstr "Remove member"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "They lose access to <0>{temple}</0> Temple’s private rituals at once. Copies downloaded to their devices are deleted the next time those devices connect, and a device that stays offline locks them within 14 days at the latest."
+msgstr "They lose access to <0>{temple}</0> Temple’s private rituals at once. Copies downloaded to their devices are deleted the next time those devices connect, and a device that stays offline locks them within 14 days at the latest."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx

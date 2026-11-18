@@ -1,9 +1,10 @@
 import { Button, Container, Stack, TextField, Typography } from "@mui/material";
 import Link from "next/link";
+import TempleFeedback from "@/app/temples/TempleFeedback";
 import { getCurrentSqlUserId } from "@/auth/session";
 import { db } from "@/db/neonFull";
-import EnglishText from "@/i18n/EnglishText";
 import { privateUiMetadata, requestUiI18n } from "@/i18n/server";
+import UiRichText from "@/i18n/UiRichText";
 import UiText from "@/i18n/UiText";
 import { createSqlTempleReader } from "@/temples/sql";
 import {
@@ -42,10 +43,10 @@ export default async function TemplesAdminEditMembershipPage({
     return (
       <Container sx={{ my: 2 }}>
         <Typography>
-          <Link href={signInHref(callbackURL)}>
-            <UiText message={/*i18n*/ "Sign in"} />
-          </Link>{" "}
-          <EnglishText>to edit this membership.</EnglishText>
+          <UiRichText
+            message={/*i18n*/ "<0>Sign in</0> to edit this membership."}
+            components={{ 0: <Link href={signInHref(callbackURL)} /> }}
+          />
         </Typography>
       </Container>
     );
@@ -78,12 +79,15 @@ export default async function TemplesAdminEditMembershipPage({
         <UiText message={/*i18n*/ "Edit Membership"} />
       </Typography>
       <Typography sx={{ my: 1 }}>
-        {membership.displayName} <EnglishText>in</EnglishText> {temple.name}{" "}
-        <EnglishText>Temple</EnglishText>
+        <UiRichText
+          message={/*i18n*/ "<0>{member}</0> in <1>{temple}</1> Temple"}
+          values={{ member: membership.displayName, temple: temple.name }}
+          components={{ 0: <bdi />, 1: <bdi /> }}
+        />
       </Typography>
       {query.error ? (
         <Typography color="error" role="alert" sx={{ my: 2 }}>
-          {query.error}
+          <TempleFeedback text={query.error} />
         </Typography>
       ) : null}
       <form action={updateTempleMembershipAction}>
@@ -148,16 +152,19 @@ export default async function TemplesAdminEditMembershipPage({
           membershipId: membership.membershipId,
         }}
         label={ui._(/*i18n*/ "Remove from temple")}
-        title={`Remove ${shortName(membership.motto || membership.displayName)}?`}
-        confirmLabel="Remove member"
+        title={ui._(/*i18n*/ "Remove {member}?", {
+          member: shortName(membership.motto || membership.displayName),
+        })}
+        confirmLabel={ui._(/*i18n*/ "Remove member")}
       >
         <p>
-          <EnglishText>They lose access to</EnglishText> {temple.name}{" "}
-          <EnglishText>
-            Temple’s private rituals at once. Copies downloaded to their devices
-            are deleted the next time those devices connect, and a device that
-            stays offline locks them within 14 days at the latest.
-          </EnglishText>
+          <UiRichText
+            message={
+              /*i18n*/ "They lose access to <0>{temple}</0> Temple’s private rituals at once. Copies downloaded to their devices are deleted the next time those devices connect, and a device that stays offline locks them within 14 days at the latest."
+            }
+            values={{ temple: temple.name }}
+            components={{ 0: <bdi /> }}
+          />
         </p>
         <p>
           <UiText

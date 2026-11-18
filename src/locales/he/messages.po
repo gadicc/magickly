@@ -28,8 +28,69 @@ msgstr "חיפוש באתר"
 
 #. js-lingui-explicit-id
 #: src/search/SearchDialog.tsx
+msgid "Planetary hours"
+msgstr "שעות פלנטריות"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+#: src/search/SearchDialog.tsx
+msgid "Tree of Life"
+msgstr "עץ החיים"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Enochian calls"
+msgstr "הקריאות החנוכיות"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Temple floor plans"
+msgstr "תוכניות מקדשים"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search request rejected."
+msgstr "בקשת החיפוש נדחתה."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Enter between 2 and 300 characters."
+msgstr "יש להזין בין 2 ל־300 תווים."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search by meaning is unavailable. Text results are still shown."
+msgstr "החיפוש לפי משמעות אינו זמין. תוצאות חיפוש הטקסט עדיין מוצגות."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search by meaning has reached today's limit. Text results are still shown."
+msgstr "החיפוש לפי משמעות הגיע למכסה היומית. תוצאות חיפוש הטקסט עדיין מוצגות."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search by meaning could not finish. Text results are still shown."
+msgstr "לא ניתן היה להשלים את החיפוש לפי משמעות. תוצאות חיפוש הטקסט עדיין מוצגות."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search could not load. Connect to the internet and try again."
+msgstr "לא ניתן היה לטעון את החיפוש. יש להתחבר לאינטרנט ולנסות שוב."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search Magick.ly"
+msgstr "חיפוש ב־Magick.ly"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
 msgid "Close search"
 msgstr "סגירת החיפוש"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Search currently covers English pages. Use English words; results keep their original language."
+msgstr "החיפוש כולל כרגע דפים באנגלית. יש להשתמש במילים באנגלית; התוצאות נשארות בשפת המקור שלהן."
 
 #. js-lingui-explicit-id
 #: src/search/SearchDialog.tsx
@@ -58,6 +119,31 @@ msgstr "חיפוש לפי משמעות"
 #: src/search/SearchDialog.tsx
 msgid "Retry"
 msgstr "ניסיון נוסף"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Explore the tools, names and texts on the site."
+msgstr "גלו את הכלים, השמות והטקסטים באתר."
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "Searching…"
+msgstr "מתבצע חיפוש…"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "{count}{more} {count, plural, one {related page} other {related pages}}"
+msgstr "{count}{more} {count, plural, one {דף קשור} other {דפים קשורים}}"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "{count}{more} {count, plural, one {matching page} other {matching pages}}"
+msgstr "{count}{more} {count, plural, one {דף תואם} other {דפים תואמים}}"
+
+#. js-lingui-explicit-id
+#: src/search/SearchDialog.tsx
+msgid "No matching pages. Try a shorter phrase or another spelling."
+msgstr "לא נמצאו דפים תואמים. כדאי לנסות ביטוי קצר יותר או איות אחר."
 
 #. js-lingui-explicit-id
 #: src/search/SearchDialog.tsx
@@ -331,11 +417,6 @@ msgid "72 Angels"
 msgstr "72 מלאכים"
 
 #. js-lingui-explicit-id
-#: src/app/pathnames.ts
-msgid "Tree of Life"
-msgstr "עץ החיים"
-
-#. js-lingui-explicit-id
 #: src/app/HomeTiles.tsx
 #: src/app/pathnames.ts
 msgid "Open source"
@@ -516,8 +597,48 @@ msgstr "כניסה לחשבון"
 
 #. js-lingui-explicit-id
 #: src/app/MyAppBar.tsx
+msgid "User avatar"
+msgstr "תמונת משתמש"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Pentagram"
+msgstr "פנטגרם"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
 msgid "Home"
 msgstr "בית"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Breadcrumb"
+msgstr "נתיב ניווט"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Saved account data could not be locked. Retry sign-out."
+msgstr "לא ניתן היה לנעול את נתוני החשבון השמורים. יש לנסות לצאת שוב."
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "The server could not sign out this session. Retry sign-out."
+msgstr "השרת לא הצליח לנתק את ההתחברות הזו. יש לנסות לצאת שוב."
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Check out \"{title}\" on magick.ly, the open source magick app!"
+msgstr "גלו את ״{title}״ ב־magick.ly, אפליקציית המאגיה בקוד פתוח!"
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "The page could not be shared. Try again."
+msgstr "לא ניתן היה לשתף את הדף. יש לנסות שוב."
+
+#. js-lingui-explicit-id
+#: src/app/MyAppBar.tsx
+msgid "Sharing not supported on this platform."
+msgstr "השיתוף אינו נתמך בפלטפורמה זו."
 
 #. js-lingui-explicit-id
 #: src/app/MyAppBar.tsx
@@ -616,6 +737,312 @@ msgid "Checking this browser for offline work before allowing sign-in…"
 msgstr "בודקים אם יש עבודה שנשמרה בדפדפן ללא חיבור, לפני שמאפשרים כניסה לחשבון…"
 
 #. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Check the submitted values and try again."
+msgstr "יש לבדוק את הערכים שנשלחו ולנסות שוב."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Sign in and try again."
+msgstr "יש להיכנס לחשבון ולנסות שוב."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Your signed-in account changed. Switch back and try again."
+msgstr "החשבון המחובר השתנה. יש לחזור לחשבון הקודם ולנסות שוב."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "You do not have permission to manage this temple."
+msgstr "אין לך הרשאה לנהל מקדש זה."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The temple or membership was not found."
+msgstr "המקדש או החברות בו לא נמצאו."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+#: src/app/temples/feedback.ts
+msgid "No temple matches that slug and join code."
+msgstr "לא נמצא מקדש התואם למזהה ולקוד ההצטרפות."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "A temple needs an administrator. Make another member an administrator first."
+msgstr "מקדש חייב להיות מנוהל בידי מנהל. יש למנות חבר אחר למנהל תחילה."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The temple service is temporarily unavailable. Try again."
+msgstr "שירות המקדשים אינו זמין כרגע. יש לנסות שוב."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Enter a valid slug and join code."
+msgstr "יש להזין מזהה מקדש וקוד הצטרפות תקינים."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Enter a temple name of 1–200 characters and retry with a valid request."
+msgstr "יש להזין שם מקדש באורך 1–200 תווים ולנסות שוב עם בקשה תקינה."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Sign in before creating a temple."
+msgstr "יש להיכנס לחשבון לפני יצירת מקדש."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Your signed-in account changed. Switch back before retrying this request."
+msgstr "החשבון המחובר השתנה. יש לחזור לחשבון הקודם לפני שליחה חוזרת של הבקשה."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The pending creation request changed. Restore the original request before retrying."
+msgstr "בקשת היצירה הממתינה השתנתה. יש לשחזר את הבקשה המקורית לפני ניסיון חוזר."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "This temple address is already in use. Change the name, or join your existing temple."
+msgstr "כתובת המקדש הזו כבר בשימוש. יש לשנות את השם או להצטרף למקדש הקיים שלך."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Temple creation is busy. Please retry."
+msgstr "שירות יצירת המקדשים עמוס. יש לנסות שוב."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "We could not confirm whether the temple was created. Retry to check its status."
+msgstr "לא ניתן היה לאשר אם המקדש נוצר. יש לנסות שוב כדי לבדוק את מצבו."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The temple was not found."
+msgstr "המקדש לא נמצא."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "This server cannot protect forum keys yet, so forum connections are switched off."
+msgstr "השרת הזה עדיין אינו יכול להגן על מפתחות פורום, ולכן חיבורי הפורומים מושבתים."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The forum settings could not be saved. Try again."
+msgstr "לא ניתן היה לשמור את הגדרות הפורום. יש לנסות שוב."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The saved API key can no longer be read. Enter the API key again."
+msgstr "לא ניתן עוד לקרוא את מפתח ה־API השמור. יש להזין את מפתח ה־API מחדש."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Could not reach that forum."
+msgstr "לא ניתן היה להתחבר לפורום הזה."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The forum did not accept that key as an administrator's for that username."
+msgstr "הפורום לא אישר את המפתח כמפתח מנהל עבור שם המשתמש הזה."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The API username may use letters, numbers, dots, dashes and underscores."
+msgstr "שם המשתמש ב־API יכול לכלול אותיות לטיניות, מספרים, נקודות, מקפים וקווים תחתונים."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "That does not look like an API key."
+msgstr "זה אינו נראה כמו מפתח API."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "That is the Magick.ly forum, which site administrators sync for you."
+msgstr "זהו הפורום של Magick.ly, שמנהלי האתר מסנכרנים עבורך."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Enter the API key again when you change the forum address."
+msgstr "יש להזין מחדש את מפתח ה־API בעת שינוי כתובת הפורום."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Enter the forum's API key."
+msgstr "יש להזין את מפתח ה־API של הפורום."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Enter the forum's web address, such as https://forum.example.org."
+msgstr "יש להזין את כתובת האתר של הפורום, למשל https://forum.example.org."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The forum address must use https."
+msgstr "כתובת הפורום חייבת להשתמש ב־https."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Remove the username and password from the address."
+msgstr "יש להסיר את שם המשתמש והסיסמה מהכתובת."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Use only the forum's address, without a path."
+msgstr "יש להשתמש בכתובת הפורום בלבד, ללא נתיב."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Use the forum's standard https port."
+msgstr "יש להשתמש ביציאת ה־https הרגילה של הפורום."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Use the forum's public web address."
+msgstr "יש להשתמש בכתובת האינטרנט הציבורית של הפורום."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "That address could not be found."
+msgstr "הכתובת הזו לא נמצאה."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The sync request is invalid."
+msgstr "בקשת הסנכרון אינה תקינה."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Temple administrator access is required."
+msgstr "נדרשת הרשאת מנהל מקדש."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "This server cannot read forum keys at the moment. Try again later."
+msgstr "השרת הזה אינו יכול לקרוא מפתחות פורום כרגע. יש לנסות שוב מאוחר יותר."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "This temple's forum key can no longer be read. Enter the API key again."
+msgstr "לא ניתן עוד לקרוא את מפתח הפורום של המקדש הזה. יש להזין את מפתח ה־API מחדש."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Add this temple's forum details first."
+msgstr "יש להוסיף תחילה את פרטי הפורום של המקדש הזה."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Discourse sync is not configured."
+msgstr "הסנכרון עם Discourse לא הוגדר."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The forum connection was removed."
+msgstr "החיבור לפורום הוסר."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The forum connection was saved."
+msgstr "החיבור לפורום נשמר."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Sync stopped because your administrator access changed."
+msgstr "הסנכרון נעצר מפני שהרשאת הניהול שלך השתנתה."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Sync stopped because a forum identity link changed. No existing link was overwritten."
+msgstr "הסנכרון נעצר מפני שהקישור לזהות בפורום השתנה. אף קישור קיים לא נדרס."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Sync stopped because temple membership data changed. Run it again to use the current membership."
+msgstr "הסנכרון נעצר מפני שנתוני החברות במקדש השתנו. יש להריץ אותו שוב עם נתוני החברות העדכניים."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Discourse sync stopped after a forum operation failed. Check forum availability before retrying."
+msgstr "הסנכרון עם Discourse נעצר לאחר שפעולה בפורום נכשלה. יש לבדוק את זמינות הפורום לפני ניסיון חוזר."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Forum grade groups are ready."
+msgstr "קבוצות הדרגות בפורום מוכנות."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Discourse sync completed."
+msgstr "הסנכרון עם Discourse הושלם."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: membership changed."
+msgstr "דילוג על חבר {member}: נתוני החברות השתנו."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: grade is outside 0–6."
+msgstr "דילוג על חבר {member}: הדרגה מחוץ לטווח 0–6."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: an established forum link no longer resolves; the link was retained."
+msgstr "דילוג על חבר {member}: קישור קיים לפורום אינו מוביל עוד לחשבון; הקישור נשמר."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: there is no verified email available."
+msgstr "דילוג על חבר {member}: אין כתובת דוא״ל מאומתת זמינה."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: a verified email matches multiple forum accounts."
+msgstr "דילוג על חבר {member}: כתובת דוא״ל מאומתת תואמת למספר חשבונות בפורום."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: the verified emails match different forum accounts."
+msgstr "דילוג על חבר {member}: כתובות הדוא״ל המאומתות תואמות לחשבונות שונים בפורום."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: the matched forum account changed during reconciliation."
+msgstr "דילוג על חבר {member}: החשבון התואם בפורום השתנה במהלך התאמת החשבונות."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: a forum username could not be derived."
+msgstr "דילוג על חבר {member}: לא ניתן היה ליצור שם משתמש לפורום."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Skipped member {member}: forum account creation had an unresolved outcome; reconciliation is required before retrying."
+msgstr "דילוג על חבר {member}: תוצאת יצירת החשבון בפורום אינה ידועה; יש לברר את מצב החשבון לפני ניסיון חוזר."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Synced member {member} of {total}."
+msgstr "סונכרן חבר {member} מתוך {total}."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Sync completed with {count, plural, one {# member skipped} other {# members skipped}}."
+msgstr "הסנכרון הושלם עם {count, plural, one {דילוג על חבר אחד} other {דילוג על # חברים}}."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "Removed {count, plural, one {# former member} other {# former members}} from forum grade groups."
+msgstr "{count, plural, one {חבר לשעבר אחד הוסר} other {# חברים לשעבר הוסרו}} מקבוצות הדרגות בפורום."
+
+#. js-lingui-explicit-id
+#: src/app/temples/feedback.ts
+msgid "The temple action returned an unrecognized result. Refresh the page and try again."
+msgstr "פעולת המקדש החזירה תוצאה לא מוכרת. יש לרענן את הדף ולנסות שוב."
+
+#. js-lingui-explicit-id
 #: src/app/temples/CreateTempleForm.tsx
 msgid "New temple name"
 msgstr "שם המקדש החדש"
@@ -632,7 +1059,6 @@ msgstr "יצירת מקדש"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/DiscourseSyncButton.tsx
-#: src/app/temples/admin/[_id]/ForumSettings.tsx
 msgid "Discourse"
 msgstr "Discourse"
 
@@ -663,8 +1089,8 @@ msgstr "תוצאות הסנכרון עם Discourse"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/ForumSettings.tsx
-msgid "What the sync does"
-msgstr "מה הסנכרון עושה"
+msgid "Connect this temple to its own <0>Discourse</0> forum to give each member the forum group, title and badge for their grade. <1>What the sync does</1>."
+msgstr "אפשר לחבר למקדש הזה פורום <0>Discourse</0> משלו, כדי להעניק לכל חבר את הקבוצה, התואר והתג המתאימים לדרגתו. <1>מה הסנכרון עושה</1>."
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/ForumSettings.tsx
@@ -703,6 +1129,16 @@ msgstr "מפתח API"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "A key ending {hint} is saved. Leave blank to keep it; enter it again if you change the address."
+msgstr "שמור מפתח המסתיים ב־{hint}. יש להשאיר את השדה ריק כדי לשמור אותו; אם משנים את הכתובת, יש להזין אותו מחדש."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "A global API key from the forum's admin area. It is stored encrypted and not shown again."
+msgstr "מפתח API כללי מאזור הניהול של הפורום. הוא נשמר מוצפן ולא יוצג שוב."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
 msgid "Syncing sends each member’s name, motto, grade and verified email addresses to this forum, which creates an account for anyone it does not already know. Only connect a forum you run."
 msgstr "הסנכרון שולח לפורום את השם, המוטו, הדרגה וכתובות הדוא״ל המאומתות של כל חבר. הפורום יוצר חשבון למי שעדיין אינו רשום בו. חברו רק פורום שאתם מנהלים."
 
@@ -718,6 +1154,11 @@ msgstr "חיבור פורום"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/ForumSettings.tsx
+msgid "Disconnect this forum? The saved key is deleted."
+msgstr "לנתק את הפורום הזה? המפתח השמור יימחק."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/ForumSettings.tsx
 msgid "Disconnect"
 msgstr "ניתוק"
 
@@ -729,6 +1170,16 @@ msgstr "קוד הצטרפות"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Hide join code"
+msgstr "הסתרת קוד ההצטרפות"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Show join code"
+msgstr "הצגת קוד ההצטרפות"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
 msgid "Save join code"
 msgstr "שמירת קוד ההצטרפות"
 
@@ -736,6 +1187,11 @@ msgstr "שמירת קוד ההצטרפות"
 #: src/app/temples/admin/[_id]/InviteManager.tsx
 msgid "Clear the code and save to disable new invitations."
 msgstr "כדי לבטל הזמנות חדשות, מחקו את הקוד ושמרו."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Join {temple}"
+msgstr "הצטרפות למקדש {temple}"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/InviteManager.tsx
@@ -766,6 +1222,11 @@ msgstr "המשך עם Google"
 #: src/app/signin/SignInButton.tsx
 msgid "Local development"
 msgstr "פיתוח מקומי"
+
+#. js-lingui-explicit-id
+#: src/app/signin/SignInButton.tsx
+msgid "Uses the fixed identities prepared by <0>pnpm {command}</0>."
+msgstr "שימוש בזהויות הקבועות שהוכנו באמצעות <0>pnpm {command}</0>."
 
 #. js-lingui-explicit-id
 #: src/app/signin/SignInButton.tsx
@@ -1384,11 +1845,6 @@ msgstr "צירוף תמונה לטקס"
 #. js-lingui-explicit-id
 #: src/app/(private)/chat/train/page.tsx
 #: src/app/(private)/gd/rituals/deleted/page.tsx
-#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
-#: src/app/(private)/temples/admin/[_id]/page.tsx
-#: src/app/(private)/temples/admin/page.tsx
-#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
-#: src/app/(private)/temples/page.tsx
 #: src/app/(private)/upload/page.tsx
 msgid "Sign in"
 msgstr "כניסה לחשבון"
@@ -1410,18 +1866,43 @@ msgstr "המקדשים שלי"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/page.tsx
+msgid "<0>Sign in</0> to see your temple memberships or join an organization."
+msgstr "יש <0>להיכנס לחשבון</0> כדי לראות את המקדשים שלך או להצטרף לארגון."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
 msgid "You are not currently a member of any temples."
 msgstr "כרגע אינכם חברים באף מקדש."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/page.tsx
-msgid "admin"
-msgstr "מנהל"
+msgid "<0>{temple}</0> (grade {grade}, <1>admin</1>)"
+msgstr "<0>{temple}</0> (דרגה {grade}, <1>מנהל</1>)"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "<0>{temple}</0> (grade {grade})"
+msgstr "<0>{temple}</0> (דרגה {grade})"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/page.tsx
 msgid "Leave"
 msgstr "עזיבה"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Leave {temple}?"
+msgstr "לעזוב את המקדש {temple}?"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "Leave temple"
+msgstr "עזיבת המקדש"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/page.tsx
+msgid "You will lose access to <0>{temple}</0>’s private rituals at once. Copies downloaded to your devices are deleted the next time those devices connect. You can only come back with a join code from one of its administrators."
+msgstr "הגישה שלך לטקסים הפרטיים של <0>{temple}</0> תבוטל מיד. עותקים שהורדו למכשירים שלך יימחקו בפעם הבאה שהמכשירים יתחברו. אפשר לחזור רק באמצעות קוד הצטרפות מאחד ממנהלי המקדש."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/page.tsx
@@ -1482,8 +1963,18 @@ msgstr "הצטרפות למקדש"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
-msgid "No temple matches that slug and join code."
-msgstr "לא נמצא מקדש התואם למזהה ולקוד ההצטרפות."
+msgid "<0>Sign in</0> to review and confirm this invitation."
+msgstr "יש <0>להיכנס לחשבון</0> כדי לעיין בהזמנה הזו ולאשר אותה."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "You are already a member of <0>{temple}</0> Temple."
+msgstr "כבר קיימת לך חברות במקדש <0>{temple}</0>."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+msgid "Confirm that you want to join <0>{temple}</0> Temple. Your membership will begin at grade 0."
+msgstr "יש לאשר את רצונך להצטרף למקדש <0>{temple}</0>. החברות תתחיל בדרגה 0."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
@@ -1507,6 +1998,11 @@ msgstr "ניהול מקדשים"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/page.tsx
+msgid "<0>Sign in</0> to create or administer a temple."
+msgstr "יש <0>להיכנס לחשבון</0> כדי ליצור מקדש או לנהל מקדש."
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/page.tsx
 msgid "Temples you administer"
 msgstr "מקדשים בניהולכם"
 
@@ -1522,13 +2018,18 @@ msgstr "הרשאת מנהל האתר מאפשרת לכם לנהל את כל המ
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/page.tsx
-msgid "My Temples page"
-msgstr "עמוד המקדשים שלי"
+msgid "This creates a separate organization and makes you its first administrator. To join an existing temple, use its slug and join code on the <0>My Temples page</0>."
+msgstr "פעולה זו יוצרת ארגון נפרד וממנה אותך למנהל הראשון שלו. כדי להצטרף למקדש קיים, יש להשתמש במזהה ובקוד ההצטרפות שלו ב<0>דף המקדשים שלי</0>."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/page.tsx
 msgid "Manage Temple"
 msgstr "ניהול מקדש"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "<0>Sign in</0> to administer this temple."
+msgstr "יש <0>להיכנס לחשבון</0> כדי לנהל את המקדש הזה."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/page.tsx
@@ -1543,6 +2044,11 @@ msgstr "חזרה לניהול המקדשים"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "<0>{temple}</0> Temple"
+msgstr "מקדש <0>{temple}</0>"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
 msgid "The member has been removed."
 msgstr "החבר הוסר."
 
@@ -1550,6 +2056,11 @@ msgstr "החבר הוסר."
 #: src/app/(private)/temples/admin/[_id]/page.tsx
 msgid "Members"
 msgstr "חברים"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "{temple} members"
+msgstr "חברי המקדש {temple}"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
@@ -1580,13 +2091,33 @@ msgstr "מנהל מקדש"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Edit {member}"
+msgstr "עריכת {member}"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Recently deleted rituals ({count})"
+msgstr "טקסים שנמחקו לאחרונה ({count})"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
 msgid "Join information"
 msgstr "פרטי הצטרפות"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/page.tsx
+msgid "Temple slug: <0>{slug}</0>"
+msgstr "מזהה המקדש: <0>{slug}</0>"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
 msgid "Temple Membership"
 msgstr "חברות במקדש"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "<0>Sign in</0> to edit this membership."
+msgstr "יש <0>להיכנס לחשבון</0> כדי לערוך את החברות הזו."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
@@ -1597,6 +2128,11 @@ msgstr "החברות לא נמצאה, או שאין לכם הרשאה לנהל �
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
 msgid "Edit Membership"
 msgstr "עריכת חברות"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "<0>{member}</0> in <1>{temple}</1> Temple"
+msgstr "<0>{member}</0> במקדש <1>{temple}</1>"
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
@@ -1627,6 +2163,21 @@ msgstr "שמירת החברות"
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
 msgid "Remove from temple"
 msgstr "הסרה מהמקדש"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Remove {member}?"
+msgstr "להסיר את {member}?"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "Remove member"
+msgstr "הסרת חבר"
+
+#. js-lingui-explicit-id
+#: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
+msgid "They lose access to <0>{temple}</0> Temple’s private rituals at once. Copies downloaded to their devices are deleted the next time those devices connect, and a device that stays offline locks them within 14 days at the latest."
+msgstr "הגישה שלהם לטקסים הפרטיים של מקדש <0>{temple}</0> תבוטל מיד. עותקים שהורדו למכשירים שלהם יימחקו בפעם הבאה שהמכשירים יתחברו, ומכשיר שיישאר ללא חיבור ינעל אותם בתוך 14 ימים לכל היותר."
 
 #. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
