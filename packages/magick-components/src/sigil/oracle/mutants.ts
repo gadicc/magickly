@@ -1,20 +1,34 @@
 /**
- * The oracle's own test (plan 088, "The oracle is tested too"): a
- * scrambler that rewrites a figure's commands without changing its ink,
- * which neither O2 nor O3 may notice, and a mirrored rose for checking a
- * figure against the wrong layout. Known-good figures come from
- * `figureDrawer.ts`.
+ * The oracle's own test (plan 088, "The oracle is tested too"): known-good
+ * figures, which must pass O2 and O3, and mutants of them, each of which
+ * one or both must catch; a scrambler that rewrites a figure's commands
+ * without changing its ink, which neither may notice; and a mirrored rose.
+ * The figures come from `figureDrawer.ts`, a deliberately simple test-only
+ * drawer, since no engine draws correct figures yet.
  */
 
+import {
+  ROSE_SIGIL_PROFILE,
+  roseSigilLayout,
+} from "../../gd/roseSigilLayout.ts";
 import { svgCoordinate } from "../../svgCoordinate.ts";
-import type { SigilLayout } from "../types.ts";
+import type { Point, SigilLayout, SigilPlan } from "../types.ts";
 import {
   arcCentre,
   arcPoint,
   type PathSegment,
   parsePathData,
 } from "./figure.ts";
-import { pair, round } from "./figureDrawer.ts";
+import {
+  type DrawChoices,
+  type DrawFaults,
+  drawPlaced,
+  pair,
+  placeSimply,
+  round,
+} from "./figureDrawer.ts";
+import { KAMEA_STUB_PROFILE, planetKameaLayout } from "./kameaLayout.ts";
+import { referencePlan, referenceWords } from "./referencePlan.ts";
 
 function segmentText(seg: PathSegment): string {
   if (seg.type === "M") return "";
@@ -111,3 +125,146 @@ export function mirroredLayout(
     placeAt: (point) => layout.placeAt({ x: -point.x, y: point.y }),
   };
 }
+
+/** A figure with the plan and layout it is judged against. */
+export interface JudgedFigure {
+  svg: string;
+  plan: SigilPlan;
+  layout: SigilLayout<string> | SigilLayout<number>;
+}
+
+const rose = roseSigilLayout();
+const planOf = (text: string) =>
+  referencePlan(referenceWords(text), rose, ROSE_SIGIL_PROFILE);
+
+function simple(
+  text: string,
+  options: {
+    faults?: DrawFaults;
+    choices?: DrawChoices;
+    overrides?: (Point | undefined)[][];
+    drawn?: string;
+  } = {},
+): JudgedFigure {
+  const drawnPlan = planOf(options.drawn ?? text);
+  return {
+    svg: drawPlaced(
+      placeSimply(drawnPlan, rose, options.overrides),
+      rose,
+      options.faults,
+      options.choices,
+    ),
+    plan: planOf(text),
+    layout: rose,
+  };
+}
+
+/**
+ * ללהאל placed by hand: the worst case, two strokes and a noose within the
+ * slack at Aleph, with He and both Lameds at the edge of their slack.
+ */
+function lamedLamed(): JudgedFigure {
+  const he = { x: 0, y: -30.45 };
+  const lamed = { x: 4.488, y: 34.7 };
+  const lamed2 = { x: -4.488, y: 34.7 };
+  const t = (-15 - he.y) / (lamed2.y - he.y);
+  const aleph = { x: he.x + (lamed2.x - he.x) * t, y: -15 };
+  return simple("ללהאל", {
+    overrides: [[lamed, he, aleph, lamed2]],
+    choices: { nooseRight: [{ word: 0, vertex: 2 }] },
+  });
+}
+
+/** Figures that follow the grammar and must pass O2 and O3. */
+export const KNOWN_GOOD: readonly { id: string; figure: () => JudgedFigure }[] =
+  [
+    // Crook at Teth, noose at Resh (p. 58).
+    { id: "metatron", figure: () => simple("מטטרון") },
+    { id: "binah", figure: () => simple("בינה") },
+    // F1: the return to He beside its first visit.
+    { id: "yhvh", figure: () => simple("יהוה") },
+    { id: "agiel", figure: () => simple("אגיאל") },
+    { id: "yod-he-vau-he", figure: () => simple("יוד הא ואו הא") },
+    // Two crooks at the first letter, a noose at Aleph.
+    { id: "yod-yod-yod", figure: () => simple("יייאל") },
+    { id: "he-he-he", figure: () => simple("הההאל") },
+    { id: "lamed-lamed", figure: lamedLamed },
+    { id: "aleph", figure: () => simple("א") },
+    {
+      id: "zazel-kamea",
+      figure: () => {
+        const layout = planetKameaLayout("saturn");
+        const plan = referencePlan([[7, 1, 7, 3]], layout, KAMEA_STUB_PROFILE);
+        return {
+          svg: drawPlaced(placeSimply(plan, layout), layout),
+          plan,
+          layout,
+        };
+      },
+    },
+  ];
+
+/** A broken figure, and which checks must catch it. */
+export interface Mutant {
+  id: string;
+  caughtBy: readonly ("O2" | "O3")[];
+  figure: () => JudgedFigure;
+}
+
+/** Plan 088's mutants, each a known-good figure broken one way. */
+export const MUTANTS: readonly Mutant[] = [
+  {
+    id: "no bar",
+    caughtBy: ["O2", "O3"],
+    figure: () => simple("מטטרון", { faults: { noBar: true } }),
+  },
+  {
+    id: "one cup of a crook missing",
+    caughtBy: ["O2", "O3"],
+    figure: () =>
+      simple("מטטרון", { faults: { dropCup: { word: 0, vertex: 1 } } }),
+  },
+  {
+    id: "a missing noose",
+    caughtBy: ["O2", "O3"],
+    figure: () =>
+      simple("מטטרון", { faults: { dropNoose: { word: 0, vertex: 2 } } }),
+  },
+  {
+    id: "a noose where none belongs",
+    caughtBy: ["O2", "O3"],
+    figure: () =>
+      simple("בינה", { faults: { extraNoose: { word: 0, vertex: 1 } } }),
+  },
+  {
+    id: "two strokes laid on each other",
+    caughtBy: ["O2", "O3"],
+    // The return to He drawn on its first visit, so Vau→He lies on He→Vau.
+    figure: () =>
+      simple("יהוה", {
+        overrides: [[undefined, undefined, undefined, rose.anchor("ה")]],
+      }),
+  },
+  {
+    id: "the rose mirrored",
+    caughtBy: ["O2", "O3"],
+    figure: () => ({ ...simple("מטטרון"), layout: mirroredLayout(rose) }),
+  },
+  {
+    id: "two letters swapped",
+    // O2 finds no noose at Resh, which no longer lies on its chord; O3
+    // reads the other order.
+    caughtBy: ["O2", "O3"],
+    figure: () => simple("מטטרון", { drawn: "מטטורן" }),
+  },
+  {
+    id: "words joined",
+    caughtBy: ["O2", "O3"],
+    figure: () => simple("יוד הא ואו הא", { drawn: "יודהאואוהא" }),
+  },
+  {
+    id: "a start circle at the wrong end",
+    caughtBy: ["O2", "O3"],
+    figure: () => simple("מטטרון", { faults: { startAtEnd: true } }),
+  },
+];
