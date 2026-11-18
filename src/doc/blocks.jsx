@@ -193,7 +193,15 @@ class Task extends Node {
     }
     */
 
-    const samePreviousRole = this.prev() && this.prev().block.role === role;
+    // The same role again continues its turn, whatever the kinds: the frame
+    // closes up and tucks a direction under speech (plan 089, decision 3).
+    const prev = this.prev();
+    const continues =
+      prev && prev.block.role === role
+        ? prev.block.do
+          ? "do"
+          : "say"
+        : undefined;
 
     // biome-ignore lint/correctness/useHookAtTopLevel: JRT invokes render as its React component
     const ref = React.useRef();
@@ -249,8 +257,9 @@ class Task extends Node {
         <TaskFrame
           role={role}
           roles={roles}
+          kind={block.do ? "do" : "say"}
           audience={forMe ? "self" : "other"}
-          samePreviousRole={samePreviousRole}
+          continues={continues}
           page={key}
           footer={footer}
         >

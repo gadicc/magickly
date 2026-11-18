@@ -307,3 +307,50 @@ it("opens a link on this site in a new tab where the context asks, as the editor
     "_blank",
   );
 });
+
+it("continues a role's turn whatever the kinds, and starts a new one on a new role", () => {
+  // Plan 089, decision 3: the same role again drops its role line; the
+  // frame records the previous task's kind, so a direction after speech
+  // tucks under the bubble.
+  const task = (role: string, kind: "say" | "do", text: string) => ({
+    type: "task",
+    role,
+    [kind]: true,
+    children: [{ type: "text", value: text }],
+  });
+  const doc = {
+    children: [
+      task("hierophant", "say", "One"),
+      task("hierophant", "say", "Two"),
+      task("hierophant", "do", "Three"),
+      task("hierophant", "do", "Four"),
+      task("hierophant", "say", "Five"),
+      task("keryx", "do", "Six"),
+      task("all", "say", "Seven"),
+    ],
+  };
+  const view = render(
+    <DocContext.Provider value={{ vars: {}, roles }}>
+      <Render doc={doc} onChange={undefined} />
+    </DocContext.Provider>,
+  );
+  const frames = [
+    ...view.container.querySelectorAll('[data-ritual-frame="task"]'),
+  ];
+  expect(
+    frames.map((frame) => [
+      frame.getAttribute("data-kind"),
+      frame.getAttribute("data-continues"),
+    ]),
+  ).toEqual([
+    ["say", null],
+    ["say", "say"],
+    ["do", "say"],
+    ["do", "do"],
+    ["say", "do"],
+    ["do", null],
+    ["say", null],
+  ]);
+  expect(screen.getAllByText("Hierophant")).toHaveLength(1);
+  expect(screen.getAllByText("Keryx")).toHaveLength(1);
+});

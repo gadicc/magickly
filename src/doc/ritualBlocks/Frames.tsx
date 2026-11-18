@@ -3,6 +3,7 @@ import Typography from "@mui/material/Typography";
 import type { CSSProperties, ReactNode } from "react";
 import { inkClass } from "@/drawings/Ink";
 import { plateClass } from "@/drawings/plate";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
 import {
   canonicalRole,
   parseRoleAssignment,
@@ -12,24 +13,34 @@ import styles from "./frames.module.css";
 import type { RitualRolePresentation } from "./roles";
 
 /**
- * A role name's colours as the variables `.roleColor` reads: its own in
- * light, its lighter `darkColor` in dark (plan 076, step 5). Unset, the
- * name inherits the bubble's text colour, as before.
+ * A single officer's colours as the variables the frame reads, for its
+ * role name and a direction's rule: its own in light, its lighter
+ * `darkColor` in dark (plan 076, step 5). Groups and roles without a colour
+ * set them to `initial`, so that a task drawn inside another (a footnote's)
+ * does not inherit the outer officer's: the name then inherits the text
+ * colour and the rule is neutral (plan 089, decision 1).
  */
 function roleColorStyle(role: RitualRolePresentation | undefined) {
-  if (!role?.color) return undefined;
   return {
-    "--ritual-role": role.color,
-    "--ritual-role-dark": role.darkColor ?? role.color,
+    "--ritual-role": role?.color ?? "initial",
+    "--ritual-role-dark": role?.color
+      ? (role.darkColor ?? role.color)
+      : "initial",
   } as CSSProperties;
 }
 
-/** Formatting slots shared by JRT reading and editor-owned child DOM. */
+/**
+ * Formatting slots shared by JRT reading and editor-owned child DOM. Speech
+ * is a bubble, a direction a rubric on the surface (plan 089, decision 1);
+ * both kinds share one root element, styled by `data-kind`, so switching a
+ * task's kind in the editor never remounts its content slot.
+ */
 export function TaskFrame({
   role,
   roles,
+  kind,
   audience = "other",
-  samePreviousRole = false,
+  continues,
   page,
   children,
   footer,
@@ -37,9 +48,16 @@ export function TaskFrame({
 }: {
   role: string;
   roles: Record<string, RitualRolePresentation>;
+  /** Speech or a direction ("do"). */
+  kind: "say" | "do";
   /** Authoring shows a neutral card, without a selected reader's audience shift. */
   audience?: "self" | "other" | "author";
-  samePreviousRole?: boolean;
+  /**
+   * The kind of the previous task when it has the same role: this one then
+   * drops its role line and closes up to it, and a direction after speech
+   * tucks under the bubble (plan 089, decision 3).
+   */
+  continues?: "say" | "do";
   page?: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
@@ -51,27 +69,28 @@ export function TaskFrame({
     assignment?.basis === "roles"
       ? [...new Set(assignment.roles.map(canonicalRole))]
       : [];
+  const presentation = (entry: string) =>
+    Object.hasOwn(roles, entry) ? roles[entry] : undefined;
   return (
-    <Paper
+    <div
       className={styles.task}
       data-ritual-frame="task"
+      data-kind={kind}
       data-audience={audience}
-      sx={{
-        px: 2,
-        pt: 1,
-        pb: 1,
-        mb: 1.6,
-        mt: samePreviousRole ? -1 : 0,
-        ml: audience === "self" ? 5 : 0,
-        mr: audience === "other" ? 5 : 0,
-        // Light: the bubble is the Paper's own white, as before.
-        bgcolor: audience === "self" ? "ritual.self" : "ritual.bubble",
-        // No dark elevation overlay: the bubbles are the chosen colours.
-        backgroundImage: "none",
-        position: "relative",
-      }}
+      data-continues={continues}
+      style={roleColorStyle(
+        individualRoles.length === 1
+          ? presentation(individualRoles[0])
+          : undefined,
+      )}
     >
-      {!samePreviousRole && (
+      {/* First, floated: rows without a role line wrap around it. */}
+      {page !== undefined && (
+        <span className={styles.page} contentEditable={false}>
+          {page}
+        </span>
+      )}
+      {!continues && (
         <div className={styles.role} contentEditable={false}>
           {/* The symbols only repeat the role names beside them. */}
           <div
@@ -79,9 +98,7 @@ export function TaskFrame({
             aria-hidden="true"
           >
             {individualRoles.map((entry) => (
-              <span key={entry}>
-                {Object.hasOwn(roles, entry) ? roles[entry].symbol : undefined}
-              </span>
+              <span key={entry}>{presentation(entry)?.symbol}</span>
             ))}
           </div>{" "}
           <div className={styles.roleName}>
@@ -90,13 +107,17 @@ export function TaskFrame({
                   <span
                     key={entry}
                     className={styles.roleColor}
-                    style={roleColorStyle(
-                      Object.hasOwn(roles, entry) ? roles[entry] : undefined,
-                    )}
+                    // One officer's colours are the frame's; each of
+                    // several names carries its own.
+                    style={
+                      individualRoles.length > 1
+                        ? roleColorStyle(presentation(entry))
+                        : undefined
+                    }
                   >
                     {index > 0 &&
                       (index === individualRoles.length - 1 ? " and " : ", ")}
-                    {(Object.hasOwn(roles, entry) && roles[entry].name) ||
+                    {presentation(entry)?.name ||
                       entry.slice(0, 1).toUpperCase() + entry.slice(1)}
                   </span>
                 ))
@@ -105,18 +126,18 @@ export function TaskFrame({
           {headerActions}
         </div>
       )}
-      {page !== undefined && (
-        <span className={styles.page} contentEditable={false}>
-          {page}
-        </span>
-      )}
       {children}
       {footer}
-    </Paper>
+    </div>
   );
 }
 
-/** Keep the body slot stable when switching speech/action or selecting a task. */
+/**
+ * Keep the body slot stable when switching speech/action or selecting a
+ * task. A direction carries its translated kind for screen readers, which
+ * announce the visually hidden generated content; it is never copied and
+ * never part of the editor's content.
+ */
 export function TaskBody({
   action,
   children,
@@ -124,8 +145,12 @@ export function TaskBody({
   action: boolean;
   children: ReactNode;
 }) {
+  const { t } = useUiLanguage();
   return (
-    <div className={action ? `do ${styles.action}` : `say ${styles.speech}`}>
+    <div
+      className={action ? `do ${styles.action}` : `say ${styles.speech}`}
+      data-kind-label={action ? t(/*i18n*/ "Direction") : undefined}
+    >
       {children}
     </div>
   );

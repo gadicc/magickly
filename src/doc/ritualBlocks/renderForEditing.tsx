@@ -148,6 +148,7 @@ export function RitualBlockForEditing({
         <TaskFrame
           role={String(attrs.role ?? "all")}
           roles={roles}
+          kind={attrs.do === true ? "do" : "say"}
           audience="author"
           footer={footer}
           headerActions={

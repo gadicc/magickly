@@ -1,11 +1,68 @@
+/* A task (plan 089, decision 1). Speech is a bubble, a direction a rubric
+   on the surface with a rule in its officer's colour; one element, styled
+   by data-kind. Sides are physical, not logical: the ritual body is always
+   dir="ltr" (DocRender), and MUI's RTL plugin would flip sx margins under
+   the Hebrew interface even there, so the offsets live here, not in sx. */
 .task {
+  position: relative;
   overflow-wrap: anywhere;
+  margin: 0 0 12.8px;
+  color: var(--mui-palette-text-primary);
+}
+.task[data-audience="self"] {
+  margin-left: 40px;
+}
+.task[data-audience="other"] {
+  margin-right: 40px;
+}
+.task[data-kind="say"] {
+  padding: 8px 16px;
+  border-radius: 4px;
+  background: var(--mui-palette-ritual-bubble);
+  /* The Paper bubble's elevation 1, as before. */
+  box-shadow: var(
+    --mui-shadows-1,
+    0px 2px 1px -1px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 3px 0px rgba(0, 0, 0, 0.12)
+  );
+}
+.task[data-kind="say"][data-audience="self"] {
+  background: var(--mui-palette-ritual-self);
+}
+.task[data-kind="do"] {
+  padding: 4px 16px 4px 10px;
+  border-left: 3px solid var(--ritual-role, var(--mui-palette-text-secondary));
+}
+:global(.dark) .task[data-kind="do"] {
+  border-left-color: var(--ritual-role-dark, var(--mui-palette-text-secondary));
+}
+.task[data-kind="do"][data-audience="self"],
+:global(.dark) .task[data-kind="do"][data-audience="self"] {
+  border-left-color: var(--mui-palette-success-main);
+  border-radius: 0 4px 4px 0;
+  background: var(--mui-palette-ritual-selfAction);
+}
+/* The same role again (decision 3): no role line, closed up; a direction
+   after that officer's speech tucks under the bubble, indented. */
+.task[data-continues] {
+  margin-top: -8px;
+}
+.task[data-kind="do"][data-continues="say"][data-audience="other"] {
+  margin-left: 16px;
+}
+.task[data-kind="do"][data-continues="say"][data-audience="self"] {
+  margin-left: 56px;
 }
 .role {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.2rem;
+}
+/* A direction's role line is smaller; in em, so the text size scales it. */
+.task[data-kind="do"] > .role {
+  font-size: 0.8125em;
 }
 .role > div {
   height: 100%;
@@ -15,37 +72,41 @@
   margin-right: 3px;
   vertical-align: top;
 }
+/* A lamen is 25px beside 16px text, and scales with it. */
+.roleSymbol svg {
+  height: 1.5625em;
+  width: auto;
+}
 .roleName {
   vertical-align: top;
   min-width: 0;
 }
+/* The line number floats, so a row without a role line wraps around it. */
 .page {
-  position: absolute;
-  right: 8px;
-  top: 6px;
-  color: #ddd;
-}
-.speech {
-  quotes: "“" "”" "‘" "’";
-  text-indent: -0.45em;
-  margin-block: 0 0.5em;
-  margin-inline: 5px 0;
-}
-.speech::before {
-  content: open-quote;
-  font-size: 120%;
-}
-.speech::after {
-  content: close-quote;
-  font-size: 120%;
+  float: right;
+  margin-left: 8px;
+  font-size: 0.875em;
+  color: var(--mui-palette-text-disabled);
 }
 .action,
 .note {
   font-style: italic;
 }
-.action::before,
-.action::after {
-  content: "*";
+.action {
+  color: var(--mui-palette-ritual-rubric);
+}
+/* Announced before each direction, never shown or copied (decision 1). */
+.action[data-kind-label]::before {
+  content: attr(data-kind-label) ": ";
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .grade {
   display: inline-block;
@@ -81,18 +142,15 @@
   max-height: 360px;
   object-fit: contain;
 }
-/* Tiptap owns these wrapper elements. Inline paragraphs preserve the reader's
-   quotes and action markers on the same line; later paragraphs remain separate. */
-.speech > :global([data-node-view-content]),
-.speech > :global([data-node-view-content]) > div,
-.action > :global([data-node-view-content]),
-.action > :global([data-node-view-content]) > div {
-  display: inline;
-}
+/* Tiptap owns these wrapper elements. Paragraphs keep the reader's spacing,
+   which has none around a task's text. */
 .speech > :global([data-node-view-content]) > div > p:first-child,
 .action > :global([data-node-view-content]) > div > p:first-child {
-  display: inline;
-  margin: 0;
+  margin-top: 0;
+}
+.speech > :global([data-node-view-content]) > div > p:last-child,
+.action > :global([data-node-view-content]) > div > p:last-child {
+  margin-bottom: 0;
 }
 .title :global([data-node-view-content]) p {
   margin: 0;
@@ -188,9 +246,6 @@
 }
 :global(.dark) .roleColor {
   color: var(--ritual-role-dark);
-}
-:global(.dark) .page {
-  color: #4f5a6c;
 }
 :global(.dark) .hallPlaceholder {
   background: var(--mui-palette-ritual-note);

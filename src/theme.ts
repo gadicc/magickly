@@ -19,6 +19,16 @@ interface AppPaletteTokens {
     bubble: string;
     /** A note between bubbles. */
     note: string;
+    /**
+     * A direction's text, drawn on the surface as a rubric (plan 089,
+     * decision 1): at least 4.5:1 on `surface` and on `selfAction`.
+     */
+    rubric: string;
+    /**
+     * The tint behind the reader's own directions: `self`, paler (in dark,
+     * nearer the surface).
+     */
+    selfAction: string;
   };
 }
 
@@ -38,6 +48,8 @@ const lightTokens: AppPaletteTokens = {
     self: "#d9fdd3",
     bubble: "#fff",
     note: "#f4f4f4",
+    rubric: "#8a3324",
+    selfAction: "#e9f9e5",
   },
 };
 
@@ -52,6 +64,8 @@ const darkTokens: AppPaletteTokens = {
     self: "#1f3a2c",
     bubble: "#1b2333",
     note: "#141a24",
+    rubric: "#f28b7d",
+    selfAction: "#172a22",
   },
 };
 

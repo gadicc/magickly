@@ -25,7 +25,7 @@ describe("ritual role symbols", () => {
   it("hides every role's symbol from assistive technology, beside its name", () => {
     for (const role of Object.keys(roles)) {
       const markup = renderToStaticMarkup(
-        <TaskFrame role={role} roles={roles}>
+        <TaskFrame role={role} roles={roles} kind="say">
           text
         </TaskFrame>,
       );

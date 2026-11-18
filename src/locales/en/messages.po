@@ -249,6 +249,11 @@ msgid "Publish"
 msgstr "Publish"
 
 #. js-lingui-explicit-id
+#: src/doc/ritualBlocks/Frames.tsx
+msgid "Direction"
+msgstr "Direction"
+
+#. js-lingui-explicit-id
 #: src/app/pathnames.ts
 msgid "Magick.ly"
 msgstr "Magick.ly"
