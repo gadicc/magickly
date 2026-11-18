@@ -479,6 +479,25 @@ export const Sigil = ({ text }: { text: string }) => (
 that draws the figure its own way: the plan says what each vertex is
 (its place, which visit to that place, its crooks and its marks), and
 placement says where it is drawn.
+`sigil/ink` is the third step, the renderer: `wordInk()` turns a placed
+word into its marks and strokes, `sigilSubpaths()` into SVG path data in
+drawing order, and `sigilFrame()` and `sigilViewBox()` say where words
+sit; `DEFAULT_SIGIL_MARKS` are the mark sizes a profile can change.
+
+Placement checks every figure against the figure grammar (strokes kept
+apart, marks clear of other ink, corners that show, unbent nooses) and
+moves vertices until it passes. Words of up to 12 letters are the domain
+this is tested on, and nearly all of them pass. Longer words, and a few
+hard shorter ones, are drawn best effort: `sigilFigure()` returns, in
+`failures`, what each word still fails (empty when every mark stands
+clear), `placeSigilWords()` the same per placed word, and
+`wordFailures(word, layout, profile)` judges any placed word, so a page
+can say when a figure may be hard to read.
+
+Placement keeps the words it places, keyed by the layout and profile
+objects themselves, and hands them out frozen. So give it a layout or
+profile that does not change after first use; to change one, make a new
+object.
 
 ## What you supply
 

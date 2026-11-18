@@ -21,13 +21,21 @@
  * the four diagonals, by each of `steps`, capped by its slack. The move
  * that lowers the score most is made, the earliest on a tie, and the next
  * round begins; a round with no move that gains at least 0.01 ends the
- * search. If failures remain, the search starts again from revisits on
- * the other side, then towards the layout's centre, then the same three
- * at the slack's edge, and the best figure of all is kept. Everything
- * stops when `budget` units of checking work are spent.
+ * search. If failures remain, the search starts again, from up to ten
+ * starts in all: revisits on the roomier side, the other side and towards
+ * the layout's centre, at `revisitOffset` and at the slack's edge; then,
+ * at the edge, either side, with the first letter of a revisited place
+ * (or a first letter with crooks) drawn ahead along its first stroke, and
+ * then drawn back. A start that repeats an earlier one's positions is
+ * skipped, and the best figure of all is kept. Everything stops when
+ * `budget` units of checking work are spent.
+ *
+ * A run of nooses in a row is settled together, onto the chord between
+ * the run's outer neighbours, so the line through them stays unbent;
+ * placement checks that it does.
  *
  * Checking is incremental: the ink is split into elements (vertices,
- * corners, strokes, loops, waves, the bar) whose results are kept by
+ * corners, noose passes, strokes, loops, waves, the bar) whose results are kept by
  * pair, and a move re-checks only the elements whose geometry changed.
  *
  * Inputs are quantised to 0.001, as the SVG is written, and only
@@ -37,6 +45,7 @@
 
 import {
   along,
+  cross,
   crossing,
   direction,
   dist,
@@ -113,10 +122,10 @@ const LIMITS = {
   loopClearance: 1,
   /**
    * A stroke may pass another visit to one of its own places (Regardie's
-   * יהוה), but not run through it: half a stroke width, well clear of
-   * read-back's 0.05, at which a vertex on a line splits it.
+   * יהוה), but no nearer than a stroke width: nearer, the vertex's corner
+   * runs into the stroke.
    */
-  samePlaceClearance: 0.5,
+  samePlaceClearance: 1,
   /** No ink but the last stroke this near the bar (the grammar's 1 and a margin). */
   barClearance: 1.05,
   /** No ink but a crook's own this near its cups, on their side. */
@@ -125,6 +134,8 @@ const LIMITS = {
   ownSkip: 1,
   /** The limit for a mark's own stroke, measured from `ownSkip` away: just under it. */
   ownClearance: 0.99,
+  /** A noose's vertex lies this close to its neighbours' chord (O2 allows 0.03). */
+  unbent: 0.01,
   /** cos 12°: an unmarked corner turns by at least 12° (the grammar's 10 and a margin). */
   cornerCos: 0.9781476007338057,
 };
@@ -137,6 +148,7 @@ export interface PlacementFailure {
     | "overlap"
     | "clearance"
     | "corner"
+    | "noose"
     | "crook"
     | "bar-clearance"
     | "crook-clearance"
@@ -149,7 +161,7 @@ export interface PlacementFailure {
 /** A piece of a word's figure that checks are made on. */
 type Element =
   | { kind: "vertex"; i: number; p: Point }
-  | { kind: "corner"; i: number; a: Point; b: Point; c: Point }
+  | { kind: "corner" | "pass"; i: number; a: Point; b: Point; c: Point }
   | { kind: "line"; seg: Segment; first: number; last: number }
   | { kind: "loop"; loop: InkLoop }
   | { kind: "wave"; wave: InkWave; cramped: boolean }
@@ -175,21 +187,34 @@ function involve(word: SigilWord, vertices: number[]): number[] {
   return out;
 }
 
+/** Distance from `p` to the line through `a` and `c`. */
+function toLine(p: Point, a: Point, c: Point): number {
+  const l = dist(a, c);
+  return l === 0 ? dist(p, a) : Math.abs(cross(sub(c, a), sub(p, a))) / l;
+}
+
 /** A word's elements, in an order its plan fixes. */
-function elements(word: SigilWord, points: Point[], ink: WordInk): Element[] {
+function elements(
+  word: SigilWord,
+  points: Point[],
+  ink: WordInk,
+  unit: number,
+): Element[] {
   const n = word.length;
   const out: Element[] = points.map((p, i) => ({ kind: "vertex", i, p }));
   for (let i = 1; i < n - 1; i++)
-    if (word[i].crooks === 0 && !word[i].marks.includes("noose"))
+    if (word[i].crooks === 0)
       out.push({
-        kind: "corner",
+        kind: word[i].marks.includes("noose") ? "pass" : "corner",
         i,
         a: points[i - 1],
         b: points[i],
         c: points[i + 1],
       });
-  // Strokes as O2 reads them: pieces through a noose, which are
-  // collinear, are one line.
+  // Strokes as O2 reads them: pieces through a noose are one line. That
+  // holds only while the noose's line is unbent, which its "pass" element
+  // checks; the elements stay the same whatever the geometry, as the
+  // incremental judgement needs.
   for (const piece of ink.lines) {
     const prev = out[out.length - 1];
     if (
@@ -224,6 +249,7 @@ function signature(e: Element): number[] {
     case "vertex":
       return [e.p.x, e.p.y];
     case "corner":
+    case "pass":
       return [e.a.x, e.a.y, e.b.x, e.b.y, e.c.x, e.c.y];
     case "line":
     case "bar":
@@ -252,6 +278,7 @@ function verticesOf(e: Element, n: number): number[] {
     case "vertex":
       return [e.i];
     case "corner":
+    case "pass":
       return [e.i - 1, e.i, e.i + 1];
     case "line": {
       const out: number[] = [];
@@ -348,6 +375,18 @@ function single(e: Element, ctx: Context): PlacementFailure[] {
         });
       break;
     }
+    case "pass": {
+      // A noose's line is unbent: its vertex on the chord of its
+      // neighbours, within the SVG's rounding.
+      const off = toLine(e.b, e.a, e.c);
+      if (off > LIMITS.unbent * unit)
+        out.push({
+          check: "noose",
+          vertices: verticesOf(e, n),
+          excess: off / unit,
+        });
+      break;
+    }
     case "corner": {
       const c = dot(direction(e.a, e.b), direction(e.b, e.c));
       if (c > LIMITS.cornerCos)
@@ -381,7 +420,15 @@ function single(e: Element, ctx: Context): PlacementFailure[] {
 }
 
 /** The order pairs are checked in: `pair(a, b)` has `a` first in it. */
-const KIND_ORDER = ["vertex", "corner", "line", "loop", "wave", "bar"] as const;
+const KIND_ORDER = [
+  "vertex",
+  "corner",
+  "pass",
+  "line",
+  "loop",
+  "wave",
+  "bar",
+] as const;
 
 /** Checks between two elements; `a` comes first in `KIND_ORDER`. */
 function pair(a: Element, b: Element, ctx: Context): PlacementFailure[] {
@@ -640,15 +687,19 @@ class Judgement {
 }
 
 /**
- * The checks of plan 088's O2 that placement can fail, on one placed word
- * and its ink. Empty when the figure passes.
+ * What a placed word fails of placement's checks (plan 088's O2: overlap,
+ * clearance of vertices, loops, the bar and crooks, visible corners,
+ * unbent nooses, room for crooks, the outer ring and each place's slack),
+ * drawn on `layout` under `profile`. Empty when every mark stands clear;
+ * `placeSigilWords` gives the same for the words it places.
  */
 export function wordFailures(
   word: PlacedWord,
-  ink: WordInk,
   layout: SigilGeometry,
-  frame: SigilFrame,
+  profile: SigilProfile,
 ): PlacementFailure[] {
+  const frame = sigilFrame(layout);
+  const ink = wordInk(word, layout.unit, profile, frame);
   const ctx: Context = {
     word,
     layout,
@@ -661,6 +712,7 @@ export function wordFailures(
       word,
       word.map((v) => v.point),
       ink,
+      layout.unit,
     ),
     ctx,
   ).failures();
@@ -687,16 +739,32 @@ function capped(
 }
 
 /**
- * A noose vertex: its anchor's foot on its neighbours' chord, kept at
- * least `keep` from either end (half the chord, if that is shorter) so
- * its loop and a stroke width of line stand each side.
+ * Noose vertices in a row: each its anchor's foot on the chord from `p`
+ * to `n` (the run's outer neighbours), in order, at least `keep` from
+ * either end and `gap` from each other (less, evenly, if the chord is too
+ * short), so every loop and a stroke width of line stand between them.
  */
-function nooseFoot(anchor: Point, p: Point, n: Point, keep: number): Point {
+function nooseFeet(
+  anchors: readonly Point[],
+  p: Point,
+  n: Point,
+  keep: number,
+  gap: number,
+): Point[] {
   const d = direction(p, n);
   const l = dist(p, n);
-  const k = Math.min(keep, l / 2);
-  const t = Math.min(l - k, Math.max(k, dot(sub(anchor, p), d)));
-  return quantised(along(p, d, t));
+  const count = anchors.length;
+  // Shrink the spacing evenly when the chord cannot hold it all.
+  const room = 2 * keep + (count - 1) * gap;
+  const shrink = room > l ? l / room : 1;
+  const k = keep * shrink;
+  const g = gap * shrink;
+  const t = anchors.map((a) => dot(sub(a, p), d));
+  for (let i = 0; i < count; i++)
+    t[i] = Math.max(t[i], i === 0 ? k : t[i - 1] + g);
+  for (let i = count - 1; i >= 0; i--)
+    t[i] = Math.min(t[i], i === count - 1 ? l - k : t[i + 1] - g);
+  return t.map((ti) => quantised(along(p, d, ti)));
 }
 
 /**
@@ -783,24 +851,54 @@ export interface PlacedSigilWord {
   work: number;
 }
 
-/** Placed words kept for reuse, by layout, profile and plan word. */
+/** Placed words kept for reuse, by layout, profile, budget and plan word. */
 const placedCache = new WeakMap<
   SigilGeometry,
   WeakMap<SigilProfile, Map<string, PlacedSigilWord>>
 >();
 /** Placed words kept per layout and profile, oldest dropped first. */
 const CACHE_SIZE = 256;
+/**
+ * The least share of `budget` a word is given, however much its text's
+ * earlier words spent: an eighth, some three times what ללהאל, the
+ * hardest of the 72 names, needs.
+ */
+const BUDGET_FLOOR = 1 / 8;
+
+/** A placed word frozen, so the cache can hand the same one to every caller. */
+function frozen(placed: PlacedSigilWord): PlacedSigilWord {
+  for (const v of placed.word) {
+    Object.freeze(v.point);
+    Object.freeze(v.marks);
+    Object.freeze(v);
+  }
+  for (const f of placed.failures) {
+    Object.freeze(f.vertices);
+    Object.freeze(f);
+  }
+  Object.freeze(placed.word);
+  Object.freeze(placed.failures);
+  return Object.freeze(placed);
+}
 
 /**
  * A text's words placed (`placeSigil`), each with what its figure still
- * fails. A word's placement depends only on its plan word, the layout and
- * the profile, so placed words are kept (up to `CACHE_SIZE` per layout
- * and profile) and a word met again, in the same text or the next
- * keystroke's, is not placed again. A text's words share twice one
- * word's `budget`, in order: each gets its full budget while that much is
- * left, so a text of several hard words costs at most two hard words'
- * time. What a word is given depends on the words before it alone, never
- * on what the cache holds, so a text always draws the same figure.
+ * fails.
+ *
+ * Budget: a text's words share twice one word's `budget`, in order. Each
+ * new word is given what is left, up to the whole budget and never less
+ * than an eighth of it, and what it spends is taken off; a word met again
+ * in the same text costs nothing. So several hard words cost at most two
+ * hard words' time and an eighth for each beyond, and what a word is
+ * given depends on the words before it alone.
+ *
+ * Cache: a word's placement depends only on its plan word, its budget,
+ * the layout and the profile, so placed words are kept by all four (up to
+ * `CACHE_SIZE` per layout and profile) and handed out frozen; a word met
+ * again, in the same text or the next keystroke's, is not placed again.
+ * The cache keys on the layout's and profile's identity, so it assumes
+ * neither object changes behind it. A text always draws the same figure,
+ * whatever the cache holds.
  */
 export function placeSigilWords(
   plan: SigilPlan,
@@ -813,29 +911,23 @@ export function placeSigilWords(
   let cache = byProfile.get(profile);
   if (!cache) byProfile.set(profile, (cache = new Map()));
   let left = 2 * settings.budget;
-  // A word with less than the whole budget left is placed afresh, the
-  // same way whatever the cache holds, so the figure depends on the text
-  // alone; one met again in the same text is not placed twice.
-  const short = new Map<string, PlacedSigilWord>();
+  const floor = BUDGET_FLOOR * settings.budget;
+  const here = new Map<string, PlacedSigilWord>();
   return plan.map((word) => {
     const key = JSON.stringify(word);
-    const budget = Math.min(settings.budget, left);
-    let result: PlacedSigilWord;
-    if (budget === settings.budget) {
-      const kept = cache.get(key);
-      if (kept) result = kept;
-      else {
-        result = placeWord(word, layout, profile, budget);
-        cache.set(key, result);
-        if (cache.size > CACHE_SIZE)
-          cache.delete(cache.keys().next().value as string);
-      }
-    } else {
-      const memo = `${budget} ${key}`;
-      result = short.get(memo) ?? placeWord(word, layout, profile, budget);
-      short.set(memo, result);
+    const again = here.get(key);
+    if (again) return again;
+    const budget = Math.max(floor, Math.min(settings.budget, left));
+    const cacheKey = `${budget} ${key}`;
+    let result = cache.get(cacheKey);
+    if (!result) {
+      result = frozen(placeWord(word, layout, profile, budget));
+      cache.set(cacheKey, result);
+      if (cache.size > CACHE_SIZE)
+        cache.delete(cache.keys().next().value as string);
     }
     left = Math.max(0, left - result.work);
+    here.set(key, result);
     return result;
   });
 }
@@ -867,15 +959,30 @@ function placeWord(
   const frame = sigilFrame(layout);
   const unit = layout.unit;
   const keep = (marks.minStraight + marks.nooseRadius) * unit;
+  // Between two nooses in a row: both loops and a stroke width of line.
+  const gap = (2 * marks.nooseRadius + marks.minStraight) * unit;
   const least = 0.05 * unit;
   const n = word.length;
   const anchors = word.map((v) => quantised(layout.anchor(v.place)));
   const ctx: Context = { word, layout, frame, anchors, unit };
   const noose = word.map((v) => v.marks.includes("noose"));
   const settle = (pts: Point[]) => {
-    for (let i = 1; i < n - 1; i++)
-      if (noose[i])
-        pts[i] = nooseFoot(anchors[i], pts[i - 1], pts[i + 1], keep);
+    // A run of nooses in a row lies on one chord, between the run's outer
+    // neighbours, so the line through all of them stays unbent.
+    for (let i = 1; i < n - 1; i++) {
+      if (!noose[i]) continue;
+      let j = i;
+      while (j + 1 < n - 1 && noose[j + 1]) j++;
+      const feet = nooseFeet(
+        anchors.slice(i, j + 1),
+        pts[i - 1],
+        pts[j + 1],
+        keep,
+        gap,
+      );
+      for (let k = i; k <= j; k++) pts[k] = feet[k - i];
+      i = j;
+    }
   };
   type Sides = (1 | -1 | undefined)[];
   const placed = (pts: Point[], sds: Sides): PlacedVertex[] =>
@@ -884,7 +991,7 @@ function placeWord(
       return side ? { ...v, point: pts[i], side } : { ...v, point: pts[i] };
     });
   const build = (pts: Point[], sds: Sides) =>
-    elements(word, pts, wordInk(placed(pts, sds), unit, profile, frame));
+    elements(word, pts, wordInk(placed(pts, sds), unit, profile, frame), unit);
   let work = 0;
   const spent = () => work >= budget;
 

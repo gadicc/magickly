@@ -20,7 +20,11 @@ export interface Point {
  */
 export type PlaceId = string;
 
-/** Where a layout's places are, and how far a visit may stray from one. */
+/**
+ * Where a layout's places are, and how far a visit may stray from one.
+ * Placement keeps placed words by the layout object's identity, so a
+ * layout must not change after it is first used: make a new object.
+ */
 export interface SigilLayout<Token = string> {
   /** The place a token is drawn at, or `null` for a token the layout leaves out. */
   place(token: Token): PlaceId | null;
@@ -98,7 +102,9 @@ export type PlacedWord = readonly PlacedVertex[];
 
 /**
  * A tradition's settings for the rules. Distances are in sigil units
- * (`SigilLayout.unit`).
+ * (`SigilLayout.unit`). Placement keeps placed words by the profile
+ * object's identity, so a profile must not change after it is first
+ * used: make a new object.
  */
 export interface SigilProfile {
   id: string;
