@@ -319,6 +319,18 @@ const ESCAPES: Record<string, string> = {
 };
 const escape = (text: string) => text.replace(/[&<>"]/g, (c) => ESCAPES[c]);
 
+/**
+ * A label in display order: resvg lays text out left to right with no
+ * bidi, which drew ללהאל as לאהלל. Hebrew runs (with the spaces between
+ * their words) are reversed and the text is drawn with a left-to-right
+ * override, so resvg and browsers both show it as a reader would.
+ */
+const displayOrder = (text: string) =>
+  text.replace(/[\u0590-\u05ff]+(?:\s+[\u0590-\u05ff]+)*/g, (run) =>
+    [...run].reverse().join(""),
+  );
+const LTR_OVERRIDE = 'direction="ltr" unicode-bidi="bidi-override"';
+
 interface Cell {
   /** A complete `<svg …>` drawing; it is placed in its cell by its own viewBox. */
   svg: string;
@@ -352,7 +364,7 @@ function sheet(
       const labels = cell.labels
         .map(
           (label, k) =>
-            `<text x="${x + size / 2}" y="${y + size + (k + 1) * labelHeight}" text-anchor="middle" font-size="13">${escape(label)}</text>`,
+            `<text x="${x + size / 2}" y="${y + size + (k + 1) * labelHeight}" text-anchor="middle" font-size="13" ${LTR_OVERRIDE}>${escape(displayOrder(label))}</text>`,
         )
         .join("");
       return drawing + frame + labels;
@@ -360,7 +372,7 @@ function sheet(
     .join("\n");
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
 <rect width="100%" height="100%" fill="#fff"/>
-<text x="12" y="26" font-size="18">${escape(title)}</text>
+<text x="12" y="26" font-size="18" ${LTR_OVERRIDE}>${escape(displayOrder(title))}</text>
 ${body}
 </svg>
 `;
