@@ -163,3 +163,86 @@ it.each(["secret", "loadOptions"] as const)(
     expect(observed).toHaveBeenCalledTimes(1);
   },
 );
+
+it.each(["S".repeat(16), "Synthetic_Cron.Token-2026", "S".repeat(256)])(
+  "accepts the adopted bounded Vercel token format %s",
+  async (cron) => {
+    const load = vi.fn(async () => ({}) as ResearchManagedCleanupOptions),
+      handler = createResearchManagedCleanupHttpHandler({
+        origin,
+        tokenFormat: "vercel-cron",
+        secret: () => cron,
+        loadOptions: load,
+      });
+    const response = await handler(
+      request({
+        headers: { host: "synthetic.example", authorization: "Bearer " + cron },
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect(load).toHaveBeenCalledOnce();
+    expect(fake.run).toHaveBeenCalledOnce();
+    expect(await response.text()).not.toContain(cron);
+  },
+);
+it.each([
+  "S".repeat(15),
+  "S".repeat(257),
+  "Synthetic token has spaces",
+  "עברית".repeat(4),
+  "a".repeat(64) + "\n",
+  "a".repeat(64) + "\u2028",
+  "a".repeat(64) + ",other",
+])(
+  "refuses invalid configured platform token without private loading %j",
+  async (cron) => {
+    const load = vi.fn(),
+      handler = createResearchManagedCleanupHttpHandler({
+        origin,
+        tokenFormat: "vercel-cron",
+        secret: () => cron,
+        loadOptions: load,
+      });
+    expect((await handler(request())).status).toBe(404);
+    expect(load).not.toHaveBeenCalled();
+    expect(fake.run).not.toHaveBeenCalled();
+  },
+);
+it("default token format remains strict even with a valid platform-format secret", async () => {
+  const cron = "Synthetic_Cron.Token-2026",
+    secret = vi.fn(() => cron),
+    load = vi.fn();
+  const handler = createResearchManagedCleanupHttpHandler({
+    origin,
+    secret,
+    loadOptions: load,
+  });
+  expect(
+    (
+      await handler(
+        request({
+          headers: {
+            host: "synthetic.example",
+            authorization: "Bearer " + cron,
+          },
+        }),
+      )
+    ).status,
+  ).toBe(404);
+  expect(secret).not.toHaveBeenCalled();
+  expect(load).not.toHaveBeenCalled();
+});
+it("rejects unsupported token formats before reading a secret or private configuration", () => {
+  const secret = vi.fn(),
+    load = vi.fn();
+  expect(() =>
+    createResearchManagedCleanupHttpHandler({
+      origin,
+      tokenFormat: "automatic" as never,
+      secret,
+      loadOptions: load,
+    }),
+  ).toThrow("Private cleanup unavailable");
+  expect(secret).not.toHaveBeenCalled();
+  expect(load).not.toHaveBeenCalled();
+});

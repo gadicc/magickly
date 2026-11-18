@@ -9,6 +9,8 @@ const shape = v.strictObject({
   schema_version: v.literal(1),
   kind: v.literal("private-managed-cleanup-entry"),
   origin: v.string(),
+  /** Absent preserves the dedicated-token contract; platform cron is an explicit adoption. */
+  authorization: v.optional(v.picklist(["dedicated-bearer", "vercel-cron"])),
   profileSha256: hash,
   connectionSha256: hash,
   privateConfigSha256: hash,

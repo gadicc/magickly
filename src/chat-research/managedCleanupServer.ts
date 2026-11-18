@@ -81,7 +81,12 @@ export function createManagedResearchCleanupServer(
       if (Number(process.versions.node.split(".")[0]) !== 24) fail();
       const handler = createResearchManagedCleanupHttpHandler({
         origin: d.origin,
-        secret: () => env.MAGICKLI_MANAGED_CLEANUP_SECRET ?? fail(),
+        tokenFormat:
+          d.authorization === "vercel-cron" ? "vercel-cron" : "hex-256",
+        secret: () =>
+          (d.authorization === "vercel-cron"
+            ? env.CRON_SECRET
+            : env.MAGICKLI_MANAGED_CLEANUP_SECRET) ?? fail(),
         loadOptions: async (signal, configEnd) => {
           signal.throwIfAborted();
           if (performance.now() >= configEnd) fail();

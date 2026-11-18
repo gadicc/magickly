@@ -91,3 +91,32 @@ it.each(["\n", "\r", "\u2028", "\u2029"])(
     ).toThrow();
   },
 );
+
+it.each(["dedicated-bearer", "vercel-cron"] as const)(
+  "accepts explicit scheduler authorization %s without selecting any secret",
+  (authorization) => {
+    const f = managedCleanupEntryFixture(),
+      deployment = { ...f.deployment, authorization };
+    expect(
+      read({
+        ...f.env,
+        MAGICKLI_MANAGED_CLEANUP_DEPLOYMENT_JSON: JSON.stringify(deployment),
+      }),
+    ).toEqual(deployment);
+  },
+);
+it.each([null, "automatic", "", ["vercel-cron"]])(
+  "refuses an ambiguous or unsupported scheduler authorization %j",
+  (authorization) => {
+    const f = managedCleanupEntryFixture();
+    expect(() =>
+      read({
+        ...f.env,
+        MAGICKLI_MANAGED_CLEANUP_DEPLOYMENT_JSON: JSON.stringify({
+          ...f.deployment,
+          authorization,
+        }),
+      }),
+    ).toThrow("Private cleanup unavailable");
+  },
+);

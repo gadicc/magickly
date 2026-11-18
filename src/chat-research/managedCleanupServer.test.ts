@@ -288,3 +288,67 @@ it.each(["\n", "\r", "\u2028", "\u2029"])(
     }
   },
 );
+
+it.each([undefined, "dedicated-bearer", "vercel-cron"] as const)(
+  "reads only the explicitly selected %s scheduler secret",
+  async (authorization) => {
+    const f = managedCleanupEntryFixture(),
+      cron = "Synthetic_Cron.Token-2026",
+      useCron = authorization === "vercel-cron",
+      env: Record<string, string | undefined> = {
+        ...f.env,
+        CRON_SECRET: cron,
+        MAGICKLI_MANAGED_CLEANUP_DEPLOYMENT_JSON: JSON.stringify({
+          ...f.deployment,
+          ...(authorization ? { authorization } : {}),
+        }),
+      };
+    Object.defineProperty(
+      env,
+      useCron ? "MAGICKLI_MANAGED_CLEANUP_SECRET" : "CRON_SECRET",
+      {
+        get: () => {
+          throw Error("Unselected secret accessed");
+        },
+      },
+    );
+    expect(
+      (await create(env)(request("Bearer " + (useCron ? cron : f.token))))
+        .status,
+    ).toBe(200);
+    expect(m.run).toHaveBeenCalledOnce();
+  },
+);
+it.each(["dedicated-bearer", "vercel-cron"] as const)(
+  "never accepts the other token or falls back in %s mode",
+  async (authorization) => {
+    const f = managedCleanupEntryFixture(),
+      cron = "Synthetic_Cron.Token-2026",
+      useCron = authorization === "vercel-cron",
+      env: Record<string, string | undefined> = {
+        ...f.env,
+        CRON_SECRET: cron,
+        MAGICKLI_MANAGED_CLEANUP_DEPLOYMENT_JSON: JSON.stringify({
+          ...f.deployment,
+          authorization,
+        }),
+      };
+    Object.defineProperty(env, "MAGICKLI_MANAGED_CLEANUP_PRIVATE_JSON", {
+      get: () => {
+        throw Error("Private configuration accessed before token");
+      },
+    });
+    Object.defineProperty(env, "MAGICKLI_MANAGED_CLEANUP_DATABASE_URL", {
+      get: () => {
+        throw Error("Credential accessed before token");
+      },
+    });
+    expect(
+      (await create(env)(request("Bearer " + (useCron ? f.token : cron))))
+        .status,
+    ).toBe(404);
+    delete env[useCron ? "CRON_SECRET" : "MAGICKLI_MANAGED_CLEANUP_SECRET"];
+    expect((await create(env)(request("Bearer " + f.token))).status).toBe(503);
+    expect(m.run).not.toHaveBeenCalled();
+  },
+);

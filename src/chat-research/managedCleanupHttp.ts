@@ -8,7 +8,9 @@ export const RESEARCH_MANAGED_CLEANUP_PATH = RESEARCH_PAGE_PATH + "/cleanup";
 /** Independently adopted server settings only. A bearer token permits this one cleanup operation, never source access, answers or provider work. */
 export interface ResearchManagedCleanupHttpOptions {
   readonly origin: string;
-  /** A separately generated owner secret, supplied by protected configuration; never a browser or corpus credential. */
+  /** Explicitly adopted platform cron format; omission preserves dedicated 256-bit hex tokens. */
+  readonly tokenFormat?: "hex-256" | "vercel-cron";
+  /** A protected independently adopted server secret; never a browser or corpus credential. */
   readonly secret: () => string;
   /** Called only after a valid token. Must bind actual reviewed runtime/role/endpoint custody; matching input fields cannot attest it. */
   readonly loadOptions: (
@@ -31,16 +33,24 @@ export function createResearchManagedCleanupHttpHandler(
   const origin = options.origin,
     expected = new URL(origin),
     secret = options.secret,
+    tokenFormat = options.tokenFormat ?? "hex-256",
     load = options.loadOptions;
   if (secret instanceof Promise) void secret.catch(() => {});
   if (load instanceof Promise) void load.catch(() => {});
   if (
     expected.origin !== origin ||
     expected.protocol !== "https:" ||
+    !["hex-256", "vercel-cron"].includes(tokenFormat) ||
     typeof secret !== "function" ||
     typeof load !== "function"
   )
     throw Error("Private cleanup unavailable");
+  const tokenPattern =
+    tokenFormat === "vercel-cron"
+      ? /^[A-Za-z0-9._~+/=-]{16,256}$/
+      : /^[a-f0-9]{64}$/;
+  const validToken = (value: string) =>
+    value.length <= 256 && tokenPattern.exec(value)?.[0] === value;
   return async (
     request: Request,
     inheritedWorkDeadlineAt?: number,
@@ -67,15 +77,17 @@ export function createResearchManagedCleanupHttpHandler(
       )
         return reply(404, { error: "Private cleanup unavailable" });
       const offered = request.headers.get("authorization"),
-        match = offered && /^Bearer ([a-f0-9]{64})$/.exec(offered);
-      if (!match) return reply(404, { error: "Private cleanup unavailable" });
+        match =
+          offered && offered.startsWith("Bearer ") ? offered.slice(7) : null;
+      if (match === null || !validToken(match))
+        return reply(404, { error: "Private cleanup unavailable" });
       const wanted: unknown = secret();
       if (wanted instanceof Promise) void wanted.catch(() => {});
       if (
         typeof wanted !== "string" ||
-        !/^[a-f0-9]{64}$/.test(wanted) ||
+        !validToken(wanted) ||
         !timingSafeEqual(
-          createHash("sha256").update(match[1]).digest(),
+          createHash("sha256").update(match).digest(),
           createHash("sha256").update(wanted).digest(),
         )
       )

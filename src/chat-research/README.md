@@ -111,3 +111,26 @@ format. Existing publication/startup and local workers deliberately do not consu
 the managed profile. Retention, cadence, stale-health limits, cleanup scope and
 stop conditions are preserved, but no managed worker, route, scheduler, grant,
 window or activation follows from preparing this data.
+
+## Explicit cleanup scheduler authentication
+
+The independently enabled cleanup descriptor accepts optional `authorization`:
+`dedicated-bearer` (the unchanged default) or `vercel-cron`. The first reads only
+`MAGICKLI_MANAGED_CLEANUP_SECRET` and requires the existing 64-character hex token.
+The second reads only `CRON_SECRET` and accepts 16–256 ASCII bearer-token characters
+(letters, digits, `. _ ~ + / = -`). There is no fallback between secrets. Missing,
+malformed or mismatched tokens cannot load private cleanup configuration or DB
+credentials. The Node24/London, independent cleanup opt-in and native retention
+contracts are unchanged.
+
+[Vercel's cron authentication documentation](https://vercel.com/docs/schedules/cron-jobs/manage-cron-jobs#securing-cron-jobs)
+explains the platform's `Authorization: Bearer` header and deployment-captured
+`CRON_SECRET`. The explicit mode lets a reviewed release use that existing secret
+without reading it back, duplicating it into another setting or rotating the
+site's other jobs. Platform cron credentials are shared across the project's
+cron endpoints; choosing this mode is not purpose-isolated token custody. Use a
+separately adopted dedicated scheduler when that isolation is required.
+
+No hourly schedule, secret value, source/window/retention publication, credential
+custody, health write or service activation follows from this adapter. A release
+must adopt those operations separately and verify actual scheduler delivery.
