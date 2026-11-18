@@ -223,7 +223,8 @@ type SigilPlan = readonly (readonly SigilVertex[])[]; // one array per word
 The rules, exactly; the blind reference (O1) and `planSigil` are both
 written from this list:
 
-1. **Words.** Split the text on whitespace. Map each character of a word
+1. **Words.** Split the text on whitespace (JavaScript's `\s`, so a
+   no-break or em space splits and a hyphen, maqaf or joiner does not). Map each character of a word
    with `layout.place`; a character with no place (on the rose: anything
    but the 22 letters and the five final forms, which take their base
    letter's place, F5) is dropped. A word left with no places is dropped.
@@ -326,7 +327,8 @@ that directory.
   names in 92 ms (median 200 evaluations, never near the 20,000 cap), so
   nothing needs sampling.
 - **Kamea stubs**: a grid layout with Zazel (7, 1, 7, 3) and
-  Taphthartharath (40, 8, 40, 20, 40, 20, 40) from vol. 4, pp. 78–79, so
+  Taphthartharath (40, 8, 40, 20, 40, 20, 40) from vol. 4, pp. 79–80
+  (leaves n73–n74; the figures are on p. 81, n75, and p. 85, n79), so
   the layout-agnostic claim is tested in S1, not asserted.
 - **Domain**: the contract accepts up to 32 letters; the invariants cover
   at most N visits per place (N fixed in S1 from what still reads).
@@ -350,7 +352,7 @@ per-figure annotations of Vaughan's work.
 | S2 | `planSigil`, rule placement, renderer; R2 (words) in the package, page and contract; the golden tests that pin today's squiggles and one COBYLA layout (`roseSigilGeometry.test.ts:101-113`, `147-156`, `291-306`) replaced by O1–O3; `points` deprecated, the optimiser retired (decision 7); a contact sheet of every corpus vertex 0.5–3 units off its chord, drawn at 1 unit, for judging R4's tolerance | O1–O3 green on the exhaustive corpus, O2 including the 1-ulp check; the image route's cache key changes with the drawing |
 | S3 | O4 against Vaughan; disagreements classified and counted here | Gadi reviews the side-by-side sheet locally |
 | S4 (later) | The 72 angels pages: sigils rendered at build, cached, linked to `/gd/sigils?text=…`; caching and SEO decided then | Its own section |
-| S5 (later) | Kamea profile and layout on `Kamea` | Its own plan |
+| S5 (later) | Kamea profile and layout on `Kamea`. What S1 found: Zazel's figure (p. 81) has a circle at both ends and no bar, Taphthartharath's (p. 85) neither circle nor bar, and both draw a return to a cell as a rounded U beside the outgoing stroke; p. 85's printed Mercury square swaps three pairs of cells against Agrippa's (none the name uses); a 1-unit noose tolerance is 0.1 cell, which on a 9×9 square catches near-diagonal passes | Its own plan |
 
 `/gd/sigils` is not among the docs screenshots, so no capture is needed.
 
@@ -371,7 +373,9 @@ the rest as recommended.
 4. **A doubled letter on a straight pass**: a crook on the unbent line,
    with no noose. The crook already marks the stop that R4's noose exists
    to show; Vaughan's two nooses are his convention, counted in S3.
-5. **R2 layout**: words side by side, right to left, in one SVG.
+5. **R2 layout**: words side by side, right to left, in one SVG. (Regardie's
+   p. 60 sets its four YHVH sigils left to right, in an English book;
+   ours follow the Hebrew.)
 6. **End bar**: always, including one-stroke words.
 7. **The optimiser leaves the package.** `nlopt-js` is removed as a
    dependency of the package and the app, and the optimiser's source is
