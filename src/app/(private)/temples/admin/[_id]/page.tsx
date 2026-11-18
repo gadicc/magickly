@@ -12,11 +12,12 @@ import {
   Typography,
 } from "@mui/material";
 import Link from "next/link";
+import TempleFeedback from "@/app/temples/TempleFeedback";
 import { getCurrentSqlUserId } from "@/auth/session";
 import { db } from "@/db/neonFull";
 import { sqlRitualLifecycle } from "@/doc/sqlRuntime";
-import EnglishText from "@/i18n/EnglishText";
 import { privateUiMetadata, requestUiI18n } from "@/i18n/server";
+import UiRichText from "@/i18n/UiRichText";
 import UiText from "@/i18n/UiText";
 import { canRunDiscourseSync } from "@/temples/discourseSync";
 import { createSqlTempleForumService } from "@/temples/forum";
@@ -49,10 +50,10 @@ export default async function AdminTemplePage({
     return (
       <Container sx={{ my: 2 }}>
         <Typography>
-          <Link href={signInHref(callbackURL)}>
-            <UiText message={/*i18n*/ "Sign in"} />
-          </Link>{" "}
-          <EnglishText>to administer this temple.</EnglishText>
+          <UiRichText
+            message={/*i18n*/ "<0>Sign in</0> to administer this temple."}
+            components={{ 0: <Link href={signInHref(callbackURL)} /> }}
+          />
         </Typography>
       </Container>
     );
@@ -89,7 +90,11 @@ export default async function AdminTemplePage({
   return (
     <Container sx={{ my: 2 }}>
       <Typography variant="h5">
-        {temple.name} <EnglishText>Temple</EnglishText>
+        <UiRichText
+          message={/*i18n*/ "<0>{temple}</0> Temple"}
+          values={{ temple: temple.name }}
+          components={{ 0: <bdi /> }}
+        />
       </Typography>
       {query.removed ? (
         <Typography color="success" role="status" sx={{ my: 2 }}>
@@ -98,7 +103,7 @@ export default async function AdminTemplePage({
       ) : null}
       {query.error ? (
         <Typography color="error" role="alert" sx={{ my: 2 }}>
-          {query.error}
+          <TempleFeedback text={query.error} />
         </Typography>
       ) : null}
 
@@ -106,7 +111,11 @@ export default async function AdminTemplePage({
         <UiText message={/*i18n*/ "Members"} />
       </Typography>
       <TableContainer component={Paper}>
-        <Table aria-label={`${temple.name} members`}>
+        <Table
+          aria-label={ui._(/*i18n*/ "{temple} members", {
+            temple: temple.name,
+          })}
+        >
           <TableHead>
             <TableRow>
               <TableCell width={80}>
@@ -141,7 +150,9 @@ export default async function AdminTemplePage({
                 <TableCell>
                   <IconButton
                     size="small"
-                    aria-label={`Edit ${member.displayName}`}
+                    aria-label={ui._(/*i18n*/ "Edit {member}", {
+                      member: member.displayName,
+                    })}
                     href={`/temples/admin/${temple.id}/membership/${member.membershipId}`}
                   >
                     <Edit fontSize="small" />
@@ -158,8 +169,10 @@ export default async function AdminTemplePage({
           <Link
             href={`/gd/rituals/deleted?${new URLSearchParams({ temple: temple.slug })}`}
           >
-            <EnglishText>Recently deleted rituals (</EnglishText>
-            {deleted.count})
+            <UiText
+              message={/*i18n*/ "Recently deleted rituals ({count})"}
+              values={{ count: deleted.count }}
+            />
           </Link>
         </Typography>
       ) : null}
@@ -168,7 +181,11 @@ export default async function AdminTemplePage({
         <UiText message={/*i18n*/ "Join information"} />
       </Typography>
       <Typography sx={{ mb: 2 }}>
-        <EnglishText>Temple slug:</EnglishText> {temple.slug}
+        <UiRichText
+          message={/*i18n*/ "Temple slug: <0>{slug}</0>"}
+          values={{ slug: temple.slug }}
+          components={{ 0: <bdi /> }}
+        />
       </Typography>
       <InviteManager
         actorId={actorId}

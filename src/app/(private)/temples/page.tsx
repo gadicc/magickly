@@ -1,9 +1,10 @@
 import { Button, Container, Stack, TextField, Typography } from "@mui/material";
 import Link from "next/link";
+import TempleFeedback from "@/app/temples/TempleFeedback";
 import { getCurrentSqlUserId } from "@/auth/session";
 import { db } from "@/db/neonFull";
-import EnglishText from "@/i18n/EnglishText";
 import { privateUiMetadata, requestUiI18n } from "@/i18n/server";
+import UiRichText from "@/i18n/UiRichText";
 import UiText from "@/i18n/UiText";
 import { createSqlTempleReader } from "@/temples/sql";
 import { leaveTempleAction, startTempleJoin } from "../../temples/actions";
@@ -37,12 +38,12 @@ export default async function TemplePage({
       </Typography>
       {!actorId ? (
         <Typography sx={{ my: 2 }}>
-          <Link href={signInHref("/temples")}>
-            <UiText message={/*i18n*/ "Sign in"} />
-          </Link>{" "}
-          <EnglishText>
-            to see your temple memberships or join an organization.
-          </EnglishText>
+          <UiRichText
+            message={
+              /*i18n*/ "<0>Sign in</0> to see your temple memberships or join an organization."
+            }
+            components={{ 0: <Link href={signInHref("/temples")} /> }}
+          />
         </Typography>
       ) : templeList.length === 0 ? (
         <Typography sx={{ my: 2 }}>
@@ -54,31 +55,37 @@ export default async function TemplePage({
         <ul>
           {templeList.map((temple) => (
             <li key={temple.id}>
-              {temple.name} <EnglishText>(grade</EnglishText>{" "}
-              {temple.membership.grade}
-              {temple.membership.admin ? (
-                <>
-                  ,{" "}
-                  <Link href={`/temples/admin/${temple.id}`}>
-                    <UiText message={/*i18n*/ "admin"} />
-                  </Link>
-                </>
-              ) : null}
-              ){" "}
+              <UiRichText
+                message={
+                  temple.membership.admin
+                    ? /*i18n*/ "<0>{temple}</0> (grade {grade}, <1>admin</1>)"
+                    : /*i18n*/ "<0>{temple}</0> (grade {grade})"
+                }
+                values={{ temple: temple.name, grade: temple.membership.grade }}
+                components={{
+                  0: <bdi />,
+                  ...(temple.membership.admin
+                    ? { 1: <Link href={`/temples/admin/${temple.id}`} /> }
+                    : {}),
+                }}
+              />{" "}
               <ConfirmAction
                 action={leaveTempleAction}
                 fields={{ expectedActorId: actorId, templeId: temple.id }}
                 label={ui._(/*i18n*/ "Leave")}
                 size="small"
-                title={`Leave ${temple.name}?`}
-                confirmLabel="Leave temple"
+                title={ui._(/*i18n*/ "Leave {temple}?", {
+                  temple: temple.name,
+                })}
+                confirmLabel={ui._(/*i18n*/ "Leave temple")}
               >
-                <EnglishText>You will lose access to</EnglishText> {temple.name}
-                <EnglishText>
-                  ’s private rituals at once. Copies downloaded to your devices
-                  are deleted the next time those devices connect. You can only
-                  come back with a join code from one of its administrators.
-                </EnglishText>
+                <UiRichText
+                  message={
+                    /*i18n*/ "You will lose access to <0>{temple}</0>’s private rituals at once. Copies downloaded to your devices are deleted the next time those devices connect. You can only come back with a join code from one of its administrators."
+                  }
+                  values={{ temple: temple.name }}
+                  components={{ 0: <bdi /> }}
+                />
               </ConfirmAction>
             </li>
           ))}
@@ -97,7 +104,7 @@ export default async function TemplePage({
       ) : null}
       {query.error ? (
         <Typography color="error" sx={{ my: 2 }} role="alert">
-          {query.error}
+          <TempleFeedback text={query.error} />
         </Typography>
       ) : null}
 
@@ -120,7 +127,7 @@ export default async function TemplePage({
                 size="small"
                 label={ui._(/*i18n*/ "Temple slug")}
                 required
-                slotProps={{ htmlInput: { maxLength: 200 } }}
+                slotProps={{ htmlInput: { maxLength: 200, dir: "ltr" } }}
               />
               <TextField
                 name="joinPass"
@@ -128,7 +135,7 @@ export default async function TemplePage({
                 label={ui._(/*i18n*/ "Join code")}
                 type="password"
                 required
-                slotProps={{ htmlInput: { maxLength: 200 } }}
+                slotProps={{ htmlInput: { maxLength: 200, dir: "ltr" } }}
               />
               <Button type="submit" variant="contained">
                 <UiText message={/*i18n*/ "Continue"} />

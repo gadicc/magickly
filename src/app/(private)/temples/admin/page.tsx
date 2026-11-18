@@ -2,8 +2,8 @@ import { Container, Typography } from "@mui/material";
 import Link from "next/link";
 import { getCurrentSqlUserId } from "@/auth/session";
 import { db } from "@/db/neonFull";
-import EnglishText from "@/i18n/EnglishText";
 import { privateUiMetadata } from "@/i18n/server";
+import UiRichText from "@/i18n/UiRichText";
 import UiText from "@/i18n/UiText";
 import { createUuidV7 } from "@/lib/ids";
 import { createSqlTempleReader } from "@/temples/sql";
@@ -26,10 +26,12 @@ export default async function AdminTemplesPage() {
           <UiText message={/*i18n*/ "Temples"} />
         </Typography>
         <Typography sx={{ mt: 2 }}>
-          <Link href={signInHref()}>
-            <UiText message={/*i18n*/ "Sign in"} />
-          </Link>{" "}
-          <EnglishText>to create or administer a temple.</EnglishText>
+          <UiRichText
+            message={
+              /*i18n*/ "<0>Sign in</0> to create or administer a temple."
+            }
+            components={{ 0: <Link href={signInHref()} /> }}
+          />
         </Typography>
       </Container>
     );
@@ -79,15 +81,12 @@ export default async function AdminTemplesPage() {
         <UiText message={/*i18n*/ "Create a new temple"} />
       </Typography>
       <Typography sx={{ my: 1 }}>
-        <EnglishText>
-          This creates a separate organization and makes you its first
-          administrator. To join an existing temple, use its slug and join code
-          on the
-        </EnglishText>{" "}
-        <Link href="/temples">
-          <UiText message={/*i18n*/ "My Temples page"} />
-        </Link>
-        .
+        <UiRichText
+          message={
+            /*i18n*/ "This creates a separate organization and makes you its first administrator. To join an existing temple, use its slug and join code on the <0>My Temples page</0>."
+          }
+          components={{ 0: <Link href="/temples" /> }}
+        />
       </Typography>
       <CreateTempleForm actorId={actorId} operationId={createUuidV7()} />
     </Container>

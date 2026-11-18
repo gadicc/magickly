@@ -1,9 +1,10 @@
 import { Button, Container, Stack, Typography } from "@mui/material";
 import Link from "next/link";
+import TempleFeedback from "@/app/temples/TempleFeedback";
 import { getCurrentSqlUserId } from "@/auth/session";
 import { db } from "@/db/neonFull";
-import EnglishText from "@/i18n/EnglishText";
 import { privateUiMetadata } from "@/i18n/server";
+import UiRichText from "@/i18n/UiRichText";
 import UiText from "@/i18n/UiText";
 import { createSqlTempleReader } from "@/temples/sql";
 import { joinTempleAction } from "../../../../../temples/actions";
@@ -33,10 +34,12 @@ export default async function TemplesJoinPage({
           <UiText message={/*i18n*/ "Join Temple"} />
         </Typography>
         <Typography sx={{ my: 2 }}>
-          <Link href={signInHref(callbackURL)}>
-            <UiText message={/*i18n*/ "Sign in"} />
-          </Link>{" "}
-          <EnglishText>to review and confirm this invitation.</EnglishText>
+          <UiRichText
+            message={
+              /*i18n*/ "<0>Sign in</0> to review and confirm this invitation."
+            }
+            components={{ 0: <Link href={signInHref(callbackURL)} /> }}
+          />
         </Typography>
       </Container>
     );
@@ -53,7 +56,7 @@ export default async function TemplesJoinPage({
       </Typography>
       {query.error ? (
         <Typography color="error" role="alert" sx={{ my: 2 }}>
-          {query.error}
+          <TempleFeedback text={query.error} />
         </Typography>
       ) : null}
       {!preview ? (
@@ -64,17 +67,24 @@ export default async function TemplesJoinPage({
         </Typography>
       ) : preview.alreadyMember ? (
         <Typography sx={{ my: 2 }}>
-          <EnglishText>You are already a member of</EnglishText>{" "}
-          {preview.temple.name} <EnglishText>Temple.</EnglishText>
+          <UiRichText
+            message={
+              /*i18n*/ "You are already a member of <0>{temple}</0> Temple."
+            }
+            values={{ temple: preview.temple.name }}
+            components={{ 0: <bdi /> }}
+          />
         </Typography>
       ) : (
         <>
           <Typography sx={{ my: 2 }}>
-            <EnglishText>Confirm that you want to join</EnglishText>{" "}
-            {preview.temple.name}{" "}
-            <EnglishText>
-              Temple. Your membership will begin at grade 0.
-            </EnglishText>
+            <UiRichText
+              message={
+                /*i18n*/ "Confirm that you want to join <0>{temple}</0> Temple. Your membership will begin at grade 0."
+              }
+              values={{ temple: preview.temple.name }}
+              components={{ 0: <bdi /> }}
+            />
           </Typography>
           <Typography variant="body2" sx={{ my: 2 }}>
             <UiText

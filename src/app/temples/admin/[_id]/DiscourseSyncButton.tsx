@@ -4,6 +4,7 @@ import { Alert, Button, Stack, Typography } from "@mui/material";
 import { useActionState } from "react";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
 import UiText from "@/i18n/UiText";
+import TempleFeedback from "../../TempleFeedback";
 import { discourseSync } from "./actions";
 
 const initialState = {
@@ -65,13 +66,15 @@ export function DiscourseSyncButton({
                 : "success"
           }
         >
-          {state.message}
+          <TempleFeedback text={state.message} />
         </Alert>
       ) : null}
       {!pending && state.progress.length > 0 ? (
         <ol aria-label={translateUi(/*i18n*/ "Discourse sync results")}>
           {state.progress.map((entry) => (
-            <li key={entry}>{entry}</li>
+            <li key={entry}>
+              <TempleFeedback text={entry} />
+            </li>
           ))}
         </ol>
       ) : null}

@@ -3,7 +3,7 @@
 import { Alert, Button, Divider, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { authClient } from "@/auth/client";
-import EnglishText from "@/i18n/EnglishText";
+import UiRichText from "@/i18n/UiRichText";
 import UiText from "@/i18n/UiText";
 import { useLegacyRecoveryGate } from "../clientProviders";
 
@@ -66,10 +66,15 @@ export default function SignInButton({
             <UiText message={/*i18n*/ "Local development"} />
           </Divider>
           <Typography variant="body2">
-            <EnglishText>
-              Uses the fixed identities prepared by pnpm
-            </EnglishText>{" "}
-            {localTestSeedCommand}.
+            <UiRichText
+              message={
+                /*i18n*/ "Uses the fixed identities prepared by <0>pnpm {command}</0>."
+              }
+              values={{ command: localTestSeedCommand }}
+              components={{
+                0: <code dir="ltr" style={{ display: "inline-block" }} />,
+              }}
+            />
           </Typography>
           <form action="/api/dev/test-login" method="post">
             <input name="callbackURL" type="hidden" value={callbackURL} />

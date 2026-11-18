@@ -150,12 +150,13 @@ export function UserAvatar({
   sx?: Parameters<typeof Avatar>[0]["sx"];
 }) {
   const session = useSession();
+  const { t } = useUiLanguage();
   const user = session.data?.user;
   const avatarSrc = user?.image;
 
   return avatarSrc ? (
     <Avatar
-      alt={user?.name || "avatar"}
+      alt={user?.name || t(/*i18n*/ "User avatar")}
       src={avatarSrc}
       sx={sx}
       slotProps={{
@@ -214,7 +215,7 @@ function MenuLinks({
         <Box
           component={Image}
           src="/pentagram.png"
-          alt="Pentagram"
+          alt={t(/*i18n*/ "Pentagram")}
           width={32}
           height={32}
           sx={[
@@ -342,10 +343,11 @@ const TRAIL_SEPARATOR = "›";
  * enough (MUI's `sm`, 600 px). Phones show the title and the menu's arrow.
  */
 function InlineTrail({ trail }: { trail: NavLink[] }) {
+  const { t } = useUiLanguage();
   return (
     <Box
       component="nav"
-      aria-label="Breadcrumb"
+      aria-label={t(/*i18n*/ "Breadcrumb")}
       sx={{
         display: { xs: "none", sm: "block" },
         // The title keeps its room; the trail gives way first.
@@ -555,8 +557,8 @@ export default function ButtonAppBar() {
     if (!result.ok) {
       setSignOutError(
         result.code === "LOCAL_CLEANUP_FAILED"
-          ? "Saved account data could not be locked. Retry sign-out."
-          : "The server could not sign out this session. Retry sign-out.",
+          ? /*i18n*/ "Saved account data could not be locked. Retry sign-out."
+          : /*i18n*/ "The server could not sign out this session. Retry sign-out.",
       );
       setSignOutPending(false);
     }
@@ -565,18 +567,20 @@ export default function ButtonAppBar() {
   function share() {
     const data = {
       title: title + " - magick.ly",
-      text:
-        'Check out "' + title + '" on magick.ly, the open source magick app!',
+      text: t(
+        /*i18n*/ 'Check out "{title}" on magick.ly, the open source magick app!',
+        { title },
+      ),
       url: window.location.href,
     };
-
-    //console.log({ data });
 
     if (navigator.share)
       navigator
         .share(data)
-        .catch((error) => alert("Error sharing. " + JSON.stringify(error)));
-    else alert("Sharing not supported on this platform.");
+        .catch(() =>
+          alert(t(/*i18n*/ "The page could not be shared. Try again.")),
+        );
+    else alert(t(/*i18n*/ "Sharing not supported on this platform."));
   }
 
   return (
@@ -706,7 +710,7 @@ export default function ButtonAppBar() {
                         sx={{ maxWidth: 260, px: 2, py: 1 }}
                         variant="body2"
                       >
-                        {signOutError}
+                        {t(signOutError)}
                       </Typography>
                     )}
                   </Menu>

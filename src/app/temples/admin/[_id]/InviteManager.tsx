@@ -50,11 +50,13 @@ export function InviteManager({
             size="small"
             type={visible ? "text" : "password"}
             defaultValue={joinPass ?? ""}
-            slotProps={{ htmlInput: { maxLength: 200 } }}
+            slotProps={{ htmlInput: { maxLength: 200, dir: "ltr" } }}
           />
           <IconButton
             type="button"
-            aria-label={visible ? "Hide join code" : "Show join code"}
+            aria-label={translateUi(
+              visible ? /*i18n*/ "Hide join code" : /*i18n*/ "Show join code",
+            )}
             onClick={() => setVisible((value) => !value)}
           >
             {visible ? <VisibilityOff /> : <Visibility />}
@@ -73,9 +75,18 @@ export function InviteManager({
       </Typography>
       {joinUrl ? (
         <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-          <QRCode value={joinUrl} aria-label={`Join ${templeName}`} />
+          <QRCode
+            value={joinUrl}
+            aria-label={translateUi(/*i18n*/ "Join {temple}", {
+              temple: templeName,
+            })}
+          />
           <div>
-            <Typography component="div" sx={{ overflowWrap: "anywhere" }}>
+            <Typography
+              component="div"
+              dir="ltr"
+              sx={{ overflowWrap: "anywhere" }}
+            >
               {visible
                 ? joinUrl
                 : `${location.origin}/temples/join/${slug}/••••`}

@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
 import UiText from "@/i18n/UiText";
 import { type CreateTempleFormState, createTempleAction } from "./actions";
+import TempleFeedback from "./TempleFeedback";
 
 const initialState: CreateTempleFormState = { error: null };
 
@@ -42,7 +43,7 @@ export function CreateTempleForm({
       </Stack>
       {state.error ? (
         <Typography color="error" sx={{ mt: 1 }} role="alert">
-          {state.error}
+          <TempleFeedback text={state.error} />
         </Typography>
       ) : null}
     </form>

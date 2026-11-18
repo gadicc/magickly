@@ -17,18 +17,27 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { useDeferredValue, useEffect, useId, useRef, useState } from "react";
-import EnglishText from "@/i18n/EnglishText";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
 import UiText from "@/i18n/UiText";
 import { type LoadedSearchEngine, loadSearchEngine } from "./client";
 import type { SearchResult } from "./types";
 
 const SUGGESTIONS = [
-  "Planetary hours",
-  "Tree of Life",
-  "Enochian calls",
-  "Temple floor plans",
+  /*i18n*/ "Planetary hours",
+  /*i18n*/ "Tree of Life",
+  /*i18n*/ "Enochian calls",
+  /*i18n*/ "Temple floor plans",
 ];
+
+// Only app-owned responses become message IDs; network/provider details stay out of the UI.
+const SEMANTIC_FAILURES = new Set([
+  /*i18n*/ "Search request rejected.",
+  /*i18n*/ "Enter between 2 and 300 characters.",
+  /*i18n*/ "Search by meaning is unavailable. Text results are still shown.",
+  /*i18n*/ "Search by meaning has reached today's limit. Text results are still shown.",
+]);
+const SEMANTIC_FAILED =
+  /*i18n*/ "Search by meaning could not finish. Text results are still shown.";
 
 /** A public search surface: keyboard navigation uses ordinary focusable links. */
 export default function SearchDialog({
@@ -93,25 +102,23 @@ export default function SearchDialog({
         signal: controller.signal,
       });
       const body = await response.json();
-      if (!response.ok)
-        throw new Error(
-          typeof body.message === "string"
-            ? body.message
-            : "Search by meaning could not finish.",
-        );
+      if (!response.ok) {
+        if (!controller.signal.aborted)
+          setSemanticError(
+            SEMANTIC_FAILURES.has(body.message)
+              ? body.message
+              : SEMANTIC_FAILED,
+          );
+        return;
+      }
       if (
         !controller.signal.aborted &&
         body.query === text &&
         Array.isArray(body.results)
       )
         setSemantic({ query: text, results: body.results });
-    } catch (error) {
-      if (!controller.signal.aborted)
-        setSemanticError(
-          error instanceof Error
-            ? error.message
-            : "Search by meaning could not finish. Text results are still shown.",
-        );
+    } catch {
+      if (!controller.signal.aborted) setSemanticError(SEMANTIC_FAILED);
     } finally {
       if (!controller.signal.aborted) setSemanticLoading(false);
     }
@@ -129,7 +136,7 @@ export default function SearchDialog({
       () => {
         if (active)
           setError(
-            "Search could not load. Connect to the internet and try again.",
+            /*i18n*/ "Search could not load. Connect to the internet and try again.",
           );
       },
     );
@@ -170,7 +177,7 @@ export default function SearchDialog({
           justifyContent: "space-between",
         }}
       >
-        <EnglishText>Search Magick.ly</EnglishText>
+        <UiText message={/*i18n*/ "Search Magick.ly"} />
         <IconButton
           aria-label={translateUi(/*i18n*/ "Close search")}
           onClick={onClose}
@@ -179,6 +186,13 @@ export default function SearchDialog({
         </IconButton>
       </DialogTitle>
       <DialogContent>
+        <Typography variant="body2" color="textSecondary">
+          <UiText
+            message={
+              /*i18n*/ "Search currently covers English pages. Use English words; results keep their original language."
+            }
+          />
+        </Typography>
         <TextField
           autoFocus
           inputRef={input}
@@ -241,7 +255,7 @@ export default function SearchDialog({
         ) : null}
         {semanticError ? (
           <Alert severity="info" sx={{ mt: 1 }}>
-            {semanticError}
+            {translateUi(semanticError)}
           </Alert>
         ) : null}
         {error ? (
@@ -257,7 +271,7 @@ export default function SearchDialog({
               </Button>
             }
           >
-            {error}
+            {translateUi(error)}
           </Alert>
         ) : null}
         <Typography
@@ -268,12 +282,24 @@ export default function SearchDialog({
           sx={{ mt: 2 }}
         >
           {!query.trim()
-            ? "Explore the tools, names and texts on the site."
+            ? translateUi(
+                /*i18n*/ "Explore the tools, names and texts on the site.",
+              )
             : waiting
-              ? "Searching…"
+              ? translateUi(/*i18n*/ "Searching…")
               : results.length
-                ? `${results.length}${results.length === 20 ? "+" : ""} ${semantic?.query === query.trim() ? "related" : "matching"} pages`
-                : "No matching pages. Try a shorter phrase or another spelling."}
+                ? translateUi(
+                    semantic?.query === query.trim()
+                      ? /*i18n*/ "{count}{more} {count, plural, one {related page} other {related pages}}"
+                      : /*i18n*/ "{count}{more} {count, plural, one {matching page} other {matching pages}}",
+                    {
+                      count: results.length,
+                      more: results.length === 20 ? "+" : "",
+                    },
+                  )
+                : translateUi(
+                    /*i18n*/ "No matching pages. Try a shorter phrase or another spelling.",
+                  )}
         </Typography>
         {!query.trim() ? (
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 2, mb: 1 }}>
@@ -287,7 +313,7 @@ export default function SearchDialog({
                   input.current?.focus();
                 }}
               >
-                {suggestion}
+                {translateUi(suggestion)}
               </Button>
             ))}
           </Box>
@@ -322,6 +348,8 @@ export default function SearchDialog({
                 sx={{ alignItems: "flex-start", borderRadius: 1 }}
               >
                 <ListItemText
+                  lang="en"
+                  dir="ltr"
                   disableTypography
                   primary={
                     <Typography sx={{ fontWeight: 500 }}>
