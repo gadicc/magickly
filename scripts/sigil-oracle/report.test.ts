@@ -66,10 +66,15 @@ describe("the sigil oracle report", () => {
     );
     const summary = await sigilOracleReport({ out, tiny: true, external });
     expect(summary.cases).toBeGreaterThan(20);
+    // Every failure is a known one; nothing listed passes unnoticed.
+    expect(summary.known.regressions).toBe(0);
     expect(summary.oracle.All).toEqual({
       applies: summary.cases,
-      passes: summary.cases,
+      passes: summary.cases - summary.known.expected,
     });
+    expect(summary.byCorpus.kamea).toEqual({ applies: 1, passes: 1 });
+    expect(summary.byCorpus["ababa (gd)"].applies).toBe(3);
+    expect(summary.beyond.cases).toBe(4);
     expect(summary.rules.R1.applies).toBe(summary.cases);
     for (const name of ["names", "hardest-triples", "r4"])
       for (const ext of ["svg", "png"])
@@ -79,9 +84,10 @@ describe("the sigil oracle report", () => {
     expect(readFileSync(join(out, "names.png")).subarray(1, 4).toString()).toBe(
       "PNG",
     );
-    expect(readFileSync(join(out, "report.md"), "utf8")).toContain(
-      "## By rule",
-    );
+    const markdown = readFileSync(join(out, "report.md"), "utf8");
+    expect(markdown).toContain("## By rule");
+    expect(markdown).toContain("## Regressions");
+    expect(markdown).toContain("## Beyond the tested domain");
 
     expect(summary.o4).toEqual({ tolerance: 1, figures: 2, agree: 1 });
     const o4 = JSON.parse(

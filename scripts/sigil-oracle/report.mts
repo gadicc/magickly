@@ -6,7 +6,14 @@
  * - `report.json` and `report.md`: per rule, how many cases it applies to
  *   and how many pass; per oracle check (O1 plans, O2 invariants, O3
  *   read-back, the 1-ulp check), the same; per name of the 72, which
- *   checks fail; and every failing case;
+ *   checks fail; and every failing case, as a known failure (expected:
+ *   `engineKnownFailures.ts`, which the engine suite holds it to) or a
+ *   regression, with the known failures that now pass;
+ * - the corpus is the engine suite's: hand fixtures, templates, the 72
+ *   names, every pair and triple, the seeded random corpus and the
+ *   domain's edge words, every A-B-A-B-A word, the kamea stubs; and,
+ *   apart from it, a seeded random set of 13- to 32-letter words beyond
+ *   the tested domain, reported on its own;
  * - contact sheets, each as SVG and PNG (`@resvg/resvg-wasm`, with the
  *   repository's own Noto fonts): `names` (the 72 on the Golden Dawn's
  *   rose), `hardest-triples` (the three-letter texts placement moved
@@ -31,6 +38,7 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
+import type { KameaPlanetId } from "magick-data/astrology/kameas";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import RoseSigilImage from "../../packages/magick-components/src/gd/RoseSigilImage.tsx";
@@ -40,16 +48,37 @@ import {
   roseSigilLayout,
 } from "../../packages/magick-components/src/gd/roseSigilLayout.ts";
 import {
+  sigilFrame,
+  sigilPathData,
+  sigilViewBox,
+} from "../../packages/magick-components/src/sigil/ink.ts";
+import {
+  kameaUnroundedAnchor,
+  roseUnroundedAnchor,
+} from "../../packages/magick-components/src/sigil/oracle/anchors.ts";
+import {
+  ababaTexts,
+  BEYOND_DOMAIN_CORPUS,
+  DOMAIN_EDGE_TEXTS,
+  randomRoseTexts,
   roseTexts,
   SEVENTY_TWO_NAMES,
 } from "../../packages/magick-components/src/sigil/oracle/corpus.ts";
-import { HAND_FIXTURES } from "../../packages/magick-components/src/sigil/oracle/fixtures.ts";
+import { ENGINE_KNOWN_FAILURES } from "../../packages/magick-components/src/sigil/oracle/engineKnownFailures.ts";
+import {
+  HAND_FIXTURES,
+  KAMEA_FIXTURES,
+} from "../../packages/magick-components/src/sigil/oracle/fixtures.ts";
 import {
   checkInvariants,
   checkStability,
   type InvariantCheck,
   type InvariantFailure,
 } from "../../packages/magick-components/src/sigil/oracle/invariants.ts";
+import {
+  KAMEA_STUB_PROFILE,
+  planetKameaLayout,
+} from "../../packages/magick-components/src/sigil/oracle/kameaLayout.ts";
 import { firstDifference } from "../../packages/magick-components/src/sigil/oracle/o1.ts";
 import {
   checkReadBack,
@@ -60,6 +89,7 @@ import {
   referenceWords,
 } from "../../packages/magick-components/src/sigil/oracle/referencePlan.ts";
 import { PLAN_TEMPLATES } from "../../packages/magick-components/src/sigil/oracle/templates.ts";
+import { placeSigil } from "../../packages/magick-components/src/sigil/placeSigil.ts";
 import {
   planSigil,
   sigilWords,
@@ -74,12 +104,23 @@ import type {
   SigilLayout,
   SigilPlan,
 } from "../../packages/magick-components/src/sigil/types.ts";
+import { svgCoordinate } from "../../packages/magick-components/src/svgCoordinate.ts";
 
 const REPO = fileURLToPath(new URL("../..", import.meta.url));
 const VERSIONS: readonly RoseVersionId[] = ["gd", "regardie1939"];
 
 /** Which corpus a case comes from. */
-type Corpus = "fixtures" | "templates" | "names" | "pairs" | "triples";
+type Corpus =
+  | "fixtures"
+  | "templates"
+  | "names"
+  | "pairs"
+  | "triples"
+  | "random"
+  | "domain-edge"
+  | "ababa"
+  | "kamea"
+  | "beyond";
 
 /** One text to judge, with the plan it must have. */
 interface Case {
@@ -88,6 +129,8 @@ interface Case {
   text: string;
   version: RoseVersionId;
   expected: SigilPlan;
+  /** A kamea stub's square and numbers; `version` is then unused. */
+  kamea?: { planet: KameaPlanetId; numbers: readonly number[] };
 }
 
 /** What the oracle says of a case. */
@@ -132,8 +175,8 @@ const RULES: readonly Rule[] = [
   },
   {
     id: "R4",
-    title: "a noose on a straight pass",
-    checks: ["noose"],
+    title: "a noose on a straight pass, clear of the other loops",
+    checks: ["noose", "loop-clearance"],
     applies: (plan) =>
       plan.some((w) => w.some((v) => v.marks.includes("noose"))),
   },
@@ -202,7 +245,30 @@ function corpus(tiny: boolean): Case[] {
       version: t.version,
       expected: t.plan,
     });
+  for (const f of take(KAMEA_FIXTURES, 1))
+    cases.push({
+      corpus: "kamea",
+      id: f.id,
+      text: f.numbers.join(","),
+      version: "gd",
+      expected: f.plan,
+      kamea: { planet: f.planet, numbers: f.numbers },
+    });
+  const random = randomRoseTexts();
   for (const version of VERSIONS) {
+    for (const [corpusName, texts] of [
+      ["random", random],
+      ["domain-edge", DOMAIN_EDGE_TEXTS],
+      ["ababa", ababaTexts(version)],
+    ] as const)
+      for (const text of take(texts, 3))
+        cases.push({
+          corpus: corpusName,
+          id: text,
+          text,
+          version,
+          expected: reference(text, version),
+        });
     for (const n of take(SEVENTY_TWO_NAMES, 3))
       cases.push({
         corpus: "names",
@@ -227,7 +293,63 @@ function corpus(tiny: boolean): Case[] {
   return cases;
 }
 
+/** Words beyond the tested domain: 13 to 32 letters, on both roses. */
+function beyondCorpus(tiny: boolean): Case[] {
+  const texts = randomRoseTexts(
+    tiny
+      ? { ...BEYOND_DOMAIN_CORPUS, perLength: 1, maxLength: 14 }
+      : BEYOND_DOMAIN_CORPUS,
+  );
+  return VERSIONS.flatMap((version) =>
+    texts.map((text) => ({
+      corpus: "beyond" as const,
+      id: text,
+      text,
+      version,
+      expected: reference(text, version),
+    })),
+  );
+}
+
+/** A kamea stub drawn by the engine, as the engine suite draws it. */
+async function judgeKamea(c: Case, stability: boolean): Promise<Verdict> {
+  const { planet, numbers } = c.kamea ?? { planet: "saturn", numbers: [] };
+  const layout = planetKameaLayout(planet);
+  const drawNumbers = (text: string, l: SigilLayout<number>) => {
+    const plan = planSigil(
+      [text.split(",").map(Number)],
+      l,
+      KAMEA_STUB_PROFILE,
+    );
+    const d = sigilPathData(
+      placeSigil(plan, l, KAMEA_STUB_PROFILE),
+      l,
+      KAMEA_STUB_PROFILE,
+    );
+    const viewBox = sigilViewBox(sigilFrame(l), plan.length).join(" ");
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}"><path stroke="red" stroke-width="${l.unit}" fill="none" d="${d}"/></svg>`;
+  };
+  const plan = planSigil([[...numbers]], layout, KAMEA_STUB_PROFILE);
+  const svg = drawNumbers(c.text, layout);
+  const verdict: Verdict = {
+    case: c,
+    o1: firstDifference(c.expected, plan),
+    o2: checkInvariants(svg, c.expected, layout),
+    o3: checkReadBack(svg, c.expected, layout).failures,
+    placed: placeSigil(plan, layout, KAMEA_STUB_PROFILE),
+  };
+  if (stability)
+    verdict.stable = (
+      await checkStability(drawNumbers, c.text, layout, {
+        unrounded: kameaUnroundedAnchor(Math.sqrt(layout.places.length)),
+        quantise: svgCoordinate,
+      })
+    ).stable;
+  return verdict;
+}
+
 async function judge(c: Case, stability: boolean): Promise<Verdict> {
+  if (c.kamea) return judgeKamea(c, stability);
   const layout = roseSigilLayout(c.version);
   const plan = planSigil(sigilWords(c.text), layout, ROSE_SIGIL_PROFILE);
   const svg = draw(c.text, layout);
@@ -238,9 +360,40 @@ async function judge(c: Case, stability: boolean): Promise<Verdict> {
     o3: checkReadBack(svg, c.expected, layout).failures,
     placed: sigilFigure(c.text, layout, ROSE_SIGIL_PROFILE).placed,
   };
+  // Nudged before the layout rounds its anchors, as the engine suite does.
   if (stability)
-    verdict.stable = (await checkStability(draw, c.text, layout)).stable;
+    verdict.stable = (
+      await checkStability(draw, c.text, layout, {
+        unrounded: roseUnroundedAnchor(c.version),
+        quantise: svgCoordinate,
+      })
+    ).stable;
   return verdict;
+}
+
+/** The key `engineKnownFailures.ts` gives a case. */
+const knownKey = (c: Case) =>
+  c.kamea ? `kamea ${c.id}` : `${c.version} ${c.text}`;
+
+/**
+ * The checks a case is known to fail, if any. Regardie's rose moves only
+ * Kaph and Tau, so a word with neither is the gd rose's figure, which the
+ * engine suite draws once.
+ */
+function knownFailure(c: Case): string | undefined {
+  return (
+    ENGINE_KNOWN_FAILURES[knownKey(c)] ??
+    (!c.kamea && c.version !== "gd" && !/[כת]/u.test(c.text)
+      ? ENGINE_KNOWN_FAILURES[`gd ${c.text}`]
+      : undefined)
+  );
+}
+
+/** The checks a verdict fails, named as `engineKnownFailures.ts` names them. */
+function checksFailed(v: Verdict): string {
+  const checks: string[] = [...new Set(v.o2.map((f) => f.check))].sort();
+  if (v.o3.length) checks.push("O3");
+  return checks.join(" ");
 }
 
 /** A verdict's failures, one short line each. */
@@ -301,7 +454,9 @@ function tallies(verdicts: readonly Verdict[]) {
   };
   const byCorpus: Record<string, Tally> = {};
   for (const v of verdicts) {
-    const key = `${v.case.corpus} (${v.case.version})`;
+    const key = v.case.kamea
+      ? v.case.corpus
+      : `${v.case.corpus} (${v.case.version})`;
     byCorpus[key] ??= { applies: 0, passes: 0 };
     byCorpus[key].applies++;
     if (failures(v).length === 0) byCorpus[key].passes++;
@@ -653,13 +808,65 @@ export async function sigilOracleReport(options: SigilOracleReportOptions) {
   const verdicts: Verdict[] = [];
   for (const c of cases)
     verdicts.push(
-      await judge(c, c.corpus === "names" || c.corpus === "fixtures"),
+      await judge(
+        c,
+        c.corpus === "names" || c.corpus === "fixtures" || c.corpus === "kamea",
+      ),
     );
   log(
     `judged ${verdicts.length} figures in ${((performance.now() - started) / 1000).toFixed(1)} s`,
   );
 
+  const beyond: Verdict[] = [];
+  const beyondStarted = performance.now();
+  for (const c of beyondCorpus(tiny)) beyond.push(await judge(c, false));
+  log(
+    `judged ${beyond.length} figures beyond the tested domain in ${((performance.now() - beyondStarted) / 1000).toFixed(1)} s`,
+  );
+
   const { rules, oracle, byCorpus } = tallies(verdicts);
+  // Failures against the engine suite's known-failures list.
+  const line = (v: Verdict) => ({
+    corpus: v.case.corpus,
+    id: v.case.id,
+    version: v.case.version,
+    text: v.case.text,
+    failing: failures(v),
+  });
+  const failed = verdicts.filter((v) => failures(v).length > 0);
+  const expected = failed
+    .filter((v) => knownFailure(v.case) !== undefined)
+    .map((v) => ({
+      ...line(v),
+      known: knownFailure(v.case),
+      checks: checksFailed(v),
+    }));
+  const regressions = failed
+    .filter((v) => knownFailure(v.case) === undefined)
+    .map(line);
+  const fixed = verdicts
+    .filter((v) => failures(v).length === 0 && knownFailure(v.case))
+    .map((v) => ({ ...line(v), known: knownFailure(v.case) }));
+  const known = {
+    expected: expected.length,
+    regressions: regressions.length,
+    fixed: fixed.length,
+    /** Known failures whose checks today differ from the list's. */
+    changed: expected.filter((e) => e.known !== e.checks).length,
+  };
+  const beyondByLength: Record<string, Tally> = {};
+  for (const v of beyond) {
+    const length = [...v.case.text].length;
+    const band = `${length - ((length - 13) % 5)}–${Math.min(32, length - ((length - 13) % 5) + 4)} letters`;
+    beyondByLength[band] ??= { applies: 0, passes: 0 };
+    beyondByLength[band].applies++;
+    if (failures(v).length === 0) beyondByLength[band].passes++;
+  }
+  const beyondSummary = {
+    cases: beyond.length,
+    passes: beyond.filter((v) => failures(v).length === 0).length,
+    byLength: beyondByLength,
+  };
   const names = verdicts
     .filter((v) => v.case.corpus === "names")
     .map((v) => ({
@@ -761,12 +968,27 @@ export async function sigilOracleReport(options: SigilOracleReportOptions) {
     rules,
     oracle,
     byCorpus,
+    known,
+    beyond: beyondSummary,
     r4Vertices: near.length,
     o4,
   };
   writeFileSync(
     join(out, "report.json"),
-    `${JSON.stringify({ summary, names, failing, sheets }, null, 2)}\n`,
+    `${JSON.stringify(
+      {
+        summary,
+        names,
+        failing,
+        regressions,
+        expected,
+        fixed,
+        beyond: beyond.filter((v) => failures(v).length > 0).map(line),
+        sheets,
+      },
+      null,
+      2,
+    )}\n`,
   );
   const table = (rows: Record<string, Tally & { title?: string }>) => [
     "| | Applies | Passes |",
@@ -781,7 +1003,11 @@ export async function sigilOracleReport(options: SigilOracleReportOptions) {
     [
       "# Sigil oracle report (plan 088)",
       "",
-      `${verdicts.length} figures${tiny ? " (the tiny corpus)" : ""}, the engine against O1–O3; the 1-ulp check on the names and fixtures.`,
+      `${verdicts.length} figures${tiny ? " (the tiny corpus)" : ""}, the engine against O1–O3; the 1-ulp check on the names, fixtures and kamea stubs, nudged before rounding.`,
+      "",
+      `${oracle.All.passes} pass. ${known.expected} fail as known (expected: \`engineKnownFailures.ts\`${known.changed ? `, ${known.changed} with other checks than listed` : ""}); ${known.regressions} regression${known.regressions === 1 ? "" : "s"}; ${known.fixed} known failure${known.fixed === 1 ? "" : "s"} now pass${known.fixed === 1 ? "es" : ""}.`,
+      "",
+      `Beyond the tested domain (13–32 letters, not in CI): ${beyondSummary.passes} of ${beyondSummary.cases} pass.`,
       "",
       "## By rule",
       "",
@@ -802,14 +1028,45 @@ export async function sigilOracleReport(options: SigilOracleReportOptions) {
           `- ${n.id} ${n.text} (${n.version}): ${n.failing.length ? n.failing.join("; ") : "passes"}`,
       ),
       "",
-      "## Failing figures",
+      "## Regressions",
       "",
-      ...(failing.length
-        ? failing.map(
+      "Failing, and not in the known-failures list.",
+      "",
+      ...(regressions.length
+        ? regressions.map(
             (f) =>
               `- ${f.corpus} ${f.text} (${f.version}): ${f.failing.join("; ")}`,
           )
         : ["None."]),
+      "",
+      "## Known failures (expected)",
+      "",
+      ...(expected.length
+        ? expected.map(
+            (f) =>
+              `- ${f.corpus} ${f.text} (${f.version}): ${f.checks}${f.checks === f.known ? "" : ` (listed: ${f.known})`}`,
+          )
+        : ["None."]),
+      "",
+      "## Known failures that now pass",
+      "",
+      "Take them off the list.",
+      "",
+      ...(fixed.length
+        ? fixed.map(
+            (f) => `- ${f.corpus} ${f.text} (${f.version}): listed ${f.known}`,
+          )
+        : ["None."]),
+      "",
+      "## Beyond the tested domain",
+      "",
+      "Seeded random words of 13 to 32 letters (`BEYOND_DOMAIN_CORPUS`), drawn best effort; CI tests words up to 12. Not regressions.",
+      "",
+      ...table(beyondSummary.byLength),
+      "",
+      ...beyond
+        .filter((v) => failures(v).length > 0)
+        .map((v) => `- ${v.case.text} (${v.case.version}): ${checksFailed(v)}`),
       "",
       "## Sheets",
       "",
