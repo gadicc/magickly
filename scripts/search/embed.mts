@@ -173,6 +173,17 @@ for (const profile of profiles) {
       });
     }
   if (mode === "publish") {
+    // The committed rows (plan 087): the same bytes, one file per row. Written
+    // before the manifest, so a failure here leaves the old manifest in place.
+    const { written, pruned } = publishRows(
+      root,
+      profile,
+      values.map((value) => embeddingCacheKey(profile, value)),
+      bytes,
+    );
+    console.log(
+      `${profile.key}: wrote ${written} rows, pruned ${pruned.length}`,
+    );
     mkdirSync(resolve(root, "public/search-vectors"), { recursive: true });
     const sha256 = digest(bytes);
     const file = `${profile.key}-${sha256.slice(0, 12)}.bin`;
@@ -186,16 +197,6 @@ for (const profile of profiles) {
     writeFileSync(
       resolve(root, "src/search/embeddings/manifest.json"),
       JSON.stringify(manifest, null, 2) + "\n",
-    );
-    // The committed rows (plan 087): the same bytes, one file per row.
-    const { written, pruned } = publishRows(
-      root,
-      profile,
-      values.map((value) => embeddingCacheKey(profile, value)),
-      bytes,
-    );
-    console.log(
-      `${profile.key}: wrote ${written} rows, pruned ${pruned.length}`,
     );
   }
   report.push({
