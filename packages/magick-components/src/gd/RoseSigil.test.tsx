@@ -13,8 +13,9 @@ afterEach(() => {
 
 describe("RoseSigil", () => {
   it("hydrates when the browser's trig results differ in the last bit", () => {
-    // The server render and the first client render both draw the letter
-    // centres; the optimised layout only arrives after hydration.
+    // The server and the browser both draw the figure placed by rule from
+    // anchors rounded to 0.001; `engine.oracle.test.tsx` nudges the anchors
+    // themselves by an ulp.
     const render = () =>
       renderToString(<RoseSigil text="אבג" showRose animate />);
     const server = render();
@@ -30,23 +31,33 @@ describe("RoseSigil", () => {
     const numbers = [...server.matchAll(/ (?:x|y|cx|cy|d)="([^"]*)"/g)].flatMap(
       ([, value]) => value.match(/-?[\d.]+(?:e[-+]?\d+)?/g) ?? [],
     );
-    expect(numbers.length).toBeGreaterThan(100);
+    expect(numbers.length).toBeGreaterThan(80);
     for (const number of numbers) expect(number).toMatch(/^-?\d+(\.\d{1,3})?$/);
   });
 
-  it("draws repeated letters before optimisation", () => {
-    // Repeated letters share a centre until the client optimises the layout.
-    // A browser stops drawing a path at its first NaN, so a NaN in the
-    // opening move drops the whole path.
+  it("draws repeated letters as crooks on the server, with nothing to wait for", () => {
+    // Two crooks at the first letter and two at the last: eight cups, on
+    // the one stroke from Daleth to Beth.
     const html = renderToString(
       <RoseSigil text="דדדבבב" showRose={false} animate />,
     );
     const paths = [...html.matchAll(/<path [^>]*\bd="([^"]*)"/g)];
     expect(paths).toHaveLength(1);
-    for (const [, d] of paths) {
-      expect(d).toMatch(/^M 1,25 A /);
-      expect(d).not.toContain("NaN");
-    }
+    const [[, d]] = paths;
+    expect(d).toMatch(/^M [-\d.]+,[-\d.]+ A 1.5,1.5 /);
+    expect(d.match(/C /g)).toHaveLength(8);
+    expect(d).not.toContain("NaN");
+  });
+
+  it("draws each word as its own sigil", () => {
+    const html = renderToStaticMarkup(
+      <RoseSigilImage text="יהוה אלהים" showRose />,
+    );
+    expect(html).toContain('viewBox="-150 -50 200 100"');
+    // The rose behind each word, the second moved into its region.
+    expect(html.match(/<circle /g)).toHaveLength(8);
+    expect(html).toContain('transform="translate(-100 0)"');
+    expect(html.match(/<path /g)).toHaveLength(1);
   });
 
   it("draws any text: final forms as their base letters, the rest left out", () => {

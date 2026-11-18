@@ -1,17 +1,13 @@
 "use client";
 import React from "react";
 import { RoseSigilImage } from "./RoseSigilImage.tsx";
-import {
-  type RoseVersionId,
-  type SigilPoint,
-  sigilPoints,
-} from "./roseSigilGeometry.ts";
-import { optimizeSigilPoints } from "./roseSigilOptimizer.ts";
+import type { RoseVersionId } from "./roseSigilGeometry.ts";
 
 export interface RoseSigilProps {
   /**
-   * The text to draw. Final forms are drawn as their base letters, and
-   * anything not one of the 22 letters (spaces, points, Latin) is left out.
+   * The text to draw. Whitespace separates words, each its own sigil (R2).
+   * Final forms are drawn as their base letters, and anything else not one
+   * of the 22 letters (points, Latin) is left out.
    */
   text: string;
   /** Draws the rose's three rings of letters behind the sigil. */
@@ -23,7 +19,7 @@ export interface RoseSigilProps {
    * says where each comes from.
    */
   version?: RoseVersionId;
-  /** Draws the connecting path on, once the layout is optimised. */
+  /** Draws the sigil's path on after it renders. */
   animate?: boolean;
   /** The `<svg>`, for exporting the drawing. */
   ref?: React.Ref<SVGSVGElement>;
@@ -31,10 +27,10 @@ export interface RoseSigilProps {
 
 /**
  * The rose-cross sigil of a Hebrew text, drawn through the letters' places
- * on the rose. It renders the letter centres first, on the server too, then
- * spreads repeated and aligned letters with the optimiser once in the
- * browser, and draws the path on. A client component: the server-safe
- * drawing is `RoseSigilImage`.
+ * on the rose by plan 088's rules, placed by rule: the server and the
+ * browser draw the same figure, with nothing to wait for. In the browser
+ * the path is drawn on. A client component: the server-safe drawing is
+ * `RoseSigilImage`.
  */
 export function RoseSigil({
   text,
@@ -46,47 +42,26 @@ export function RoseSigil({
   const pathRef = React.useRef<SVGPathElement>(null);
   // useId yields ":r1:"-style ids; CSS identifiers need the colons removed.
   const animation = `rose-sigil-draw-${React.useId().replace(/[^\w-]/g, "")}`;
-  const points = React.useMemo(
-    () => sigilPoints(text, version),
-    [text, version],
-  );
-  const [optimized, setOptimized] = React.useState<SigilPoint[] | null>(null);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new text or rose is a new path to draw on.
   React.useEffect(() => {
-    if (!points.length) return;
-    let cancelled = false;
-    optimizeSigilPoints(points).then(
-      (result) => {
-        if (!cancelled) setOptimized(result);
-      },
-      // Without the optimiser (its WASM failed to load) the sigil keeps
-      // the letter centres it was first drawn with.
-      (error) => console.error(error),
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, [points]);
-
-  React.useEffect(() => {
-    if (pathRef.current && optimized) {
-      const length = pathRef.current.getTotalLength();
-      pathRef.current.style.strokeDasharray = animate ? length.toString() : "";
-      pathRef.current.style.strokeDashoffset = animate ? length.toString() : "";
-      pathRef.current.classList.remove(animation);
-      // @ts-expect-error: trick to trigger reflow
-      void pathRef.current.offsetWidth;
-      if (animate) pathRef.current.classList.add(animation);
-    }
-  }, [animate, animation, optimized]);
+    const path = pathRef.current;
+    // jsdom has no path geometry; there is nothing to draw on.
+    if (!path || typeof path.getTotalLength !== "function") return;
+    const length = path.getTotalLength();
+    path.style.strokeDasharray = animate ? length.toString() : "";
+    path.style.strokeDashoffset = animate ? length.toString() : "";
+    path.classList.remove(animation);
+    // @ts-expect-error: trick to trigger reflow
+    void path.offsetWidth;
+    if (animate) path.classList.add(animation);
+  }, [animate, animation, text, version]);
 
   return (
     <RoseSigilImage
       text={text}
       showRose={showRose}
       version={version}
-      debug={false}
-      points={optimized || points}
       animation={animate ? animation : undefined}
       ref={ref}
       pathRef={pathRef}

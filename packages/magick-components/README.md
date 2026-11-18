@@ -91,7 +91,7 @@ in the browser. Three need the browser, and are marked `"use client"`:
 
 - `astrology/MoonWidget`, which works out today's phase after hydration;
 - `astrology/MercuryWidget`, which works out Mercury's next retrograde;
-- `gd/RoseSigil`, which optimises and animates the sigil.
+- `gd/RoseSigil`, which draws the sigil on.
 
 A client module's exports all become client references, so each of these
 exports only its component. Their helpers live in modules of their own
@@ -130,10 +130,10 @@ assembled graph, so they import magick-data's root entry, every table.
 | `gd/hall/tags` | The hall's tags, for writing a hall as JSX in `GdHall` (`import * as Hall`, then `<Hall.Floor>`, `<Hall.Pillar>` …; [below](#a-hall-written-as-tags)), with `defineHallTag()` and `defineHallItem()` for your own art's tags and item kinds, and `hallFromTags()`, which gives the hall the tags describe as data |
 | `gd/Lamen` | An officer's lamen |
 | `gd/lamenGrades` | Which grades' lamens each officer wears |
-| `gd/RoseSigil` | The rose-cross sigil of a Hebrew text, optimised and drawn on in the browser (`"use client"`) |
-| `gd/RoseSigilImage` | The same sigil with no hooks, for the server, from points you give it |
+| `gd/RoseSigil` | The rose-cross sigil of a Hebrew text, drawn on in the browser (`"use client"`) |
+| `gd/RoseSigilImage` | The same sigil with no hooks, for the server |
 | `gd/roseSigilGeometry` | The rose's letters and where a text's letters stand on it, on either version of the rose: `ROSE_LETTERS`, `roseRings()`, `roseLetters()`, `letterPoint()` and `sigilPoints()`, with `ROSE_VERSIONS` and `ROSE_VERSION_NOTES` |
-| `gd/roseSigilOptimizer` | `optimizeSigilPoints()`, the layout optimiser (nlopt, compiled to WASM) |
+| `gd/roseSigilOptimizer` | `optimizeSigilPoints()`, the old layout optimiser (nlopt, compiled to WASM), which nothing draws with any more; it is to be removed |
 | `gd/SevenBranchedCandlestick` | The seven-branched candlestick, with its planets, in two versions: *The Equinox*'s figure of 1909 (the default) and the modern arrangement (`CANDLESTICK_VERSIONS`, `CANDLESTICK_VERSION_NOTES`) |
 | `gd/TableOfShewbread` | The table of shewbread, with the signs and the tribes |
 | `gd/FylfotCross` | The fylfot cross of the signs and elements |
@@ -428,12 +428,25 @@ Ruhl Libre stands in for them. Load them in one of two ways:
   (`<GdHall hall={…} fontBaseUrl="/fonts" />`); the SVG then carries its
   own `@font-face` rules, which an exported SVG needs.
 
-## The rose sigil and nlopt
+## The rose sigil
 
-`RoseSigil` optimises the sigil's layout with
+`RoseSigil` and `RoseSigilImage` draw a sigil by the Golden Dawn's rules
+for the rose (*The Golden Dawn*, vol. 4, 1940, p. 57): a circle at the
+first letter, straight lines letter to letter, a crook where a letter is
+doubled, a noose where the line passes straight through a letter of the
+name, and a bar at the last. Each word is its own sigil, side by side
+from right to left. The points are placed by rule, with only arithmetic
+and square roots on coordinates rounded to 0.001, so the server and
+every browser draw the same figure and nothing waits on the client.
+Text that is not Hebrew is left out of the sigil, and final forms are
+drawn as their base letters.
+
+`RoseSigilImage`'s `points` prop is deprecated: given, the sigil is drawn
+through those points by the old rules, as one word. `optimizeSigilPoints`
+(`gd/roseSigilOptimizer`) made such points with
 [nlopt-js](https://www.npmjs.com/package/nlopt-js), whose Emscripten glue
-asks for Node's `fs` even in a browser bundle. Both of Next's bundlers then
-fail with `Can't resolve 'fs'` until you stub it out:
+asks for Node's `fs` even in a browser bundle; only that entry reaches
+nlopt now, and a bundle that imports it needs `fs` stubbed out:
 
 ```ts
 // next.config.ts
@@ -454,17 +467,11 @@ const nextConfig: NextConfig = {
 export default nextConfig;
 ```
 
-Only `RoseSigil` and `gd/roseSigilOptimizer` reach nlopt; a page that
-draws the sigil on the server with `RoseSigilImage`, or uses nothing of the
-sigil, needs no stub. If the optimiser fails to load, `RoseSigil` keeps the
-letters' centres it first drew. Text that is not Hebrew is left out of the
-sigil, and final forms are drawn as their base letters.
-
 The rose has two versions, which differ in where Kaph and Tau stand on its
 middle ring: the Golden Dawn's, as *The Equinox* printed it (`gd`, the
 default), and Regardie's of 1939 (`version="regardie1939"`).
 `ROSE_VERSION_NOTES`, from `gd/roseSigilGeometry`, names each and says
-where it comes from; give `sigilPoints()` the same version as the drawing.
+where it comes from.
 
 ## What you supply
 
