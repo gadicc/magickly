@@ -255,6 +255,31 @@ it("hides a ready ritual synchronously when the route changes", async () => {
   await screen.findByText(/unavailable on this device/i);
 });
 
+it("draws a ready ritual's title as the reader shell's h1", async () => {
+  const fixture = privateRuntime();
+  mock.getRuntime.mockReturnValue(fixture.runtime);
+  render(<PrivateRitualReader resolvedRitualId={A} />);
+  // Loading sits on the ritual's surface already, without a title.
+  expect(
+    screen.getByLabelText("Loading ritual").closest("[data-reader-shell]"),
+  ).not.toBeNull();
+  await waitFor(() => expect(fixture.view).toBeDefined());
+  await act(async () => fixture.view?.available());
+  const heading = await screen.findByRole("heading", {
+    level: 1,
+    name: "Ritual A",
+  });
+  // Ritual text, not interface copy, and outside the ltr ritual body.
+  expect(heading.getAttribute("dir")).toBe("auto");
+  expect(heading.getAttribute("lang")).toBe("");
+  const title = heading.closest("[data-reader-area]");
+  expect(title?.getAttribute("data-reader-area")).toBe("title");
+  expect(title?.parentElement?.hasAttribute("data-reader-shell")).toBe(true);
+  expect(
+    screen.getByText("Rendered ritual").closest("[data-reader-shell]"),
+  ).toBe(title?.parentElement);
+});
+
 it("shows a safe unavailable state when reader runtime creation fails", async () => {
   mock.getRuntime.mockImplementation(() => {
     throw new DOMException("blocked", "SecurityError");

@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
@@ -9,6 +9,7 @@ import { socialCardImage } from "@/seo/cards";
 import { privateMetadata, seoMetadata } from "@/seo/metadata";
 import DocRender from "../../../doc/[_id]/DocRender";
 import PrivateRitualReader from "../../../doc/[_id]/PrivateRitualReader";
+import ReaderShell from "../../../doc/ReaderShell";
 
 /** Only anonymous, SQL-public rituals are indexed, under their canonical id. */
 export async function generateMetadata({
@@ -41,14 +42,24 @@ export default async function DocPage({ params }: PageProps<"/doc/[_id]">) {
   if (deletedPublic) notFound();
   if (publicRitual && publicDoc)
     return (
-      <Box>
-        <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-          {publicRitual.ritual.title}
-        </Typography>
+      <ReaderShell
+        title={
+          // A stored ritual's title is ritual text, not interface copy.
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{ mb: 2 }}
+            lang=""
+            dir="auto"
+          >
+            {publicRitual.ritual.title}
+          </Typography>
+        }
+      >
         <Suspense fallback={<div>Loading ritual...</div>}>
           <DocRender doc={publicDoc} />
         </Suspense>
-      </Box>
+      </ReaderShell>
     );
   return (
     <Suspense fallback={<div>Loading ritual...</div>}>

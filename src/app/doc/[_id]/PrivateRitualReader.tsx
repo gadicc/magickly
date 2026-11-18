@@ -20,6 +20,7 @@ import type { OfflineOperation } from "@/offline/lifecycle";
 import { refreshOfflineRitual } from "@/offline/ritualDownload";
 import type { RitualBundle } from "@/offline/storage";
 import type { DocNode } from "@/schemas";
+import ReaderShell from "../ReaderShell";
 import DocRender from "./DocRender";
 
 type ReaderState =
@@ -265,37 +266,52 @@ export default function PrivateRitualReader({
 
   if (visibleState.kind === "ready")
     return (
-      <Box>
-        <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-          {visibleState.title}
-        </Typography>
+      <ReaderShell
+        title={
+          // A stored ritual's title is ritual text, not interface copy.
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{ mb: 2 }}
+            lang=""
+            dir="auto"
+          >
+            {visibleState.title}
+          </Typography>
+        }
+      >
         <DocRender doc={visibleState.doc} />
-      </Box>
+      </ReaderShell>
     );
 
+  // On the ritual's surface too, so it does not flash white while loading.
   return (
-    <Box sx={{ p: 2 }}>
-      {visibleState.kind === "loading" ? (
-        <CircularProgress aria-label={translateUi(/*i18n*/ "Loading ritual")} />
-      ) : (
-        <Alert severity="info">
-          <UiText
-            message={
-              validRoute
-                ? /*i18n*/ "This ritual is unavailable on this device. Connect and retry to check access."
-                : /*i18n*/ "Open the original ritual link to use the offline reader."
-            }
+    <ReaderShell>
+      <Box>
+        {visibleState.kind === "loading" ? (
+          <CircularProgress
+            aria-label={translateUi(/*i18n*/ "Loading ritual")}
           />
-        </Alert>
-      )}
-      {ritualId && (
-        <Button sx={{ mt: 2 }} onClick={() => refreshRef.current()}>
-          <UiText message={/*i18n*/ "Retry"} />
+        ) : (
+          <Alert severity="info">
+            <UiText
+              message={
+                validRoute
+                  ? /*i18n*/ "This ritual is unavailable on this device. Connect and retry to check access."
+                  : /*i18n*/ "Open the original ritual link to use the offline reader."
+              }
+            />
+          </Alert>
+        )}
+        {ritualId && (
+          <Button sx={{ mt: 2 }} onClick={() => refreshRef.current()}>
+            <UiText message={/*i18n*/ "Retry"} />
+          </Button>
+        )}
+        <Button sx={{ mt: 2, ml: ritualId ? 1 : 0 }} href="/offline/ritual">
+          <UiText message={/*i18n*/ "Downloaded rituals"} />
         </Button>
-      )}
-      <Button sx={{ mt: 2, ml: ritualId ? 1 : 0 }} href="/offline/ritual">
-        <UiText message={/*i18n*/ "Downloaded rituals"} />
-      </Button>
-    </Box>
+      </Box>
+    </ReaderShell>
   );
 }

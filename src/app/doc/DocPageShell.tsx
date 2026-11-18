@@ -1,6 +1,7 @@
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { Suspense } from "react";
 import DocLoader from "./[_id]/DocLoader";
+import ReaderShell from "./ReaderShell";
 
 /**
  * Display variables are applied in the client, keeping bundled HTML
@@ -15,13 +16,16 @@ export default function DocPageShell({
   title: string;
 }) {
   return (
-    <Box>
-      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        {title}
-      </Typography>
+    <ReaderShell
+      title={
+        <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
+          {title}
+        </Typography>
+      }
+    >
       <Suspense fallback={<DocLoader id={id} prerender />}>
         <DocLoader id={id} />
       </Suspense>
-    </Box>
+    </ReaderShell>
   );
 }

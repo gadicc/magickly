@@ -1,0 +1,47 @@
+/* The ritual reader's page (plan 089, decision 2): the ritual surface from
+   the app bar down, and one grid holding the page title, the display
+   variables and the ritual in a reading column. The areas are named so
+   that the rails (stage C) can join them as columns either side from
+   1,200 px without moving anything. Logical properties throughout: the
+   shell follows the interface's direction; the ritual body inside it keeps
+   its own dir="ltr" (DocRender). */
+.shell {
+  display: grid;
+  grid-template-columns: minmax(0, 46rem);
+  grid-template-areas:
+    "title"
+    "controls"
+    "body";
+  justify-content: center;
+  /* A short page keeps its rows together, the surface running on below. */
+  align-content: start;
+  padding: 16px;
+  min-block-size: calc(100vh - var(--app-bar, 56px));
+  min-block-size: calc(100dvh - var(--app-bar, 56px));
+  background: var(--mui-palette-ritual-surface);
+}
+/* Anything not placed, such as a loading or not-found message, reads in
+   the column; nothing is wider than it. The areas below come later and
+   win at the same specificity. */
+.shell > * {
+  grid-area: body;
+  min-inline-size: 0;
+}
+/* With the heading's own margin, the 32 px the variables always had below
+   it. */
+.title {
+  grid-area: title;
+  margin-block-end: 16px;
+}
+.controls {
+  grid-area: controls;
+}
+.body {
+  grid-area: body;
+}
+/* Fragment targets, the titles' anchors and the halls' `hall-N`, clear the
+   fixed app bar. Hash navigation and scrollIntoView, which revealHall uses,
+   both honour it. Only here: the editor's preview scrolls in its own pane. */
+.body :global([id]) {
+  scroll-margin-block-start: calc(var(--app-bar, 56px) + 8px);
+}

@@ -47,6 +47,7 @@ import {
   ritualHalls,
 } from "@/doc/ritualHalls";
 import { DocNode } from "@/schemas";
+import shell from "../readerShell.module.css";
 
 // The halls' sheet and viewer load only for a ritual with halls (plan 069),
 // so other rituals carry no dialog code for them. `loading` gives each its
@@ -413,6 +414,14 @@ interface DocRenderProps {
    * editor's preview turns it off, so the editor has no hall ids.
    */
   hallNavigation?: boolean;
+  /**
+   * The reader's page layout (plan 089, decision 2): the variables and the
+   * ritual go in the areas of the `ReaderShell` this is drawn in, which
+   * gives the surface and the reading column. On by default; the ritual
+   * editor's preview turns it off and keeps its own self-contained box, as
+   * its pane is not the page.
+   */
+  chrome?: boolean;
 }
 
 /** Reads the display variables from the page query. */
@@ -429,6 +438,7 @@ export function DocView({
   doc,
   wrapWithErrorBoundary,
   hallNavigation = true,
+  chrome = true,
   searchParams,
 }: DocRenderProps & {
   searchParams: Pick<URLSearchParams, "get"> | null;
@@ -569,46 +579,69 @@ export function DocView({
 
   // console.log({ currentPos, nextPos });
 
+  const variables = (
+    <div>
+      <ShowVars vars={alwaysVars} context={context} />
+      <details>
+        <summary>
+          <UiText>{/*i18n*/ "More Variables"}</UiText>
+        </summary>
+        <br />
+        <ShowVars vars={collapsableVars} context={context} />
+      </details>
+    </div>
+  );
+  const ritual = (
+    <div
+      className="docBody"
+      // Legacy revisions have no content-locale field. Never infer it from
+      // interface preference; preserve physical diagram/read order until
+      // the translation resolver supplies an explicit content boundary.
+      lang=""
+      dir="ltr"
+      style={
+        {
+          // fontFamily: "Frank Ruhl Libre, Roboto, Helvetica, Arial, sans-serif",
+        }
+      }
+    >
+      <DocContext.Provider value={context}>
+        {wrapWithErrorBoundary ? (
+          <ErrorBoundary>
+            <Render doc={doc} onChange={undefined} halls={halls} />
+          </ErrorBoundary>
+        ) : (
+          <Render doc={doc} onChange={undefined} halls={halls} />
+        )}
+      </DocContext.Provider>
+    </div>
+  );
+  // The text-size control scales both areas alike, not the page's title.
+  const zoom = { fontSize: fontSize + "%" };
+
   return (
     <>
-      <Box sx={{ bgcolor: "ritual.surface", p: 2, fontSize: fontSize + "%" }}>
-        <div>
-          <ShowVars vars={alwaysVars} context={context} />
-          <details>
-            <summary>
-              <UiText>{/*i18n*/ "More Variables"}</UiText>
-            </summary>
+      {chrome ? (
+        <>
+          <div
+            className={shell.controls}
+            data-reader-area="controls"
+            style={zoom}
+          >
+            {variables}
             <br />
-            <ShowVars vars={collapsableVars} context={context} />
-          </details>
-        </div>
-
-        <br />
-
-        <div
-          className="docBody"
-          // Legacy revisions have no content-locale field. Never infer it from
-          // interface preference; preserve physical diagram/read order until
-          // the translation resolver supplies an explicit content boundary.
-          lang=""
-          dir="ltr"
-          style={
-            {
-              // fontFamily: "Frank Ruhl Libre, Roboto, Helvetica, Arial, sans-serif",
-            }
-          }
-        >
-          <DocContext.Provider value={context}>
-            {wrapWithErrorBoundary ? (
-              <ErrorBoundary>
-                <Render doc={doc} onChange={undefined} halls={halls} />
-              </ErrorBoundary>
-            ) : (
-              <Render doc={doc} onChange={undefined} halls={halls} />
-            )}
-          </DocContext.Provider>
-        </div>
-      </Box>
+          </div>
+          <div className={shell.body} data-reader-area="body" style={zoom}>
+            {ritual}
+          </div>
+        </>
+      ) : (
+        <Box sx={{ bgcolor: "ritual.surface", p: 2, ...zoom }}>
+          {variables}
+          <br />
+          {ritual}
+        </Box>
+      )}
 
       <SpeedDial
         ariaLabel="SpeedDial basic example"

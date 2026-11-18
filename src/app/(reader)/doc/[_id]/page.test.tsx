@@ -34,6 +34,7 @@ const { default: DocRender } = await import("../../../doc/[_id]/DocRender");
 const { default: PrivateRitualReader } = await import(
   "../../../doc/[_id]/PrivateRitualReader"
 );
+const { default: ReaderShell } = await import("../../../doc/ReaderShell");
 
 const id = "019a0000-0000-7000-8000-000000000999";
 const params = { params: Promise.resolve({ _id: id }) } as never;
@@ -123,6 +124,20 @@ describe("the ritual page of a public SQL ritual", () => {
       const page = await DocPage(params);
       expect(find(page, PrivateRitualReader)).toBeNull();
       expect(find(page, DocRender)?.doc).toEqual({ children: body });
+      // The h1 is the reader shell's title, the ritual its content.
+      const shell = find(page, ReaderShell) as {
+        title: ReactNode;
+        children: ReactNode;
+      };
+      expect(find(shell.children, DocRender)).not.toBeNull();
+      const title = isValidElement<Record<string, unknown>>(shell.title)
+        ? shell.title.props
+        : null;
+      expect(title).toMatchObject({
+        component: "h1",
+        dir: "auto",
+        children: "Synthetic Opening",
+      });
 
       const metadata = await generateMetadata(params);
       expect(metadata.robots).toBeUndefined();
