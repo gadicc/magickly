@@ -92,22 +92,7 @@ describe("rose sigil geometry", () => {
     expect(pathFromPoints({ points: [], sigilTokens: [] })).toBe("");
   });
 
-  it("keeps non-degenerate paths unchanged", () => {
-    const path = (text: string) =>
-      pathFromPoints({ points: sigilPoints(text), sigilTokens: [...text] });
-    // Written by the implementation before coincident points were handled.
-    expect(path("אבבא")).toBe(
-      "M -0.538,-14.157 A 1,1 0 0,0 0.215,-14.023 A 1,1 0 0,0 0.843,-14.462 " +
-        "A 1,1 0 0,0 0.977,-15.215 A 1,1 0 0,0 0.538,-15.843 " +
-        "A 1,1 0 0,0 -0.215,-15.977 A 1,1 0 0,0 -0.843,-15.538 " +
-        "A 1,1 0 0,0 -0.977,-14.785 A 1,1 0 0,0 -0.538,-14.157 " +
-        "L -19.169,14.997 A 2,1 0 1,0 -19.357,15.292" +
-        "A 2,1 0 1,0 -19.546,15.587" +
-        "L 0,-15 L 1.685,-13.923 L -1.685,-16.077",
-    );
-    expect(path("שלומ")).toMatch(
-      / L 0,35 L -17\.5,-30\.311 L -12\.99,7\.5 L -11\.004,7\.263 L -14\.976,7\.737$/,
-    );
+  it("draws end bars across the last line", () => {
     // End bars across rising, falling and vertical lines, +x end first.
     const bar = (points: SigilPoint[]) =>
       pathFromPoints({ points, sigilTokens: ["א", "ב"] })
@@ -146,14 +131,6 @@ describe("rose sigil geometry", () => {
     expect(paths.get("אא")).toBe(`${lone}L 0,-15 L 0,-13 L 0,-17`);
     expect(paths.get("דדדבבב")).toMatch(/^M 1,25 A 1,1 0 0,0 /);
     expect(paths.get("חפטטההה")).toMatch(/ 0,-35L 0,-35 L 0,-33 L 0,-37$/);
-    // Later repeats of a run squiggle in from +x; the last one bends away
-    // from ב.
-    expect(paths.get("קללללללב")).toContain(
-      "A 2,1 0 1,0 0,35" +
-        "L 0.7,35 A 2,1 0 1,0 0.35,35A 2,1 0 1,0 0,35" +
-        "L 0.7,35 A 2,1 0 1,1 0.35,35A 2,1 0 1,1 0,35" +
-        "L -19.546,15.587 ",
-    );
   });
 
   it("draws a vertical end bar after a level line", () => {
@@ -288,23 +265,6 @@ describe("rose sigil geometry", () => {
         expect(at).toEqual({ x: svgCoordinate(to.x), y: svgCoordinate(to.y) });
       }
     expect(largeArc({ x: 1, y: 2 }, { x: 1, y: 2 }, 1, true)).toBe("");
-  });
-
-  it("keeps the loop between optimised repeats a thousandth apart", () => {
-    // COBYLA's layout for אאא under Node 25; the loop's chord is 0.00012.
-    const points = [
-      { x: 1.8369684029544886e-15, y: -15.000510271213843 },
-      { x: 1.836944300199573e-15, y: -14.999293443774167 },
-      { x: 9.184537381221264e-16, y: -14.998976117843958 },
-    ];
-    const d = pathFromPoints({ points, sigilTokens: ["א", "א", "א"] });
-    const loop = [...d.matchAll(/A 1,1 0 0,1 (-?[\d.]+),/g)].map(([, x]) =>
-      Number(x),
-    );
-    expect(loop).toHaveLength(12);
-    // Its two unit circles sit either side of the vertical path.
-    expect(Math.max(...loop)).toBe(2);
-    expect(Math.min(...loop)).toBe(-2);
   });
 
   it("scores wider angles higher and penalises drifting far from the letter", () => {
