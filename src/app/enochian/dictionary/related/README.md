@@ -90,6 +90,19 @@ other 196 still pass, 140 good, 53 loose and 3 wrong (1.5% wrong).
 nine put back, is the one the sample was drawn from (it redraws the
 same 200 with seed 3).
 
+**The 19 November 2026 rebuild** (plan 081's stage-2 follow-ups), from
+the re-embedded vector cache (see the gap hints' README): the name rule
+now takes "king/prince of heptarchy" and the first three Aethyrs for
+names, which took out CARMARA and HAGONEL as each other's related word,
+and LUIAHE's gloss is "a song of". The moved z-scores took out ADAPH
+and ADEPH's NA "lord of hosts", BLIORS's BLIARD "with comfort" and
+LVCE's LUCAL "north", and added ZNA's ZACAR "move" (judged loose) and
+BLIORS's BLIARD "to be with comfort" (good), judged by a fresh judge
+in `judged-added-2026-11-19.tsv`. One removed pair was in the seed-3
+sample (ADEPH's NA, good); the other 195 score 139 good, 53 loose and 3
+wrong. The test redraws the sample from today's table with all fifteen
+removed pairs put back and the two added taken out.
+
 Its wrong rows: CORS "such, work" and VAUL "to work" (the judge's least
 certain), HCOMA "water name, tablet of union" and TOANT "union" (gone
 since 2H), UGEG and NOAR "is become", UGEG "strong" and GOSA
@@ -97,12 +110,13 @@ since 2H), UGEG and NOAR "is become", UGEG "strong" and GOSA
 judgings noticed, left in: "Son of Light" against "Son of Son of Light"
 (loose); near-inflections whose form is a prefix or an extension of the
 entry's own (about 160 of 1,201 at 6.0, judged good as inflections);
-and two likely data errors, LUIAHE glossed both "a son of" and "a Song
-of honour" (a mis-split "Song"), and GESCO carrying both "is not the
-fourth" and "but with the holy Pentagram".
+and GESCO's gloss, a note from Liber Loagaeth ("is not the fourth, but
+with the holy Pentagram…") read as two senses; its pairs left (ACO,
+GENSO and O, the pentagram) are fair, so it stays. LUIAHE's "a son of",
+a mis-split of Casaubon's "a Song of honour", is corrected since.
 
-**The shipped table**, at z ≥ 6.75: 464 entries with related words,
-655 items, in 370 rows, 18,351 bytes served, 7,052 gzipped. The cost of
+**The shipped table**, at z ≥ 6.75: 461 entries with related words,
+651 items, in 367 rows, 18,212 bytes served, 6,986 gzipped. The cost of
 the margin is coverage: at 6.0, with the number rule, 679 entries
 would have related words. A later
 re-judging, or a dictionary change that alters the glosses, should run

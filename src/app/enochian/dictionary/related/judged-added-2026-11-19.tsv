@@ -1,0 +1,10 @@
+# Related words the 19 November 2026 rebuild added (plan 081's stage-2 follow-ups): every pair
+# in the rebuilt table that the seed-3 table didn't have, judged by a fresh model judge shown no
+# z-scores, with the rubric below.
+# Judge each related word against the entry's meanings:
+#   good  - the related gloss means what the entry means (the same sense, or as near as a synonym);
+#   loose - related in meaning, a fair pointer for a reader of the entry, not the same meaning;
+#   wrong - anything else.
+n	entry	meanings	related	verdict
+1	ZNA	motion, movement	ZACAR ‘move’	loose
+2	BLIORS	comfort, of; comfort, to our comfort	BLIARD ‘to be with comfort’	good

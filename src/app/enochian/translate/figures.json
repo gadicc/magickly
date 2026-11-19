@@ -1,14 +1,14 @@
 {
-  "date": "2026-11-15",
+  "date": "2026-11-19",
   "coverage": {
     "sentences": 60,
-    "gapFree": 4,
+    "gapFree": 5,
     "words": 622,
     "forms": 283,
-    "chips": 113,
+    "chips": 114,
     "ruleForms": 41,
-    "gaps": 226,
-    "gapsWithNearest": 37,
+    "gaps": 225,
+    "gapsWithNearest": 36,
     "byKind": {
       "practitioner": {
         "sentences": 20,
@@ -32,13 +32,13 @@
       },
       "attested": {
         "sentences": 20,
-        "gapFree": 3,
+        "gapFree": 4,
         "words": 171,
         "forms": 117,
-        "chips": 32,
+        "chips": 33,
         "ruleForms": 11,
-        "gaps": 22,
-        "gapsWithNearest": 13
+        "gaps": 21,
+        "gapsWithNearest": 12
       }
     }
   },

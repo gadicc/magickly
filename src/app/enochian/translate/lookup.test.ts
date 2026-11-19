@@ -1016,7 +1016,7 @@ describe("the final review's findings (plan 081, stage 1)", () => {
     // An elision's apostrophe is its word's, and opens no quote.
     expect(possessive("'Tis the angels' song")).toEqual(["angels'"]);
     expect(possessive("'Twas the angels' song")).toEqual(["angels'"]);
-    expect(enochian("'Tis the angels' song")).toBe("['Tis] ·G4 [song] MERIFRI");
+    expect(enochian("'Tis the angels' song")).toBe("['Tis] ·G4 LUIAHE MERIFRI");
     // Nothing moves: the forms keep the English order.
     const spans = translator
       .toEnochian("I said 'yes' to him")

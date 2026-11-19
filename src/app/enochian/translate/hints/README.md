@@ -114,6 +114,34 @@ spike's rubric (good, loose or wrong, for the English word alone):
    `scripts/enochian-hints/table.test.ts` checks the table is the one it
    was drawn from (it redraws the same 200 with seed 91).
 
+**The 19 November 2026 rebuild** (plan 081's stage-2 follow-ups). The
+vector cache was lost with a removed worktree and re-embedded in full
+(`enochian:hints:run`), so this table is the first from the new cache;
+an offline `build` reproduces it byte for byte. Main's exact inputs
+weren't rebuilt from it (five of their glosses are gone now), so
+whether the fresh vectors match the old ones is unchecked. The gloss
+changes: LUIAHE's "a son of" corrected to "a song of", and the name
+rule now takes "first, second and third aethyr", "the first aire" and
+"king/prince of heptarchy" for names. The word denylist took out the
+borderline hints of numbers and of words read inside longer ones:
+"eighty" by "eight", "ninety" by "nineteen", "fourteenth" by "fourth",
+"fifth" by "not the fifth", "sirloin(s)", "manifesto(s)",
+"breather(s)", "ghost", and "phoned", "phoning", "telephoned",
+"telephoning" and "dialled" by "call" (the telephone sense; the seed-91
+judge had "phoned" good). With the scores moved slightly, "halving", "monologue"
+and "workforce" fell under the cut-off and 14 words gained a hint. A
+fresh judge shown no z-scores judged all 14: 8 good, 5 loose, and
+"nigh" by "night" wrong (7% of the additions, over the 5% bar for
+them alone), which is now denied, as is "bastards" by "you sons",
+judged loose but poor on review. They are in
+`judged-added-2026-11-19.tsv`. The seed-91 sample's rows other than
+the removed words score 82 good, 111 loose, 0 wrong of 193; since its
+four wrong rows were denied because this sample showed them, that zero
+is not a fresh measurement, only a check that the removals took out
+nothing the bar relied on. The test redraws the seed-91 sample from
+today's table with the 22 removed words put back and the judged
+additions taken out.
+
 **Why 7.0**: the first two samples were each used to pick a cut-off
 (6.24, then 6.67), so neither is a fair test of the cut-off it picked.
 7.0 was chosen from both together, and the third sample, drawn only
@@ -124,9 +152,9 @@ from the spike's (its population kept grammar and hub glosses; SCOWL
 brings inflections), which is why the cut-off was judged here rather
 than taken from the spike.
 
-**The shipped table**, at z ≥ 7.0: 1,670 words under 424 glosses,
-27,685 bytes served, 11,356 gzipped (before the 2H changes, 1,726
-under 439). The cost of the margin is coverage: 3,650 words had a hint
+**The shipped table**, at z ≥ 7.0: 1,660 words under 425 glosses,
+27,596 bytes served, 11,316 gzipped (1,670 under 424 at 2H; before the
+2H changes, 1,726 under 439). The cost of the margin is coverage: 3,650 words had a hint
 at 6.25, 1,670 have one at 7.0.
 
 ## Format

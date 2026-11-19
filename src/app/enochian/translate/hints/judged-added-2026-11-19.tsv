@@ -1,0 +1,22 @@
+# Gap hints the 19 November 2026 rebuild added (plan 081's stage-2 follow-ups): every word
+# the rebuilt table hints that the seed-91 table didn't, judged by a fresh model judge shown no
+# z-scores, with the rubric below. "nigh" was judged wrong and is now in word-denylist.txt.
+# Judge each hint for the English word alone:
+#   good  - the gloss means the word (the same sense, or as near as a synonym);
+#   loose - related in meaning, a fair pointer, not the same word;
+#   wrong - anything else.
+n	word	hint	verdict
+1	resembling	related: AZIAZIOR, T, TA ‘likeness’	loose
+2	nigh	related: DOSIG ‘night’	wrong
+3	supplied	related: ABRAASSA ‘provided’	good
+4	agitate	related: LRING ‘stir up’	good
+5	sangs	related: LUIAHE ‘a song of’	good
+6	innards	related: ZAH ‘inner’	loose
+7	vow	related: ISRO, AISRO ‘promise’	good
+8	eat	related: IAL ‘to consume’	good
+9	momentarily	related: OANIO ‘moment’	loose
+10	bastards	related: NOROMI, NOR ‘you sons’	loose
+11	relieve	related: BLIAR ‘ease’	good
+12	devastates	related: QUASB, RLU ‘destroy’	good
+13	noisily	related: NIDALI ‘noise’	loose
+14	inward	related: ZAH ‘inner’	good

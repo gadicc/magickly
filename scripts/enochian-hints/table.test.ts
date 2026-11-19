@@ -312,17 +312,50 @@ describe("the committed hint table", () => {
   });
 });
 
+/**
+ * Words whose hint the 19 November 2026 rebuild took away (plan 081's
+ * stage-2 follow-ups): the denied ones by `word-denylist.txt`, the rest
+ * because the rebuilt cache's scores put them just under the cut-off.
+ * The table the seed-91 sample was drawn from is today's with these put
+ * back and the judged additions taken out.
+ */
+const REMOVED_AFTER_SEED_91: readonly string[] = [
+  // Denied: a number stretched, or a word read inside a longer one.
+  "breathers",
+  "eightieth",
+  "eightieths",
+  "eighty",
+  "fifth",
+  "fourteenth",
+  "ghost",
+  "manifesto",
+  "nineties",
+  "ninety",
+  "phoned",
+  "phoning",
+  "sirloin",
+  "telephoned",
+  // Denied on review: the same senses as the above.
+  "breather",
+  "dialled",
+  "manifestos",
+  "sirloins",
+  "telephoning",
+  // Under the cut-off after the rebuild.
+  "halving",
+  "monologue",
+  "workforce",
+];
+
 describe("the held-out sample the table ships on", () => {
   /**
    * The held-out sample, drawn after the cut-off was chosen (README): the
-   * table it is drawn from is the one committed, and it is judged before
-   * the table ships.
+   * table it is drawn from is the one committed then, and it is judged
+   * before the table ships.
    */
+  const here = path.dirname(path.join(root, HINT_TABLE_FILE));
   const sampleText = readFileSync(
-    path.join(
-      path.dirname(path.join(root, HINT_TABLE_FILE)),
-      "judged-z7-seed91.tsv",
-    ),
+    path.join(here, "judged-z7-seed91.tsv"),
     "utf8",
   );
   const drawnAt = Number(/table at z >= ([\d.]+)\./.exec(sampleText)?.[1]);
@@ -335,6 +368,22 @@ describe("the held-out sample the table ships on", () => {
       const [, word, hint, z] = line.split("\t");
       return { word, hint, z: Number(z) };
     });
+  /** The rebuild's added hints, each judged: the word, the hint, the verdict. */
+  const added = readFileSync(
+    path.join(here, "judged-added-2026-11-19.tsv"),
+    "utf8",
+  )
+    .split("\n")
+    .filter((line) => line && !line.startsWith("#") && !line.startsWith("n\t"))
+    .map((line) => {
+      const [, word, hint, verdict] = line.split("\t");
+      return { word, hint, verdict };
+    });
+  const removed = new Set(REMOVED_AFTER_SEED_91);
+  const hintOf = new Map<string, string>();
+  for (const [gloss, forms, words] of table.hints)
+    for (const word of words.split(" "))
+      hintOf.set(word, `related: ${forms.join(", ")} ‘${gloss}’`);
 
   it("was drawn at the committed table's cut-off", () => {
     expect(drawnAt).toBe(7);
@@ -343,28 +392,50 @@ describe("the held-out sample the table ships on", () => {
     expect(table.asked).toBe(drawnAt);
   });
 
-  it("holds 200 of the table's hints, each the table's hint for its word", () => {
+  it("holds 200 hints, each the table's hint for its word or one removed since", () => {
     expect(drawn).toHaveLength(SAMPLE_SIZE);
-    const hintOf = new Map<string, string>();
-    for (const [gloss, forms, words] of table.hints)
-      for (const word of words.split(" "))
-        hintOf.set(word, `related: ${forms.join(", ")} ‘${gloss}’`);
     for (const one of drawn) {
-      expect(hintOf.get(one.word), one.word).toBe(one.hint);
+      expect(hintOf.get(one.word), one.word).toBe(
+        removed.has(one.word) ? undefined : one.hint,
+      );
       expect(one.z).toBeGreaterThanOrEqual(drawnAt);
+    }
+    for (const word of removed) expect(hintOf.has(word), word).toBe(false);
+  });
+
+  it("judged every hint the rebuild added, and denied the one judged wrong", () => {
+    // An added word left unjudged would make the redraw below's table
+    // one word too long, so that test guards this file's completeness.
+    for (const one of added) {
+      expect(["good", "loose", "wrong"], one.word).toContain(one.verdict);
+      if (one.verdict === "wrong")
+        expect(WORD_DENYLIST.has(one.word), one.word).toBe(true);
+      // "bastards" (loose) was denied on review too.
+      expect(hintOf.get(one.word), one.word).toBe(
+        WORD_DENYLIST.has(one.word) ? undefined : one.hint,
+      );
     }
   });
 
-  it("is the sample the table draws with its seed", () => {
-    // The build draws among the kept words, ordered by word, which are
-    // exactly the table's words.
-    const words = table.hints.flatMap(([, , list]) => list.split(" "));
+  /** The words of the table the sample was drawn from. */
+  function drawSampleWords(): string[] {
+    const today = table.hints.flatMap(([, , list]) => list.split(" "));
+    const judgedHere = new Set(added.map((one) => one.word));
+    return [...today.filter((word) => !judgedHere.has(word)), ...removed].sort(
+      (a, b) => (a < b ? -1 : a > b ? 1 : 0),
+    );
+  }
+
+  it("is the sample that table draws with its seed", () => {
+    // The build draws among the kept words, ordered by word.
+    const words = drawSampleWords();
+    expect(words).toHaveLength(1670);
     expect(drawSample(words, (word) => word, SAMPLE_SIZE, seed)).toEqual(
       drawn.map((one) => one.word),
     );
   });
 
-  it("passes S11's bar", () => {
+  it("passes S11's bar, and still does without the removed words", () => {
     const { judged, unjudged } = readVerdicts(sampleText);
     expect(unjudged).toBe(0);
     expect(judged).toHaveLength(SAMPLE_SIZE);
@@ -373,6 +444,18 @@ describe("the held-out sample the table ships on", () => {
       good: 84,
       loose: 112,
       wrong: 4,
+      passes: true,
+    });
+    // The four wrong rows are among the denied, chosen from this very
+    // sample, so the zero below is no fresh measurement: it shows only
+    // that the removals took out nothing the bar relied on. "phoned"
+    // (good) was denied for the telephone sense; monologue (loose) and
+    // workforce (good) fell under the cut-off.
+    expect(score(judged.filter((one) => !removed.has(one.word))).all).toEqual({
+      n: 193,
+      good: 82,
+      loose: 111,
+      wrong: 0,
       passes: true,
     });
   });

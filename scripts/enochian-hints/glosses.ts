@@ -94,11 +94,13 @@ export const isGrammarGloss = (text: string) =>
 
 /**
  * Tablet and Aethyr names, ministers, letters: a name, not a meaning
- * (the spike's filter, unchanged). The tablets build them from shared
- * letters, so their glosses say nothing a reader's word could mean.
+ * (the spike's filter, with the first three Aethyrs and the Heptarchy's
+ * king and prince added in plan 081's follow-ups). The tablets build
+ * them from shared letters, so their glosses say nothing a reader's
+ * word could mean.
  */
 const NAME =
-  /^(servient|kerubic) (arch)?angel|^senior |^(\d+(st|nd|rd|th)|first|second|third|fourth|fifth|sixth) minister of|^\d+ ?(st|nd|rd|th) aethyr|^\w+th aethyr$|^the \d+ ?(st|nd|rd|th)? aethyr|^angel (of )?\w+ in \w+|king of \w+ tablet|god-names?\b|^enochian letter|^name of|angel's name|^warden of aethyr|^zodiacal king|elemental king|^(a )?holy name of/;
+  /^(servient|kerubic) (arch)?angel|^senior |^(\d+(st|nd|rd|th)|first|second|third|fourth|fifth|sixth) minister of|^\d+ ?(st|nd|rd|th) aethyr|^(\w+th|first|second|third) aethyr$|^the \w+ aire$|^the \d+ ?(st|nd|rd|th)? aethyr|^angel (of )?\w+ in \w+|king of \w+ tablet|god-names?\b|^enochian letter|^name of|angel's name|^warden of aethyr|^zodiacal king|elemental king|^(a )?holy name of|^(king|prince) of heptarchy$/;
 export const isNameGloss = (text: string) => NAME.test(text);
 
 /**

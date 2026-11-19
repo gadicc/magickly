@@ -502,6 +502,21 @@ const REMOVED_IN_2H: readonly (readonly [string, string])[] = [
   ["VLLA", "UL, VLS, GALVAH ‘the ends’"],
 ];
 
+/**
+ * The pairs the 19 November 2026 rebuild took out (plan 081's stage-2
+ * follow-ups): the name rule now reads "king/prince of heptarchy" as
+ * names, and the rebuilt cache's scores put four other pairs under the
+ * cut-off. It added two, judged in `judged-added-2026-11-19.tsv`.
+ */
+const REMOVED_AFTER_2H: readonly (readonly [string, string])[] = [
+  ["ADAPH", "NA ‘lord of hosts’"],
+  ["ADEPH", "NA ‘lord of hosts’"],
+  ["BLIORS", "BLIARD ‘with comfort’"],
+  ["CARMARA", "HAGONEL ‘prince of heptarchy’"],
+  ["HAGONEL", "CARMARA ‘king of heptarchy’"],
+  ["LVCE", "LUCAL ‘north’"],
+];
+
 describe("the judged sample the related words shipped on", () => {
   /** The held-out sample, judged after its cut-off was chosen (README). */
   const judgedFile = readFileSync(
@@ -517,6 +532,21 @@ describe("the judged sample the related words shipped on", () => {
     readFileSync(path.join(root, RELATED_TABLE_FILE), "utf8"),
   ) as RelatedTable;
   const { judged, unjudged } = readVerdicts(judgedFile);
+  /** The rebuild's added pairs, each judged: entry, related word, verdict. */
+  const added = readFileSync(
+    path.join(
+      path.dirname(path.join(root, RELATED_TABLE_FILE)),
+      "judged-added-2026-11-19.tsv",
+    ),
+    "utf8",
+  )
+    .split("\n")
+    .filter((line) => line && !line.startsWith("#") && !line.startsWith("n\t"))
+    .map((line) => {
+      const [, entry, , hint, verdict] = line.split("\t");
+      return { entry, hint, verdict };
+    });
+  const allRemoved = [...REMOVED_IN_2H, ...REMOVED_AFTER_2H];
 
   it("was drawn at the committed table's cut-off", () => {
     expect(drawnAt).toBe(6.75);
@@ -525,7 +555,7 @@ describe("the judged sample the related words shipped on", () => {
     expect(table.asked).toBe(drawnAt);
   });
 
-  it("passes the bar, and every pair in it is the table's or one 2H removed", () => {
+  it("passes the bar, and every pair in it is the table's or one removed since", () => {
     expect(unjudged).toBe(0);
     expect(judged).toHaveLength(SAMPLE_SIZE);
     expect(score(judged).all).toEqual({
@@ -538,14 +568,15 @@ describe("the judged sample the related words shipped on", () => {
     const index = relatedIndex(table);
     const text = (item: RelatedItem) =>
       `${item.forms.map((one) => one.form).join(", ")} ‘${item.gloss}’`;
-    const removed = new Set(REMOVED_IN_2H.map((one) => one.join("\t")));
+    const removed = new Set(allRemoved.map((one) => one.join("\t")));
     const kept = judged.filter(
       (one) => !removed.has(`${one.word}\t${one.hint}`),
     );
-    // Four of the 200 were among the removed; the rest still pass.
+    // Four of the 200 were among 2H's removed and one (ADEPH's NA, good)
+    // among the rebuild's; the rest still pass.
     expect(score(kept).all).toEqual({
-      n: 196,
-      good: 140,
+      n: 195,
+      good: 139,
       loose: 53,
       wrong: 3,
       passes: true,
@@ -556,11 +587,24 @@ describe("the judged sample the related words shipped on", () => {
       );
       expect(one.z).toBeGreaterThanOrEqual(drawnAt);
     }
-    for (const [entry, hint] of REMOVED_IN_2H)
+    for (const [entry, hint] of allRemoved)
       expect((index.get(entry) ?? []).map(text), entry).not.toContain(hint);
   });
 
-  it("is the sample the table, with 2H's removed pairs, draws with its seed", () => {
+  it("judged every pair the rebuild added, none wrong", () => {
+    const index = relatedIndex(table);
+    const text = (item: RelatedItem) =>
+      `${item.forms.map((one) => one.form).join(", ")} ‘${item.gloss}’`;
+    expect(added.length).toBeGreaterThan(0);
+    for (const one of added) {
+      expect(["good", "loose"], one.entry).toContain(one.verdict);
+      expect((index.get(one.entry) ?? []).map(text), one.entry).toContain(
+        one.hint,
+      );
+    }
+  });
+
+  it("is the sample the table, with the removed pairs and without the added, draws with its seed", () => {
     // The draw orders pairs by entry, then by the gloss's place among the
     // glosses; the build's places are those after `englishOnly`, which
     // keeps the candidates' order, so the candidates' places order them
@@ -569,19 +613,26 @@ describe("the judged sample the related words shipped on", () => {
     const place = new Map(
       hintGlosses(translator).map((one, at) => [one.shown, at]),
     );
-    const pairs = [...relatedIndex(table)].flatMap(([entry, items]) =>
-      items.map((item) => ({
-        entry,
-        gloss: place.get(item.gloss) as number,
-        hint: `${item.forms.map((one) => one.form).join(", ")} ‘${item.gloss}’`,
-      })),
-    );
-    for (const [entry, hint] of REMOVED_IN_2H)
+    const addedPairs = new Set(added.map((one) => `${one.entry}\t${one.hint}`));
+    const pairs = [...relatedIndex(table)]
+      .flatMap(([entry, items]) =>
+        items.map((item) => ({
+          entry,
+          gloss: place.get(item.gloss) as number,
+          hint: `${item.forms.map((one) => one.form).join(", ")} ‘${item.gloss}’`,
+        })),
+      )
+      .filter((pair) => !addedPairs.has(`${pair.entry}\t${pair.hint}`));
+    for (const [entry, hint] of allRemoved) {
+      const gloss = /‘(.*)’$/.exec(hint)?.[1] ?? "";
       pairs.push({
         entry,
-        gloss: place.get(/‘(.*)’$/.exec(hint)?.[1] ?? "") as number,
+        // The Heptarchy's glosses are names now, so have no place; each
+        // is its entry's only pair, so any place draws alike.
+        gloss: place.get(gloss) ?? (/heptarchy/.test(gloss) ? 0 : undefined),
         hint,
-      });
+      } as { entry: string; gloss: number; hint: string });
+    }
     for (const pair of pairs) expect(pair.gloss, pair.hint).toBeDefined();
     const drawn = sampleRelated(pairs, SAMPLE_SIZE, seed);
     expect(drawn.map((one) => [one.entry, one.hint])).toEqual(

@@ -46,3 +46,17 @@ understating: understand  # understate
 hood: self hood  # a head's covering
 momentous: of moment  # important; OANIO's is "of a moment"
 swordfish: sword  # a fish
+nigh: night  # near, not DOSIG's night
+
+# A number stretched to another, or a word read inside a longer one
+# (plan 081's borderline hints, denied after the seed-91 judging).
+eightieth eightieths eighty: eight  # eighty, not P's eight
+nineties ninety: nineteen  # ninety, not AF's nineteen
+fourteenth: fourth  # fourteenth, not ES's fourth
+fifth: not fifth  # AGO denies the fifth
+sirloin sirloins: loins  # a cut of beef
+manifesto manifestos: manifest  # a declaration, not ORDAN's manifest
+breather breathers: breath  # rests, not GIGIPAH's breath
+dialled phoned phoning telephoned telephoning: call  # the telephone, not JUMD's calling
+ghost: holy ghost  # any ghost, not only the Holy Ghost
+bastards: you sons  # an insult, not NOROMI's sons (judged loose; denied on review)

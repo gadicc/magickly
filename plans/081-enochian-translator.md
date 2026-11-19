@@ -1716,16 +1716,15 @@ This plan's questions for an expert, with plan 077's, are in
     runs transactions one at a time).
   - The Keys rows where Casaubon's English and the dictionary part ways
     ([plan 082](082-enochian-expert-questions.md)).
-  - The dictionary's likely data slips: LUIAHE's "a Song of honour",
-    GESCO's two glosses, and the related words' name-like glosses
-    ("king/prince of heptarchy" for CARMARA and HAGONEL; "first, second
-    and third aethyr" missed by the name rule).
-  - Borderline hints left in, for the next re-judging: "girders" by
-    "beams", the telephone senses of "call", "execution", "sirloin",
-    "manifesto", number words stretched (eighty, ninety, fourteenth),
-    and the seed-91 sample's four wrong rows.
+  - Done 19 November 2026 (below): LUIAHE's slip, the related words'
+    name-like glosses and the borderline hints. GESCO stays: its
+    remaining pairs are fair. Left in as fair pointers: "girders" by
+    "beams", "execution" by "execute", "eighth" by "eight", "ninth" by
+    "nine" and "ghosts" by "spirits".
   - The translator's and the dictionary's text aren't marked for Lingui
-    (2E's, 2F's and 2G's text followed the files as they are).
+    (2E's, 2F's and 2G's text followed the files as they are). Plan
+    086's batch T9 (T9a the dictionary, T9c the translator) covers it,
+    with the Hebrew translation and its browser review.
   - The dictionary page's other links and the app bar's sign-in
     prefetch send the page's address, `?q=` included, as the Referer to
     our own server; no `Referrer-Policy` is set. The server already
@@ -1781,3 +1780,35 @@ Done after the build:
   "one, everlasting"). A reader's "'d" is "would" unless its stem is a
   verb our English has (call'd is called); "lov'd" still reads "lov
   would".
+- 19 November 2026: the stage-2 follow-ups' data and hint fixes.
+  - LUIAHE's dictionary meaning is "honor, a song of": Casaubon prints
+    "a Song of honour", and "son" was a mis-split. A reader's "song"
+    now reads LUIAHE, not a gap. Figures: forms 283, chips 114, gaps
+    225 (36 with a nearest form); site search's vectors are
+    republished for the page's figures.
+  - The gap hints' name rule takes "first, second and third aethyr",
+    "the first aire" and "king/prince of heptarchy" for names (every
+    other Aethyr already was), so CARMARA and HAGONEL are no longer
+    each other's related word.
+  - The word denylist takes out the borderline hints: numbers stretched
+    (eighty, ninety, fourteenth, fifth by "not the fifth"), words read
+    inside longer ones (sirloin(s), manifesto(s), breather(s)), the
+    Holy Ghost for any ghost, the telephone senses of "call" (phoned,
+    phoning, telephoned, telephoning, dialled), "nigh" by "night"
+    (judged wrong after the rebuild) and "bastards" by "you sons"
+    (judged loose, denied on review).
+  - The vector cache was lost with the stage-2 worktree, so Gadi
+    re-embedded it (about $0.07) and both tables were rebuilt from it.
+    The scores moved slightly: three hints and four related pairs fell
+    under the cut-offs, and 14 hints and two related pairs came in; a
+    fresh judge judged every addition (the hints 8 good, 5 loose, 1
+    wrong; the pairs 1 good, 1 loose), committed beside each table. The
+    held-out samples still pass without their removed rows: hints 82
+    good, 111 loose, 0 wrong of 193 (its wrong rows were the ones
+    denied, so not a fresh measurement); related words 139, 53 and 3 of
+    195.
+    The tests redraw each sample from today's table with the removals
+    put back and the additions taken out. Whether the new vectors equal
+    the old is unchecked (main's own inputs need five glosses the new
+    cache lacks). Hints 1,660 words under 425 glosses; related words
+    461 entries.
