@@ -96,11 +96,20 @@ export interface KircherNation {
   entry: string;
 }
 
+/** An entry that names no nation but says whose the name is. */
+export interface KircherRemark {
+  no: number;
+  /** The entry's own words that say it. */
+  quote: string;
+  /** What to say beside the row in the first table. */
+  remark: string;
+}
+
 interface KircherFile {
   rays: KircherRay[];
   departures: KircherDeparture[];
   nations: KircherNation[];
-  remarks: { no: number; quote: string; remark: string }[];
+  remarks: KircherRemark[];
 }
 
 const kircher = kircherPlate as KircherFile;
@@ -112,7 +121,7 @@ export const kircherRays = (): KircherRay[] => kircher.rays;
 export const kircherDepartures = (): KircherDeparture[] => kircher.departures;
 
 /** The rows whose entry names no nation but says whose the name is. */
-export const kircherRemarks = () => kircher.remarks;
+export const kircherRemarks = (): KircherRemark[] => kircher.remarks;
 
 /** The nations accepted as the same people, one for every ray not departed from. */
 export const kircherNations = (): KircherNation[] => kircher.nations;
