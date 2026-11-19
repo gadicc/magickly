@@ -3,6 +3,10 @@ import tablets, { tabletVersion } from "magick-data/enochian/tablets";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import Tablet, {
+  REGION_TINTS,
+  regionFromPosition,
+  type TabletHighlights,
+  tabletGround,
   tabletName,
   tabletViewBox,
   UNION_VIEWBOX,
@@ -396,5 +400,183 @@ describe("Tablet", () => {
         "EXARPHCOMANANTABITOM",
       );
     });
+  });
+});
+
+describe("Tablet's highlight kinds", () => {
+  // Earth's Laidrom, row 7 leftward from square 7 (counted from 1).
+  const senior = Array.from({ length: 7 }, (_, step) => ({
+    row: 6,
+    column: 6 - step,
+  }));
+  /** Drawn with these highlights, and no squares outlined unless given. */
+  const drawWith = (
+    highlights: Omit<TabletHighlights, "squares"> & {
+      squares?: TabletHighlights["squares"];
+    },
+    id = "earth",
+  ) =>
+    renderToStaticMarkup(
+      <Tablet tablet={id} highlights={{ squares: [], ...highlights }} />,
+    );
+  /** A highlight's layer, up to the next one or the end. */
+  const layer = (markup: string, kind: string) => {
+    const start = markup.indexOf(`<g data-highlight="${kind}">`);
+    if (start < 0) return "";
+    const next = markup.indexOf("<g data-highlight=", start + 1);
+    return markup.slice(start, next < 0 ? undefined : next);
+  };
+
+  it("leaves the drawing as it was when nothing is asked for", () => {
+    for (const highlights of [
+      { squares: [] },
+      { squares: [], regions: false, name: undefined, preview: undefined },
+      { squares: [], anySquare: true, onSelect: () => {} },
+    ])
+      expect(drawWith(highlights)).toBe(
+        renderToStaticMarkup(<Tablet tablet="earth" />),
+      );
+  });
+
+  it("dims every other square for a chosen name, outlines and flags it", () => {
+    const markup = drawWith({ name: { squares: senior } });
+    const chosen = layer(markup, "name");
+    // One veil over the 149 other squares, as one path.
+    const veil = chosen.match(
+      /<path d="([^"]*)" style="fill:white;fill-opacity:0.72"/,
+    );
+    expect(veil?.[1].match(/M/g)).toHaveLength(156 - 7);
+    expect(veil?.[1]).not.toContain("M102 122h20"); // row 7, square 6
+    // Each square outlined in the dark violet, the first flagged.
+    expect(chosen.match(/stroke:#4a0072;stroke-width:1.4/g)).toHaveLength(7);
+    expect(chosen.match(/data-start=""/g)).toHaveLength(1);
+    expect(chosen).toContain('d="M122.6 122.6h8L122.6 130.6Z"');
+    // No numbers unless asked for.
+    expect(chosen).not.toContain("data-order");
+    // Over the letters, after the last square's.
+    expect(markup.indexOf('data-highlight="name"')).toBeGreaterThan(
+      markup.lastIndexOf("</text>", markup.indexOf('data-highlight="name"')),
+    );
+    expect(markup).not.toContain("dasharray");
+  });
+
+  it("numbers a chosen name's squares in its bottom left corners when asked", () => {
+    const markup = drawWith({
+      name: { squares: senior, numbers: senior.map((_, index) => index + 1) },
+    });
+    const numbers = [
+      ...markup.matchAll(
+        /<g data-order="(\d+)"><circle cx="([\d.]+)" cy="([\d.]+)"/g,
+      ),
+    ];
+    expect(numbers.map((match) => Number(match[1]))).toEqual([
+      1, 2, 3, 4, 5, 6, 7,
+    ]);
+    // Square 7 of row 7: x 122 to 142, y 122 to 142; the corner, not the
+    // top right where second letters go.
+    expect(numbers[0]?.slice(2).map(Number)).toEqual([126.8, 137.2]);
+  });
+
+  it("rings a previewed name without dimming the rest", () => {
+    const markup = drawWith({ preview: { squares: senior } });
+    const preview = layer(markup, "preview");
+    expect(preview.match(/stroke:white;stroke-width:4/g)).toHaveLength(7);
+    expect(preview.match(/stroke:#c0f;stroke-width:2.4/g)).toHaveLength(7);
+    expect(preview.match(/data-start=""/g)).toHaveLength(1);
+    expect(markup).not.toContain("fill-opacity:0.72");
+    expect(markup).not.toContain("dasharray");
+  });
+
+  it("draws a chosen name and a previewed one together", () => {
+    const markup = drawWith({
+      name: { squares: senior },
+      preview: { squares: [{ row: 0, column: 0 }] },
+    });
+    expect(markup.indexOf('data-highlight="name"')).toBeLessThan(
+      markup.indexOf('data-highlight="preview"'),
+    );
+  });
+
+  it("tints the crosses under the letters and hatches the top rows over them", () => {
+    const markup = drawWith({ regions: true });
+    const tints = markup.indexOf('data-regions="tints"');
+    const firstLetter = markup.indexOf(
+      "<text",
+      markup.indexOf('viewBox="0 0 244 264"'),
+    );
+    const lastGround = markup.lastIndexOf("stroke-width:1.2", tints);
+    expect(tints).toBeGreaterThan(lastGround);
+    expect(tints).toBeLessThan(firstLetter);
+    // Every square's ground before the tints, every letter after them.
+    expect(markup.slice(tints).match(/stroke-width:1.2/g)).toBeNull();
+    expect(markup.slice(0, tints)).not.toContain("<text");
+    const region = (name: string) =>
+      markup.match(new RegExp(`data-region="${name}" d="([^"]*)"`))?.[1] ?? "";
+    expect(region("greatCross").match(/M/g)).toHaveLength(36);
+    expect(region("calvaryCross").match(/M/g)).toHaveLength(40);
+    expect(markup).toContain(
+      `fill:${REGION_TINTS.greatCross.fill};fill-opacity:${REGION_TINTS.greatCross.opacity}`,
+    );
+    // The hatch: lines over the 16 top-row squares, after the letters.
+    const hatch = markup.indexOf('data-region="topRow"');
+    expect(hatch).toBeGreaterThan(markup.lastIndexOf("<text", hatch));
+    expect(region("topRow").match(/M/g)?.length).toBeGreaterThan(16 * 3);
+    expect(markup).not.toContain("<pattern");
+    expect(markup).not.toContain("dasharray");
+    // The same letters, in the same order.
+    expect(letters(markup)).toEqual(letters(drawWith({})));
+  });
+
+  it("places the regions as the names' paths do", () => {
+    const counts: Record<string, number> = {};
+    for (let row = 0; row < 13; row++)
+      for (let column = 0; column < 12; column++) {
+        const region = regionFromPosition(row, column);
+        counts[region] = (counts[region] ?? 0) + 1;
+      }
+    expect(counts).toEqual({
+      greatCross: 36,
+      calvaryCross: 40,
+      topRow: 16,
+      servient: 64,
+    });
+    expect(regionFromPosition(0, 0)).toBe("topRow");
+    expect(regionFromPosition(7, 0)).toBe("topRow");
+    expect(regionFromPosition(8, 0)).toBe("calvaryCross");
+    expect(regionFromPosition(12, 11)).toBe("servient");
+  });
+
+  it("names each Watchtower's ground", () => {
+    expect(tabletGround("earth")).toBe("black");
+    expect(tabletGround("air")).toBe("#fff100");
+    expect(tabletGround("water")).toBe("#59f");
+    expect(tabletGround("fire")).toBe("#f33");
+    expect(tabletGround("union")).toBeUndefined();
+    expect(tabletGround("constructor")).toBeUndefined();
+  });
+
+  it("keeps clicks off every layer it draws over the squares", () => {
+    const markup = drawWith({
+      regions: true,
+      name: { squares: senior, numbers: [1, 2, 3, 4, 5, 6, 7] },
+      preview: { squares: [{ row: 0, column: 0 }] },
+    });
+    // The tints under the letters, and the hatch, veil, outlines, rings,
+    // flags and numbers over them.
+    expect(markup).toContain(
+      '<g data-regions="tints" style="pointer-events:none">',
+    );
+    const over = markup.indexOf('<g style="pointer-events:none">');
+    expect(over).toBeGreaterThan(-1);
+    for (const layer of [
+      'data-region="topRow"',
+      'data-highlight="name"',
+      'data-highlight="preview"',
+      "data-start",
+      "data-order",
+    ])
+      expect(markup.indexOf(layer), layer).toBeGreaterThan(over);
+    // Nothing clickable follows but the outlined squares and the frame.
+    expect(markup.slice(over).match(/<g data-regions/)).toBeNull();
   });
 });

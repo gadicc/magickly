@@ -1,10 +1,15 @@
 import { type TabletProps, TabletSvg, tabletName } from "./tabletSvg.tsx";
 
 export {
+  REGION_HATCH,
+  REGION_TINTS,
+  regionFromPosition,
   type TabletHighlights,
+  type TabletNameHighlight,
   type TabletProps,
   type TabletSquare,
   type TabletViewBox,
+  tabletGround,
   tabletName,
   tabletViewBox,
   UNION_VIEWBOX,

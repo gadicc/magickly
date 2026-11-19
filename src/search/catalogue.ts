@@ -5,6 +5,15 @@ import planets from "magick-data/astrology/planets";
 import zodiacs from "magick-data/astrology/zodiac";
 import dictionary from "magick-data/enochian/dictionary";
 import keys, { aethyrs, keyTitle, keyVersion } from "magick-data/enochian/keys";
+import {
+  TABLET_QUARTERS,
+  type TabletName,
+  tabletNames,
+} from "magick-data/enochian/tabletNames";
+import tablets, {
+  tabletVersion,
+  WATCHTOWER_IDS,
+} from "magick-data/enochian/tablets";
 import grades from "magick-data/gd/grades";
 import figures from "magick-data/geomancy/tetragrams";
 import { divisions, leavesOf } from "magick-data/kabbalah/lenain/volume";
@@ -101,6 +110,54 @@ export function searchSections(
     if (offset + 180 >= tokens.length) break;
   }
   return sections;
+}
+
+/** The Watchtowers' and the Golden Dawn's quarters' elements, as named. */
+const ELEMENTS: Readonly<Record<string, string>> = {
+  earth: "Earth",
+  air: "Air",
+  water: "Water",
+  fire: "Fire",
+};
+
+/** The Golden Dawn's element of each quarter of a Watchtower, by place. */
+const QUARTER_ELEMENTS = {
+  topLeft: "Air",
+  topRight: "Water",
+  bottomLeft: "Earth",
+  bottomRight: "Fire",
+} as const;
+
+/**
+ * The Golden Dawn's names of each Watchtower, which the tablets page
+ * reads off the letters in code and site search cannot find in its JSX
+ * (plan 090, decision 9): "Holy names: Mor Dial Hctga. King: Iczhihal.
+ * Seniors: … Air of Earth: …", spelled as the page lists them.
+ */
+export function tabletNamesText(): [string, string][] {
+  const shown = (name: TabletName) =>
+    name.spelling.charAt(0).toUpperCase() +
+    name.spelling.slice(1).toLowerCase();
+  return WATCHTOWER_IDS.flatMap((id) => {
+    const view = tabletVersion(tablets[id], "gd");
+    if (!view) return [];
+    const names = tabletNames(view);
+    const of = (kind: TabletName["kind"]) =>
+      names.filter((name) => !name.quarter && name.kind === kind).map(shown);
+    const lines = [
+      `Holy names: ${of("holyName").join(" ")}.`,
+      `King: ${of("king").join(" ")}.`,
+      `Seniors: ${of("senior").join(" ")}.`,
+      ...TABLET_QUARTERS.map(
+        (quarter) =>
+          `${QUARTER_ELEMENTS[quarter]} of ${ELEMENTS[id]}: ${names
+            .filter((name) => name.quarter === quarter)
+            .map(shown)
+            .join(" ")}.`,
+      ),
+    ];
+    return [[id, lines.join(" ")]];
+  });
 }
 
 const ALIASES: Record<string, string[]> = {
@@ -229,6 +286,13 @@ export async function buildSearchCatalogue(): Promise<SearchCatalogue> {
           ].join(" "),
         )
         .join(", "),
+    );
+  for (const [id, text] of tabletNamesText())
+    add(
+      "/enochian/tablets",
+      `names-${id}`,
+      `The ${ELEMENTS[id]} tablet's names`,
+      text,
     );
   for (const [word, entry] of Object.entries(dictionary))
     add("/enochian/dictionary", word, word, words(entry.meanings));

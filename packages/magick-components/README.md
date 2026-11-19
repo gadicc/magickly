@@ -499,6 +499,49 @@ objects themselves, and hands them out frozen. So give it a layout or
 profile that does not change after first use; to change one, make a new
 object.
 
+## A tablet's highlights
+
+`Tablet` draws over a Watchtower's grid what `highlights` asks for, one
+layer at a time, so the letters, the Enochian font and the mirrored
+letters are untouched and an export draws what is shown. None of it is
+drawn with dashes. A name's squares are given in reading order, as
+magick-data's `enochian/tabletNames` gives them (from its next release);
+here Earth's Senior Laidrom, read leftward along the seventh row:
+
+```tsx
+import Tablet from "magick-components/enochian/Tablet";
+
+// Row 7 from the centre to the edge, counting rows and columns from 0.
+const laidrom = [6, 5, 4, 3, 2, 1, 0].map((column) => ({ row: 6, column }));
+
+export const ChosenSenior = () => (
+  <Tablet
+    tablet="earth"
+    highlights={{
+      // No squares outlined.
+      squares: [],
+      // The rest dimmed, the name outlined, its first square flagged and
+      // each numbered in its bottom left corner.
+      name: {
+        squares: laidrom,
+        numbers: laidrom.map((_, index) => index + 1),
+      },
+      // The Great Cross and the Calvary crosses tinted, the top rows
+      // hatched.
+      regions: true,
+    }}
+  />
+);
+```
+
+`preview` rings a name's squares without dimming the rest, for a name
+under the pointer; `squares` (always given, `[]` for none) and `selected`
+outline squares as before;
+and `onSelect` is called for a square clicked, an outlined one, or any
+with `anySquare`. Leave out `numbers` where the squares are too small to
+read them. The pointer is a shortcut only: offer the same choices in a
+list for keyboards and screen readers.
+
 ## What you supply
 
 - **An Enochian font.** `Tablet` draws the Latin transliteration unless you

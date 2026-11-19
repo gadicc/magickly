@@ -116,6 +116,17 @@ const tabletColors: Readonly<Record<string, TabletColors>> = {
 };
 
 /**
+ * The ground a Watchtower's angles are painted in, outside its crosses
+ * (whose squares are white): black for Earth, yellow for Air, blue for
+ * Water, red for Fire. Nothing for a key that is not a Watchtower's.
+ */
+export function tabletGround(id: string): string | undefined {
+  return Object.hasOwn(tabletColors, id)
+    ? tabletColors[id]?.background
+    : undefined;
+}
+
+/**
  * Which sigils each version draws: Regardie's for the Golden Dawn's and
  * his own, the Equinox's for its own, and none for Dee's and Raphael's
  * tables, which carry none (the Golden Dawn takes its sigils from Dee's
@@ -173,16 +184,90 @@ export interface TabletSquare {
 }
 
 /**
- * Squares to outline over a Watchtower's grid, one of them selected, and
- * what a click on one does. The outlines are drawing only; a page that
- * offers them gives keyboard and screen-reader users the same choice in a
- * list.
+ * A name's squares to mark over a Watchtower's grid, in reading order (as
+ * magick-data's `enochian/tabletNames` gives them): a flag marks the
+ * first.
+ */
+export interface TabletNameHighlight {
+  /** The squares, in reading order. */
+  squares: readonly TabletSquare[];
+  /**
+   * The reading order, drawn small in each square's bottom left corner
+   * (clear of the second letters, top right): the number for each of
+   * `squares`, in the same order. None drawn when absent; leave it out
+   * where the squares are too small to read it.
+   */
+  numbers?: readonly number[];
+}
+
+/**
+ * What to draw over a Watchtower's grid, and what a click on a square
+ * does. All of it is drawing and pointer only; a page that offers it
+ * gives keyboard and screen-reader users the same choices in a list.
+ * Nothing is drawn with dashes, which an export may strip.
+ *
+ * - `squares` are outlined, `selected` among them more boldly, and a
+ *   click on one calls `onSelect`;
+ * - `anySquare` lets a click on any square of the grid call `onSelect`;
+ * - `name` is a chosen name: every other square veiled in white, its own
+ *   kept in their colours inside a dark violet outline;
+ * - `preview` is a name looked at but not chosen: a violet ring round
+ *   each square, the rest left as drawn;
+ * - `regions` tints the Great Cross and the Calvary crosses under the
+ *   letters, hatches the top rows over theirs, and leaves the servient
+ *   squares plain.
  */
 export interface TabletHighlights {
+  /** Squares to outline; none with `[]`. */
   squares: readonly TabletSquare[];
+  /** One of `squares`, outlined more boldly. */
   selected?: TabletSquare;
+  /** A click on an outlined square, or on any with `anySquare`. */
   onSelect?: (square: TabletSquare) => void;
+  /** A click on any square of the grid calls `onSelect`. */
+  anySquare?: boolean;
+  /** A chosen name: the rest dimmed, its squares outlined and flagged. */
+  name?: TabletNameHighlight;
+  /** A name previewed: its squares ringed and flagged. */
+  preview?: TabletNameHighlight;
+  /** Tint the Great Cross, the Calvary crosses and the top rows. */
+  regions?: boolean;
 }
+
+/**
+ * The regions a Watchtower's square lies in, by row and column from 0:
+ * the Great Cross (row 6, columns 5 and 6), a quarter's Calvary cross
+ * (its middle column and second row), a quarter's top row (the Kerubic
+ * squares) or its servient squares. The same lines as
+ * `isCrossFromPosition`.
+ */
+export function regionFromPosition(
+  row: number,
+  column: number,
+): "greatCross" | "calvaryCross" | "topRow" | "servient" {
+  if (row === 6 || column === 5 || column === 6) return "greatCross";
+  const quarterRow = row < 6 ? row : row - 7;
+  if (column === 2 || column === 9 || quarterRow === 1) return "calvaryCross";
+  return quarterRow === 0 ? "topRow" : "servient";
+}
+
+/** The highlights' ink: a chosen name's outline, flag and numbers. */
+const HIGHLIGHT_INK = "#4a0072";
+/** A previewed name's ring. */
+const HIGHLIGHT_RING = "#c0f";
+/** The regions' tints, under the letters on the crosses' white squares. */
+export const REGION_TINTS = Object.freeze({
+  greatCross: { fill: "#ffd54a", opacity: 0.55 },
+  calvaryCross: { fill: "#5fd3c6", opacity: 0.45 },
+});
+/** The top rows' hatch: white lines over the ground, at 45 degrees. */
+export const REGION_HATCH = Object.freeze({
+  stroke: "#fff",
+  opacity: 0.55,
+  width: 2,
+  /** The lines' distance apart, across them. */
+  spacing: 5,
+});
 
 /** How a grid draws its letters: reversed ones mirrored, second letters. */
 interface LetterOptions {
@@ -257,6 +342,256 @@ function AltLetters({
 /** A reversed letter's mirror about the vertical through `cx`. */
 const mirrorAt = (cx: number) => `translate(${2 * cx} 0) scale(-1 1)`;
 
+/** A grid's square: 20 units, inside a 2-unit border. */
+const SQUARE = 20;
+const BORDER = 2;
+const squareX = (column: number) => column * SQUARE + BORDER;
+const squareY = (row: number) => row * SQUARE + BORDER;
+const squareKey = ({ row, column }: TabletSquare) => `${row},${column}`;
+
+/** Every square of a Watchtower's grid, top row first. */
+const ALL_SQUARES: readonly TabletSquare[] = Array.from(
+  { length: 13 * 12 },
+  (_, index) => ({ row: Math.floor(index / 12), column: index % 12 }),
+);
+
+/** Squares as one path of their outlines, for a single fill. */
+const squaresPath = (squares: readonly TabletSquare[]) =>
+  squares
+    .map(
+      ({ row, column }) =>
+        `M${squareX(column)} ${squareY(row)}h${SQUARE}v${SQUARE}h${-SQUARE}Z`,
+    )
+    .join("");
+
+/**
+ * Lines at 45 degrees across squares, continuous from one square to the
+ * next: the parts of the lines x + y = c, c a multiple of the hatch's
+ * step, that cross each square.
+ */
+function hatchPath(squares: readonly TabletSquare[]) {
+  const step = REGION_HATCH.spacing * Math.SQRT2;
+  const round = (value: number) => Math.round(value * 1000) / 1000;
+  const parts: string[] = [];
+  for (const { row, column } of squares) {
+    const left = squareX(column);
+    const top = squareY(row);
+    const first = Math.ceil((left + top) / step);
+    const last = Math.floor((left + top + 2 * SQUARE) / step);
+    for (let n = first; n <= last; n++) {
+      const c = n * step;
+      // Where x + y = c enters the square from the top or left, and
+      // leaves it at the right or bottom.
+      const x0 = Math.min(left + SQUARE, c - top);
+      const x1 = Math.max(left, c - top - SQUARE);
+      if (x0 - x1 < 0.01) continue;
+      parts.push(
+        `M${round(x0)} ${round(c - x0)}L${round(x1)} ${round(c - x1)}`,
+      );
+    }
+  }
+  return parts.join("");
+}
+
+/** A flag in the top left corner of a name's first square. */
+function StartFlag({ square }: { square: TabletSquare }) {
+  const x = squareX(square.column) + 0.6;
+  const y = squareY(square.row) + 0.6;
+  return (
+    <path
+      data-start=""
+      d={`M${x} ${y}h8L${x} ${y + 8}Z`}
+      style={{
+        fill: HIGHLIGHT_INK,
+        stroke: "white",
+        strokeWidth: 0.7,
+        strokeLinejoin: "round",
+      }}
+    />
+  );
+}
+
+/** A square's place in the reading order, small in its bottom left corner. */
+function OrderNumber({
+  square,
+  number,
+}: {
+  square: TabletSquare;
+  number: number;
+}) {
+  const cx = squareX(square.column) + 4.8;
+  const cy = squareY(square.row) + SQUARE - 4.8;
+  return (
+    <g data-order={number}>
+      <circle
+        cx={cx}
+        cy={cy}
+        r={3.2}
+        style={{ fill: HIGHLIGHT_INK, stroke: "white", strokeWidth: 0.6 }}
+      />
+      <text
+        x={cx}
+        y={cy + 1.75}
+        style={{
+          fontSize: 5,
+          fontWeight: 700,
+          fontFamily: "sans-serif",
+          textAnchor: "middle",
+          fill: "white",
+        }}
+      >
+        {number}
+      </text>
+    </g>
+  );
+}
+
+/** The flag and the numbers of a name, over its squares. */
+function NameMarks({ name }: { name: TabletNameHighlight }) {
+  const [first] = name.squares;
+  return (
+    <>
+      {first && <StartFlag square={first} />}
+      {name.numbers?.map((number, index) => {
+        const square = name.squares[index];
+        return (
+          square && (
+            <OrderNumber
+              key={`n-${squareKey(square)}-${number}`}
+              square={square}
+              number={number}
+            />
+          )
+        );
+      })}
+    </>
+  );
+}
+
+/**
+ * A chosen name: every other square veiled in white, the name's own
+ * outlined in dark violet, its first flagged and, where given, each
+ * numbered. One layer over the drawing, so the letters are untouched.
+ */
+function ChosenName({ name }: { name: TabletNameHighlight }) {
+  const on = new Set(name.squares.map(squareKey));
+  const unique = [...new Map(name.squares.map((s) => [squareKey(s), s]))];
+  return (
+    <g data-highlight="name">
+      <path
+        d={squaresPath(
+          ALL_SQUARES.filter((square) => !on.has(squareKey(square))),
+        )}
+        style={{ fill: "white", fillOpacity: 0.72 }}
+      />
+      {unique.map(([key, { row, column }]) => (
+        <rect
+          key={`o-${key}`}
+          x={squareX(column) + 0.7}
+          y={squareY(row) + 0.7}
+          width={SQUARE - 1.4}
+          height={SQUARE - 1.4}
+          style={{ fill: "none", stroke: HIGHLIGHT_INK, strokeWidth: 1.4 }}
+        />
+      ))}
+      <NameMarks name={name} />
+    </g>
+  );
+}
+
+/**
+ * A name previewed: a violet ring with a white edge round each square,
+ * and its first flagged, the rest of the tablet as drawn.
+ */
+function PreviewedName({ name }: { name: TabletNameHighlight }) {
+  const unique = [...new Map(name.squares.map((s) => [squareKey(s), s]))];
+  const ring = (
+    key: string,
+    square: TabletSquare,
+    stroke: string,
+    width: number,
+  ) => (
+    <rect
+      key={key}
+      x={squareX(square.column) + 1.4}
+      y={squareY(square.row) + 1.4}
+      width={SQUARE - 2.8}
+      height={SQUARE - 2.8}
+      style={{ fill: "none", stroke, strokeWidth: width }}
+    />
+  );
+  return (
+    <g data-highlight="preview">
+      {unique.map(([key, square]) => ring(`w-${key}`, square, "white", 4))}
+      {unique.map(([key, square]) =>
+        ring(`r-${key}`, square, HIGHLIGHT_RING, 2.4),
+      )}
+      <NameMarks name={{ squares: name.squares }} />
+    </g>
+  );
+}
+
+/** The crosses' tints, drawn under the letters. */
+function RegionTints() {
+  const of = (region: keyof typeof REGION_TINTS) =>
+    ALL_SQUARES.filter(
+      ({ row, column }) => regionFromPosition(row, column) === region,
+    );
+  return (
+    // Drawing only: a click goes through to the square beneath.
+    <g data-regions="tints" style={{ pointerEvents: "none" }}>
+      {(["greatCross", "calvaryCross"] as const).map((region) => (
+        <path
+          key={region}
+          data-region={region}
+          d={squaresPath(of(region))}
+          style={{
+            fill: REGION_TINTS[region].fill,
+            fillOpacity: REGION_TINTS[region].opacity,
+          }}
+        />
+      ))}
+    </g>
+  );
+}
+
+/** The top rows' hatch, drawn over their letters. */
+function RegionHatch() {
+  return (
+    <path
+      data-region="topRow"
+      d={hatchPath(
+        ALL_SQUARES.filter(
+          ({ row, column }) => regionFromPosition(row, column) === "topRow",
+        ),
+      )}
+      style={{
+        fill: "none",
+        stroke: REGION_HATCH.stroke,
+        strokeOpacity: REGION_HATCH.opacity,
+        strokeWidth: REGION_HATCH.width,
+      }}
+    />
+  );
+}
+
+/**
+ * The square a click on the grid landed in, read from the clicked
+ * square's own rect or letter: their `x` and `y` lie inside it.
+ */
+function squareOfTarget(target: EventTarget | null): TabletSquare | undefined {
+  if (!(target instanceof Element)) return undefined;
+  const x = Number(target.getAttribute("x"));
+  const y = Number(target.getAttribute("y"));
+  if (!target.hasAttribute("x") || Number.isNaN(x) || Number.isNaN(y))
+    return undefined;
+  const column = Math.floor((x - BORDER) / SQUARE);
+  const row = Math.floor((y - BORDER) / SQUARE);
+  return row >= 0 && row < 13 && column >= 0 && column < 12
+    ? { row, column }
+    : undefined;
+}
+
 function Grid({
   id,
   tablet,
@@ -274,71 +609,132 @@ function Grid({
   const enochianFont = enochianStyle !== undefined;
   const reversed = reversedSquares(tablet, options);
   const alt = altLetters(tablet, options);
-  const size = 20;
-  const border = 2;
+  const size = SQUARE;
+  const border = BORDER;
+  const regions = highlights?.regions === true;
+
+  /** A square's ground, and its letters over it. */
+  const parts = (letter: string | null, x: number, y: number) => {
+    const element = elementFromPosition(x, y);
+    const isCross = isCrossFromPosition(x, y);
+    const fill = tabletColors[id]?.background || elementColors[element];
+    const color = tabletColors[id]?.color?.[element] || elementColors[element];
+    const ground = (
+      <rect
+        key={`r-${y}-${x}`}
+        x={x * size + border}
+        y={y * size + border}
+        width={size}
+        height={size}
+        style={{
+          strokeWidth: 1.2,
+          stroke: isCross
+            ? tabletColors[id]?.border || "black"
+            : tabletColors[id]?.borderCross || "black",
+          fill: isCross ? "white" : fill,
+        }}
+      />
+    );
+    const letters = (
+      <>
+        {letter !== null && (
+          <text
+            key={`t-${y}-${x}`}
+            x={x * size + size / 2 + border}
+            y={y * size + size / 2 + 6 + border}
+            transform={
+              reversed.has(`${y},${x}`)
+                ? mirrorAt(x * size + size / 2 + border)
+                : undefined
+            }
+            style={{
+              fontWeight: enochianFont ? "bold" : undefined,
+              fontSize: size - 2 - (enochianFont ? 4 : 0),
+              textAnchor: "middle",
+              fill: isCross ? "black" : color || undefined,
+              ...enochianStyle,
+            }}
+          >
+            {letter}
+          </text>
+        )}
+        {alt.has(`${y},${x}`) && (
+          <AltLetters
+            letters={alt.get(`${y},${x}`) ?? ""}
+            right={(x + 1) * size + border}
+            top={y * size + border}
+            fill={isCross ? "black" : color || undefined}
+            enochianStyle={enochianStyle}
+          />
+        )}
+      </>
+    );
+    return { ground, letters };
+  };
+
+  const onSelect = highlights?.onSelect;
+  const pickAny =
+    highlights?.anySquare && onSelect
+      ? (event: React.MouseEvent<SVGSVGElement>) => {
+          // An outlined square calls `onSelect` itself.
+          if (
+            event.target instanceof Element &&
+            event.target.closest("[data-square]")
+          )
+            return;
+          const square = squareOfTarget(event.target);
+          if (square) onSelect(square);
+        }
+      : undefined;
 
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox={`0 0 ${size * 12 + border * 2} ${size * 13 + border * 2}`}
+      // No cursor of its own, so the drawing's markup does not change;
+      // the page shows one.
+      onClick={pickAny}
     >
-      {tablet.grid.map((row, y) =>
-        row.map((letter, x) => {
-          const element = elementFromPosition(x, y);
-          const isCross = isCrossFromPosition(x, y);
-          const fill = tabletColors[id]?.background || elementColors[element];
-          const color =
-            tabletColors[id]?.color?.[element] || elementColors[element];
-
-          return (
-            <React.Fragment key={"grid-" + x + "," + y}>
-              <rect
-                key={`r-${y}-${x}`}
-                x={x * size + border}
-                y={y * size + border}
-                width={size}
-                height={size}
-                style={{
-                  strokeWidth: 1.2,
-                  stroke: isCross
-                    ? tabletColors[id]?.border || "black"
-                    : tabletColors[id]?.borderCross || "black",
-                  fill: isCross ? "white" : fill,
-                }}
-              />
-              {letter !== null && (
-                <text
-                  key={`t-${y}-${x}`}
-                  x={x * size + size / 2 + border}
-                  y={y * size + size / 2 + 6 + border}
-                  transform={
-                    reversed.has(`${y},${x}`)
-                      ? mirrorAt(x * size + size / 2 + border)
-                      : undefined
-                  }
-                  style={{
-                    fontWeight: enochianFont ? "bold" : undefined,
-                    fontSize: size - 2 - (enochianFont ? 4 : 0),
-                    textAnchor: "middle",
-                    fill: isCross ? "black" : color || undefined,
-                    ...enochianStyle,
-                  }}
-                >
-                  {letter}
-                </text>
-              )}
-              {alt.has(`${y},${x}`) && (
-                <AltLetters
-                  letters={alt.get(`${y},${x}`) ?? ""}
-                  right={(x + 1) * size + border}
-                  top={y * size + border}
-                  fill={isCross ? "black" : color || undefined}
-                  enochianStyle={enochianStyle}
-                />
-              )}
-            </React.Fragment>
-          );
-        }),
+      {regions ? (
+        // The tints go under the letters: every ground first, then the
+        // tints, then every letter.
+        <>
+          {tablet.grid.map((row, y) =>
+            row.map((letter, x) => (
+              <React.Fragment key={"ground-" + x + "," + y}>
+                {parts(letter, x, y).ground}
+              </React.Fragment>
+            )),
+          )}
+          <RegionTints />
+          {tablet.grid.map((row, y) =>
+            row.map((letter, x) => (
+              <React.Fragment key={"letters-" + x + "," + y}>
+                {parts(letter, x, y).letters}
+              </React.Fragment>
+            )),
+          )}
+        </>
+      ) : (
+        tablet.grid.map((row, y) =>
+          row.map((letter, x) => {
+            const { ground, letters } = parts(letter, x, y);
+            return (
+              <React.Fragment key={"grid-" + x + "," + y}>
+                {ground}
+                {letters}
+              </React.Fragment>
+            );
+          }),
+        )
+      )}
+      {(regions || highlights?.name || highlights?.preview) && (
+        // Drawing only: a click goes through to the square beneath.
+        <g style={{ pointerEvents: "none" }}>
+          {regions && <RegionHatch />}
+          {highlights?.name && <ChosenName name={highlights.name} />}
+          {highlights?.preview && <PreviewedName name={highlights.preview} />}
+        </g>
       )}
       {highlights?.squares.map(({ row, column }) => {
         const chosen =
@@ -541,7 +937,11 @@ export interface TabletProps {
    * second letter, so its grid has none to draw.
    */
   showSecondLetters?: boolean;
-  /** Squares of a Watchtower's grid to outline, and choose by pointer. */
+  /**
+   * What to draw over a Watchtower's grid: squares outlined, a chosen
+   * name with the rest dimmed, a name previewed in a ring, the regions
+   * tinted; and squares to choose by pointer (`TabletHighlights`).
+   */
   highlights?: TabletHighlights;
   /**
    * The drawing's accessible name: the tablet's own (`tabletName`) when

@@ -1,7 +1,7 @@
 import keys, { aethyrs, hasVersion } from "magick-data/enochian/keys";
 import { beforeAll, describe, expect, it } from "vitest";
 import { PUBLIC_PAGES } from "@/seo/pages";
-import { buildSearchCatalogue } from "./catalogue";
+import { buildSearchCatalogue, tabletNamesText } from "./catalogue";
 import { createSearchEngine } from "./engine";
 import type { SearchCatalogue } from "./types";
 
@@ -91,5 +91,30 @@ describe("the real public search catalogue", () => {
       );
     }
     expect(ids.includes("aethyrs")).toBe(aethyrs.length > 0);
+  });
+
+  it("indexes the Golden Dawn's names of the four Watchtowers on the tablets page", () => {
+    const text = Object.fromEntries(tabletNamesText());
+    expect(Object.keys(text).sort()).toEqual(["air", "earth", "fire", "water"]);
+    expect(text.earth).toMatch(
+      /^Holy names: Mor Dial Hctga\. King: Iczhihal\. Seniors: Laidrom Aczinor Lzinopo Alhctga Ahmlicv Liiansa\. Air of Earth: Angpoi Unnax Boza Aira Ormn Rsni Iznr\./,
+    );
+    const page = catalogue.documents.find(
+      (each) => each.path === "/enochian/tablets",
+    )!;
+    expect(
+      page.sections
+        .filter((section) => section.id.startsWith("names-"))
+        .map((section) => section.title),
+    ).toEqual([
+      ...tabletNamesText().map(
+        ([id]) => `The ${id[0]?.toUpperCase()}${id.slice(1)} tablet's names`,
+      ),
+    ]);
+    for (const name of ["Laidrom", "Bataivah", "Boza", "Edlprnaa"])
+      expect(
+        engine.search(name).map((result) => result.path),
+        name,
+      ).toContain("/enochian/tablets");
   });
 });

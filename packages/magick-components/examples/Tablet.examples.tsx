@@ -41,5 +41,45 @@ export const Tablet: ComponentExamples<ComponentProps<typeof TabletComponent>> =
           },
         },
       },
+      {
+        // Laidrom, row 7 read leftward from square 7.
+        title: "Earth, a Senior chosen, the rest dimmed",
+        props: {
+          tablet: "earth",
+          frame: true,
+          highlights: {
+            squares: [],
+            name: {
+              squares: [6, 5, 4, 3, 2, 1, 0].map((column) => ({
+                row: 6,
+                column,
+              })),
+              numbers: [1, 2, 3, 4, 5, 6, 7],
+            },
+          },
+        },
+      },
+      {
+        // Air's Kerubic name of its top left quarter, ringed.
+        title: "Air, a name previewed",
+        props: {
+          tablet: "air",
+          frame: true,
+          highlights: {
+            squares: [],
+            preview: {
+              squares: [0, 1, 3, 4].map((column) => ({ row: 0, column })),
+            },
+          },
+        },
+      },
+      {
+        title: "Fire, its regions",
+        props: {
+          tablet: "fire",
+          frame: true,
+          highlights: { squares: [], regions: true },
+        },
+      },
     ],
   };

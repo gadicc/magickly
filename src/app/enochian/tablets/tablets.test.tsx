@@ -37,6 +37,10 @@ const screenMatching = (...matching: RegExp[]) =>
     dispatchEvent: () => false,
   }));
 const WIDE = /min-width:\s*900px/;
+
+/** Opens the Differences tab, where the squares the sources differ in are. */
+const openDifferences = () =>
+  fireEvent.click(screen.getByRole("tab", { name: "Differences" }));
 const STILL = /prefers-reduced-motion: reduce/;
 
 /**
@@ -199,7 +203,7 @@ describe("/enochian/tablets' versions", () => {
   });
 
   it("names downloads for what is drawn", () => {
-    const shown = { alt: false, reversed: true, showSquares: false };
+    const shown = { alt: false, reversed: true };
     expect(downloadName("enochian-fire-tablet-dee", shown)).toBe(
       "enochian-fire-tablet-dee",
     );
@@ -207,9 +211,25 @@ describe("/enochian/tablets' versions", () => {
       downloadName("enochian-fire-tablet-dee", {
         alt: true,
         reversed: false,
-        showSquares: true,
+        differences: true,
+        square: { row: 4, column: 11 },
       }),
-    ).toBe("enochian-fire-tablet-dee-second-letters-plain-differences");
+    ).toBe(
+      "enochian-fire-tablet-dee-second-letters-plain-differences-row5-square12",
+    );
+    expect(
+      downloadName("enochian-earth-tablet", {
+        ...shown,
+        name: "senior-row-left",
+        regions: true,
+      }),
+    ).toBe("enochian-earth-tablet-senior-row-left-regions");
+    expect(
+      downloadName("enochian-earth-tablet", {
+        ...shown,
+        square: { row: 6, column: 5 },
+      }),
+    ).toBe("enochian-earth-tablet-row7-square6");
   });
 
   it("links the image in the version shown", () => {
@@ -295,9 +315,7 @@ describe("/enochian/tablets' notes", () => {
     fireEvent.click(screen.getByRole("option", { name: "Water" }));
     const outlined = () => container.querySelectorAll("[data-square]");
     expect(outlined()).toHaveLength(0);
-    fireEvent.click(
-      screen.getByRole("switch", { name: "Show where the sources differ" }),
-    );
+    openDifferences();
     const list = screen.getByRole("list", {
       name: "Squares where the sources differ",
     });
@@ -342,21 +360,17 @@ describe("/enochian/tablets' notes", () => {
 describe("/enochian/tablets while differences are shown", () => {
   it("keeps its headings in order", () => {
     const { container } = render(<Tablets />);
-    fireEvent.click(
-      screen.getByRole("switch", { name: "Show where the sources differ" }),
-    );
+    openDifferences();
     const levels = [...container.querySelectorAll("h2, h3, h4")].map(
       (heading) => Number(heading.tagName[1]),
     );
     expect(levels[0]).toBe(2);
     for (let i = 1; i < levels.length; i++)
       expect(levels[i] - levels[i - 1]).toBeLessThanOrEqual(1);
-    expect(
-      container
-        .querySelector("#tablet-squares")
-        ?.closest("section")
-        ?.parentElement?.querySelector("h2")?.textContent,
-    ).toBe("The Earth tablet");
+    // In the tab's panel, beside or under the tablet, before its note.
+    const heading = container.querySelector("#tablet-squares");
+    expect(heading?.tagName).toBe("H2");
+    expect(heading?.closest('[role="tabpanel"]')).toBeTruthy();
   });
 
   it("offers no image link while the outlines are drawn", () => {
@@ -364,9 +378,7 @@ describe("/enochian/tablets while differences are shown", () => {
     expect(
       screen.getAllByRole("link", { name: "Open SVG image link" }).length,
     ).toBeGreaterThan(0);
-    fireEvent.click(
-      screen.getByRole("switch", { name: "Show where the sources differ" }),
-    );
+    openDifferences();
     expect(
       screen.queryAllByRole("link", { name: "Open SVG image link" }),
     ).toHaveLength(0);
@@ -444,9 +456,7 @@ describe("/enochian/tablets beside its panel on a wide screen", () => {
   it("puts the squares where the sources differ in the panel, under their own h2", () => {
     screenMatching(WIDE);
     const { container } = render(<Tablets />);
-    fireEvent.click(
-      screen.getByRole("switch", { name: "Show where the sources differ" }),
-    );
+    openDifferences();
     const heading = container.querySelector("#tablet-squares");
     expect(heading?.tagName).toBe("H2");
     // Beside the tablet, before the tablet's note below both columns.
@@ -502,9 +512,7 @@ describe("/enochian/tablets beside its panel on a wide screen", () => {
       ] as const) {
         screenMatching(...matching);
         const { container } = render(<Tablets />);
-        fireEvent.click(
-          screen.getByRole("switch", { name: "Show where the sources differ" }),
-        );
+        openDifferences();
         fireEvent.click(container.querySelector("[data-square]") as Element);
         expect(scrollIntoView).toHaveBeenLastCalledWith({
           block: "nearest",
@@ -519,12 +527,10 @@ describe("/enochian/tablets beside its panel on a wide screen", () => {
 });
 
 describe("/enochian/tablets across the breakpoint", () => {
-  it("keeps focus on the square whose button had it", () => {
+  it("keeps the tab's list, and the focus in it, across the breakpoint", () => {
     const resize = resizableScreen(false);
     render(<Tablets />);
-    fireEvent.click(
-      screen.getByRole("switch", { name: "Show where the sources differ" }),
-    );
+    openDifferences();
     const buttons = () =>
       [
         ...screen
@@ -532,20 +538,13 @@ describe("/enochian/tablets across the breakpoint", () => {
           .querySelectorAll("button"),
       ] as HTMLElement[];
     const third = buttons()[2];
-    const name = third.textContent;
     third.focus();
     resize(true);
     expect(document.querySelector("#tablet-squares")?.tagName).toBe("H2");
-    expect(document.activeElement).not.toBe(third);
-    expect(document.activeElement).toBe(buttons()[2]);
-    expect(document.activeElement?.textContent).toBe(name);
+    expect(buttons()[2]).toBe(third);
+    expect(document.activeElement).toBe(third);
     resize(false);
-    expect(document.querySelector("#tablet-squares")?.tagName).toBe("H3");
-    expect(document.activeElement?.textContent).toBe(name);
-    // Without focus in the list, nothing is focused for it.
-    (document.activeElement as HTMLElement).blur();
-    resize(true);
-    expect(document.activeElement).toBe(document.body);
+    expect(document.activeElement).toBe(third);
   });
 
   it("keeps the downloads, and their feedback, mounted", async () => {
@@ -632,9 +631,7 @@ describe("/enochian/tablets' URL as it writes it", () => {
 describe("/enochian/tablets' chosen square", () => {
   it("is cleared when the tablet changes, from the URL as from the select", () => {
     render(<Tablets />);
-    fireEvent.click(
-      screen.getByRole("switch", { name: "Show where the sources differ" }),
-    );
+    openDifferences();
     const list = () =>
       screen.getByRole("list", { name: "Squares where the sources differ" });
     const first = list().querySelector("button") as HTMLElement;

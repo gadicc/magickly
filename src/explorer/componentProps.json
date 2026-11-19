@@ -472,7 +472,7 @@
         "name": "highlights",
         "type": "TabletHighlights",
         "required": false,
-        "description": "Squares of a Watchtower's grid to outline, and choose by pointer."
+        "description": "What to draw over a Watchtower's grid: squares outlined, a chosen\nname with the rest dimmed, a name previewed in a ring, the regions\ntinted; and squares to choose by pointer (`TabletHighlights`)."
       },
       {
         "name": "label",

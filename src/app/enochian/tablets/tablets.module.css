@@ -99,3 +99,96 @@
     width: min(100%, var(--tablet-fit));
   }
 }
+
+/*
+ * The Names tab on a phone (plan 090, decision 5, the mock-up of 19
+ * November 2026): the grid alone stays in place under the app bar while
+ * the list scrolls beneath it, so choosing a name never moves the page.
+ * The tablet's box sticks with a negative top, which slides the sigil up
+ * under the app bar and leaves the grid, and 4px of the page above it,
+ * showing. It follows the bar as it hides and comes back
+ * (`data-app-bar-hidden`, from MyAppBar's HideOnScroll), as the
+ * dictionary's search boxes do.
+ *
+ * The sigil's height is worked out from the box's width, which is the
+ * layout's (`--layout-width`, which the page sets from its measure, or
+ * the screen less the container's 16px padding each side until then;
+ * not container units, since a size container would hold the downloads'
+ * fixed "Copied" message inside it in some browsers): the drawing is the box less the dark plate's
+ * padding (`--plate-pad`) and its own 1px frame each side, 210 units
+ * wide, and the grid's black frame starts 77.856 units down its 297
+ * (the grid's 244 × 264 viewBox fitted to the page, scaled by 0.9 and
+ * moved down 48: `tabletSvg.tsx`). The grid is then 207.6 units tall,
+ * nearly the width.
+ *
+ * Only where that leaves a usable list beneath: a screen at least 560px
+ * tall and no wider than 5/8 of its height. A 390 × 844 phone keeps about
+ * 430px of list, a 320 × 568 one about 230px, a 600 × 960 tablet about
+ * 330px; a phone on its side, where the grid is taller than the screen,
+ * does not qualify, and there choosing a name brings its squares on
+ * screen when they are not all showing (`showSquares` in tablets.tsx).
+ */
+@media (max-width: 899.95px) and (max-aspect-ratio: 5 / 8) and (
+    min-height: 560px
+  ) {
+  .layout {
+    --plate-pad: 0px;
+  }
+  :global(.dark) .layout {
+    --plate-pad: 8px;
+  }
+  .namesOpen .tablet,
+  .namesOpen .panel {
+    --tablet-scale: calc(
+      (var(--layout-width, calc(100vw - 32px)) - 2 * var(--plate-pad) - 2px) /
+      210
+    );
+    /* From the box's top to 4px above the grid's frame. */
+    --tablet-sigil: calc(
+      var(--plate-pad) +
+      1px +
+      77.856 *
+      var(--tablet-scale) -
+      4px
+    );
+  }
+  .namesOpen .tablet {
+    position: sticky;
+    z-index: 2;
+    top: calc(var(--app-bar, 56px) - var(--tablet-sigil));
+    transition: top 200ms ease-out;
+    /* The list passes beneath it. */
+    background-color: var(--mui-palette-background-default);
+  }
+  :global(.dark) .namesOpen .tablet {
+    background-color: var(--mui-palette-plate);
+  }
+  :global([data-app-bar-hidden]) .namesOpen .tablet {
+    top: calc(0px - var(--tablet-sigil));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .namesOpen .tablet {
+      transition: none;
+    }
+  }
+  /*
+   * A name or a square's names brought into view stops below the grid:
+   * the bar, then what of the box shows (4px, the grid's 219.144 units
+   * to the drawing's foot, the frame and the plate's padding), and 8px.
+   */
+  .namesOpen .namesItem {
+    scroll-margin-top: calc(
+      var(--app-bar, 56px) +
+      var(--plate-pad) +
+      5px +
+      219.144 *
+      var(--tablet-scale) +
+      8px
+    );
+  }
+}
+
+/* Elsewhere a name brought into view stops below the app bar. */
+.namesItem {
+  scroll-margin-top: calc(var(--app-bar, 56px) + 8px);
+}

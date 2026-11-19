@@ -1550,6 +1550,347 @@ msgid "This sigil could not be drawn so that every mark stands clear; it may be 
 msgstr "This sigil could not be drawn so that every mark stands clear; it may be hard to read."
 
 #. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{first} or {second}"
+msgstr "{first} or {second}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "Earth"
+msgstr "Earth"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "Air"
+msgstr "Air"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "Water"
+msgstr "Water"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "Fire"
+msgstr "Fire"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A Senior, of Mars"
+msgstr "A Senior, of Mars"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A Senior, of Jupiter"
+msgstr "A Senior, of Jupiter"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A Senior, of the Moon"
+msgstr "A Senior, of the Moon"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A Senior, of Venus"
+msgstr "A Senior, of Venus"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A Senior, of Mercury"
+msgstr "A Senior, of Mercury"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A Senior, of Saturn"
+msgstr "A Senior, of Saturn"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A Senior, row 7 leftward"
+msgstr "A Senior, row 7 leftward"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A Senior, row 7 rightward"
+msgstr "A Senior, row 7 rightward"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A Senior, column 6 upward"
+msgstr "A Senior, column 6 upward"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A Senior, column 6 downward"
+msgstr "A Senior, column 6 downward"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A Senior, column 7 upward"
+msgstr "A Senior, column 7 upward"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A Senior, column 7 downward"
+msgstr "A Senior, column 7 downward"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A holy name"
+msgstr "A holy name"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A name of God"
+msgstr "A name of God"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "The King, of the Sun"
+msgstr "The King, of the Sun"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "The King"
+msgstr "The King"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "The name that calls"
+msgstr "The name that calls"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "The name that commands"
+msgstr "The name that commands"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "The Kerubic name"
+msgstr "The Kerubic name"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "Above the cross"
+msgstr "Above the cross"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A servient angel"
+msgstr "A servient angel"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "Below the cross bar"
+msgstr "Below the cross bar"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A Senior"
+msgstr "A Senior"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "The top left quarter"
+msgstr "The top left quarter"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "The top right quarter"
+msgstr "The top right quarter"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "The bottom left quarter"
+msgstr "The bottom left quarter"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "The bottom right quarter"
+msgstr "The bottom right quarter"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+#: src/app/enochian/tablets/nameWords.ts
+msgid "The Great Cross"
+msgstr "The Great Cross"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{quarter} of {tablet}"
+msgstr "{quarter} of {tablet}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, a holy name: row {row}, squares {from} to {to}"
+msgstr "{name}, a holy name: row {row}, squares {from} to {to}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, a name of God: row {row}, squares {from} to {to}"
+msgstr "{name}, a name of God: row {row}, squares {from} to {to}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{first} or {second}, the King: row 7, square 5; row 6, squares 6 and 7; row 7, square 8; row 8, squares 7 and 6; then row 7, square 6 or square 7"
+msgstr "{first} or {second}, the King: row 7, square 5; row 6, squares 6 and 7; row 7, square 8; row 8, squares 7 and 6; then row 7, square 6 or square 7"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, the King: row 7, square 5; row 6, squares 6 and 7; row 7, square 8; row 8, squares 7 and 6; then row 7, squares 6 and 7"
+msgstr "{name}, the King: row 7, square 5; row 6, squares 6 and 7; row 7, square 8; row 8, squares 7 and 6; then row 7, squares 6 and 7"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, a Senior: row {row}, squares {from} to {to}"
+msgstr "{name}, a Senior: row {row}, squares {from} to {to}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, a Senior: column {column}, rows {from} to {to}"
+msgstr "{name}, a Senior: column {column}, rows {from} to {to}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, the name that calls: column {column}, rows {from} to {to}"
+msgstr "{name}, the name that calls: column {column}, rows {from} to {to}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, the name that commands: row {row}, squares {from} to {to}"
+msgstr "{name}, the name that commands: row {row}, squares {from} to {to}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, the Kerubic name: row {row}, squares {first}, {second}, {third} and {fourth}"
+msgstr "{name}, the Kerubic name: row {row}, squares {first}, {second}, {third} and {fourth}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, above the cross: row {row}, squares {first}, {second}, {third} and {fourth}"
+msgstr "{name}, above the cross: row {row}, squares {first}, {second}, {third} and {fourth}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, a servient angel: row {row}, squares {first}, {second}, {third} and {fourth}"
+msgstr "{name}, a servient angel: row {row}, squares {first}, {second}, {third} and {fourth}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, below the cross bar: row {row}, squares {first}, {second}, {third} and {fourth}"
+msgstr "{name}, below the cross bar: row {row}, squares {first}, {second}, {third} and {fourth}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "Row {row}, square {column}"
+msgstr "Row {row}, square {column}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "Names on the tablet"
+msgstr "Names on the tablet"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "Choose a name to see where it is read: the rest of the tablet is dimmed, a flag marks its first square, and on a large enough screen each square is numbered in reading order. Choose it again to let it go, or tap a square to find the names through it."
+msgstr "Choose a name to see where it is read: the rest of the tablet is dimmed, a flag marks its first square, and on a large enough screen each square is numbered in reading order. Choose it again to let it go, or tap a square to find the names through it."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "Show the regions"
+msgstr "Show the regions"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "{square}: in {count} names. Choose one below."
+msgstr "{square}: in {count} names. Choose one below."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "The names through row {row}, square {column}"
+msgstr "The names through row {row}, square {column}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "Clear the square"
+msgstr "Clear the square"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "The Calvary crosses"
+msgstr "The Calvary crosses"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "The top rows, hatched"
+msgstr "The top rows, hatched"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "The servient squares, left plain"
+msgstr "The servient squares, left plain"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "The regions' key"
+msgstr "The regions' key"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "This version's letters:"
+msgstr "This version's letters:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "Rotations:"
+msgstr "Rotations:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "In the other versions:"
+msgstr "In the other versions:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "Spelled otherwise in the sources:"
+msgstr "Spelled otherwise in the sources:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "Where it is read:"
+msgstr "Where it is read:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "{word} in the dictionary"
+msgstr "{word} in the dictionary"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
+msgid "The other names through its squares:"
+msgstr "The other names through its squares:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "No image link while a name, a square or the regions are shown."
+msgstr "No image link while a name, a square or the regions are shown."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "What the panel shows"
+msgstr "What the panel shows"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "Names"
+msgstr "Names"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "Differences"
+msgstr "Differences"
+
+#. js-lingui-explicit-id
 #: src/app/doc/[_id]/DocLoader.tsx
 msgid "Ritual not found."
 msgstr "Ritual not found."
