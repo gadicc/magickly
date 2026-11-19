@@ -21,6 +21,12 @@ import {
 import { hebrewRuns } from "@/app/books/la-science-cabalistique/hebrewRuns";
 import Witnesses from "@/app/books/la-science-cabalistique/Witnesses";
 import { angelSlug } from "@/lib/angelSlugs";
+import {
+  ANGEL_SIGIL_ALT,
+  angelSigilFiles,
+  angelSigilGeneratorHref,
+  angelSigilText,
+} from "@/seo/angelSigils";
 import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
 import {
   EntityFrame,
@@ -33,6 +39,7 @@ import {
   Trail,
 } from "@/ui/entity";
 import Link from "@/ui/Link";
+import AngelSigil from "./AngelSigil";
 import styles from "./angel.module.css";
 
 /**
@@ -125,6 +132,7 @@ export default function AngelPage({
   const choir = christianChoirs[choirOf(no) - 1];
   const notes = notesOfGenius(no);
   const anchor = anchorOfGenius(no);
+  const sigil = angelSigilFiles(angel);
 
   return (
     <EntityFrame>
@@ -220,6 +228,15 @@ export default function AngelPage({
         <Row label="Born under">{angel.bornUnder.en}</Row>
         <Row label="Contrary genius">{angel.contrary.en}</Row>
       </EntityTable>
+
+      <AngelSigil
+        name={angel.name.en}
+        hebrew={angelSigilText(angel)}
+        alt={ANGEL_SIGIL_ALT}
+        png={sigil.png}
+        svg={sigil.svg}
+        generatorHref={angelSigilGeneratorHref(angel)}
+      />
 
       <h2>Lenain’s entry</h2>
       <p className={styles.said}>{english}</p>

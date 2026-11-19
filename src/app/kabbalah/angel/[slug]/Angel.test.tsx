@@ -27,6 +27,10 @@ import AngelPage from "./Angel";
  * with links, the pointed Hebrew is "as the page points it" rather than
  * Lenain's, and "In the book" says its page numbers are the reissue's.
  * Nothing else in the text changed.
+ *
+ * And once more for plan 088's S4, which added the Rose Cross sigil's
+ * section after the table (its heading, the sentence linking the
+ * generator and the two downloads). Nothing else in the text changed.
  */
 const GOLDEN = readFileSync(
   path.join(import.meta.dirname, "angel.golden.txt"),
@@ -78,6 +82,22 @@ describe("the angel page", () => {
           `href="/kabbalah/angel/${angelSlug(no)}"`,
         );
     }
+  });
+
+  it("shows the sigil's static PNG and links its files and the generator", async () => {
+    const html = await body(1);
+    expect(html).toContain(
+      '<img src="/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png" width="1024" height="1024" alt="The Rose Cross sigil of Vehuiah, והויה, traced on the Golden Dawn&#x27;s rose of 22 letters" loading="lazy"',
+    );
+    expect(html).toContain(
+      `href="/gd/sigils?text=${encodeURIComponent("והויה")}"`,
+    );
+    expect(html).toMatch(
+      /<a [^>]*download="vehuiah-rose-cross-sigil\.png" href="\/kabbalah\/angel\/vehuiah\/vehuiah-rose-cross-sigil\.png"[^>]*>Download PNG<\/a>/,
+    );
+    expect(html).toMatch(
+      /<a [^>]*download="vehuiah-rose-cross-sigil\.svg" href="\/kabbalah\/angel\/vehuiah\/vehuiah-rose-cross-sigil\.svg"[^>]*>Download SVG<\/a>/,
+    );
   });
 
   it("links the decade's planet and the sign to their pages", async () => {

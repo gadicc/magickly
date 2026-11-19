@@ -22,6 +22,11 @@ msgid "OK"
 msgstr "OK"
 
 #. js-lingui-explicit-id
+#: src/seo/angelSigils.ts
+msgid "The Rose Cross sigil of {name}, {hebrew}, traced on the Golden Dawn's rose of 22 letters"
+msgstr "The Rose Cross sigil of {name}, {hebrew}, traced on the Golden Dawn's rose of 22 letters"
+
+#. js-lingui-explicit-id
 #: src/search/SearchButton.tsx
 msgid "Search the site"
 msgstr "Search the site"
@@ -1298,6 +1303,26 @@ msgstr "East is at the top of every plan and North on the left."
 #: src/app/offline/ritual/OfflineRitualEntry.tsx
 msgid "Loading offline rituals"
 msgstr "Loading offline rituals"
+
+#. js-lingui-explicit-id
+#: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
+msgid "Rose Cross sigil"
+msgstr "Rose Cross sigil"
+
+#. js-lingui-explicit-id
+#: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
+msgid "The sigil traces the letters of {name}'s Hebrew name through the Golden Dawn's Rose Cross, by the Order's rules. <0>Watch it drawn</0> in the sigil generator, or draw another name there."
+msgstr "The sigil traces the letters of {name}'s Hebrew name through the Golden Dawn's Rose Cross, by the Order's rules. <0>Watch it drawn</0> in the sigil generator, or draw another name there."
+
+#. js-lingui-explicit-id
+#: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
+msgid "Download PNG"
+msgstr "Download PNG"
+
+#. js-lingui-explicit-id
+#: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
+msgid "Download SVG"
+msgstr "Download SVG"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/DebugSigil.tsx

@@ -3,6 +3,7 @@ import { divisions } from "magick-data/kabbalah/lenain/volume";
 import { expect } from "vitest";
 import { publicRitualQueryKeys } from "@/doc/publicRituals";
 import { angelSlugs } from "@/lib/angelSlugs";
+import { allAngelSigilFiles } from "@/seo/angelSigils";
 import { allHallFiles, hallPages } from "@/seo/halls";
 import { PUBLIC_PAGES } from "@/seo/pages";
 
@@ -82,6 +83,8 @@ const ROUTES = new Set<string>([
   // The temple halls' pages and their image files (plan 062).
   ...hallPages().map((page) => page.path),
   ...allHallFiles().map(({ file }) => file.path),
+  // The angels' sigil files (plan 088, S4).
+  ...allAngelSigilFiles().map(({ file }) => file.path),
 ]);
 
 /**

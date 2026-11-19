@@ -29,6 +29,13 @@ export function angelSigilText(angel: Angel): string {
   return text;
 }
 
+/**
+ * The generator with an angel's name in it, encoded as the generator's own
+ * example links encode theirs (`SigilsText.tsx`).
+ */
+export const angelSigilGeneratorHref = (angel: Angel) =>
+  `/gd/sigils?text=${encodeURIComponent(angelSigilText(angel))}`;
+
 /** One of an angel's static sigil files. */
 export interface AngelSigilFile {
   /** The file's name in the URL: `vehuiah-rose-cross-sigil.png`. */
@@ -89,3 +96,16 @@ export function angelSigilQuery(angel: Angel, file: AngelSigilFile) {
   if (file.format === "png") query.set("fmt", "png");
   return query;
 }
+
+/**
+ * The sigil's alt text, in our own words, for Lingui: the page translates
+ * it where it is shown.
+ */
+export const ANGEL_SIGIL_ALT =
+  /*i18n*/ "The Rose Cross sigil of {name}, {hebrew}, traced on the Golden Dawn's rose of 22 letters";
+
+/** The values the alt text names. */
+export const angelSigilAltValues = (angel: Angel) => ({
+  name: angel.name.en,
+  hebrew: angelSigilText(angel),
+});

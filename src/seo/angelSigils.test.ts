@@ -5,6 +5,7 @@ import { canonicalSigilText } from "@/render/contracts/roseSigil";
 import {
   allAngelSigilFiles,
   angelSigilFiles,
+  angelSigilGeneratorHref,
   angelSigilQuery,
   angelSigilText,
 } from "./angelSigils";
@@ -52,6 +53,12 @@ describe("the angels' sigil files", () => {
     );
     expect(angelSigilQuery(vehuiah, svg).toString()).toBe(
       `text=${encodeURIComponent("והויה")}`,
+    );
+  });
+
+  it("links the generator as its own examples do", () => {
+    expect(angelSigilGeneratorHref(vehuiah)).toBe(
+      "/gd/sigils?text=%D7%95%D7%94%D7%95%D7%99%D7%94",
     );
   });
 });

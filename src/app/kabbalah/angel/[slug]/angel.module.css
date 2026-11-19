@@ -22,3 +22,19 @@
   font-variant: small-caps;
   opacity: 0.7;
 }
+
+/* The Rose Cross sigil (plan 088, S4): the 1,024-pixel file shown small,
+   square, within the column on a phone. */
+.sigil {
+  display: block;
+  width: 100%;
+  max-width: 18rem;
+  height: auto;
+  margin: 0.5em 0 1em;
+}
+
+.downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1.4em;
+}
