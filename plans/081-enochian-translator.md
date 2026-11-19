@@ -1707,11 +1707,15 @@ This plan's questions for an expert, with plan 077's, are in
   ([plan 082](082-enochian-expert-questions.md)), which decides how
   far the notice can be softened.
 - Stage 2 (2H, 18 November 2026):
-  - Gadi's first live AI reading, with 2D's checklist: routing and
-    cost through the real Gateway, the token inside `after()`, part by
-    part flushing, `maxDuration` 300 on the plan, and the Gateway's
-    error shapes (a hold is zeroed only for a 401, 403, 404 or 429
-    that came before any output).
+  - What Gadi's first live readings (19 November 2026, below) left
+    open from 2D's checklist: that the spend row settles to the
+    Gateway's cost (it is in the database, not the logs); the Gateway's
+    error shapes (no call failed; a hold is zeroed only for a 401, 403,
+    404 or 429 that came before any output); whether production sits
+    behind another proxy, which would put every anonymous reader in one
+    `x-real-ip` bucket (the bucket isn't logged); the purge cron's first
+    run, at 00:07 UTC; and why the log lines name the region `fra1`
+    when `vercel.json` asks for `lhr1`.
   - The row lock in `returnDailyUsage` on native PostgreSQL (PGlite
     runs transactions one at a time).
   - The Keys rows where Casaubon's English and the dictionary part ways
@@ -1812,3 +1816,26 @@ Done after the build:
     the old is unchecked (main's own inputs need five glosses the new
     cache lacks). Hints 1,660 words under 425 glosses; related words
     461 entries.
+- 19 November 2026: Gadi's first live AI readings, on production at
+  fa3008bd, as the `enochian-read` log lines record them.
+  - Four readings: "MADRIAX IAD", "MICMA GOHO MAD ZIR COMSELH" and
+    "ZACAR OD ZAMRAN NIIS MADRIAX", a part each, and a 94-word passage
+    of Key words out of Dee's order, in two parts of 49 and 45 words.
+    (A passage that is all a run of Dee's lines, such as "OL SONF VORSG
+    GOHO IAD BALT", is never offered.) Every part ended `read`, which
+    the reply check allows only when the Gateway reports OpenAI as the
+    final provider and zero data retention as enforced.
+  - Cost: the prompt is about 52,000 tokens. The first call paid for
+    all of it, $0.066 for two words; with 51,816 of them cached, five
+    words cost $0.004 and the 94-word passage $0.027 (1.2 and 1.4 cents
+    a part, 22 and 27 seconds, one after the other). The first reading
+    after the cache goes cold costs about 16 times the next.
+  - The output caps held: 168 to 259 tokens for the short readings
+    (cap 2,000), and 1,845 of 2,940 and 2,264 of 2,700 for the two
+    parts, the closest at 84% of its cap.
+  - Gadi closed the tab once the first part showed: the second landed
+    27 seconds later and was stored, so the Gateway's token works inside
+    `after()` after the reader has gone, and the first part reached the
+    page before the second (part by part flushing). Reopened, each
+    reading came from the store at once, for 0 units.
+  - `maxDuration` 300 deployed, so the plan allows it.
