@@ -1,7 +1,7 @@
 # Rose sigil rules and oracle — 18 November 2026
 
-Status: S0–S2 built on `gate/rose-sigil-oracle` (18 November 2026), not
-merged; S3 in part ([stages](#stages)); S4 built on `gate/angel-sigils`
+Status: S0–S2 built (18 November 2026) and merged; S3 built, the sheet
+for Gadi to review ([stages](#stages)); S4 built on `gate/angel-sigils`
 (19 November 2026), not merged. Decided with Gadi
 ([decisions](#decisions)); the design and the build each reviewed
 adversarially ([below](#review-18-november-2026)). Read
@@ -592,7 +592,9 @@ Dawn's rose, with O4's differences, the annotators' notes and a mark
 where his spelling is not the site's. The figures that disagree are
 linked at the top. Like O4's files, the page and the crops stay in that
 directory, never in `--out` or the repository; without a PDF or
-`pdftoppm` the page has our figures alone. The smoke test checks the
+`pdftoppm` the page has our figures alone. The report refuses an
+external directory inside the repository or overlapping `--out`, more
+than one PDF in it, and a page that is not a whole number. The smoke test checks the
 page on its made-up annotation. Run on 19 November: 67 of 72 agree, as
 in S0; the five that do not are #7, #26, #43, #70 and #72.
 

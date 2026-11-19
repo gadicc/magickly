@@ -9,7 +9,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
-import { sigilOracleReport } from "./report.mts";
+import { checkExternalDirectory, sigilOracleReport } from "./report.mts";
 
 /**
  * A smoke test of `pnpm sigils:oracle` on its tiny corpus: it runs, and
@@ -109,4 +109,24 @@ describe("the sigil oracle report", () => {
     expect(existsSync(join(out, "o4-comparison.json"))).toBe(false);
     expect(existsSync(join(out, "side-by-side.html"))).toBe(false);
   }, 60_000);
+
+  it("keeps the external directory out of the repository and --out", () => {
+    const repo = join(import.meta.dirname, "../..");
+    const outside = join(root, "elsewhere");
+    expect(() =>
+      checkExternalDirectory(join(repo, "scratch"), join(root, "out")),
+    ).toThrow("outside the repository");
+    expect(() => checkExternalDirectory(repo, join(root, "out"))).toThrow(
+      "outside the repository",
+    );
+    expect(() => checkExternalDirectory(join(outside, "ext"), outside)).toThrow(
+      "must not overlap",
+    );
+    expect(() => checkExternalDirectory(outside, join(outside, "out"))).toThrow(
+      "must not overlap",
+    );
+    expect(() =>
+      checkExternalDirectory(join(root, "ext"), join(root, "out")),
+    ).not.toThrow();
+  });
 });

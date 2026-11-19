@@ -8,7 +8,7 @@ import { allAngelSigilFiles, angelSigilQuery } from "@/seo/angelSigils";
  * renderer as the temple halls' files are (plan 062, decision 3): the
  * canonical, indexable copies, under names a download keeps. Anything else
  * is a 404 that renders nothing. The page is in `(public)`; this handler
- * sits beside its components, at the same URL.
+ * sits beside its components, one segment below the page's URL.
  */
 export const dynamicParams = false;
 

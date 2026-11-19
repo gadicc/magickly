@@ -35,7 +35,7 @@
 
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
@@ -771,7 +771,6 @@ function runO4(dir: string) {
     figures: figures.length,
     agree,
   };
-  sideBySide(dir, annotation.figures, figures);
   writeFileSync(
     join(dir, "o4-comparison.json"),
     `${JSON.stringify({ summary, figures }, null, 2)}\n`,
@@ -789,7 +788,32 @@ function runO4(dir: string) {
       "",
     ].join("\n"),
   );
+  // After O4's own files, so a figure the sheet cannot draw costs only
+  // the sheet.
+  sideBySide(dir, annotation.figures, figures);
   return summary;
+}
+
+/** Whether `inner` is `outer` or lies inside it. */
+function within(inner: string, outer: string): boolean {
+  const path = relative(resolve(outer), resolve(inner));
+  return path === "" || (!path.startsWith("..") && !isAbsolute(path));
+}
+
+/**
+ * Throws unless the external directory lies outside the repository and
+ * apart from `out`: it receives crops of a book in copyright, which must
+ * never be one `git add` away from a commit (AGENTS.md, Outside sources).
+ */
+export function checkExternalDirectory(external: string, out: string): void {
+  if (within(external, REPO))
+    throw new Error(
+      `SIGIL_ORACLE_EXTERNAL must lie outside the repository: ${external}`,
+    );
+  if (within(external, out) || within(out, external))
+    throw new Error(
+      `SIGIL_ORACLE_EXTERNAL and --out must not overlap: ${external}, ${out}`,
+    );
 }
 
 /**
@@ -805,11 +829,18 @@ function sideBySide(
   his: readonly ExternalFigure[],
   compared: readonly { n: number; agrees: boolean; differences: string[] }[],
 ) {
-  const pdf = readdirSync(dir).find((f) => f.toLowerCase().endsWith(".pdf"));
+  const pdfs = readdirSync(dir).filter((f) => f.toLowerCase().endsWith(".pdf"));
+  // One book: with two, which one was cropped would be a guess.
+  if (pdfs.length > 1)
+    throw new Error(`More than one PDF in ${dir}: ${pdfs.join(", ")}`);
+  const pdf = pdfs[0];
   const images = join(dir, "side-by-side");
   mkdirSync(images, { recursive: true });
   const site = new Map(SEVENTY_TWO_NAMES.map((c) => [c.number, c.text]));
   const crop = (page: number): string | undefined => {
+    // A page goes into a file name and to pdftoppm: a whole number only.
+    if (!Number.isInteger(page) || page < 1)
+      throw new Error(`Not a page number: ${JSON.stringify(page)}`);
     if (!pdf) return undefined;
     const name = `vaughan-${String(page).padStart(2, "0")}`;
     try {
@@ -872,7 +903,7 @@ figcaption { font-size: 13px; color: #555; text-align: center; }
 .notes { color: #555; font-size: 13px; }
 </style></head><body>
 <h1>Rose sigils: Vaughan beside ours</h1>
-<p>Noose tolerance ${ROSE_SIGIL_PROFILE.nooseTolerance} unit(s). ${compared.length - disagreeing.length} of ${compared.length} figures agree on their marks. Local only: never commit this page or its images.</p>
+<p>Noose tolerance ${ROSE_SIGIL_PROFILE.nooseTolerance} unit(s). ${compared.length - disagreeing.length} of ${compared.length} figures agree on their marks. Local only: never commit this page or its images.${pdf ? ` Crops from ${escape(pdf)}.` : ""}</p>
 <p>Disagreeing: ${disagreeing.map((c) => `<a href="#n${c.n}">#${c.n}</a>`).join(", ") || "none"}.</p>
 ${rows.join("\n")}
 </body></html>
@@ -895,6 +926,7 @@ export interface SigilOracleReportOptions {
 /** Runs the oracle over the corpus and writes the report; returns its summary. */
 export async function sigilOracleReport(options: SigilOracleReportOptions) {
   const { out, tiny = false, external, log = () => {} } = options;
+  if (external) checkExternalDirectory(external, out);
   mkdirSync(out, { recursive: true });
   const cases = corpus(tiny);
   const started = performance.now();
