@@ -663,8 +663,10 @@ their titles and descriptions, which S4 leaves alone.
 ### After Gadi's review (19 November 2026)
 
 - **The generator's link** (decision 6) is taken, as `fa2b4549`, with
-  the embeddings refreshed by `pnpm search:publish` in the commit after
-  it, so no commit between them is pushed.
+  the embeddings refreshed by `pnpm search:publish` two commits later,
+  so no commit between them is pushed. Main had published its own rows
+  meanwhile, so after the rebase the matrix was rebuilt from both sets
+  of committed rows, with no provider call: every record had its row.
 - **The two Lauviahs** (11 and 17) share their name, so their sigils are
   the same figure. Plan 033 gave a shared name its number in the URL and
   nowhere it is not needed; the sigil's alt text, caption and
