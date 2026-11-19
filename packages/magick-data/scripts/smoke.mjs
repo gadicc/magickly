@@ -18,9 +18,9 @@
  *    every `@ts-expect-error` is used, and the same file without them gives
  *    exactly that many errors on exactly those lines;
  * 4. the consumer again under `nodenext`, as an ES module;
- * 5. the barrel, a table, `./tools`, the kameas, the Enochian tablets and a
- *    JSON subpath loaded in Node, with real values asserted, and the
- *    dictionary refused.
+ * 5. the barrel, a table, `./tools`, the kameas, the Enochian tablets, their
+ *    notes and names, and a JSON subpath loaded in Node, with real values
+ *    asserted, and the dictionary refused.
  *
  * Every step throws on failure and the process exits non-zero; the temporary
  * directory is removed either way.
@@ -333,6 +333,16 @@ import elementals from "magick-data/alchemy/elementals";
 import { assemble, pathTarget, rowOf, type PathTarget } from "magick-data/tools";
 import type { GraphSpec, LinkSpec, TableSpec } from "magick-data/graph";
 import { graph } from "magick-data/graph";
+import tablets, { tabletVersion } from "magick-data/enochian/tablets";
+import {
+  tabletNames,
+  type TabletName,
+  type TabletNameId,
+} from "magick-data/enochian/tabletNames";
+import {
+  citedSpellings,
+  type CitedTabletSpelling,
+} from "magick-data/enochian/tabletNotes";
 
 // The barrel, and a four-hop read through it.
 export const roman: string = data.sephirah.hod.name.roman;
@@ -358,6 +368,17 @@ export const target: PathTarget | undefined = pathTarget(
 export const spec: GraphSpec = graph;
 export const table: TableSpec = graph.planet;
 export const link: LinkSpec = graph.planet.links.godNameId;
+
+// The Enochian tablets' names and their notes.
+const air = tabletVersion(tablets.air);
+export const firstName: TabletName | undefined = air
+  ? tabletNames(air)[0]
+  : undefined;
+export const nameId: TabletNameId | undefined = firstName?.id;
+export const cited: readonly CitedTabletSpelling[] = citedSpellings(
+  "earth",
+  "senior-row-right",
+);
 `,
   );
 
@@ -487,7 +508,8 @@ import data from "magick-data";
 import sephirot from "magick-data/kabbalah/sephirot";
 import kameas from "magick-data/astrology/kameas";
 import tablets, { WATCHTOWER_IDS, tabletVersion } from "magick-data/enochian/tablets";
-import { squareNote, versionNote } from "magick-data/enochian/tabletNotes";
+import { citedSpellings, nameRules, squareNote, versionNote } from "magick-data/enochian/tabletNotes";
+import { TABLET_NAME_IDS, tabletNames, tabletNameVariants } from "magick-data/enochian/tabletNames";
 import keys, { aethyrCall, aethyrs, checkedText, keyByNumber, keyVersion } from "magick-data/enochian/keys";
 import * as tools from "magick-data/tools";
 import sephirotJson from "magick-data/json/kabbalah/sephirot.json" with { type: "json" };
@@ -520,6 +542,15 @@ assert.equal(versionNote("raphael")?.title, "Raphael's, 1587");
 assert.equal(tabletVersion(tablets.union)?.grid.map((row) => row.join("")).join(" "), "EXARP HCOMA NANTA BITOM");
 assert.equal(tabletVersion(tablets.union, "dee"), undefined);
 assert.equal(tabletVersion(tablets.fire, "dee")?.grid[0][11], null);
+assert.equal(TABLET_NAME_IDS.length, 38);
+const airNames = tabletNames(tabletVersion(tablets.air));
+assert.equal(airNames.find((name) => name.id === "king")?.spelling, "baTaiVah");
+assert.deepEqual(airNames.find((name) => name.id === "top-left-top-row")?.rotations, ["rZla", "Zlar", "larZ", "arZl"]);
+assert.deepEqual(tabletNames(tabletVersion(tablets.air, "dee")).find((name) => name.id === "king")?.spellings, ["baTaiVA", "baTaiVh"]);
+assert.equal(tabletNames(tabletVersion(tablets.fire, "dee")).find((name) => name.id === "top-right-cross-row")?.spelling, "oba?i");
+assert.deepEqual(tabletNameVariants(tablets.air, "king")[0]?.versions, ["dee", "raphael"]);
+assert.equal(citedSpellings("water", "top-left-cross-column")[0]?.spelling, "OBLGOTCA");
+assert.ok(nameRules("king", "dee").length > 0);
 assert.equal(keyByNumber(1)?.key, 1);
 assert.ok(Object.isFrozen(keys[0]));
 assert.equal(keyVersion(keys[0])?.length, keys[0].rows.length);

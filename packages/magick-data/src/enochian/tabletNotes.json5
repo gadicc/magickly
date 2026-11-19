@@ -5,7 +5,10 @@
 // letters themselves are in tablets.json5, each source's reading by
 // source: what a source prints in a square, and the counts and squares
 // where two versions differ, are read from there, never written here.
-// Rows and columns are counted from 0, as in tablets.json5.
+// Rows and columns are counted from 0, as in tablets.json5. "names" cites
+// where the names TabletNames.ts reads along its paths come from, and the
+// spellings the sources print that no path gives (plan 090); the names
+// themselves are computed, never written here.
 //
 // Generated once from a script outside the repository and edited by hand
 // since; nothing regenerates it.
@@ -640,6 +643,576 @@
         }
       ]
     }
+  },
+  "names": {
+    "rules": [
+      {
+        "kinds": [
+          "holyName"
+        ],
+        "versions": [
+          "gd",
+          "regardie",
+          "equinox"
+        ],
+        "text": "The Golden Dawn reads the three holy names, its names of God, from the seventh row, the line of the Holy Spirit, as three, four and five letters, the same on all four tablets.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 276,
+            "leaf": 268
+          },
+          {
+            "work": "equinox1912",
+            "page": 235,
+            "leaf": 247
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "king"
+        ],
+        "versions": [
+          "gd",
+          "regardie",
+          "equinox"
+        ],
+        "text": "The Golden Dawn reads the King in a whirl of eight squares round the centre of the Great Cross: the square left of the centre, the two above it, the one to its right, the two below read leftward, and the two centre squares, the same on all four tablets.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 276,
+            "leaf": 268
+          },
+          {
+            "work": "regardie1940",
+            "page": 277,
+            "leaf": 269
+          },
+          {
+            "work": "equinox1912",
+            "page": 235,
+            "leaf": 247
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "senior"
+        ],
+        "versions": [
+          "gd",
+          "regardie",
+          "equinox"
+        ],
+        "text": "The Golden Dawn reads the six Seniors from the two centre squares outwards to the tablet's edge, seven letters each: along the seventh row to the left and to the right, and up and down the sixth and seventh columns, the lines of the Father and the Son.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 276,
+            "leaf": 268
+          },
+          {
+            "work": "regardie1940",
+            "page": 277,
+            "leaf": 269
+          },
+          {
+            "work": "regardie1940",
+            "page": 278,
+            "leaf": 270
+          },
+          {
+            "work": "equinox1912",
+            "page": 235,
+            "leaf": 247
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "crossColumn",
+          "crossRow"
+        ],
+        "versions": [
+          "gd",
+          "regardie",
+          "equinox"
+        ],
+        "text": "In each lesser angle the Golden Dawn reads a Calvary cross: its upright, the middle column, read down as a name of six letters that calls, and its bar, the second row, read across as a name of five that commands. Read backward they call evil forces.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 278,
+            "leaf": 270
+          },
+          {
+            "work": "regardie1940",
+            "page": 279,
+            "leaf": 271
+          },
+          {
+            "work": "equinox1912",
+            "page": 235,
+            "leaf": 247
+          },
+          {
+            "work": "equinox1912",
+            "page": 236,
+            "leaf": 248
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "topRow"
+        ],
+        "versions": [
+          "gd",
+          "regardie",
+          "equinox"
+        ],
+        "text": "The Kerubic squares, the four of a lesser angle's top row outside the upright, make one name read in four rotations, each one letter further to the left; the first is the strongest.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 279,
+            "leaf": 271
+          },
+          {
+            "work": "equinox1912",
+            "page": 236,
+            "leaf": 248
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "servient"
+        ],
+        "versions": [
+          "gd",
+          "regardie",
+          "equinox"
+        ],
+        "text": "The four rows below the bar, read left to right without the upright's square, are the servient angels. The Golden Dawn rotates them too, and names each square by the rotation that starts there.",
+        "sources": [
+          {
+            "work": "equinox1912",
+            "page": 236,
+            "leaf": 248
+          },
+          {
+            "work": "regardie1940",
+            "page": 325,
+            "leaf": 317
+          },
+          {
+            "work": "regardie1940",
+            "page": 326,
+            "leaf": 318
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "holyName"
+        ],
+        "versions": [
+          "dee",
+          "raphael"
+        ],
+        "text": "Dee's record reads three names of God from the middle row, the line of the Holy Ghost, as three, four and five letters, given for ORO and said to be the same in each table.",
+        "sources": [
+          {
+            "work": "casaubon1659",
+            "page": 177,
+            "leaf": 266
+          },
+          {
+            "work": "casaubon1659",
+            "page": 184,
+            "leaf": 273
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "king"
+        ],
+        "versions": [
+          "dee",
+          "raphael"
+        ],
+        "text": "Dee's record gives the King as six letters of the whirl round the centre, one to the left, two above, one to the right and two below, with one of the two centre letters put to them: Bataiva or Bataivh on ORO.",
+        "sources": [
+          {
+            "work": "casaubon1659",
+            "page": 178,
+            "leaf": 267
+          },
+          {
+            "work": "casaubon1659",
+            "page": 184,
+            "leaf": 273
+          },
+          {
+            "work": "casaubon1659",
+            "page": 189,
+            "leaf": 278
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "senior"
+        ],
+        "versions": [
+          "dee",
+          "raphael"
+        ],
+        "text": "Dee's record reads the six Seniors outward from the great cross's centre: the two of the middle row first at six letters, then all six at seven, the two short ones taking in the centre letter beside them.",
+        "sources": [
+          {
+            "work": "casaubon1659",
+            "page": 178,
+            "leaf": 267
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "crossColumn",
+          "crossRow"
+        ],
+        "versions": [
+          "dee",
+          "raphael"
+        ],
+        "text": "In each lesser angle Dee's record reads a name of six letters down the middle column, by which the angels are called, and one of five along the second row, by which they are commanded.",
+        "sources": [
+          {
+            "work": "casaubon1659",
+            "page": 177,
+            "leaf": 266
+          },
+          {
+            "work": "casaubon1659",
+            "page": 178,
+            "leaf": 267
+          },
+          {
+            "work": "casaubon1659",
+            "page": 180,
+            "leaf": 269
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "topRow"
+        ],
+        "versions": [
+          "dee",
+          "raphael"
+        ],
+        "text": "Above each lesser cross Dee's record reads the four letters outside the column as four angels, the one name rotated a letter at a time.",
+        "sources": [
+          {
+            "work": "casaubon1659",
+            "page": 178,
+            "leaf": 267
+          },
+          {
+            "work": "casaubon1659",
+            "page": 181,
+            "leaf": 270
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "servient"
+        ],
+        "versions": [
+          "dee",
+          "raphael"
+        ],
+        "text": "Below each lesser cross bar Dee's record reads four rows of four letters, the column's square left out: four angels to each cross, sixteen to each table.",
+        "sources": [
+          {
+            "work": "casaubon1659",
+            "page": 180,
+            "leaf": 269
+          },
+          {
+            "work": "casaubon1659",
+            "page": 181,
+            "leaf": 270
+          }
+        ]
+      }
+    ],
+    "attributions": [
+      {
+        "attribution": "element",
+        "text": "The Golden Dawn gives each lesser angle an element by its place, as the tablets themselves are placed: Air top left, Water top right, Earth bottom left, Fire bottom right.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 275,
+            "leaf": 267
+          },
+          {
+            "work": "regardie1940",
+            "page": 278,
+            "leaf": 270
+          },
+          {
+            "work": "regardie1940",
+            "page": 281,
+            "leaf": 273
+          },
+          {
+            "work": "regardie1940",
+            "page": 282,
+            "leaf": 274
+          }
+        ]
+      },
+      {
+        "attribution": "planet",
+        "text": "The Golden Dawn gives the King the Sun, and the Seniors the planets by their lines: along the seventh row leftward Mars and rightward Venus, up the sixth column Jupiter and down it Mercury, up the seventh column the Moon and down it Saturn, on all four tablets.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 278,
+            "leaf": 270
+          }
+        ]
+      }
+    ],
+    "cited": [
+      {
+        "tablet": "earth",
+        "id": "bottom-left-cross-column",
+        "spelling": "CABALPT",
+        "reason": "doubledSquare",
+        "squares": [
+          {
+            "row": 7,
+            "column": 2
+          }
+        ],
+        "text": "Read with both letters of the column's first square.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 330,
+            "leaf": 322
+          }
+        ]
+      },
+      {
+        "tablet": "air",
+        "id": "top-right-cross-column",
+        "spelling": "LILACZA",
+        "reason": "doubledSquare",
+        "squares": [
+          {
+            "row": 0,
+            "column": 9
+          }
+        ],
+        "text": "Read with both letters of the column's first square.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 330,
+            "leaf": 322
+          }
+        ]
+      },
+      {
+        "tablet": "air",
+        "id": "bottom-right-cross-column",
+        "spelling": "AOUVRRZ",
+        "reason": "doubledSquare",
+        "squares": [
+          {
+            "row": 9,
+            "column": 9
+          }
+        ],
+        "text": "Read with both letters of the column's third square.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 330,
+            "leaf": 322
+          }
+        ]
+      },
+      {
+        "tablet": "water",
+        "id": "top-left-cross-column",
+        "spelling": "OBLGOTCA",
+        "reason": "doubledSquare",
+        "squares": [
+          {
+            "row": 1,
+            "column": 2
+          },
+          {
+            "row": 4,
+            "column": 2
+          }
+        ],
+        "text": "Read with both letters of the column's second and fifth squares.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 330,
+            "leaf": 322
+          }
+        ]
+      },
+      {
+        "tablet": "earth",
+        "id": "bottom-right-cross-column",
+        "spelling": "OSPMNIR",
+        "reason": "doubledSquare",
+        "squares": [
+          {
+            "row": 7,
+            "column": 9
+          }
+        ],
+        "text": "Read with both letters of the column's first square.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 330,
+            "leaf": 322
+          }
+        ]
+      },
+      {
+        "tablet": "fire",
+        "id": "bottom-left-cross-column",
+        "spelling": "UVOLBXDO",
+        "reason": "doubledSquare",
+        "squares": [
+          {
+            "row": 7,
+            "column": 2
+          },
+          {
+            "row": 9,
+            "column": 2
+          }
+        ],
+        "text": "Read with both letters of the column's first and third squares.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 331,
+            "leaf": 323
+          }
+        ]
+      },
+      {
+        "tablet": "earth",
+        "id": "bottom-left-top-row",
+        "spelling": "NROAM",
+        "kerubicArchangel": true,
+        "reason": "secondLetters",
+        "prefix": "N",
+        "text": "The Kerubic archangel, NANTA's first letter before the Kerubic name, read with Regardie's lower letters in three of the row's squares.",
+        "sources": [
+          {
+            "work": "regardie1939",
+            "page": 77,
+            "leaf": 70
+          }
+        ]
+      },
+      {
+        "tablet": "earth",
+        "id": "bottom-right-top-row",
+        "spelling": "NAAOM",
+        "kerubicArchangel": true,
+        "reason": "secondLetters",
+        "prefix": "N",
+        "text": "The Kerubic archangel, NANTA's first letter before the Kerubic name, read with Regardie's lower letters in all four of the row's squares.",
+        "sources": [
+          {
+            "work": "regardie1939",
+            "page": 76,
+            "leaf": 69
+          }
+        ]
+      },
+      {
+        "tablet": "earth",
+        "id": "senior-row-right",
+        "spelling": "ALPHCTGA",
+        "reason": "spelling",
+        "text": "Regardie's vol. 3 spells this Senior with eight letters; every source's tablet reads seven.",
+        "sources": [
+          {
+            "work": "regardie1939",
+            "page": 73,
+            "leaf": 66
+          }
+        ]
+      },
+      {
+        "tablet": "water",
+        "id": "senior-col6-up",
+        "spelling": "SAIINOR",
+        "reason": "spelling",
+        "text": "Regardie's vol. 3 ends this Senior with R where every source's tablet has V or U.",
+        "sources": [
+          {
+            "work": "regardie1939",
+            "page": 73,
+            "leaf": 66
+          }
+        ]
+      },
+      {
+        "tablet": "fire",
+        "id": "senior-row-left",
+        "spelling": "AAETPOI",
+        "reason": "spelling",
+        "text": "Regardie's vol. 3 has the last two letters of this Senior the other way round from every source's tablet.",
+        "sources": [
+          {
+            "work": "regardie1939",
+            "page": 73,
+            "leaf": 66
+          }
+        ]
+      },
+      {
+        "tablet": "earth",
+        "id": "bottom-right-top-row",
+        "spelling": "AISMT",
+        "kerubicArchangel": true,
+        "reason": "prefix",
+        "prefix": "A",
+        "text": "A square of this row is named with A before the Kerubic name, where the Order's rule puts NANTA's first letter, N.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 303,
+            "leaf": 295
+          }
+        ]
+      }
+    ]
   },
   "squares": {
     "air": [

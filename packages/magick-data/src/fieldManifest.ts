@@ -353,6 +353,12 @@ export const TEXTS: Readonly<Record<string, TextSpec>> = {
       "Notes on the Enochian tablets: each version and where it comes from, each tablet, and particular squares, with the works they cite.",
     page: "/enochian/tablets",
   },
+  "./enochian/tabletNames": {
+    sources: [],
+    description:
+      "The names read off each Watchtower, computed from a version's letters along fixed paths: the holy names, the King, the Seniors and each quarter's names, with the Kerubic and servient rotations and the Golden Dawn's attributions.",
+    page: "/enochian/tablets",
+  },
   "./kabbalah/seventyTwoAngels/text": {
     sources: [
       "kabbalah/seventyTwoAngelsText/en",

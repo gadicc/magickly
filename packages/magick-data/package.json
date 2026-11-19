@@ -58,6 +58,7 @@
     "./enochian/letters": "./src/enochian/Letters.ts",
     "./enochian/tablets": "./src/enochian/Tablets.ts",
     "./enochian/tabletNotes": "./src/enochian/TabletNotes.ts",
+    "./enochian/tabletNames": "./src/enochian/TabletNames.ts",
     "./gd/grades": "./src/gd/Grades.ts",
     "./geomancy/houses": "./src/geomancy/Houses.ts",
     "./geomancy/tetragrams": "./src/geomancy/Tetragrams.ts",
@@ -169,6 +170,10 @@
       "./enochian/tabletNotes": {
         "types": "./lib/enochian/TabletNotes.d.ts",
         "default": "./lib/enochian/TabletNotes.js"
+      },
+      "./enochian/tabletNames": {
+        "types": "./lib/enochian/TabletNames.d.ts",
+        "default": "./lib/enochian/TabletNames.js"
       },
       "./gd/grades": {
         "types": "./lib/gd/Grades.d.ts",

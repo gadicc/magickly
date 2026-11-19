@@ -283,12 +283,42 @@ or `null`.
   Tablet of Union. `tabletDifferences(a, b)` lists the squares where two
   versions differ, and how. A new source or version is a new key; no id
   moves.
+- `magick-data/enochian/tabletNames`: the names read off a Watchtower,
+  computed rather than written out, as the kameas are. `tabletNames(view)`
+  reads a version's letters (`tabletVersion`) along fixed paths, 38 names
+  a tablet: the three holy names, the King, the six Seniors and, in each
+  quarter, the Calvary cross's column and row, the top row and the four
+  servient rows. A name (`TabletName`) has a positional `id`
+  (`TabletNameId`) that is the same in every version (`holy-1`, `king`,
+  `senior-row-left`, `top-left-servient-1`), its `kind`, `quarter`,
+  `squares` in reading order and `spelling` (an empty square as `?`). A
+  top row has its `rotations`, each one letter further left, in every
+  version, a servient row in the Golden Dawn's versions only; in Dee's and
+  Raphael's versions the King has two `spellings`, the six squares of the
+  whirl with either centre letter, as Dee's record gives it; and the
+  Golden Dawn's versions carry its `attribution`, a quarter's element or a
+  Senior's or the King's planet. The module also exports
+  `findTabletName(view, id)`, one name; `isTabletNameId(id)`;
+  `TABLET_NAME_IDS`, the 38 ids in order; `TABLET_QUARTERS` and
+  `TABLET_QUARTER_ID_PREFIXES`, the quarters and their prefixes in the ids
+  (`topLeft`, `top-left`); `TABLET_NAME_TRADITIONS`, which tradition each
+  version's names follow; `tabletNameVariants(tablet, id, version)`, the
+  other versions' whole readings for display, hiding differences of case
+  or of u for v alone; and `tabletNameSpellings(tablet, id, version)`,
+  every version's spelling, the given version's first, unfolded, to look
+  a name up by. The Tablet of Union has no names here yet. Where each path
+  and attribution comes from, and the spellings sources print that no path
+  gives, are in `tabletNotes`; the Kerubic archangels' spellings there
+  (marked `kerubicArchangel`) are filed under the top row's id for now.
 - `magick-data/enochian/tabletNotes`: notes on the Enochian tablets: each
   version, where it comes from and how it differs from each of the others
   (`versionNote(id)`), how the versions differ in general, each tablet,
   and particular squares, by row and column from 0 as the readings count
   them (`squareNote(id, row, column)`), with `sourceText` and `sourceUrl`
-  for the works cited. The prose is ours, under CC BY 4.0 like the tables;
+  for the works cited. For the names (`tabletNames`), where each kind is
+  read in a version (`nameRules(kind, version)`), where the Golden Dawn's
+  attributions come from (`attributionNote`), and the spellings sources
+  print that no path gives (`citedSpellings(tablet, id)`). The prose is ours, under CC BY 4.0 like the tables;
   the counts and squares where versions differ are the readings', never
   written into the prose.
 - `magick-data/enochian/dictionary`: for the app only, and not published

@@ -1,5 +1,10 @@
 import notes from "../../dist/enochian/tabletNotes.js";
-import type { EnochianTabletID, TabletVersionId } from "./Tablets.ts";
+import type { TabletNameId, TabletNameKind } from "./TabletNames.ts";
+import type {
+  EnochianTabletID,
+  EnochianWatchtowerID,
+  TabletVersionId,
+} from "./Tablets.ts";
 
 /**
  * Notes on the Enochian tablets (plan 061, "Tablet versions"): the
@@ -84,6 +89,65 @@ export interface SquareNote {
   sources: readonly TabletSource[];
 }
 
+/**
+ * Where a kind of name is read (`magick-data/enochian/tabletNames`), as one
+ * tradition gives it: the Golden Dawn's for its versions, Dee's record for
+ * Dee's and Raphael's.
+ */
+export interface TabletNameRule {
+  kinds: readonly TabletNameKind[];
+  versions: readonly TabletVersionId[];
+  text: string;
+  sources: readonly TabletSource[];
+}
+
+/** Where the Golden Dawn's attributions of the names come from. */
+export interface TabletNameAttributionNote {
+  attribution: "element" | "planet";
+  text: string;
+  sources: readonly TabletSource[];
+}
+
+/**
+ * Why no path gives a cited spelling: it reads both letters of a doubled
+ * square (`doubledSquare`, the square or squares in `squares`), or a
+ * square's second letters (`secondLetters`), or the source spells the name
+ * otherwise (`spelling`), or puts another letter of the Tablet of Union in
+ * front (`prefix`).
+ */
+export type CitedSpellingReason =
+  | "doubledSquare"
+  | "secondLetters"
+  | "spelling"
+  | "prefix";
+
+/** A spelling a source prints for a name that no version's path gives. */
+export interface CitedTabletSpelling {
+  tablet: EnochianWatchtowerID;
+  id: TabletNameId;
+  spelling: string;
+  reason: CitedSpellingReason;
+  /**
+   * The spelling is a Kerubic archangel's: the top row's name with a
+   * letter of the Tablet of Union before it. Filed under the top row's id
+   * until the archangels are names of their own.
+   */
+  kerubicArchangel?: true;
+  /** The letter of the Tablet of Union before the name. */
+  prefix?: string;
+  /** The doubled squares read with both letters, by row and column from 0. */
+  squares?: readonly { row: number; column: number }[];
+  text: string;
+  sources: readonly TabletSource[];
+}
+
+/** The notes on the names read off the Watchtowers. */
+export interface TabletNamesNotes {
+  rules: readonly TabletNameRule[];
+  attributions: readonly TabletNameAttributionNote[];
+  cited: readonly CitedTabletSpelling[];
+}
+
 /** Everything the notes hold. */
 export interface TabletNotes {
   works: Readonly<Record<TabletWorkId, TabletWork>>;
@@ -92,6 +156,7 @@ export interface TabletNotes {
   versions: readonly TabletVersionNote[];
   differences: readonly TabletTopic[];
   tablets: Readonly<Record<EnochianTabletID, TabletNote>>;
+  names: TabletNamesNotes;
   squares: Readonly<Partial<Record<EnochianTabletID, readonly SquareNote[]>>>;
 }
 
@@ -117,6 +182,43 @@ export function squareNote(
 ): SquareNote | undefined {
   return squareNotes(id).find(
     (note) => note.row === row && note.column === column,
+  );
+}
+
+/**
+ * Where a kind of name is read in a version: the rules that say so, with
+ * their sources. None for a kind or version the notes do not have.
+ */
+export function nameRules(
+  kind: string,
+  version: string,
+): readonly TabletNameRule[] {
+  return tabletNotes.names.rules.filter(
+    (rule) =>
+      (rule.kinds as readonly string[]).includes(kind) &&
+      (rule.versions as readonly string[]).includes(version),
+  );
+}
+
+/** Where one of the Golden Dawn's attributions comes from. */
+export function attributionNote(
+  attribution: string,
+): TabletNameAttributionNote | undefined {
+  return tabletNotes.names.attributions.find(
+    (note) => note.attribution === attribution,
+  );
+}
+
+/**
+ * The spellings sources print for one name of one tablet that no
+ * version's path gives, each with its source.
+ */
+export function citedSpellings(
+  tablet: string,
+  id: string,
+): readonly CitedTabletSpelling[] {
+  return tabletNotes.names.cited.filter(
+    (cited) => cited.tablet === tablet && cited.id === id,
   );
 }
 

@@ -36,13 +36,23 @@ function tabletOf(id: string): EnochianTablet | undefined {
     : undefined;
 }
 
-function isCrossFromPosition(x: number, y: number) {
+/**
+ * Whether a Watchtower's square, by column `x` and row `y` from 0, is on a
+ * cross: the Great Cross or a quarter's Calvary cross. Exported for the
+ * test that holds it to `magick-data/enochian/tabletNames`' paths.
+ */
+export function isCrossFromPosition(x: number, y: number): boolean {
   if (x === 2 || x === 5 || x === 6 || x === 9) return true;
   if (y === 1 || y === 6 || y === 8) return true;
   return false;
 }
 
-function elementFromPosition(x: number, y: number) {
+/**
+ * The Golden Dawn's element of the quarter a Watchtower's square lies in,
+ * by column `x` and row `y` from 0; "" on the Great Cross. Exported for the
+ * same test.
+ */
+export function elementFromPosition(x: number, y: number): string {
   if (x < 5) {
     if (y < 6) return "air";
     if (y > 6) return "earth";

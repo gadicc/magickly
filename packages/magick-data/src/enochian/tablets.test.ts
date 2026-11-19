@@ -1,6 +1,7 @@
 import * as v from "valibot";
 import { describe, expect, it } from "vitest";
 import { schemas } from "../schemas.ts";
+import { findTabletName, type TabletNameId } from "./TabletNames.ts";
 import tablets, {
   DEFAULT_TABLET_VERSION,
   type EnochianTablet,
@@ -267,65 +268,53 @@ describe("the Watchtowers' Great Cross", () => {
   );
 });
 
-type Grid = TabletView["grid"];
-
-/** The letters of `at` from row `from` to row `to`, inclusive. */
-function column(grid: Grid, at: number, from: number, to: number) {
-  let letters = "";
-  for (let row = from; row <= to; row++) letters += grid[row][at];
-  return letters.toLowerCase();
-}
-
-/** The letters of row `at` in these columns. */
-const row = (grid: Grid, at: number, columns: readonly number[]) =>
-  columns
-    .map((index) => grid[at][index])
-    .join("")
-    .toLowerCase();
+/** A name of a tablet's version, read along its path by `tabletNames`. */
+const nameOf = (
+  id: EnochianTabletID,
+  nameId: TabletNameId,
+  version: TabletVersionId = "gd",
+) => {
+  const found = findTabletName(view(id, version), nameId);
+  if (!found) throw new Error(`no ${nameId} on ${version} ${id}`);
+  return found.spelling.toLowerCase();
+};
 
 describe("the Golden Dawn's version", () => {
   // The six Seniors of each, read from the centre of the Great Cross
-  // outwards: along the seventh row to the left and to the right, then up
-  // and down the sixth and seventh columns. The names are the Order's, from
-  // its consecration of the elemental weapons as Regardie prints it in The
-  // Golden Dawn, vol. 3 (1939), p.73 (archive.org leaf n66), and they settle
-  // the squares where the version reads otherwise than Regardie's higher
-  // letter (tablets.json5). That page spells three of them Saiinor, Aaetpoi
-  // and Alphctga, where every source's tablet reads Saiinov, Aaetpio and
-  // Alhctga.
-  const seniors = (id: EnochianTabletID) => {
-    const { grid } = view(id);
-    const read = (squares: [number, number][]) =>
-      squares
-        .map(([row, column]) => grid[row][column])
-        .join("")
-        .toLowerCase()
-        .replaceAll("v", "u");
-    const seven = Array.from({ length: 7 }, (_, step) => step);
-    return [
-      read(seven.map((step) => [6, 6 - step])),
-      read(seven.map((step) => [6, 5 + step])),
-      read(seven.map((step) => [6 - step, 5])),
-      read(seven.map((step) => [6 + step, 5])),
-      read(seven.map((step) => [6 - step, 6])),
-      read(seven.map((step) => [6 + step, 6])),
-    ];
-  };
+  // outwards, in the order of Regardie's vol. 4 (1940), p.277: along the
+  // seventh row to the left, up the sixth and the seventh columns, along the
+  // row to the right, then down the sixth and the seventh. The names are the
+  // Order's, from its consecration of the elemental weapons as Regardie
+  // prints it in The Golden Dawn, vol. 3 (1939), p.73 (archive.org leaf
+  // n66), and they settle the squares where the version reads otherwise
+  // than Regardie's higher letter (tablets.json5). That page spells three
+  // of them Saiinor, Aaetpoi and Alphctga, where every source's tablet
+  // reads Saiinov, Aaetpio and Alhctga (`citedSpellings` in tabletNotes).
+  const SENIOR_IDS = [
+    "senior-row-left",
+    "senior-col6-up",
+    "senior-col7-up",
+    "senior-row-right",
+    "senior-col6-down",
+    "senior-col7-down",
+  ] as const;
+  const seniors = (id: EnochianTabletID) =>
+    SENIOR_IDS.map((nameId) => nameOf(id, nameId).replaceAll("v", "u"));
 
   it.each([
     [
       "water",
-      ["lsrahpm", "slgaiol", "saiinou", "soniznt", "laoaxrp", "ligdisa"],
+      ["lsrahpm", "saiinou", "laoaxrp", "slgaiol", "soniznt", "ligdisa"],
     ],
     [
       "fire",
-      ["aaetpio", "aapdoce", "adoeoet", "anodoin", "alnduod", "arinnap"],
+      ["aaetpio", "adoeoet", "alnduod", "aapdoce", "anodoin", "arinnap"],
     ],
     [
       "earth",
-      ["laidrom", "alhctga", "aczinor", "ahmlicu", "lzinopo", "liiansa"],
+      ["laidrom", "aczinor", "lzinopo", "alhctga", "ahmlicu", "liiansa"],
     ],
-    ["air", ["habioro", "ahaozpi", "aaozaif", "autotar", "htmorda", "hipotga"]],
+    ["air", ["habioro", "aaozaif", "htmorda", "ahaozpi", "autotar", "hipotga"]],
   ] as const)("%s reads its six Seniors", (id, names) => {
     expect(seniors(id)).toEqual(names);
   });
@@ -334,16 +323,16 @@ describe("the Golden Dawn's version", () => {
   // Water and of Air of Water, and Kerubic and servient names (The
   // Equinox, vol. I no. 7, pp.235-236).
   it.each([
-    ["nelapr", (grid: Grid) => column(grid, 9, 0, 5)],
-    ["omebb", (grid: Grid) => row(grid, 1, [7, 8, 9, 10, 11])],
-    ["olgota", (grid: Grid) => column(grid, 2, 0, 5)],
-    ["aalco", (grid: Grid) => row(grid, 1, [0, 1, 2, 3, 4])],
-    ["tdim", (grid: Grid) => row(grid, 0, [7, 8, 10, 11])],
-    ["vssn", (grid: Grid) => row(grid, 4, [7, 8, 10, 11])],
-    ["rvoi", (grid: Grid) => row(grid, 5, [7, 8, 10, 11])],
-    ["iaaasd", (grid: Grid) => column(grid, 9, 7, 12)],
-  ] as const)("Water reads %s", (name, read) => {
-    expect(read(view("water").grid)).toBe(name);
+    ["nelapr", "top-right-cross-column"],
+    ["omebb", "top-right-cross-row"],
+    ["olgota", "top-left-cross-column"],
+    ["aalco", "top-left-cross-row"],
+    ["tdim", "top-right-top-row"],
+    ["vssn", "top-right-servient-3"],
+    ["rvoi", "top-right-servient-4"],
+    ["iaaasd", "bottom-right-cross-column"],
+  ] as const)("Water reads %s", (name, nameId) => {
+    expect(nameOf("water", nameId)).toBe(name);
   });
 
   it("keeps both letters of a doubled square", () => {

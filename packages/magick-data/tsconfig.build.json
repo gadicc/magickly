@@ -35,6 +35,7 @@
     "src/enochian/Letters.ts",
     "src/enochian/Tablets.ts",
     "src/enochian/TabletNotes.ts",
+    "src/enochian/TabletNames.ts",
     "src/gd/Grades.ts",
     "src/geomancy/Houses.ts",
     "src/geomancy/Tetragrams.ts",
