@@ -220,9 +220,24 @@ depend on `Paper`.
 4. A pinned "Reading as …" chip below 1,200 px.
 5. Rehearsal mode (hide my lines; my lines plus their cues).
 6. Screen wake lock while reading; linkable line numbers.
-7. The editor preview (`chrome={false}`) scrolls in its own pane, but
+7. ~~The editor preview (`chrome={false}`) scrolls in its own pane, but
    the count measures against the window and Jump back scrolls the
-   window: both stale or inert there (Jump back was already).
+   window: both stale or inert there (Jump back was already).~~ Done on
+   19 November 2026: `DocView` takes the pane it scrolls in
+   (`scrollPane`) and measures against its visible edges (its client
+   area, no lower than the window's). It catches on the way down a scroll
+   of the pane or of anything holding it, not the source pane beside it.
+   Jump to Next scrolls the pane alone (`scrollIntoView` would also move
+   the editor around it, which Jump Back could not undo), and Jump Back,
+   from the line or from a hall, returns the pane, not the window. An
+   Opus review the same day found nothing critical; its findings are in
+   this change. The preview is
+   the legacy source editor's (`/doc/<id>/edit?legacy=1`), which opens
+   only rituals with old source; the semantic editor's preview is drawn
+   by the editor itself and has no count. Checked by the reader tests
+   (each fails without the change), not in a browser: the screenshot
+   seed has no legacy ritual, and the legacy editor reports the seeded
+   ones' source unavailable.
 8. The variables panel in the rail has no "Reading as" label; the
    "My role" select's own label stands in.
 9. The public `/doc/*` search prose is extracted from `DocRender.tsx`'s
