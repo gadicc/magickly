@@ -56,6 +56,9 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  // Here, not only at a test's end, so a failing test cannot leave its
+  // frame or scroll stubs to the next.
+  vi.unstubAllGlobals();
   Reflect.deleteProperty(Element.prototype, "scrollIntoView");
 });
 
@@ -328,6 +331,138 @@ describe("Your next line", () => {
     expect(scrollTo).toHaveBeenCalledWith(0, 0);
     expect(screen.queryByRole("button", { name: "Jump back" })).toBeNull();
     vi.unstubAllGlobals();
+  });
+});
+
+/**
+ * The ritual editor's preview: the reader without its rails, in a pane of
+ * its own that scrolls while the window does not, inside the editor, which
+ * scrolls too, beside the source pane. The pane's box is its own, from the
+ * window's top to `bottom`; its client area and scroll position are
+ * settable, as jsdom's are not.
+ */
+function preview(ritual: DocNode, bottom = 768) {
+  const pane = { current: null as HTMLDivElement | null };
+  const view = render(
+    <div data-testid="editor">
+      <div data-testid="source" />
+      <div
+        ref={(element) => {
+          if (!element || pane.current) return;
+          pane.current = element;
+          element.getBoundingClientRect = () => new DOMRect(0, 0, 400, bottom);
+          for (const [name, value] of [
+            ["clientTop", 0],
+            ["clientHeight", bottom],
+            ["scrollTop", 0],
+          ] as const)
+            Object.defineProperty(element, name, {
+              configurable: true,
+              writable: true,
+              value,
+            });
+        }}
+      >
+        <DocView
+          doc={ritual}
+          searchParams={null}
+          chrome={false}
+          scrollPane={pane}
+        />
+      </div>
+    </div>,
+  );
+  const button = () =>
+    screen.getByRole("button", { name: "SpeedDial basic example" });
+  return { view, pane: pane.current!, count: () => button().textContent };
+}
+
+/** Animation frames, held to run by hand. */
+function holdFrames() {
+  const frames: FrameRequestCallback[] = [];
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) =>
+    frames.push(callback),
+  );
+  vi.stubGlobal("cancelAnimationFrame", () => {});
+  return frames;
+}
+
+describe("Your next line in the editor's preview pane", () => {
+  const ritual = () =>
+    doc(
+      role(),
+      say("hierophant", "One."),
+      say("keryx", "Two."),
+      say("member", "Mine."),
+    );
+
+  it("follows the pane's own scroll, not only the window's", () => {
+    layOut();
+    const frames = holdFrames();
+    const { pane, count } = preview(ritual());
+    expect(count()).toBe("2");
+    layout.top = 700;
+    // An element's scroll does not bubble; it is caught on the way down.
+    fireEvent.scroll(pane);
+    expect(frames).toHaveLength(1);
+    act(() => frames[0](0));
+    expect(count()).toBe("1");
+  });
+
+  it("follows the editor around the pane, not the source beside it", () => {
+    layOut();
+    const frames = holdFrames();
+    const { view } = preview(ritual());
+    fireEvent.scroll(screen.getByTestId("source"));
+    expect(frames).toHaveLength(0);
+    fireEvent.scroll(screen.getByTestId("editor"));
+    expect(frames).toHaveLength(1);
+    // And stops listening when it goes.
+    view.unmount();
+    frames.length = 0;
+    fireEvent.scroll(document);
+    fireEvent.scroll(window);
+    expect(frames).toHaveLength(0);
+  });
+
+  it("measures against the pane's bottom edge, or the window's if lower", () => {
+    // The first task, at 700, is on the window but below the pane's 650.
+    layOut(700);
+    expect(preview(ritual(), 650).count()).toBe("2");
+    cleanup();
+    expect(preview(ritual()).count()).toBe("1");
+    cleanup();
+    // The pane runs on below the window (the editor around it is not
+    // scrolled to its end): the task at 800 is hidden all the same.
+    layOut(800);
+    expect(preview(ritual(), 1000).count()).toBe("2");
+  });
+
+  it("jumps in the pane alone, and back, leaving the page where it is", () => {
+    layOut();
+    const intoView = vi.fn();
+    Object.defineProperty(Element.prototype, "scrollIntoView", {
+      configurable: true,
+      value: intoView,
+    });
+    const scrollTo = vi.fn();
+    vi.stubGlobal("scrollTo", scrollTo);
+    const { pane } = preview(ritual());
+    pane.scrollTop = 120;
+    fireEvent.click(
+      screen.getByRole("button", { name: "SpeedDial basic example" }),
+    );
+    fireEvent.click(screen.getByRole("menuitem", { name: "Jump to Next" }));
+    // The next line's bottom brought to the pane's visible bottom, 768.
+    const line = screen
+      .getByText("Mine.")
+      .closest('[data-ritual-frame="task"]')!
+      .getBoundingClientRect();
+    expect(pane.scrollTop).toBe(120 + line.bottom - 768);
+    expect(intoView).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("menuitem", { name: "Jump Back" }));
+    expect(pane.scrollTop).toBe(120);
+    expect(scrollTo).not.toHaveBeenCalled();
   });
 });
 

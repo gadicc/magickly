@@ -1529,6 +1529,7 @@ export default function SqlDocEdit({ ritualId }: { ritualId: string }) {
             wrapWithErrorBoundary={true}
             hallNavigation={false}
             chrome={false}
+            scrollPane={previewRef}
           />
         </div>
       </Split>

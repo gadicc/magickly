@@ -447,6 +447,28 @@ interface DocRenderProps {
    * its pane is not the page.
    */
   chrome?: boolean;
+  /**
+   * The element the ritual scrolls in, when it is not the window: the
+   * legacy ritual editor's preview pane. The next-line count then measures
+   * against the pane's visible bottom and the current section below its
+   * top; Jump to Next scrolls the pane alone, and Jump Back returns it,
+   * not the window, to where it was.
+   */
+  scrollPane?: React.RefObject<HTMLElement | null>;
+}
+
+/**
+ * The part of a scrolling pane the reader sees, in the window's coordinates
+ * as the tasks' boxes are: its client area, which leaves out a border and a
+ * horizontal scrollbar, and no lower than the window's bottom edge, as the
+ * editor around the pane may scroll it partly out of view.
+ */
+function visibleEdges(pane: HTMLElement) {
+  const top = pane.getBoundingClientRect().top + pane.clientTop;
+  return {
+    top,
+    bottom: Math.min(top + pane.clientHeight, window.innerHeight),
+  };
 }
 
 /** Reads the display variables from the page query. */
@@ -464,6 +486,7 @@ export function DocView({
   wrapWithErrorBoundary,
   hallNavigation = true,
   chrome = true,
+  scrollPane,
   searchParams,
 }: DocRenderProps & {
   searchParams: Pick<URLSearchParams, "get"> | null;
@@ -575,6 +598,8 @@ export function DocView({
   const measure = React.useCallback(() => {
     const body = bodyRef.current;
     if (!body) return;
+    const pane = scrollPane?.current;
+    const edges = pane ? visibleEdges(pane) : null;
     // Every drawn task, a footnote's inside its host's frame excepted; one
     // in a closed summary has no box and is not a line to read yet.
     const tasks = [
@@ -589,7 +614,7 @@ export function DocView({
         top: frame.getBoundingClientRect().top,
         mine: frame.dataset.audience === "self",
       })),
-      window.innerHeight,
+      edges ? edges.bottom : window.innerHeight,
     );
     nextTask.current = found ? tasks[found.index] : null;
     setNext((previous) =>
@@ -605,18 +630,21 @@ export function DocView({
           "--app-bar",
         ),
       ) || 56;
+    // Below the app bar, and below the pane's top when that is lower.
     setSection(
       currentSection(
         ritualTitles(body).map((title) => title.getBoundingClientRect().top),
-        appBar + 24,
+        Math.max(edges?.top ?? 0, appBar) + 24,
       ),
     );
-  }, []);
+  }, [scrollPane]);
 
   // Measured once a frame at most, on scroll, resize, any `<details>` in the
   // reader opening or closing, More Variables too (`toggle` does not bubble,
   // so it is caught on the way down), and the ritual changing height, as
-  // when a hall's drawing arrives.
+  // when a hall's drawing arrives. Scrolling is caught on the way down too,
+  // as an element's scroll does not bubble: the editor's preview pane, or
+  // the editor around it, moves the ritual without the window scrolling.
   React.useEffect(() => {
     const body = bodyRef.current;
     let frame = 0;
@@ -627,7 +655,21 @@ export function DocView({
           measure();
         });
     };
+    // Only a scroll that moves the ritual: the page's, or an element's that
+    // holds it, not the editor's source pane or another scroller beside it.
+    const scrolled = (event: Event) => {
+      const target = event.target;
+      if (
+        target === document ||
+        (target instanceof Node && body && target.contains(body))
+      )
+        schedule();
+    };
     window.addEventListener("scroll", schedule, { passive: true });
+    document.addEventListener("scroll", scrolled, {
+      capture: true,
+      passive: true,
+    });
     window.addEventListener("resize", schedule);
     document.addEventListener("toggle", schedule, true);
     const resized =
@@ -639,6 +681,7 @@ export function DocView({
       resized?.disconnect();
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", schedule);
+      document.removeEventListener("scroll", scrolled, true);
       window.removeEventListener("resize", schedule);
       document.removeEventListener("toggle", schedule, true);
     };
@@ -694,14 +737,27 @@ export function DocView({
 
   // "Your next line" only for a reader who chooses a role (decision 2).
   const readingAs = vars.some((v) => v.name === "myRole" && !v.hidden);
+  // Where the ritual is scrolled to, for Jump Back: its pane, or the page.
+  const scrolledTo = () => scrollPane?.current?.scrollTop ?? window.pageYOffset;
   const jumpToNext = () => {
     const target = nextTask.current;
     if (!target) return;
-    setJumpedFrom(window.pageYOffset);
-    target.scrollIntoView(false);
+    const pane = scrollPane?.current;
+    setJumpedFrom(scrolledTo());
+    // In a pane, only the pane moves, the line to its visible bottom as
+    // `scrollIntoView(false)` would put it; that would also scroll the
+    // editor around the pane, which Jump Back could not undo.
+    if (pane)
+      pane.scrollTop +=
+        target.getBoundingClientRect().bottom - visibleEdges(pane).bottom;
+    else target.scrollIntoView(false);
   };
   const jumpBack = () => {
-    if (jumpedFrom !== null) window.scrollTo(0, jumpedFrom);
+    const pane = scrollPane?.current;
+    if (jumpedFrom !== null) {
+      if (pane) pane.scrollTop = jumpedFrom;
+      else window.scrollTo(0, jumpedFrom);
+    }
     setJumpedFrom(null);
   };
   // A title by its index among the titles (their anchors may repeat):
@@ -858,7 +914,7 @@ export function DocView({
             onGoTo={(hall) => {
               // Armed as Jump to Next arms it, before scrolling; the dialog
               // closing renders the button as Jump Back.
-              setJumpedFrom(window.pageYOffset);
+              setJumpedFrom(scrolledTo());
               setViewingHall(null);
               setHallSheetOpen(false);
               setSdOpen(false);
