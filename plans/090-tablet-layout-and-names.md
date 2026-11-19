@@ -318,6 +318,42 @@ right). The default drawing's bytes must not move: `Tablet.test.tsx` pins
 them, and the halls draw `TabletSvg` too. The package's examples and the
 explorer's props are updated with it.
 
+**The mock-up (19 November 2026).** Drawn from the real tablets and
+names (a scratch render of `TabletSvg` with candidate layers, screenshot
+in headless Chromium), it compared four highlight styles on the five
+grounds in light and dark at desktop size, three phone behaviours at
+390 × 844, and two ways to show the regions. Gadi chose, as recommended:
+
+- **A chosen name dims the rest.** Every other square is veiled in white
+  (about 70%), and the name's squares keep their colours inside a dark
+  violet outline, with a flag in the first square's top left corner and
+  the reading order in each square's bottom left (clear of the second
+  letters, top right). It is one layer over the drawing, so the letters,
+  the Enochian font and the mirrored letters are untouched and exports
+  draw it as shown.
+- **A hovered or focused name is ringed**, a solid violet ring with a
+  white edge round each square and the start flag, so moving along the
+  list does not dim the whole tablet. Repainting the squares pale with
+  dark letters needed the letters redrawn; a line through the squares in
+  reading order crossed the letters. Both were dropped.
+- **Order numbers only where the squares are big enough.** At a phone's
+  24 to 29 px squares the numbers are about 8 px; there the order is in
+  the detail's words ("row 7, squares 7 to 1"), which the live region
+  reads anyway.
+- **On a phone, the grid alone stays in place while Names is open.** The
+  title, choices and sigil scroll away; the grid (without the sigil)
+  sticks under the app bar and the list scrolls in the space beneath, so
+  choosing a name never moves the page. Where the screen is too short
+  for that (landscape), choosing a name scrolls the tablet into view only
+  when it is off screen. At every width a chosen name's detail opens in
+  the list, under the name.
+  The dictionary's sheet was dropped: it is modal, and its backdrop
+  shades the tablet the reader is meant to look at.
+- **The regions are tints:** the Great Cross and the Calvary crosses
+  tinted under the letters (they are white squares), the rows above the
+  bar hatched lightly over their ground, the servient squares left
+  plain, with a key. Outlines were too thin at phone size.
+
 ### 6. Every version gets its names; the Union's only where it exists
 
 Stage 0 confirmed the paths against Dee's record: the three names of
@@ -548,6 +584,42 @@ stage 2 commits the name lists as its test fixture.
    tabs, the list, hover and pin, square to names, the regions switch,
    dictionary links from the server, the downloads' names, the search
    adapter and `search:publish`, the description.
+   **Built 19 November 2026** (`4675badf`), to the mock-up's choices
+   (decision 5). `TabletHighlights` keeps `squares` required and adds
+   `name` (dim the rest, start flag, optional `numbers`), `preview` (the
+   ring), `regions` and `anySquare` (one click handler on the grid that
+   finds the square from the clicked shape, adding no markup); every
+   layer drawn over the squares ignores the pointer. The default drawing,
+   with `{ squares: [] }` and the new kinds off, is byte for byte as
+   before, and the tablet images' identity did not move. The page:
+   `NamesPanel.tsx` (the list as MUI accordions, the Great Cross open;
+   the detail under the chosen name; the square's names box; the regions
+   switch and key; a visually hidden live region), `nameWords.ts` (one
+   whole message per kind and tradition; the Golden Dawn's roles, and for
+   Dee's and Raphael's versions positional ones such as "Above the
+   cross"), `nameLinks.ts` (server only: the name-to-headword map, 4.8 KB,
+   through the Keys' `findWord` and then a case, u/v and hyphen-folded
+   index; every name links on today's data, so the single-second-letter
+   step is tested on a made-up dictionary). Order numbers are drawn where
+   a square measures at least 30 px. Both tabs sit in the panel at every
+   width. The phone's grid sticks under
+   `(max-width: 899.95px) and (max-aspect-ratio: 5/8) and (min-height: 560px)`
+   while Names is open, its top offset from the measured layout width so
+   the sigil slides under the app bar, and it follows the bar as it
+   hides; elsewhere choosing a name scrolls its squares into view, and
+   never while the tablet is stuck. The tab and the chosen name are not in
+   the URL; the chosen name is kept by id across tablets and versions.
+   Checked in a browser at 1440 × 900 (light and dark), 390 × 844 and
+   844 × 390 against a dev server on the gate branch. A fresh Opus review
+   found two defects, both fixed and checked in a browser before the
+   gate: the region tints took clicks on the 76 cross squares, and with
+   the app bar hidden choosing a name in a top quarter scrolled the
+   phone's page. Site search: the adapter gives the Golden Dawn's names of
+   the four Watchtowers; `search:publish` embedded 8 changed passages;
+   after rebasing onto main's own publish, `search:assemble` rebuilt the
+   matrix from both sides' committed rows. The pairwise comparisons stay in the
+   version section below both columns, as decision 1 places it, not in
+   the Differences tab as decision 2 has it.
 4. **The Tablet of Union.** Decision 7 (the contract per id, the catalogue,
    the explorer, the republish if identity moves), `UnionGrid`'s
    highlights, its names, the Kerubic archangels and the servient names
