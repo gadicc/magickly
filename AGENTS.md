@@ -63,6 +63,15 @@ the repository, not even as crops or extracted images; only facts taken
 from them, such as a temple layout, drawn with our own art. Material from
 private temples stays out of the repository altogether.
 
+Israel Regardie's *The Golden Dawn* (Aries Press, Chicago, 1937–40),
+which much of the site draws on: vol. 1 was renewed and is in US
+copyright to the end of 2032; vols. 2–4 were never renewed and are public
+domain in the US; all four are in copyright to the end of 2055 where
+copyright runs for life plus 70 years (Regardie died in 1985). The site is
+read worldwide, so treat every volume as in copyright: take facts, link
+its archive.org pages, and quote, mirror or trace nothing. Plan 091 has
+the records and what is still open.
+
 ## Hebrew fonts
 
 Hebrew that stands alone (single letters, names, short or large words) is

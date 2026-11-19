@@ -159,6 +159,14 @@ Follow-ups are separate from the completed migration work:
   attributes), published the same way that day; the halls' Provenance
   row, which names `gd/hall/tags`, was signed again on 17 November
   ([plan 084](084-composable-jsx-halls.md)).
+- 19 November 2026: the copyright of Regardie's *The Golden Dawn*
+  established from the Copyright Office's records: vol. 1 (1937) renewed,
+  in US copyright to the end of 2032; vols. 2–4 (1938–40) never renewed,
+  public domain in the US; all four in copyright to the end of 2055 where
+  copyright runs for life plus 70 years. The site treats every volume as in
+  copyright (facts and links only); AGENTS.md carries the rule
+  ([plan 091](091-regardie-golden-dawn-copyright.md)). The rose sigil's
+  Provenance row is signed again.
 - 18 November 2026: rose sigils drawn by rule (plan 088, stage S2), on
   `gate/rose-sigil-oracle`, not merged: the package plans and places a
   sigil by the Golden Dawn's rules; the oracle passes all 72 names and
@@ -178,9 +186,7 @@ Follow-ups are separate from the completed migration work:
   [plan 066](066-october-dependency-refresh.md#13-november-2026-dependabot-alerts),
   with when to drop the overrides.
 
-- TODO: rose sigils after plan 088's S2: Gadi to re-sign the rose sigil's
-  Provenance row in `packages/magick-components/README.md` (its content
-  changed under the 14 November date) before releasing 0.4.0; S3's
+- TODO: rose sigils after plan 088's S2: S3's
   side-by-side sheet against Vaughan (local only); S4, the 72 angels'
   sigils on their pages, with caching and SEO; S5, the kamea profile;
   and the A‑B‑A‑B‑A class the engine cannot place
