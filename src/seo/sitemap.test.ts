@@ -58,7 +58,9 @@ describe("sitemap", () => {
   it("claims no change frequency, priority or modification date", () => {
     for (const entry of sitemap())
       expect(Object.keys(entry)).toEqual(
-        /\/gd\/halls\/(?!editor$)[^/]+$/.test(entry.url)
+        /\/gd\/halls\/(?!editor$)[^/]+$|\/kabbalah\/angel\/[^/]+$/.test(
+          entry.url,
+        )
           ? ["url", "images"]
           : publicAlternates(new URL(entry.url).pathname)
             ? ["url", "alternates"]
@@ -67,7 +69,9 @@ describe("sitemap", () => {
   });
 
   it("lists each hall's PNG and SVG, absolute and safe to write unescaped", () => {
-    const halls = sitemap().filter((entry) => entry.images);
+    const halls = sitemap().filter(
+      (entry) => entry.images && entry.url.includes("/gd/halls/"),
+    );
     expect(halls).toHaveLength(14);
     expect(halls[1]).toEqual({
       url: "https://magick.ly/gd/halls/zelator-1",
@@ -83,6 +87,34 @@ describe("sitemap", () => {
         );
   });
 
+  it("lists each angel's sigil, the PNG then the SVG (plan 088, S4)", () => {
+    const angels = sitemap().filter((entry) =>
+      entry.url.includes("/kabbalah/angel/"),
+    );
+    expect(angels).toHaveLength(72);
+    expect(angels[0]).toEqual({
+      url: "https://magick.ly/kabbalah/angel/vehuiah",
+      images: [
+        "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png",
+        "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.svg",
+      ],
+    });
+    for (const entry of angels) {
+      const page = entry.url;
+      expect(entry.images).toEqual([
+        expect.stringMatching(/-rose-cross-sigil\.png$/),
+        expect.stringMatching(/-rose-cross-sigil\.svg$/),
+      ]);
+      for (const image of entry.images ?? [])
+        expect(image.startsWith(`${page}/`)).toBe(true);
+      for (const image of entry.images ?? [])
+        expect(image).toMatch(
+          /^https:\/\/magick\.ly\/kabbalah\/angel\/[a-z0-9-]+\/[a-z0-9-]+\.(?:png|svg)$/,
+        );
+    }
+    expect(sitemap().filter((entry) => entry.images)).toHaveLength(14 + 72);
+  });
+
   it("writes XML that parses, with the image namespace", () => {
     const xml = resolveSitemap(sitemap());
     const { DOMParser } = new JSDOM().window;
@@ -94,8 +126,12 @@ describe("sitemap", () => {
       "http://www.google.com/schemas/sitemap-image/1.1",
       "loc",
     );
-    expect(images).toHaveLength(28);
+    // The angels' come first, with the entity pages; then the halls'.
+    expect(images).toHaveLength(144 + 28);
     expect(images[0].textContent).toBe(
+      "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png",
+    );
+    expect(images[144].textContent).toBe(
       "https://magick.ly/gd/halls/neophyte/golden-dawn-neophyte-temple.png",
     );
   });

@@ -4,6 +4,8 @@ import { angelSlug } from "@/lib/angelSlugs";
 import { canonicalSigilText } from "@/render/contracts/roseSigil";
 import {
   allAngelSigilFiles,
+  angelJsonLd,
+  angelSigilAlt,
   angelSigilFiles,
   angelSigilGeneratorHref,
   angelSigilQuery,
@@ -60,5 +62,55 @@ describe("the angels' sigil files", () => {
     expect(angelSigilGeneratorHref(vehuiah)).toBe(
       "/gd/sigils?text=%D7%95%D7%94%D7%95%D7%99%D7%94",
     );
+  });
+});
+
+describe("an angel page's structured data", () => {
+  it("is one graph: the trail, then the PNG and the SVG", () => {
+    const data = angelJsonLd(vehuiah);
+    const [trail, png, svg] = data["@graph"];
+    expect(trail).toMatchObject({ "@type": "BreadcrumbList" });
+    expect(
+      (trail as { itemListElement: { item: string }[] }).itemListElement.at(-1),
+    ).toMatchObject({
+      name: "Vehuiah",
+      item: "https://magick.ly/kabbalah/angel/vehuiah",
+    });
+    const caption = angelSigilAlt(vehuiah);
+    expect(caption).toBe(
+      "The Rose Cross sigil of Vehuiah, והויה, traced on the Golden Dawn's rose of 22 letters",
+    );
+    expect(png).toMatchObject({
+      "@type": "ImageObject",
+      "@id": "https://magick.ly/kabbalah/angel/vehuiah#sigil-png",
+      contentUrl:
+        "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png",
+      url: "https://magick.ly/kabbalah/angel/vehuiah",
+      name: "Rose Cross sigil of Vehuiah (והויה)",
+      caption,
+      encodingFormat: "image/png",
+      width: 1024,
+      height: 1024,
+      license: "https://creativecommons.org/licenses/by/4.0/",
+      acquireLicensePage: "https://magick.ly/about#licence",
+      creditText: "Magick.ly, drawn by magick-components (MIT)",
+      associatedMedia: {
+        "@id": "https://magick.ly/kabbalah/angel/vehuiah#sigil-svg",
+      },
+      isBasedOn: {
+        "@type": "Book",
+        url: "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol4-1940/page/n51/mode/1up",
+      },
+    });
+    expect(svg).toMatchObject({
+      "@type": "ImageObject",
+      "@id": "https://magick.ly/kabbalah/angel/vehuiah#sigil-svg",
+      contentUrl:
+        "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.svg",
+      encodingFormat: "image/svg+xml",
+      caption,
+    });
+    // The SVG states only its viewBox, so no pixel size is claimed.
+    expect(svg).not.toHaveProperty("width");
   });
 });

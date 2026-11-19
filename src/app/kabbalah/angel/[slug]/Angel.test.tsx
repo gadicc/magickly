@@ -100,6 +100,35 @@ describe("the angel page", () => {
     );
   });
 
+  it("emits the trail and the sigil's two images in one graph", async () => {
+    const html = await body(1);
+    const scripts = [
+      ...html.matchAll(
+        /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g,
+      ),
+    ].map(([, json]) => JSON.parse(json));
+    expect(scripts).toHaveLength(1);
+    const graph = scripts[0]["@graph"] as {
+      "@type": string;
+      contentUrl?: string;
+      caption?: string;
+    }[];
+    expect(graph.map((node) => node["@type"])).toEqual([
+      "BreadcrumbList",
+      "ImageObject",
+      "ImageObject",
+    ]);
+    // Each image's URL and caption exactly as the page shows them.
+    expect(graph[1].contentUrl).toBe(
+      "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png",
+    );
+    expect(graph[2].contentUrl).toBe(
+      "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.svg",
+    );
+    const alt = html.match(/<img [^>]*alt="([^"]*)"/)?.[1];
+    expect(textOf(alt ?? "")).toBe(graph[1].caption);
+  });
+
   it("links the decade's planet and the sign to their pages", async () => {
     const html = await body(46);
     // Ariel, the 46th: 16–20° of Scorpio, the 23rd decade, under Sol.

@@ -23,11 +23,12 @@ import Witnesses from "@/app/books/la-science-cabalistique/Witnesses";
 import { angelSlug } from "@/lib/angelSlugs";
 import {
   ANGEL_SIGIL_ALT,
+  angelJsonLd,
   angelSigilFiles,
   angelSigilGeneratorHref,
   angelSigilText,
 } from "@/seo/angelSigils";
-import { Breadcrumbs, entityTrail } from "@/seo/Breadcrumbs";
+import JsonLd from "@/seo/JsonLd";
 import {
   EntityFrame,
   EntityTable,
@@ -137,13 +138,8 @@ export default function AngelPage({
   return (
     <EntityFrame>
       <Trail href="/kabbalah/yhvh/72angels">The 72 Angels</Trail>
-      <Breadcrumbs
-        trail={entityTrail(
-          "/kabbalah/yhvh/72angels",
-          angel.name.en,
-          `/kabbalah/angel/${angelSlug(no)}`,
-        )}
-      />
+      {/* The trail and the sigil's images, in one graph. */}
+      <JsonLd data={angelJsonLd(angel)} />
 
       <h1>
         {no}. {angel.name.en}
