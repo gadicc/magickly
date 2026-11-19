@@ -1521,11 +1521,13 @@ msgstr "הטקס לא נמצא."
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/DocRender.tsx
+#: src/app/doc/[_id]/ReaderRails.tsx
 msgid "decrease font size"
 msgstr "הקטנת הכתב"
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/DocRender.tsx
+#: src/app/doc/[_id]/ReaderRails.tsx
 msgid "increase font size"
 msgstr "הגדלת הכתב"
 
@@ -1595,6 +1597,46 @@ msgstr "הטקס אינו זמין במכשיר הזה. התחברו לרשת ו
 #: src/app/doc/[_id]/PrivateRitualReader.tsx
 msgid "Open the original ritual link to use the offline reader."
 msgstr "פתחו את הקישור המקורי לטקס כדי לקרוא אותו ללא חיבור."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/ReaderRails.tsx
+msgid "Contents"
+msgstr "תוכן העניינים"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/ReaderRails.tsx
+msgid "Your next line"
+msgstr "השורה הבאה שלך"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/ReaderRails.tsx
+msgid "No more lines"
+msgstr "אין עוד שורות"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/ReaderRails.tsx
+msgid "{count, plural, =0 {Your line is next} one {# line before yours} other {# lines before yours}}"
+msgstr "{count, plural, =0 {השורה שלך היא הבאה} one {שורה אחת לפני שלך} two {שתי שורות לפני שלך} other {# שורות לפני שלך}}"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/ReaderRails.tsx
+msgid "Jump to your next line"
+msgstr "מעבר לשורה הבאה שלך"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/ReaderRails.tsx
+msgid "Jump back"
+msgstr "חזרה למקום הקודם"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/ReaderRails.tsx
+msgid "Halls"
+msgstr "אולמות"
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/ReaderRails.tsx
+msgid "Text size"
+msgstr "גודל הכתב"
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/edit/SqlDocEdit.tsx

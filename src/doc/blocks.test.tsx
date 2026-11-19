@@ -87,21 +87,11 @@ it("retains reader role grouping, audience state, navigation refs and footnote o
   expect(
     view.container.querySelectorAll('[data-audience="self"]'),
   ).toHaveLength(2);
-  expect(
-    (
-      first as typeof first & {
-        forMe?: boolean;
-        ref?: { current: Element | null };
-      }
-    ).forMe,
-  ).toBe(true);
-  expect(
-    (first as typeof first & { ref?: { current: Element | null } }).ref
-      ?.current,
-  ).toBeTruthy();
-  view.unmount();
+  // The reader measures drawn frames (plan 089); it never writes a ref or
+  // its audience back onto the row, which could leak into saved content.
   expect("ref" in first).toBe(false);
   expect("forMe" in first).toBe(false);
+  view.unmount();
 });
 
 it("retains explicit footnote destinations and native summary collapse", () => {
@@ -311,7 +301,8 @@ it("opens a link on this site in a new tab where the context asks, as the editor
 it("continues a role's turn whatever the kinds, and starts a new one on a new role", () => {
   // Plan 089, decision 3: the same role again drops its role line; the
   // frame records the previous task's kind, so a direction after speech
-  // tucks under the bubble.
+  // tucks under the bubble, and so does every later direction in that turn
+  // (say, do, do).
   const task = (role: string, kind: "say" | "do", text: string) => ({
     type: "task",
     role,
@@ -346,7 +337,7 @@ it("continues a role's turn whatever the kinds, and starts a new one on a new ro
     ["say", null],
     ["say", "say"],
     ["do", "say"],
-    ["do", "do"],
+    ["do", "say"],
     ["say", "do"],
     ["do", null],
     ["say", null],

@@ -38,6 +38,7 @@ import React from "react";
 import { Render } from "@/doc/blocks";
 
 import DocContext from "@/doc/context";
+import { currentSection, type NextLine, nextLine } from "@/doc/readerPosition";
 import { focusHall, revealHall } from "@/doc/revealHall";
 import { roles } from "@/doc/ritualBlocks/roles";
 import {
@@ -48,6 +49,13 @@ import {
 } from "@/doc/ritualHalls";
 import { DocNode } from "@/schemas";
 import shell from "../readerShell.module.css";
+import {
+  ContentsRail,
+  HallsPanel,
+  NextLinePanel,
+  RailPanel,
+  TextSizePanel,
+} from "./ReaderRails";
 
 // The halls' sheet and viewer load only for a ritual with halls (plan 069),
 // so other rituals carry no dialog code for them. `loading` gives each its
@@ -248,13 +256,21 @@ function TocMenu({
   anchorEl,
   setAnchorEl,
   entries,
+  onTitle,
   onCloseExtra,
 }: {
   anchorEl: (EventTarget & HTMLDivElement) | null;
   setAnchorEl: (anchorEl: null) => void;
   entries: RitualContentsEntry[];
+  /** Goes to a title by its index among the titles. */
+  onTitle: (index: number) => void;
   onCloseExtra: (event?: unknown) => void;
 }) {
+  // Each entry's index among the titles.
+  let titles = 0;
+  const titleIndex = entries.map((entry) =>
+    entry.type === "title" ? titles++ : -1,
+  );
   return (
     <Menu
       anchorEl={anchorEl}
@@ -301,7 +317,7 @@ function TocMenu({
             // biome-ignore lint/suspicious/noArrayIndexKey: titles may repeat; the list only changes with the ritual
             key={i}
             onClick={() => {
-              location.hash = entry.text.replace(/ /g, "_");
+              onTitle(titleIndex[i]);
               setAnchorEl(null);
               onCloseExtra();
             }}
@@ -314,7 +330,7 @@ function TocMenu({
             key={`hall-${entry.hall.ordinal}`}
             sx={{ pl: 4, color: "primary.main", gap: 1 }}
             onClick={() => {
-              revealHall(entry.hall.ordinal);
+              revealHall(entry.hall.ordinal, document, { replace: true });
               setAnchorEl(null);
               onCloseExtra();
             }}
@@ -326,6 +342,15 @@ function TocMenu({
       )}
     </Menu>
   );
+}
+
+/** The ritual's top-level titles, in order: the Contents' titles. */
+function ritualTitles(body: HTMLElement): HTMLElement[] {
+  return [
+    ...body.querySelectorAll<HTMLElement>(
+      ':scope > [data-ritual-frame="title"]',
+    ),
+  ];
 }
 
 const regexp =
@@ -472,7 +497,7 @@ export function DocView({
     const ordinal = Number(match[1]);
     if (ordinal > halls.length || !revealHall(ordinal)) return;
     const { pathname, search } = window.location;
-    window.history.replaceState(window.history.state, "", pathname + search);
+    window.history.replaceState(null, "", pathname + search);
   }, [halls]);
   const [hallSheetOpen, setHallSheetOpen] = React.useState(false);
   // The index, in `halls`, of the hall in the full-screen viewer.
@@ -483,6 +508,7 @@ export function DocView({
     name: string;
     default: string;
     collapsable?: boolean;
+    hidden?: boolean;
   };
   const vars = React.useMemo(
     () =>
@@ -525,9 +551,17 @@ export function DocView({
     return [alwaysVars, collapsableVars];
   }, [vars]);
 
-  const [nextPos, setNextPos] = React.useState(0);
-  const [currentPos, setCurrentPos] = React.useState(0);
-  const jumped = React.useRef<number | false>(false);
+  // Where the reader is (plan 089, decision 2): the next line, `undefined`
+  // until measured and `null` after the reader's last, and the current
+  // section, by index among the titles.
+  const [next, setNext] = React.useState<NextLine | null | undefined>(
+    undefined,
+  );
+  const [section, setSection] = React.useState(-1);
+  const nextTask = React.useRef<HTMLElement | null>(null);
+  // The scroll position a jump left, while Jump Back can return to it.
+  const [jumpedFrom, setJumpedFrom] = React.useState<number | null>(null);
+  const bodyRef = React.useRef<HTMLDivElement>(null);
   // The hall "Go to it in the ritual" went to, focused once the dialogs
   // have closed: their own focus restoration runs first, in their effects.
   const focusAfterClose = React.useRef<number | null>(null);
@@ -538,46 +572,77 @@ export function DocView({
     focusAfterClose.current = null;
   }, [viewingHall, hallSheetOpen]);
 
+  const measure = React.useCallback(() => {
+    const body = bodyRef.current;
+    if (!body) return;
+    // Every drawn task, a footnote's inside its host's frame excepted; one
+    // in a closed summary has no box and is not a line to read yet.
+    const tasks = [
+      ...body.querySelectorAll<HTMLElement>('[data-ritual-frame="task"]'),
+    ].filter(
+      (frame) =>
+        !frame.parentElement?.closest('[data-ritual-frame="task"]') &&
+        frame.getClientRects().length > 0,
+    );
+    const found = nextLine(
+      tasks.map((frame) => ({
+        top: frame.getBoundingClientRect().top,
+        mine: frame.dataset.audience === "self",
+      })),
+      window.innerHeight,
+    );
+    nextTask.current = found ? tasks[found.index] : null;
+    setNext((previous) =>
+      previous && found
+        ? previous.index === found.index && previous.count === found.count
+          ? previous
+          : found
+        : found,
+    );
+    const appBar =
+      Number.parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--app-bar",
+        ),
+      ) || 56;
+    setSection(
+      currentSection(
+        ritualTitles(body).map((title) => title.getBoundingClientRect().top),
+        appBar + 24,
+      ),
+    );
+  }, []);
+
+  // Measured once a frame at most, on scroll, resize, any `<details>` in the
+  // reader opening or closing, More Variables too (`toggle` does not bubble,
+  // so it is caught on the way down), and the ritual changing height, as
+  // when a hall's drawing arrives.
   React.useEffect(() => {
-    function scrollListener(event) {
-      let nextPosSet = false;
-      let currentPosSet = false;
-      const bottom = window.pageYOffset + window.innerHeight;
-
-      // TODO, re-implement with binary search.
-      // const start = Date.now();
-      if (doc.children)
-        for (let i = 0; i < doc.children.length; i++) {
-          const node = doc.children[i];
-          if (node.type !== "task") continue;
-          if (
-            node.forMe &&
-            !nextPosSet &&
-            node?.ref?.current &&
-            node.ref.current.offsetTop > bottom
-          ) {
-            nextPosSet = true;
-            setNextPos(i);
-          } else {
-            if (
-              !currentPosSet &&
-              node?.ref?.current &&
-              node.ref.current.offsetTop > bottom
-            ) {
-              currentPosSet = true;
-              setCurrentPos(i - 1);
-            }
-          }
-          if (nextPosSet && currentPosSet) break;
-        }
-      // console.log("diff " + (Date.now() - start) + "ms");
-      // console.log(window.pageYOffset);
-    }
-    window.addEventListener("scroll", scrollListener);
-    return () => window.removeEventListener("scroll", scrollListener);
-  }, [doc.children]);
-
-  // console.log({ currentPos, nextPos });
+    const body = bodyRef.current;
+    let frame = 0;
+    const schedule = () => {
+      if (!frame)
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          measure();
+        });
+    };
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    document.addEventListener("toggle", schedule, true);
+    const resized =
+      body && typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(schedule)
+        : null;
+    if (body) resized?.observe(body);
+    return () => {
+      resized?.disconnect();
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      document.removeEventListener("toggle", schedule, true);
+    };
+  }, [measure]);
 
   const variables = (
     <div>
@@ -593,6 +658,7 @@ export function DocView({
   );
   const ritual = (
     <div
+      ref={bodyRef}
       className="docBody"
       // Legacy revisions have no content-locale field. Never infer it from
       // interface preference; preserve physical diagram/read order until
@@ -619,17 +685,70 @@ export function DocView({
   // The text-size control scales both areas alike, not the page's title.
   const zoom = { fontSize: fontSize + "%" };
 
+  const myRole = (context.vars as Record<string, { value: string }>).myRole
+    ?.value;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: measured again when the ritual, the role or the text size moves its tasks
+  React.useEffect(() => {
+    measure();
+  }, [doc, myRole, fontSize, measure]);
+
+  // "Your next line" only for a reader who chooses a role (decision 2).
+  const readingAs = vars.some((v) => v.name === "myRole" && !v.hidden);
+  const jumpToNext = () => {
+    const target = nextTask.current;
+    if (!target) return;
+    setJumpedFrom(window.pageYOffset);
+    target.scrollIntoView(false);
+  };
+  const jumpBack = () => {
+    if (jumpedFrom !== null) window.scrollTo(0, jumpedFrom);
+    setJumpedFrom(null);
+  };
+  // A title by its index among the titles (their anchors may repeat):
+  // scrolled to, and the address updated without a history entry.
+  const goToTitle = (index: number) => {
+    const body = bodyRef.current;
+    const anchor = body
+      ? ritualTitles(body)[index]?.querySelector<HTMLElement>("a[id]")
+      : null;
+    if (!anchor) return;
+    anchor.scrollIntoView();
+    const { pathname, search } = window.location;
+    // A `null` state, as the variables write it: Next then syncs the
+    // address it keeps, which a later router commit would otherwise reset.
+    window.history.replaceState(null, "", `${pathname}${search}#${anchor.id}`);
+  };
+
   return (
     <>
       {chrome ? (
         <>
-          <div
-            className={shell.controls}
-            data-reader-area="controls"
-            style={zoom}
-          >
-            {variables}
-            <br />
+          <ContentsRail
+            entries={contents}
+            section={section}
+            onTitle={goToTitle}
+          />
+          {/* Each control once: at the top of the column, and from 1,200 px
+              the inline-end rail, with the panels only it shows. */}
+          <div className={shell.controls} data-reader-area="controls">
+            <RailPanel railOnly={false}>
+              <div style={zoom}>
+                {variables}
+                <br className={shell.columnOnly} />
+              </div>
+            </RailPanel>
+            {readingAs && (
+              <NextLinePanel
+                next={next}
+                jumpedBack={jumpedFrom !== null}
+                onJump={jumpToNext}
+                onBack={jumpBack}
+              />
+            )}
+            {halls && halls.length > 0 && (
+              <HallsPanel halls={halls} onOpen={setViewingHall} />
+            )}
+            <TextSizePanel fontSize={fontSize} setFontSize={setFontSize} />
           </div>
           <div className={shell.body} data-reader-area="body" style={zoom}>
             {ritual}
@@ -645,8 +764,10 @@ export function DocView({
 
       <SpeedDial
         ariaLabel="SpeedDial basic example"
+        // From 1,200 px the reader's rails do its work.
+        className={chrome ? shell.speedDial : undefined}
         sx={{ position: "fixed", bottom: 16, right: 16 }}
-        icon={nextPos - currentPos}
+        icon={next ? next.count : "–"}
         open={sdOpen}
         onOpen={(event, reason) => {
           // "mouseEnter", "focus"
@@ -657,23 +778,21 @@ export function DocView({
           if (["toggle", "escapeKeyDown"].includes(reason)) setSdOpen(false);
         }}
       >
-        {jumped.current !== false ? (
+        {jumpedFrom !== null ? (
           <SpeedDialAction
             icon=<ArrowUpwardIcon />
             slotProps={{ tooltip: { title: "Jump Back" } }}
-            onClick={() => {
-              if (jumped.current !== false) window.scrollTo(0, jumped.current);
-              jumped.current = false;
-            }}
+            onClick={jumpBack}
           />
         ) : (
           <SpeedDialAction
             icon=<ArrowDownwardIcon />
-            slotProps={{ tooltip: { title: "Jump to Next" } }}
-            onClick={() => {
-              jumped.current = window.pageYOffset;
-              doc.children?.[nextPos]?.ref?.current?.scrollIntoView(false);
+            slotProps={{
+              tooltip: { title: "Jump to Next" },
+              // Nothing to jump to after the reader's last line.
+              fab: { disabled: !next },
             }}
+            onClick={jumpToNext}
           />
         )}
         {halls && halls.length > 0 && (
@@ -700,7 +819,6 @@ export function DocView({
           slotProps={{ tooltip: { title: "Zoom In/Out" } }}
           onClick={(event) => setZoomAnchorEl(event.currentTarget)}
         />
-        ))
       </SpeedDial>
 
       <ZoomMenu
@@ -715,6 +833,7 @@ export function DocView({
         setAnchorEl={setTocAnchorEl}
         onCloseExtra={() => setSdOpen(false)}
         entries={contents}
+        onTitle={goToTitle}
       />
       {halls && halls.length > 0 && (
         <>
@@ -739,7 +858,7 @@ export function DocView({
             onGoTo={(hall) => {
               // Armed as Jump to Next arms it, before scrolling; the dialog
               // closing renders the button as Jump Back.
-              jumped.current = window.pageYOffset;
+              setJumpedFrom(window.pageYOffset);
               setViewingHall(null);
               setHallSheetOpen(false);
               setSdOpen(false);

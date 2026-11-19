@@ -3,9 +3,16 @@
  * opens every `<details>` it is in (a hall under a `summary` is drawn in a
  * closed one), then sets the hash to it, which scrolls it into view. A hash
  * already pointing at it would not scroll again, so then it scrolls itself.
- * Returns whether the figure was found.
+ * With `replace`, as the reader's contents use it, it scrolls itself and
+ * records the hash with `replaceState`, so jumps add no history entries;
+ * the state is `null`, as the reader's variables write it, so Next syncs
+ * the address it keeps. Returns whether the figure was found.
  */
-export function revealHall(ordinal: number, doc: Document = document): boolean {
+export function revealHall(
+  ordinal: number,
+  doc: Document = document,
+  { replace = false }: { replace?: boolean } = {},
+): boolean {
   const id = `hall-${ordinal}`;
   const figure = doc.getElementById(id);
   if (!figure) return false;
@@ -15,8 +22,16 @@ export function revealHall(ordinal: number, doc: Document = document): boolean {
     details = details.parentElement?.closest("details")
   )
     details.open = true;
-  const location = doc.defaultView?.location;
-  if (!location || location.hash === `#${id}`) figure.scrollIntoView();
+  const view = doc.defaultView;
+  const location = view?.location;
+  if (replace && view && location) {
+    figure.scrollIntoView();
+    view.history.replaceState(
+      null,
+      "",
+      `${location.pathname}${location.search}#${id}`,
+    );
+  } else if (!location || location.hash === `#${id}`) figure.scrollIntoView();
   else location.hash = id;
   return true;
 }

@@ -202,7 +202,9 @@ describe("a hall in the address", () => {
     await waitFor(() => expect(scrolled).toEqual(["hall-2"]));
     expect(location.hash).toBe("");
     expect(location.pathname + location.search).toBe("/doc/test?x=1");
-    expect(history.state).toEqual({ router: 1 });
+    // A `null` state, as the variables write it, so Next syncs the address
+    // it keeps rather than restoring the old one at its next commit.
+    expect(history.state).toBeNull();
     // The private reader unmounts and remounts its view on every re-show.
     cleanup();
     render(<DocView doc={threeHalls()} searchParams={null} />);
@@ -740,7 +742,15 @@ describe("gestures on the viewer", () => {
 });
 
 describe("the Table of Contents", () => {
-  it("lists each hall under its title and goes to it", () => {
+  it("lists each hall under its title and goes to it, adding no history entry", () => {
+    const scrolled: string[] = [];
+    Object.defineProperty(Element.prototype, "scrollIntoView", {
+      configurable: true,
+      value(this: Element) {
+        scrolled.push(this.id);
+      },
+    });
+    const entries = history.length;
     render(<DocView doc={threeHalls()} searchParams={null} />);
     openSpeedDial();
     fireEvent.click(action("Table of Contents") as HTMLElement);
@@ -762,13 +772,30 @@ describe("the Table of Contents", () => {
     fireEvent.click(screen.getByRole("menuitem", { name: "Hidden" }));
     expect(location.hash).toBe("#hall-2");
     expect(details.open).toBe(true);
+    expect(scrolled).toEqual(["hall-2"]);
+    expect(history.length).toBe(entries);
+    Reflect.deleteProperty(Element.prototype, "scrollIntoView");
   });
 
-  it("still jumps to titles", () => {
-    render(<DocView doc={threeHalls()} searchParams={null} />);
-    openSpeedDial();
-    fireEvent.click(action("Table of Contents") as HTMLElement);
-    fireEvent.click(screen.getByRole("menuitem", { name: "Advancement" }));
-    expect(location.hash).toBe("#Advancement");
+  it("still jumps to titles, without a history entry", () => {
+    const scrolled: Element[] = [];
+    Object.defineProperty(Element.prototype, "scrollIntoView", {
+      configurable: true,
+      value(this: Element) {
+        scrolled.push(this);
+      },
+    });
+    try {
+      const entries = history.length;
+      render(<DocView doc={threeHalls()} searchParams={null} />);
+      openSpeedDial();
+      fireEvent.click(action("Table of Contents") as HTMLElement);
+      fireEvent.click(screen.getByRole("menuitem", { name: "Advancement" }));
+      expect(location.hash).toBe("#Advancement");
+      expect(history.length).toBe(entries);
+      expect(scrolled.map((element) => element.id)).toEqual(["Advancement"]);
+    } finally {
+      Reflect.deleteProperty(Element.prototype, "scrollIntoView");
+    }
   });
 });

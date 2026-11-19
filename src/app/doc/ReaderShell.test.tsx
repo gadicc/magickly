@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { readFileSync } from "node:fs";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { RitualRow } from "@/doc/ritualHalls";
@@ -76,11 +76,17 @@ describe("the reader shell", () => {
         <DocView doc={doc} searchParams={null} />
       </ReaderShell>,
     );
-    for (const area of ["controls", "body"])
-      expect(
-        container.querySelector<HTMLElement>(`[data-reader-area="${area}"]`)
-          ?.style.fontSize,
-      ).toBe("100%");
+    const scaled = () => [
+      screen
+        .getByRole("combobox", { name: "My Role" })
+        .closest<HTMLElement>('[style*="font-size"]')?.style.fontSize,
+      container.querySelector<HTMLElement>('[data-reader-area="body"]')?.style
+        .fontSize,
+    ];
+    expect(scaled()).toEqual(["100%", "100%"]);
+    // The rail's control is the floating button's zoom.
+    fireEvent.click(screen.getByRole("button", { name: "increase font size" }));
+    expect(scaled()).toEqual(["105%", "105%"]);
     expect(
       container.querySelector<HTMLElement>('[data-reader-area="title"]')?.style
         .fontSize,

@@ -195,25 +195,21 @@ class Task extends Node {
 
     // The same role again continues its turn, whatever the kinds: the frame
     // closes up and tucks a direction under speech (plan 089, decision 3).
+    // Every direction after a speech in the turn tucks, not only the first,
+    // so a say, do, do run keeps its directions in line.
     const prev = this.prev();
-    const continues =
-      prev && prev.block.role === role
-        ? prev.block.do
-          ? "do"
-          : "say"
-        : undefined;
-
-    // biome-ignore lint/correctness/useHookAtTopLevel: JRT invokes render as its React component
-    const ref = React.useRef();
-    // biome-ignore lint/correctness/useHookAtTopLevel: JRT invokes render as its React component
-    React.useEffect(() => {
-      this.block.ref = ref;
-      this.block.forMe = forMe;
-      return () => {
-        delete this.block.ref;
-        delete this.block.forMe;
-      };
-    });
+    let continues;
+    if (prev && prev.block.role === role) {
+      continues = prev.block.do ? "do" : "say";
+      let node = prev;
+      while (block.do && node && node.block.role === role) {
+        if (!node.block.do) {
+          continues = "say";
+          break;
+        }
+        node = node.prev();
+      }
+    }
 
     function renderChildren(node, children) {
       return children ? children.map((child, i) => child.render(i)) : null;
@@ -253,7 +249,7 @@ class Task extends Node {
       </FootnotesFrame>
     ) : null;
     return (
-      <div key={key} ref={ref}>
+      <div key={key}>
         <TaskFrame
           role={role}
           roles={roles}

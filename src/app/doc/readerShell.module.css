@@ -1,10 +1,11 @@
 /* The ritual reader's page (plan 089, decision 2): the ritual surface from
    the app bar down, and one grid holding the page title, the display
-   variables and the ritual in a reading column. The areas are named so
-   that the rails (stage C) can join them as columns either side from
-   1,200 px without moving anything. Logical properties throughout: the
-   shell follows the interface's direction; the ritual body inside it keeps
-   its own dir="ltr" (DocRender). */
+   variables and the ritual in a reading column; from 1,200 px, rails either
+   side. Every control is in the DOM once and placed here, never chosen by
+   script: the server, the prerendered built-in rituals and the variables'
+   local state all need the one instance. Logical properties throughout:
+   the shell follows the interface's direction, so Contents is on the
+   inline-start side; the ritual body keeps its own dir="ltr" (DocRender). */
 .shell {
   display: grid;
   grid-template-columns: minmax(0, 46rem);
@@ -19,6 +20,11 @@
   min-block-size: calc(100vh - var(--app-bar, 56px));
   min-block-size: calc(100dvh - var(--app-bar, 56px));
   background: var(--mui-palette-ritual-surface);
+  /* Where the rails stick: below the app bar, or the top while it hides. */
+  --rail-top: calc(var(--app-bar, 56px) + 16px);
+}
+:global(html[data-app-bar-hidden]) .shell {
+  --rail-top: 16px;
 }
 /* Anything not placed, such as a loading or not-found message, reads in
    the column; nothing is wider than it. The areas below come later and
@@ -44,4 +50,121 @@
    both honour it. Only here: the editor's preview scrolls in its own pane. */
 .body :global([id]) {
   scroll-margin-block-start: calc(var(--app-bar, 56px) + 8px);
+}
+
+/* Below 1,200 px the floating button does the rails' work: no Contents,
+   and of the controls only the variables, at the top of the column. */
+.contents,
+.railOnly {
+  display: none;
+}
+
+@media (min-width: 1200px) {
+  .shell {
+    grid-template-columns: 15rem minmax(0, 46rem) 15rem;
+    grid-template-areas:
+      "contents title controls"
+      "contents body controls";
+    /* Rails taller than a short ritual leave their room under the body,
+       not between the title and the ritual. */
+    grid-template-rows: auto 1fr;
+    column-gap: 24px;
+  }
+  .contents {
+    display: block;
+    grid-area: contents;
+  }
+  .railOnly {
+    display: block;
+  }
+  .columnOnly {
+    display: none;
+  }
+  .contents,
+  .controls {
+    align-self: start;
+    position: sticky;
+    inset-block-start: var(--rail-top);
+    max-block-size: calc(100vh - var(--rail-top) - 16px);
+    max-block-size: calc(100dvh - var(--rail-top) - 16px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transition: inset-block-start 0.2s;
+  }
+  /* Light cards on the surface. */
+  .panel {
+    padding: 12px;
+    border: 1px solid var(--mui-palette-divider);
+    border-radius: 8px;
+    background: var(--mui-palette-background-paper);
+  }
+  .controls .panel + .panel {
+    margin-block-start: 12px;
+  }
+  /* The variables' inputs fit the rail. */
+  .controls :global(.MuiFormControl-root),
+  .controls :global(.MuiSelect-root) {
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+  .speedDial {
+    display: none;
+  }
+}
+
+.label {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mui-palette-text-secondary);
+}
+.entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.contents .entries a {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding-block: 4px;
+  padding-inline: 8px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  line-height: 1.3;
+  color: var(--mui-palette-text-primary);
+  text-decoration: none;
+}
+.contents .entries a:hover {
+  background: var(--mui-palette-action-hover);
+}
+.contents .entries a[aria-current] {
+  background: var(--mui-palette-action-selected);
+  font-weight: 500;
+}
+/* A hall, indented under its title, as the Table of Contents has it. */
+.contents .entries .hallEntry a {
+  padding-inline-start: 24px;
+  color: var(--mui-palette-primary-main);
+}
+.count {
+  margin: 0 0 4px;
+  font-size: 0.875rem;
+}
+.hallButton {
+  justify-content: flex-start;
+  text-align: start;
+  text-transform: none;
+}
+.jumps {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.textSize {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }

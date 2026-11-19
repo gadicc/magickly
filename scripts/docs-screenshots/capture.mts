@@ -297,6 +297,27 @@ const shots: Shot[] = [
       );
     },
   },
+  {
+    // Both rails beside the column (plan 089), a little into the opening so
+    // directions show. Scrolling back up a step brings the app bar back.
+    name: "reader-desktop",
+    persona: "reader",
+    viewport: [1440, 900],
+    open: async (b) => {
+      const path = await ritualPath(b, "Neophyte 0=0");
+      await b.goto(base + path);
+      await b.waitFor(
+        `document.body.innerText.includes('Opening of the Hall of the Neophytes')`,
+      );
+      // The hall drawing fills the first screen; land on the first tasks
+      // below it, past the opening title, so the section is marked.
+      const y = `document.querySelector('[data-ritual-frame="task"]').getBoundingClientRect().top + window.scrollY - 260`;
+      await b.evaluate(`window.scrollTo(0, ${y} + 100)`);
+      await sleep(400);
+      await b.evaluate(`window.scrollTo(0, ${y})`);
+      await sleep(800);
+    },
+  },
 ];
 
 const helpers = `

@@ -16,6 +16,7 @@ import forumSettings from "../../../help/temples/images/forum-settings.webp";
 import joinCode from "../../../help/temples/images/join-code.webp";
 import members from "../../../help/temples/images/members.webp";
 import myTemples from "../../../help/temples/images/my-temples.webp";
+import readerDesktop from "../../../help/temples/images/reader-desktop.webp";
 import readerPhone from "../../../help/temples/images/reader-phone.webp";
 import recentlyDeleted from "../../../help/temples/images/recently-deleted.webp";
 import removeMember from "../../../help/temples/images/remove-member.webp";
@@ -307,6 +308,13 @@ export default function TemplesGuide() {
         A temple ritual on a phone, laid out to read at a glance rather than as
         a scan of a photocopy.
       </Figure>
+      <Figure
+        image={readerDesktop}
+        alt="The same ritual on a wide screen: its contents on the left with the current section marked, the ritual in a centred column with speech in bubbles and directions in red, and on the right the role you read as, the count to your next line, the halls and the text size."
+      >
+        On a wide screen, the contents and the reading controls sit beside the
+        ritual.
+      </Figure>
 
       <h2 id="editor">The ritual editor</h2>
       <p>
@@ -505,7 +513,8 @@ export default function TemplesGuide() {
 
       <h2 id="halls">Temple halls</h2>
       <p>
-        Inside a ritual, the floating button’s <strong>Halls</strong> opens the
+        Inside a ritual, the floating button’s <strong>Halls</strong>, or on a
+        wide screen the <strong>Halls</strong> beside the ritual, opens the
         ritual’s halls full screen. Pinch, or use Ctrl and the scroll wheel, to
         zoom. <strong>Go to it in the ritual</strong> takes you to the hall in
         the text.
