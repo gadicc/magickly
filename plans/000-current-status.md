@@ -168,11 +168,13 @@ Follow-ups are separate from the completed migration work:
   ([plan 091](091-regardie-golden-dawn-copyright.md)). The rose sigil's
   Provenance row is signed again.
 - 19 November 2026: the 72 angels' Rose Cross sigils on their pages
-  (plan 088, stage S4), on `gate/angel-sigils`, not merged: a PNG and an
+  (plan 088, stage S4), merged the same day: a PNG and an
   SVG per angel, prerendered at build under its page as the temple halls'
   files are, shown after the table with links to download them and to
   the generator; an `ImageObject` for each in the page's JSON-LD and both
-  in the sitemap; the image route's copies marked noindex
+  in the sitemap; the image route's copies marked noindex; the sigil a
+  second share image, the two Lauviahs numbered, and the generator
+  linking the angels' pages, with the embeddings refreshed
   ([plan 088](088-rose-sigil-oracle.md#s4-the-angels-pages-19-november-2026)).
 - 18 November 2026: rose sigils drawn by rule (plan 088, stage S2), on
   `gate/rose-sigil-oracle`, not merged: the package plans and places a
@@ -197,11 +199,9 @@ Follow-ups are separate from the completed migration work:
 - TODO: rose sigils after plan 088's S2: Gadi's review of S3's
   side-by-side sheet against Vaughan (built, local only); S5, the kamea profile;
   and the A‑B‑A‑B‑A class the engine cannot place
-  ([plan 088](088-rose-sigil-oracle.md#stages)). S4 is built (below);
-  Gadi reviews its decisions, and decides whether to take the
-  generator's link to the angels' pages
-  (`gate/angel-sigils-generator-link`), which needs a paid
-  `pnpm search:publish` in the same branch.
+  ([plan 088](088-rose-sigil-oracle.md#stages)). S4 is merged (below);
+  open from it: the images' copyright notice ("© 2026 Magick.ly", as the
+  halls', against the About page's "Gadi Cohen").
 - TODO: rate limiting for the public component image routes
   (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through
   WASM on request, and `/api/render/rose-sigil` takes up to about 160 ms

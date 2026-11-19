@@ -1,8 +1,8 @@
 # Rose sigil rules and oracle — 18 November 2026
 
 Status: S0–S2 built (18 November 2026) and merged; S3 built, the sheet
-for Gadi to review ([stages](#stages)); S4 built on `gate/angel-sigils`
-(19 November 2026), not merged. Decided with Gadi
+for Gadi to review ([stages](#stages)); S4 built and merged
+(19 November 2026). Decided with Gadi
 ([decisions](#decisions)); the design and the build each reviewed
 adversarially ([below](#review-18-november-2026)). Read
 `packages/magick-components/src/gd/roseSigilInternals.ts` (the path rules
@@ -603,8 +603,8 @@ in S0; the five that do not are #7, #26, #43, #70 and #72.
 Each of the 72 angels' pages (`/kabbalah/angel/<slug>`) shows its sigil,
 served as two static files, with the structured data and sitemap entries
 the temple halls have. It follows [plan 062](062-gd-hall-seo.md)'s
-decisions 3, 7, 10 and 13. Built on `gate/angel-sigils`, not merged. The
-orchestrator decided, for Gadi to review:
+decisions 3, 7, 10 and 13. Built on `gate/angel-sigils` and merged on
+19 November. The orchestrator decided, for Gadi to review:
 
 1. **Files.** `<slug>-rose-cross-sigil.png` and `.svg` under each page,
    144 in all, prerendered at build by a route handler
@@ -660,6 +660,26 @@ orchestrator decided, for Gadi to review:
 The search index is unchanged: the angels' pages enter the catalogue by
 their titles and descriptions, which S4 leaves alone.
 
+### After Gadi's review (19 November 2026)
+
+- **The generator's link** (decision 6) is taken, as `fa2b4549`, with
+  the embeddings refreshed by `pnpm search:publish` in the commit after
+  it, so no commit between them is pushed.
+- **The two Lauviahs** (11 and 17) share their name, so their sigils are
+  the same figure. Plan 033 gave a shared name its number in the URL and
+  nowhere it is not needed; the sigil's alt text, caption and
+  structured-data name follow suit ("Lauviah, angel 11 of the 72"), from
+  a second message. The file names already had the number from the slug.
+  Elsewhere both are usually just "Lauviah"; Reuchlin (1517) spells the
+  17th "Loviah".
+- **A share image.** The sigil's PNG is each angel page's second Open
+  Graph image, after the page's card, as the halls' drawings are (plan
+  062, decision 11).
+- **Open: the copyright notice.** The JSON-LD reuses the halls'
+  `copyrightNotice`, "© 2026 Magick.ly", while the About and Open source
+  pages say "Copyright (c) 2020–2026 Gadi Cohen", and Magick.ly is not a
+  legal entity. Gadi to decide; it applies to the halls as well.
+
 ### Commits
 
 | Commit | Change |
@@ -668,3 +688,5 @@ their titles and descriptions, which S4 leaves alone.
 | 7468e8ce | The section on each angel's page, in English and Hebrew |
 | 4373841d | The JSON-LD graph and the sitemap's image entries |
 | f4889048 | `indexed: false` on the `rose-sigil` contract |
+| fa2b4549 | The generator links the angels' pages (decision 6) |
+| 36a3c91c | The Lauviahs numbered; the sigil as a share image |
