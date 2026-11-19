@@ -40,6 +40,8 @@ it("links its examples into the generator and the 72 angels", () => {
       `href="/gd/sigils?text=${encodeURIComponent(text)}"`,
     );
   expect(html).toContain('href="/kabbalah/yhvh/72angels"');
+  // The angels' pages show their sigils (plan 088, S4).
+  expect(html).toContain('href="/kabbalah/angel/vehuiah"');
 });
 
 it("is translated into Hebrew, with the English headings' anchor kept", () => {

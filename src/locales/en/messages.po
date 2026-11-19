@@ -1481,6 +1481,11 @@ msgstr "Try <0>Metatron</0>, <1>Elohim</1>, <2>YHVH Elohim</2> or <3>Shabbathai<
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/SigilsText.tsx
+msgid "Every one of the <0>72 angels' pages</0> shows the sigil of its name, with the files to download, as <1>Vehuiah's</1> does."
+msgstr "Every one of the <0>72 angels' pages</0> shows the sigil of its name, with the files to download, as <1>Vehuiah's</1> does."
+
+#. js-lingui-explicit-id
+#: src/app/gd/sigils/SigilsText.tsx
 msgid "Sources"
 msgstr "Sources"
 

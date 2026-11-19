@@ -178,6 +178,17 @@ export default function SigilsText() {
           }}
         />
       </p>
+      <p>
+        <UiRichText
+          message={
+            /*i18n*/ "Every one of the <0>72 angels' pages</0> shows the sigil of its name, with the files to download, as <1>Vehuiah's</1> does."
+          }
+          components={{
+            0: <Link href="/kabbalah/yhvh/72angels" />,
+            1: <Link href="/kabbalah/angel/vehuiah" />,
+          }}
+        />
+      </p>
 
       <H3>
         <UiRichText message={/*i18n*/ "Sources"} />
