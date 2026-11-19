@@ -1,7 +1,8 @@
 # Rose sigil rules and oracle — 18 November 2026
 
 Status: S0–S2 built on `gate/rose-sigil-oracle` (18 November 2026), not
-merged; S3 in part ([stages](#stages)). Decided with Gadi
+merged; S3 in part ([stages](#stages)); S4 built on `gate/angel-sigils`
+(19 November 2026), not merged. Decided with Gadi
 ([decisions](#decisions)); the design and the build each reviewed
 adversarially ([below](#review-18-november-2026)). Read
 `packages/magick-components/src/gd/roseSigilInternals.ts` (the path rules
@@ -449,7 +450,7 @@ per-figure annotations of Vaughan's work.
 | S1 (done) | Oracle first: layout interface with the rose and a kamea stub, hand fixtures, corpus, O1 reference (written blind), O2 with fixed thresholds and a feasibility proof for the worst case (ללהאל: two strokes and a noose within the slack at Aleph), O3 ink decoder, mutation suite, report script | The oracle flags every row of "What is wrong today" and every mutant, and passes the hand fixtures |
 | S2 (done) | `planSigil`, rule placement, renderer; R2 (words) in the package, page and contract; the golden tests that pin today's squiggles and one COBYLA layout (`roseSigilGeometry.test.ts:101-113`, `147-156`, `291-306`) replaced by O1–O3; `points` deprecated, the optimiser retired (decision 7); a contact sheet of every corpus vertex 0.5–3 units off its chord, drawn at 1 unit, for judging R4's tolerance | O1–O3 green on the exhaustive corpus, O2 including the 1-ulp check; the image route's cache key changes with the drawing |
 | S3 (in part) | O4 against Vaughan; disagreements classified and counted here. Marks compared (67 of 72 agree, [S0](#s0-the-annotations-18-november-2026)); the side-by-side sheet is not built | Gadi reviews the side-by-side sheet locally |
-| S4 (later) | The 72 angels pages: sigils rendered at build, cached, linked to `/gd/sigils?text=…`; caching and SEO decided then | Its own section |
+| S4 (built) | The 72 angels pages: sigils rendered at build, cached, linked to `/gd/sigils?text=…`; caching and SEO decided then | [Its own section](#s4-the-angels-pages-19-november-2026); Gadi reviews the decisions |
 | S5 (later) | Kamea profile and layout on `Kamea`. What S1 found: Zazel's figure (p. 81) has a circle at both ends and no bar, Taphthartharath's (p. 85) neither circle nor bar, and both draw a return to a cell as a rounded U beside the outgoing stroke; p. 85's printed Mercury square swaps three pairs of cells against Agrippa's (none the name uses); a 1-unit noose tolerance is 0.1 cell, which on a 9×9 square catches near-diagonal passes | Its own plan |
 
 `/gd/sigils` is not among the docs screenshots, so no capture is needed.
@@ -580,3 +581,74 @@ passed the hand fixtures; it then matched the reference on every text.
 Still unchecked: Safari and Firefox (headless Chromium only, for the
 draw-on); the side-by-side sheet against Vaughan; Regardie's renewal
 status.
+
+## S4: the angels' pages (19 November 2026)
+
+Each of the 72 angels' pages (`/kabbalah/angel/<slug>`) shows its sigil,
+served as two static files, with the structured data and sitemap entries
+the temple halls have. It follows [plan 062](062-gd-hall-seo.md)'s
+decisions 3, 7, 10 and 13. Built on `gate/angel-sigils`, not merged. The
+orchestrator decided, for Gadi to review:
+
+1. **Files.** `<slug>-rose-cross-sigil.png` and `.svg` under each page,
+   144 in all, prerendered at build by a route handler
+   (`src/app/kabbalah/angel/[slug]/[file]/route.ts`, beside the page's
+   components; the page itself is in `(public)`, at the same URL) with
+   `generateStaticParams` over the 72 and `dynamicParams = false`. Each is
+   drawn in process by `renderComponentImage("rose-sigil", …)` from the
+   site's spelling (`name.he`), on the Golden Dawn's rose, rose shown; the
+   PNG at the contract's raster default, 1,024 pixels square. The headers
+   are the halls' (`public, max-age=0, must-revalidate`, an ETag from the
+   SHA-256, `nosniff`, an inline `Content-Disposition` with the file
+   name). Both files are indexable. `src/seo/angelSigils.ts` names them.
+2. **The page.** A "Rose Cross sigil" section after the table: the PNG
+   as an `<img>` with its intrinsic size and alt text in our own words
+   ("The Rose Cross sigil of Vehuiah, והויה, traced on the Golden Dawn's
+   rose of 22 letters"), on the light plate in the dark scheme (plan
+   076); a sentence linking the generator with the name in it
+   (`/gd/sigils?text=…`, encoded as the generator's own examples are);
+   and "Download PNG" and "Download SVG". The new copy, the alt text
+   included, is marked for Lingui and translated into Hebrew, though the
+   page itself is not translated yet; the section is a small client
+   component so that the alt attribute can be. Ariel's golden is
+   regenerated for the new text, the only change.
+3. **Structured data.** The page's JSON-LD is one graph: the
+   `BreadcrumbList` it already had, then an `ImageObject` for the PNG and
+   one for the SVG, each `contentUrl` exactly the page's URL for it. The
+   caption is the alt text's English, from the same message. Licence,
+   credit and notice are those the About page states for every image a
+   component draws (CC BY 4.0, "Magick.ly, drawn by magick-components
+   (MIT)"), as the halls state them; `isBasedOn` is Regardie, vol. 4,
+   p. 57 (leaf n51), the only source of the rules. The SVG has only a
+   viewBox, so its node gives no pixel size.
+4. **Sitemap.** Each angel's entry lists its PNG and SVG, the PNG first.
+5. **API copies.** The `rose-sigil` contract gains `indexed: false`. The
+   route already sent `X-Robots-Tag: noindex` for every sigil, because the
+   contract is `personal`; the flag records the new reason.
+6. **Internal links: held back.** A sentence in the generator's text
+   saying every angel's page shows its sigil, linking the list and
+   Vehuiah's page, changes `/gd/sigils`'s indexed prose. That moves the
+   search catalogue's digest, and `src/search/embeddings/manifest.test.ts`
+   and `src/search/semantic.test.ts` fail until the embeddings are
+   refreshed with `pnpm search:publish`, a paid call not made here. The
+   commit (`46a201bc`, with its Hebrew) is kept on
+   `gate/angel-sigils-generator-link`, on top of this branch's fourth
+   commit, for Gadi to take with a refresh. Until then the generator
+   still links the list, and each angel's page links the generator. The
+   list page is unchanged.
+7. **Pins.** No new byte pins: the registry's digest over the 72 names
+   already holds the drawings under `magickli-rose-sigil-image-v1`. Tests
+   hold the 144 files' params and names to the slug table, and the route's
+   bytes to `renderComponentImage`'s for Vehuiah.
+
+The search index is unchanged: the angels' pages enter the catalogue by
+their titles and descriptions, which S4 leaves alone.
+
+### Commits
+
+| Commit | Change |
+| --- | --- |
+| 528b9fda | The 144 static files, their route and names |
+| 7468e8ce | The section on each angel's page, in English and Hebrew |
+| 4373841d | The JSON-LD graph and the sitemap's image entries |
+| f4889048 | `indexed: false` on the `rose-sigil` contract |

@@ -167,6 +167,13 @@ Follow-ups are separate from the completed migration work:
   copyright (facts and links only); AGENTS.md carries the rule
   ([plan 091](091-regardie-golden-dawn-copyright.md)). The rose sigil's
   Provenance row is signed again.
+- 19 November 2026: the 72 angels' Rose Cross sigils on their pages
+  (plan 088, stage S4), on `gate/angel-sigils`, not merged: a PNG and an
+  SVG per angel, prerendered at build under its page as the temple halls'
+  files are, shown after the table with links to download them and to
+  the generator; an `ImageObject` for each in the page's JSON-LD and both
+  in the sitemap; the image route's copies marked noindex
+  ([plan 088](088-rose-sigil-oracle.md#s4-the-angels-pages-19-november-2026)).
 - 18 November 2026: rose sigils drawn by rule (plan 088, stage S2), on
   `gate/rose-sigil-oracle`, not merged: the package plans and places a
   sigil by the Golden Dawn's rules; the oracle passes all 72 names and
@@ -188,10 +195,13 @@ Follow-ups are separate from the completed migration work:
   with when to drop the overrides.
 
 - TODO: rose sigils after plan 088's S2: S3's
-  side-by-side sheet against Vaughan (local only); S4, the 72 angels'
-  sigils on their pages, with caching and SEO; S5, the kamea profile;
+  side-by-side sheet against Vaughan (local only); S5, the kamea profile;
   and the A‑B‑A‑B‑A class the engine cannot place
-  ([plan 088](088-rose-sigil-oracle.md#stages)).
+  ([plan 088](088-rose-sigil-oracle.md#stages)). S4 is built (below);
+  Gadi reviews its decisions, and decides whether to take the
+  generator's link to the angels' pages
+  (`gate/angel-sigils-generator-link`), which needs a paid
+  `pnpm search:publish` in the same branch.
 - TODO: rate limiting for the public component image routes
   (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through
   WASM on request, and `/api/render/rose-sigil` takes up to about 160 ms
