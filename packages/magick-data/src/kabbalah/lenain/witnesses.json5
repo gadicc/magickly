@@ -19,6 +19,8 @@
 // `verdict` says whose slip a note's departure is:
 //   reissue           the 1823 printing has what is required; the
 //                     reissue's resetting introduced the error.
+//   reissueChanged    the 1823 printing has another word, which the
+//                     reissue replaced; not a misprint, but not Lenain's.
 //   lenain            the 1823 printing has the same; the slip is Lenain's or
 //                     his printer's, not the reissue's.
 //   reissueCorrected  the 1823 printing has a slip the reissue does not.
@@ -48,17 +50,35 @@
 // read is its bare letters: the machines' marks were not trusted (see
 // scripts/seventyTwoAngels/hebrew.ts), so the reissue's dots are recorded
 // only for the names a person read.
+//
+// The nations and names of God (`people`, `godName`) are read where an entry
+// departs from Kircher's plate, Lenain's source for them (kircherPlate.json5,
+// beside this file), from the 1823 printing only, no manuscript. `reads` is
+// the phrase as printed ("la langue des Samaritains"), or empty where the
+// entry names none. They were read on 19 November 2026 from crops of the
+// page images by a machine reader (Claude Sonnet 5.5) not told the edition's
+// values or the plate's, and checked by eye against the page by another
+// (Claude Opus 5.5); the two agreed on every one. Where the 1823 entry has
+// what the reissue has, the departure is Lenain's (`lenain`); where it is
+// silent too, `agree`.
 {
   readings: [
     {"no": 1, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 46, "reads": "20 mars, 31 avril, 11 août, 22 octobre, 2 janvier"}, "ms5365": {"at": 54, "reads": "20 mars, 31 avril, 11 août, 22 octobre, 2 janvier"}},
+    {"no": 2, "field": "godName", "verdict": "lenain", "print1823": {"at": 47, "reads": "Aydy"}},
+    {"no": 2, "field": "people", "verdict": "lenain", "print1823": {"at": 47, "reads": "la Turquie"}},
+    {"no": 3, "field": "godName", "verdict": "agree", "print1823": {"at": 47, "reads": ""}},
+    {"no": 3, "field": "people", "verdict": "agree", "print1823": {"at": 47, "reads": ""}},
     {"no": 5, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 49, "reads": "24 mars, 4 juin, 14 août, 26 octobre, 6 janvier"}, "ms5365": {"at": 57, "reads": "24 mars, 4 juin, 14 août, 26 octobre, 6 janvier"}},
     {"no": 6, "field": "name.he", "verdict": "reissueCorrected", "print1823": {"at": 49, "reads": "ללחאל"}, "ms5365": {"at": 57, "reads": "ללחאל"}, "remark": "The triad of the Shem HaMephorash is ללה, so the reissue's he is right and the 1823 het a slip."},
     {"no": 6, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 49, "reads": "25 mars, 5 juin, 15 août, 27 octobre, 7 janvier"}, "ms5365": {"at": 57, "reads": "25 mars, 5 juin, 15 août, 27 octobre, 7 janvier"}},
+    {"no": 7, "field": "godName", "verdict": "agree", "print1823": {"at": 50, "reads": ""}},
+    {"no": 7, "field": "people", "verdict": "agree", "print1823": {"at": 50, "reads": ""}},
     {"no": 7, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 50, "reads": "26 mars, 6 juin, 16 août, 28 octobre, 8 janvier"}, "ms5365": {"at": 58, "reads": "26 mars, 6 juin, 16 août, 28 octobre, 8 janvier"}},
     {"no": 8, "field": "invocation", "verdict": "absent", "print1823": {"at": 50, "reads": ""}, "ms5365": {"at": 59, "reads": ""}},
     {"no": 8, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 51, "reads": "27 mars, 7 juin, 17 août, 29 octobre, 9 janvier"}, "ms5365": {"at": 59, "reads": "27 mars, 7 juin, 17 août, 29 octobre, 9 janvier"}},
     {"no": 9, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 51, "reads": "28 mars, 8 juin, 18 août, 30 octobre, 10 janvier"}, "ms5365": {"at": 59, "reads": "28 mars, 8 juin, 18 août, 30 octobre, 10 janvier"}},
     {"no": 10, "field": "degrees", "verdict": "lenain", "print1823": {"at": 52, "reads": "41–50"}, "ms5365": {"at": 60, "reads": "41–50"}},
+    {"no": 10, "field": "godName", "verdict": "lenain", "print1823": {"at": 52, "reads": "Siré et Eipi"}},
     {"no": 10, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 52, "reads": "29 mars, 9 juin, 19 août, 31 octobre, 11 janvier"}, "ms5365": {"at": 60, "reads": "29 mars, 9 juin, 19 août, 31 octobre, 11 janvier"}},
     {"no": 11, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 52, "reads": "30 mars, 10 juin, 20 août, 1 novembre, 12 janvier"}, "ms5365": {"at": 61, "reads": "30 mars, 10 juin, 20 août, 1 novembre, 12 janvier"}},
     {"no": 12, "field": "name.he", "verdict": "reissueCorrected", "print1823": {"at": 53, "reads": "חהעיה"}, "remark": "The 1823 page sets a clear het beside a clear he. The triad of the Shem HaMephorash is ההע, so the reissue's he is right and the 1823 het a slip."},
@@ -75,6 +95,7 @@
     {"no": 22, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 59, "reads": "10 avril, 21 juin, 1 septembre, 12 novembre, 22 janvier"}, "ms5365": {"at": 67, "reads": "10 avril, 21 juin, 1 septembre, 12 novembre, 22 janvier"}},
     {"no": 23, "field": "name.he", "verdict": "agree", "print1823": {"at": 60, "reads": "מלהאל"}, "ms5365": {"at": 68, "reads": "מלהאל"}},
     {"no": 24, "field": "name.he", "verdict": "agree", "print1823": {"at": 60, "reads": "ההויה"}, "remark": "The triad of the Shem HaMephorash, from Exodus 14:19–21, is חהו: the verse has het where both printings have he."},
+    {"no": 26, "field": "godName", "verdict": "lenain", "print1823": {"at": 62, "reads": "Agdy et Abdi"}},
     {"no": 28, "field": "name.he", "verdict": "agree", "print1823": {"at": 63, "reads": "שאהיה"}, "ms5365": {"at": 71, "reads": "שאהיה"}},
     {"no": 29, "field": "name.he", "verdict": "agree", "print1823": {"at": 64, "reads": "רייאל"}, "ms5365": {"at": 72, "reads": "רייאל"}},
     {"no": 30, "field": "decade", "verdict": "lenain", "print1823": {"at": 64, "reads": "9e décade"}, "ms5365": {"at": 72, "reads": "9e décade"}},
@@ -82,39 +103,53 @@
     {"no": 30, "field": "presidingDays", "verdict": "mixed", "print1823": {"at": 64, "reads": "28 avril, 29 juin, 9 septembre, 20 novembre, 18 janvier"}, "ms5365": {"at": 72, "reads": "28 avril, 29 juin, 9 septembre, 20 novembre, 18 janvier"}, "remark": "28 avril is Lenain's slip, and the reissue keeps it; 18 janvier for the fifth day is his too, which the reissue corrected to the 31st the tables require."},
     {"no": 33, "field": "name.he", "verdict": "agree", "print1823": {"at": 66, "reads": "יהויה"}, "remark": "The triad of the Shem HaMephorash, from Exodus 14:19–21, is יחו: the verse has het where both printings have he."},
     {"no": 34, "field": "name.he", "verdict": "agree", "print1823": {"at": 67, "reads": "לההיה"}, "ms5365": {"at": 75, "reads": "לההיה"}, "remark": "The triad of the Shem HaMephorash, from Exodus 14:19–21, is להח: the verse has het where both printings have he."},
+    {"no": 35, "field": "people", "verdict": "agree", "print1823": {"at": 68, "reads": ""}},
     {"no": 37, "field": "name.he", "verdict": "reissue", "print1823": {"at": 69, "reads": "אניאל"}, "ms5365": {"at": 77, "reads": "אניאל"}, "remark": "The triad of the Shem HaMephorash is אני."},
     {"no": 38, "field": "invocation", "verdict": "absent", "print1823": {"at": 71, "reads": ""}, "ms5365": {"at": 78, "reads": ""}},
     {"no": 38, "field": "name.he", "verdict": "agree", "print1823": {"at": 69, "reads": "העמיה"}, "remark": "The triad of the Shem HaMephorash, from Exodus 14:19–21, is חעמ: the verse has het where both printings have he."},
     {"no": 39, "field": "name.he", "verdict": "agree", "print1823": {"at": 71, "reads": "רהעאל"}, "ms5365": {"at": 79, "reads": "רהעאל"}},
     {"no": 40, "field": "name.he", "verdict": "agree", "print1823": {"at": 72, "reads": "ייזאל"}, "ms5365": {"at": 79, "reads": "ייזאל"}},
     {"no": 41, "field": "name.he", "verdict": "agree", "print1823": {"at": 73, "reads": "הההאל"}, "ms5365": {"at": 80, "reads": "הההאל"}},
+    {"no": 41, "field": "people", "verdict": "lenain", "print1823": {"at": 73, "reads": "la langue Irlandaise"}},
     {"no": 42, "field": "degrees", "verdict": "lenain", "print1823": {"at": 74, "reads": "216–210"}, "ms5365": {"at": 81, "reads": "206–210"}},
     {"no": 43, "field": "name.he", "verdict": "agree", "print1823": {"at": 74, "reads": "ווליה"}, "ms5365": {"at": 81, "reads": "ווליה"}},
     {"no": 44, "field": "invocation", "verdict": "absent", "print1823": {"at": 75, "reads": ""}, "ms5365": {"at": 82, "reads": ""}},
+    {"no": 45, "field": "godName", "verdict": "lenain", "print1823": {"at": 76, "reads": "Hobo"}},
     {"no": 45, "field": "name.he", "verdict": "agree", "print1823": {"at": 76, "reads": "סאליה"}, "ms5365": {"at": 83, "reads": "סאליה"}},
     {"no": 45, "field": "psalm.la", "verdict": "lenain", "print1823": {"at": 76, "reads": "misericordia tua Domine adjuvebat me"}, "ms5365": {"at": 83, "reads": "misericordia tua Domine adjuvebat me"}},
     {"no": 46, "field": "degrees", "verdict": "lenain", "print1823": {"at": 76, "reads": "226–130"}, "ms5365": {"at": 83, "reads": "226–130"}},
+    {"no": 46, "field": "godName", "verdict": "lenain", "print1823": {"at": 76, "reads": "Pino"}},
     {"no": 46, "field": "name.he", "verdict": "agree", "print1823": {"at": 76, "reads": "עריאל"}, "ms5365": {"at": 83, "reads": "עריאל"}},
     {"no": 46, "field": "ordinal", "verdict": "reissue", "print1823": {"at": 76, "reads": "46e"}, "ms5365": {"at": 83, "reads": "46e"}},
     {"no": 47, "field": "name.he", "verdict": "agree", "print1823": {"at": 77, "reads": "עשליה"}, "ms5365": {"at": 84, "reads": "עשליה"}},
+    {"no": 49, "field": "godName", "verdict": "lenain", "print1823": {"at": 78, "reads": "Mara"}},
     {"no": 50, "field": "degrees", "verdict": "lenain", "print1823": {"at": 79, "reads": "246–145"}, "ms5365": {"at": 86, "reads": "246–145"}},
+    {"no": 50, "field": "people", "verdict": "lenain", "print1823": {"at": 79, "reads": "la langue des Samaritains"}},
     {"no": 51, "field": "name.he", "verdict": "agree", "print1823": {"at": 80, "reads": "ההשיה"}, "remark": "The triad of the Shem HaMephorash, from Exodus 14:19–21, is החש: the verse has het where both printings have he."},
+    {"no": 51, "field": "people", "verdict": "lenain", "print1823": {"at": 80, "reads": "la langue des Barsiens"}},
     {"no": 52, "field": "name.he", "verdict": "agree", "print1823": {"at": 81, "reads": "עממיה"}, "ms5365": {"at": 88, "reads": "עממיה"}},
     {"no": 53, "field": "degrees", "verdict": "reissue", "print1823": {"at": 82, "reads": "261–265"}, "ms5365": {"at": 88, "reads": "261–265"}},
     {"no": 53, "field": "name.he", "verdict": "agree", "print1823": {"at": 81, "reads": "ננאאל"}, "ms5365": {"at": 88, "reads": "ננאאל"}},
+    {"no": 53, "field": "people", "verdict": "lenain", "print1823": {"at": 82, "reads": "la langue des Maltais"}},
     {"no": 54, "field": "name.he", "verdict": "agree", "print1823": {"at": 82, "reads": "ניתאל"}, "ms5365": {"at": 89, "reads": "ניתאל"}},
     {"no": 57, "field": "name.he", "verdict": "agree", "print1823": {"at": 85, "reads": "נממיה"}, "ms5365": {"at": 91, "reads": "נממיה"}},
     {"no": 58, "field": "name.he", "verdict": "agree", "print1823": {"at": 85, "reads": "יילאל"}, "ms5365": {"at": 92, "reads": "יילאל"}},
+    {"no": 58, "field": "people", "verdict": "lenain", "print1823": {"at": 85, "reads": "la langue des Célamites"}},
     {"no": 59, "field": "name.he", "verdict": "agree", "print1823": {"at": 86, "reads": "הרהאל"}, "remark": "The triad of the Shem HaMephorash, from Exodus 14:19–21, is הרח: the verse has het where both printings have he."},
+    {"no": 61, "field": "people", "verdict": "lenain", "print1823": {"at": 87, "reads": "la langue des anciens Béthuliens"}},
     {"no": 62, "field": "degrees", "verdict": "reissue", "print1823": {"at": 88, "reads": "306–310"}, "ms5365": {"at": 94, "reads": "306–310"}},
     {"no": 64, "field": "choir", "verdict": "lenain", "print1823": {"at": 90, "reads": "le chœur des anges"}, "ms5365": {"at": 96, "reads": "le chœur des anges"}},
     {"no": 64, "field": "degrees", "verdict": "lenain", "print1823": {"at": 89, "reads": "316–220"}, "ms5365": {"at": 96, "reads": "316–220"}},
     {"no": 64, "field": "name.he", "verdict": "agree", "print1823": {"at": 89, "reads": "מהיאל"}, "remark": "The triad of the Shem HaMephorash, from Exodus 14:19–21, is מחי: the verse has het where both printings have he."},
+    {"no": 64, "field": "people", "verdict": "reissueChanged", "print1823": {"at": 89, "reads": "la langue des Mogols"}},
     {"no": 66, "field": "name.he", "verdict": "agree", "print1823": {"at": 91, "reads": "מנקאה"}, "remark": "Both printings end the name אה, where every other name Lenain spells -el in roman ends אל; the tradition has מנקאל."},
     {"no": 67, "field": "name.he", "verdict": "agree", "print1823": {"at": 91, "reads": "איעאל"}, "ms5365": {"at": 98, "reads": "איעאל"}},
     {"no": 68, "field": "degrees", "verdict": "lenain", "print1823": {"at": 92, "reads": "337–340"}, "ms5365": {"at": 98, "reads": "337–310"}},
+    {"no": 68, "field": "godName", "verdict": "lenain", "print1823": {"at": 92, "reads": "Dépos"}},
     {"no": 68, "field": "name.he", "verdict": "reissue", "print1823": {"at": 92, "reads": "חבויה"}, "ms5365": {"at": 98, "reads": "הבויה"}, "remark": "The triad of the Shem HaMephorash is חבו."},
+    {"no": 68, "field": "people", "verdict": "lenain", "print1823": {"at": 92, "reads": "la langue des Péloponésiens"}},
     {"no": 69, "field": "name.he", "verdict": "reissue", "print1823": {"at": 92, "reads": "ראהאל"}, "remark": "The triad of the Shem HaMephorash is ראה."},
+    {"no": 69, "field": "people", "verdict": "lenain", "print1823": {"at": 92, "reads": "la langue des Crétois"}},
     {"no": 70, "field": "name.he", "verdict": "agree", "print1823": {"at": 93, "reads": "יבמיה"}, "ms5365": {"at": 99, "reads": "יבמיה"}},
     {"no": 71, "field": "name.he", "verdict": "agree", "print1823": {"at": 95, "reads": "הייאל"}, "ms5365": {"at": 101, "reads": "הייאל"}},
     {"no": 71, "field": "presidingDays", "verdict": "reissue", "print1823": {"at": 95, "reads": "29 mai, 9 août, 20 octobre, 31 décembre, 13 mars"}, "ms5365": {"at": 101, "reads": "29 mai, 9 août, 20 octobre, 31 décembre, 13 mars"}},

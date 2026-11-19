@@ -22,9 +22,10 @@ import {
 /**
  * A mirrored page of a cited book, full screen: the page, which pinches,
  * drags and zooms as a hall does in the reader, with the cited passage
- * outlined, and a caption naming the copy with links to the page and the
- * whole book on archive.org or Google Books (credited, as Google asks, as
- * its digitisation). On a phone it opens zoomed on the outline,
+ * outlined (a rectangle, or the ring of a wheel), and a caption naming the
+ * copy with links to the page and the whole book on archive.org, Google
+ * Books (credited, as Google asks, as its digitisation) or Wikimedia
+ * Commons. On a phone it opens zoomed on the outline,
  * which the whole page shows too small to see. MUI's Dialog traps focus
  * and closes on Escape.
  */
@@ -107,12 +108,31 @@ export default function SourceDialog({
               top: `${highlight.y * 100}%`,
               width: `${highlight.width * 100}%`,
               height: `${highlight.height * 100}%`,
-              outline: "3px solid #d32f2f",
-              outlineOffset: 2,
-              borderRadius: 0.5,
               pointerEvents: "none",
+              ...(highlight.ring
+                ? { border: "3px solid #d32f2f", borderRadius: "50%" }
+                : {
+                    outline: "3px solid #d32f2f",
+                    outlineOffset: 2,
+                    borderRadius: 0.5,
+                  }),
             }}
-          />
+          >
+            {highlight.ring ? (
+              // The ring's inner edge, an ellipse of the same centre.
+              <Box
+                sx={{
+                  position: "absolute",
+                  left: `${((1 - highlight.ring.inner) / 2) * 100}%`,
+                  top: `${((1 - highlight.ring.inner) / 2) * 100}%`,
+                  width: `${highlight.ring.inner * 100}%`,
+                  height: `${highlight.ring.inner * 100}%`,
+                  border: "3px solid #d32f2f",
+                  borderRadius: "50%",
+                }}
+              />
+            ) : null}
+          </Box>
         </Box>
       </HallPanZoom>
       <Typography
@@ -128,9 +148,14 @@ export default function SourceDialog({
         Outlined: {page.cited}. Scanned from {page.copy},{" "}
         {page.scan.site === "Google Books"
           ? "digitised by Google Books"
-          : "on archive.org"}
-        : <Link href={pageUrl(page)}>this page</Link> and{" "}
-        <Link href={bookUrl(page)}>the whole book</Link>.
+          : page.scan.site === "Wikimedia Commons"
+            ? "on Wikimedia Commons"
+            : "on archive.org"}
+        :{" "}
+        <Link href={pageUrl(page)}>
+          {page.scan.site === "Wikimedia Commons" ? "this file" : "this page"}
+        </Link>{" "}
+        and <Link href={bookUrl(page)}>the whole book</Link>.
       </Typography>
     </Dialog>
   );

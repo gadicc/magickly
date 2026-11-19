@@ -11,8 +11,16 @@ outlined on it, and the committed file's size and hash.
 
 `scripts/sources/mirror.mts` (`pnpm sources:mirror --originals <dir>`) makes
 the files. It downloads each archive.org leaf's full-size JPEG
-(`https://archive.org/download/<item>/page/n<leaf>.jpg`) into a new, empty
-directory. Google Books page images cannot be downloaded by a script (their
+(`https://archive.org/download/<item>/page/n<leaf>.jpg`), and Kircher's
+plate from Wikimedia Commons (`upload.wikimedia.org`), into a new, empty
+directory, naming itself `magickli-sources-mirror/1.0 (+https://magick.ly)`.
+On 19 November 2026 Wikimedia answered the script's request with HTTP 429
+while serving the same file to curl, so where a download is refused (HTTP
+403 or 429, or a request that fails outright) the script reads a copy
+fetched by hand instead, and says so: the original, saved with curl into
+the `--originals` directory as
+`commons-Kircher-Diagram_of_the_names_of_God_(22593924).jpg`, its hash
+checked like any other. Any other failed status stops the run. Google Books page images cannot be downloaded by a script (their
 URLs carry a short-lived signature), so the two Lenain originals were
 fetched by hand on 18 November 2026: each page opened in the Google Books
 viewer at books.google.co.uk with `hl=fr` (hence the watermark "Numérisé par
@@ -40,12 +48,15 @@ image.
 | kircher-oedipus-aegyptiacus-1653-p272.webp | The same, p. 272, rows 25 to 67; [leaf n279](https://archive.org/details/A027083/page/n279/mode/1up) | JPEG, 3456 × 5184, SHA-256 367d28cf9bd61257e60faeb80836c81e5c5507a347e05252ad1d68462801b1f6 | 271166 | ec4082a6afe2a94b007b4aa1c51d984868363ce6185da7cfcd2219c4ffb8fb4a |
 | kircher-oedipus-aegyptiacus-1653-p273.webp | The same, p. 273, rows 68 to 72, the page Lenain cites; [leaf n280](https://archive.org/details/A027083/page/n280/mode/1up) | JPEG, 3456 × 5184, SHA-256 bda31660c2599f5e32c8c4f7952decbe1133ac81fbf9f67a61455c3672229897 | 453438 | f9033bc7a6df286cf60ec6c60b0a09555fa4312214684b4850178efd4982a5b2 |
 | kircher-oedipus-aegyptiacus-1653-p287.webp | The same, class IV, ch. 7, p. 287, where Kircher says every nation's name of God has four letters and introduces the plate of them that follows (not in this copy; it is in `bub_gb_XjfzMnomDQoC`, leaf n294, which is not mirrored), and the section "Explicatio Nominis Dei Tetragrammati": the other page Lenain cites; [leaf n294](https://archive.org/details/A027083/page/n294/mode/1up) | JPEG, 3456 × 5184, SHA-256 179eac0dbcc687d0c9f2b5dbf1427285d69207dbf6cbe28e3e809cc7449d34a4 | 438122 | 0f3b3f25511cf8500b4c6ee8a608915ea1084fd27a6dfeacb51712a8585ec088 |
+| kircher-oedipus-aegyptiacus-1653-plate-p287.webp | Kircher, *Oedipus Aegyptiacus*, vol. II part 1 (Rome: Mascardi, 1653), the fold-out plate after p. 287, "Iconismus inserendus tom. II Fol. 287": the wheel of seventy-two four-letter names of God, each with its nation, the source of Lenain's first table's last two columns; the National Library of Poland's copy, [Wikimedia Commons, "Kircher-Diagram of the names of God (22593924).jpg"](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg), from [Polona](https://polona.pl/item/athanasii-kircheri-soc-iesu-oedipi-aegyptiaci-tomus-t-2-ps-1-gymnasium-siue,OTAyNjM5Ng/289/) | JPEG, 2926 × 4000, SHA-256 02d659c4e1326866bae618389de6baeef5ff9b121f4e57121faa116bc1ccbea6 | 779994 | 5c6a24a7756e9d219283f396de5e0ad9ee1f14a1c79fa53ecf657d38fff40125 |
 | agrippa-philosophie-occulte-1727-p109.webp | Agrippa, *La Philosophie occulte*, translated anonymously (The Hague, 1727), vol. II, book III, p. 109, the line introducing the seventy-two angels' table; [archive.org `per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22`, leaf n588](https://archive.org/details/per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22/page/n588/mode/1up), from a microfilm in the series *Witchcraft in Europe and America* | JPEG, 5560 × 9289, SHA-256 384e4aa44f17f10bd6621c040929673bd3f2486df774c91ea26f800f2cf89564 | 240202 | 5a69930290d512b0debc9c9cdc5a65bc581aca180b2dd4e02eef039971de030f |
 | agrippa-philosophie-occulte-1727-p110.webp | The same, p. 110, the table of the seventy-two angels' names in French spelling; [leaf n589](https://archive.org/details/per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22/page/n589/mode/1up) | JPEG, 5459 × 9247, SHA-256 9adfba99c5da26301bf4894d1d5efcb1da9de1f78cffac409588c57aa9dd2687 | 253674 | 616ed4befc67676ab210696fa470f7713e22fd687bf0f0d99f6a5fa8e913fc2b |
 
-Total: 3000510 bytes (643838 for the sigils' three pages, 2356672 for
-Lenain's eight). Each WebP is 1600 pixels wide except the 1823 Lenain page,
-which keeps its original's 1574.
+Total: 3780504 bytes (643838 for the sigils' three pages, 3136666 for
+Lenain's nine). Each WebP is 1600 pixels wide except the 1823 Lenain page,
+which keeps its original's 1574. Kircher's plate is the heaviest at 779994:
+a whole fold-out engraving, fine lines throughout, at the same width as a
+page.
 
 ## Why they are public domain
 
@@ -67,6 +78,10 @@ which keeps its original's 1574.
   being the author's life and 100 years, still runs for any of them.
   archive.org marks the 1533 Agrippa and the Kircher (`A027083`) with the
   Public Domain Mark 1.0; the 1727 Agrippa's item carries no licence mark.
+  Kircher's plate after p. 287 was printed in the same 1653 volume, and
+  whoever engraved it did so by then; Wikimedia Commons marks the file,
+  which it credits to the National Library of Poland, "Public domain"
+  (checked 19 November 2026).
 - **The scans.** A faithful photographic reproduction of a public-domain
   two-dimensional work carries no new copyright: in the United States,
   *Bridgeman Art Library v. Corel Corp.*, 36 F. Supp. 2d 191 (S.D.N.Y.

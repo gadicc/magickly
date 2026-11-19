@@ -132,6 +132,117 @@ describe("what a witnessed note says", () => {
     expect(why).not.toMatch(/“”/);
   });
 
+  it("says the reissue changed a word the 1823 printing has otherwise", () => {
+    const changed = reading({
+      no: 64,
+      field: "people",
+      verdict: "reissueChanged",
+      print1823: { at: 89, reads: "la langue des Mogols" },
+      ms5365: undefined,
+    });
+    const said = note({
+      no: 64,
+      kind: "reading",
+      field: "people",
+      printed: "les Mongols",
+      used: "",
+      why: "Kircher's plate has Mogores.",
+    });
+    expect(witnessedWhy(said, changed, false).why).toBe(
+      "Kircher's plate has Mogores. The reissue changed this: the 1823 " +
+        "printing reads “la langue des Mogols” (p. 89).",
+    );
+    expect(verdictProblem(said, changed)).toBeUndefined();
+    // A change to nothing is not a change the 1823 printing can show.
+    expect(
+      verdictProblem(said, {
+        ...changed,
+        print1823: { at: 89, reads: "" },
+      }),
+    ).toMatch(/changed a value the 1823 printing does not give/);
+  });
+
+  describe("holds a nation's or a name of God's verdict to the 1823 phrase", () => {
+    const entryNote = (no: number, field: string, printed: string) =>
+      note({ no, kind: "reading", field, printed, used: "", why: "W." });
+    const read1823 = (
+      no: number,
+      field: string,
+      verdict: WitnessReading["verdict"],
+      reads: string,
+    ) =>
+      reading({
+        no,
+        field,
+        verdict,
+        print1823: { at: 1, reads },
+        ms5365: undefined,
+      });
+
+    it("accepts the readings recorded", () => {
+      expect(
+        verdictProblem(
+          entryNote(50, "people", "les Samaritains"),
+          read1823(50, "people", "lenain", "la langue des Samaritains"),
+        ),
+      ).toBeUndefined();
+      expect(
+        verdictProblem(
+          entryNote(41, "people", "la langue irlandaise"),
+          read1823(41, "people", "lenain", "la langue Irlandaise"),
+        ),
+      ).toBeUndefined();
+      expect(
+        verdictProblem(
+          entryNote(3, "people", ""),
+          read1823(3, "people", "agree", ""),
+        ),
+      ).toBeUndefined();
+    });
+
+    it("refuses a change the 1823 printing does not show", () => {
+      expect(
+        verdictProblem(
+          entryNote(64, "people", "les Mongols"),
+          read1823(64, "people", "reissueChanged", "la langue des Mongols"),
+        ),
+      ).toMatch(/as the reissue does, yet the verdict blames the reissue/);
+      expect(
+        verdictProblem(
+          entryNote(46, "godName", "Pino"),
+          read1823(46, "godName", "reissue", "Pino"),
+        ),
+      ).toMatch(/as the reissue does, yet the verdict blames the reissue/);
+    });
+
+    it("refuses agreement where the 1823 printing differs", () => {
+      expect(
+        verdictProblem(
+          entryNote(50, "people", "les Samaritains"),
+          read1823(50, "people", "lenain", "la langue des Sumatrans"),
+        ),
+      ).toMatch(/yet the verdict says they agree/);
+      expect(
+        verdictProblem(
+          entryNote(3, "people", ""),
+          read1823(3, "people", "agree", "les Chaldéens"),
+        ),
+      ).toMatch(/yet the verdict says it agrees/);
+    });
+
+    it("says a nation's difference is Lenain's, not a slip", () => {
+      const { why } = witnessedWhy(
+        entryNote(50, "people", "les Samaritains"),
+        read1823(50, "people", "lenain", "la langue des Samaritains"),
+        false,
+      );
+      expect(why).toBe(
+        "W. The 1823 printing has the same (p. 1), so the difference is " +
+          "Lenain's, not the reissue's.",
+      );
+    });
+  });
+
   it("calls a manuscript's difference the copyist's", () => {
     const { why } = witnessedWhy(
       note(),

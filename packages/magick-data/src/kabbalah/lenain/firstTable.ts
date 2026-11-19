@@ -1,3 +1,4 @@
+import kircherPlate from "../../../dist/kabbalah/lenain/kircherPlate.js";
 import witnesses from "../../../dist/kabbalah/lenain/witnesses.js";
 import angels from "../SeventyTwoAngels.ts";
 import { leaves } from "./volume.ts";
@@ -9,10 +10,7 @@ import { leaves } from "./volume.ts";
  * reissue this edition transcribes (recorded as 1909) shows rows 62 to 72; the
  * 1823 printing (Google Books qt9SAAAAcAAJ, page 25) was opened further and
  * shows 57 to 72, the fifty-seventh cut through by the fold. Rows 1 to 56 are
- * on no image of Lenain's plate found. (Kircher's plate of the seventy-two
- * names of God by nation, very likely the source of the last two columns, is
- * in one archive.org copy, partly folded and not yet transcribed: plan 033.)
- * Every column the table carries — the genius, the nation, that nation's name
+ * on no image of Lenain's plate found. Every column the table carries — the genius, the nation, that nation's name
  * for God — is also given in the genius's own entry, so nothing it held is
  * lost, only its arrangement. This puts the arrangement back.
  *
@@ -23,6 +21,11 @@ import { leaves } from "./volume.ts";
  * plate come from the transcription, rows only the 1823 plate shows from
  * `witnesses.json5`, and the rest are marked as reconstructed wherever they
  * are shown; the apparatus carries the note explaining why. See plan 033.
+ *
+ * Beside every row stands its source: the ray of the same number on
+ * Kircher's plate of the seventy-two names of God by nation (Oedipus
+ * Aegyptiacus II.1, 1653, the plate after p. 287), which the nation and name
+ * of God columns follow row for row (`kircherPlate.json5`).
  */
 
 /** Where a row comes from, in the order one is preferred to another. */
@@ -47,6 +50,157 @@ export interface FirstTableRow {
   source: FirstTableSource;
   /** A row the fold cuts through, legible only in part. */
   partly?: boolean;
+  /** The same row on Kircher's plate, Lenain's source for the last two columns. */
+  kircher: KircherRay;
+  /** The columns in which Lenain's entry departs from Kircher's ray. */
+  departs: ("nation" | "godName")[];
+  /** What to say beside a nation the entry leaves empty, where there is more to say. */
+  remark?: string;
+}
+
+/** One ray of Kircher's plate: a name of God and its nation, as engraved. */
+export interface KircherRay {
+  ray: number;
+  /** In its own script, as engraved: יהרה, ΣΥΡΙ, DEVS. */
+  godName: string;
+  /** In Latin, as engraved: Hebræi, Abyſsini, Para.quaij. */
+  nation: string;
+  /** How sure the reading of the letters is, where it is not high. */
+  confidence?: "medium" | "low";
+  /** What the reader saw, where it is not plain. */
+  note?: string;
+  /** Said beside the row in the first table: ray 1's slip, ray 7's guess. */
+  remark?: string;
+}
+
+/** A place where one of Lenain's entries departs from its ray. */
+export interface KircherDeparture {
+  no: number;
+  /** The entry's field: its nation (`people`) or its name of God. */
+  field: "people" | "godName";
+  /** Who Kircher's nation are, in English. */
+  gloss?: string;
+  /** A likely cause, where the letters show one. */
+  cause?: string;
+  /** The entry alone departs: Lenain's table, on the plates, has Kircher's. */
+  tableAgrees?: boolean;
+}
+
+/**
+ * A ray whose nation an entry does not depart from: Kircher's Latin and the
+ * entry's French, accepted by hand as the same people.
+ */
+export interface KircherNation {
+  no: number;
+  nation: string;
+  entry: string;
+}
+
+interface KircherFile {
+  rays: KircherRay[];
+  departures: KircherDeparture[];
+  nations: KircherNation[];
+  remarks: { no: number; quote: string; remark: string }[];
+}
+
+const kircher = kircherPlate as KircherFile;
+
+/** The plate's seventy-two rays, in order. */
+export const kircherRays = (): KircherRay[] => kircher.rays;
+
+/** Where Lenain's entries depart from the plate, as recorded by hand. */
+export const kircherDepartures = (): KircherDeparture[] => kircher.departures;
+
+/** The rows whose entry names no nation but says whose the name is. */
+export const kircherRemarks = () => kircher.remarks;
+
+/** The nations accepted as the same people, one for every ray not departed from. */
+export const kircherNations = (): KircherNation[] => kircher.nations;
+
+/**
+ * What the table says of a ray whose letters are not certain, or nothing:
+ * the reader marked it medium or low.
+ */
+export const uncertainty = (ray: KircherRay): string =>
+  ray.confidence ? "reading uncertain" : "";
+
+const GREEK: Record<string, string> = {
+  Α: "A",
+  Β: "B",
+  Γ: "G",
+  Δ: "D",
+  Ε: "E",
+  Ɛ: "E",
+  Η: "E",
+  Θ: "TH",
+  Ι: "I",
+  Κ: "K",
+  Λ: "L",
+  Μ: "M",
+  Ν: "N",
+  Ο: "O",
+  Π: "P",
+  Ρ: "R",
+  Σ: "S",
+  Ϲ: "S",
+  Τ: "T",
+  Υ: "Y",
+  Ω: "O",
+};
+
+/**
+ * A name of God reduced to what transliteration leaves alone, so that two
+ * spellings of one name compare equal: capitals without accents, Greek in
+ * roman letters, V as U, Y as I, TH as T, and no letter doubled.
+ * GOTT and Goth are both GOT; Θεὸς and Théos are both TEOS.
+ */
+export function transliterated(name: string): string {
+  return [
+    ...name
+      .normalize("NFD")
+      .replace(/\p{Mark}/gu, "")
+      .toUpperCase(),
+  ]
+    .map((letter) => GREEK[letter] ?? letter)
+    .join("")
+    .replace(/V/g, "U")
+    .replace(/Y/g, "I")
+    .replace(/TH/g, "T")
+    .replace(/(.)\1+/g, "$1");
+}
+
+/**
+ * The rays whose name is in a script the rules above cannot read, with the
+ * name as engraved and the name in Lenain's French that is the same name:
+ * the Tetragrammaton (engraved with a resh for its vav: see the plate's note
+ * on ray 1), Allah, and Thoth, whose four Greek letters Lenain's own
+ * footnote counts. The engraved form is held to the plate's reading, so a
+ * change to either fails rather than passing on the French alone.
+ */
+const SAME_NAME: Record<number, { engraved: string; french: string }> = {
+  1: { engraved: "יהרה", french: "Jehovah" },
+  4: { engraved: "الله", french: "Allah" },
+  5: { engraved: "Θωντ", french: "Teut ou Theuth" },
+};
+
+/**
+ * Whether Lenain's name of God is Kircher's for that ray, allowing for
+ * transliteration. An alternative he adds with "ou" (Idio ou Iddio) passes
+ * if any spelling does; a second name joined with "et" is a second name and
+ * does not. An empty name is not Kircher's.
+ */
+export function sameGodName(lenain: string, ray: KircherRay): boolean {
+  if (!lenain.trim()) return false;
+  const same = SAME_NAME[ray.ray];
+  if (same)
+    return (
+      ray.godName === same.engraved &&
+      transliterated(lenain) === transliterated(same.french)
+    );
+  const engraved = transliterated(ray.godName);
+  return lenain
+    .split(/\s+ou\s+/)
+    .some((spelling) => transliterated(spelling) === engraved);
 }
 
 interface PlateRow {
@@ -145,13 +299,121 @@ function fromEntries(no: number): PlateRow {
 export function firstTable(): FirstTableRow[] {
   const reissue = plate1909();
   const original = plate1823();
+  // The recorded departures are the entries'. A row put back from the
+  // entries takes them as they are; so does a row a plate shows, whose cell
+  // departs the same way, except a departure marked `tableAgrees`, where the
+  // plates have Kircher's nation and only the entry does not.
+  const departs = new Map<number, ("nation" | "godName")[]>();
+  for (const { no, field, tableAgrees } of kircher.departures) {
+    if (tableAgrees && (reissue.has(no) || original.has(no))) continue;
+    departs.set(no, [
+      ...(departs.get(no) ?? []),
+      field === "people" ? "nation" : "godName",
+    ]);
+  }
+  const remarks = new Map(kircher.remarks.map((row) => [row.no, row.remark]));
   return angels.map((angel) => {
+    const beside = {
+      kircher: kircher.rays[angel.no - 1],
+      departs: departs.get(angel.no) ?? [],
+      ...(remarks.has(angel.no) ? { remark: remarks.get(angel.no) } : {}),
+    };
     const on1909 = reissue.get(angel.no);
-    if (on1909) return { ...on1909, source: "plate1909" as const };
+    if (on1909) return { ...on1909, source: "plate1909" as const, ...beside };
     const on1823 = original.get(angel.no);
-    if (on1823) return { ...on1823, source: "plate1823" as const };
-    return { ...fromEntries(angel.no), source: "reconstructed" as const };
+    if (on1823) return { ...on1823, source: "plate1823" as const, ...beside };
+    return {
+      ...fromEntries(angel.no),
+      source: "reconstructed" as const,
+      ...beside,
+    };
   });
+}
+
+/** What Lenain's table has for one row on each plate that shows it. */
+export function plateCells(no: number): {
+  plate1909?: PlateRow;
+  plate1823?: PlateRow;
+} {
+  return { plate1909: plate1909().get(no), plate1823: plate1823().get(no) };
+}
+
+/**
+ * What the source column says of a row: where it comes from, and where it
+ * parts from Kircher — "reconstructed; differs from Kircher in nation", or
+ * "reconstructed; the entry names neither a nation nor a name of God" — with
+ * any remark on an empty nation after it. Shared by the page and the
+ * Markdown.
+ */
+export function sourceCell(row: FirstTableRow): string {
+  const said = `${SOURCE_LABEL[row.source]}${row.partly ? ", partly legible" : ""}`;
+  const named = (column: "nation" | "godName") => Boolean(row[column]);
+  const unnamed = row.departs.filter((column) => !named(column));
+  const differs = row.departs.filter(named);
+  const clauses: string[] = [];
+  if (unnamed.length === 2)
+    clauses.push("the entry names neither a nation nor a name of God");
+  else if (unnamed.length)
+    clauses.push(`the entry names no ${COLUMN_NAME[unnamed[0]]}`);
+  if (differs.length)
+    clauses.push(
+      `differs from Kircher in ${differs.map((column) => COLUMN_NAME[column]).join(" and ")}`,
+    );
+  const remarks = [row.remark, row.kircher.remark].filter(Boolean);
+  const remark = remarks.length ? `. ${remarks.join(" ")}` : "";
+  return `${[said, ...clauses].join("; ")}${remark}`;
+}
+
+/** 37 as "37th", 1 as "1st", 22 as "22nd". */
+function ordinal(n: number) {
+  const teen = n % 100 >= 11 && n % 100 <= 13;
+  const suffix = teen ? "th" : ({ 1: "st", 2: "nd", 3: "rd" }[n % 10] ?? "th");
+  return `${n}${suffix}`;
+}
+
+/** "rows 2, 3 and 7", or "row 41". */
+function rowList(numbers: number[]) {
+  if (numbers.length < 2) return `row ${numbers.join("")}`;
+  return `rows ${numbers.slice(0, -1).join(", ")} and ${numbers.at(-1)}`;
+}
+
+/**
+ * How closely Lenain's entries follow Kircher's plate, as a paragraph: how
+ * many of the seventy-two rows agree in each column, and which do not.
+ * Counted from the recorded departures, so it cannot go stale.
+ */
+export function kircherSentence(): string {
+  const rowsOf = (field: KircherDeparture["field"]) => [
+    ...new Set(
+      kircher.departures
+        .filter((departure) => departure.field === field)
+        .map((departure) => departure.no),
+    ),
+  ];
+  const nations = rowsOf("people");
+  const names = rowsOf("godName");
+  const total = kircher.rays.length;
+  // Rows whose entry names no people but gives the name as some group's.
+  const attributed = kircher.remarks.map((remark) => remark.no);
+  const groups = attributed.map((no) => kircher.rays[no - 1].nation);
+  const byAttribution = attributed.length
+    ? `, the ${attributed.map(ordinal).join(" and ")} among them by ` +
+      `attribution: their entries name no people, but give the name as ` +
+      `that of Kircher's ${groups.join(" and ")}`
+    : "";
+  return (
+    `Beside each row is the same ray of Kircher's plate of the names of ` +
+    `God by nation (Oedipus Aegyptiacus II.1, 1653, the plate after p. 287), ` +
+    `which Lenain cites under his table and whose two outer rings the ` +
+    `table's last two columns follow row for row, from the Hebrews to ` +
+    `Thrace. Allowing for spelling — V for U, a Greek name in roman ` +
+    `letters — the entries give Kircher's name of God in ` +
+    `${total - names.length} of the ${total} rows and his nation in ` +
+    `${total - nations.length}${byAttribution}. They depart from him in the nation in ` +
+    `${rowList(nations)}, and in the name of God in ${rowList(names)}; an ` +
+    `editorial note on each such entry says what the plate has and whether ` +
+    `the difference is Lenain's or the reissue's.`
+  );
 }
 
 /** How many rows each source gives. */

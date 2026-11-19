@@ -51,13 +51,21 @@ describe("the book's sources", () => {
     expect(text).toContain(
       "; and p. 287, where Kircher says every nation's name of God has four letters and introduces the plate of them that follows.",
     );
-    // The plate is in another copy, and stays an outside link.
+    // The plate is in other copies: the Polish one, transcribed and
+    // mirrored, and the Complutense's, partly folded, an outside link.
     expect(text).toContain(
-      "Kircher's plate after p. 287, which the copy above lacks: archive.org bub_gb_XjfzMnomDQoC, leaf n294, the Universidad Complutense de Madrid's copy, photographed partly folded.",
+      "Kircher's plate after p. 287, which the copy above lacks: seventy-two four-letter names of God, each with its nation. The first table's last two columns follow it row for row, and it is transcribed here from the National Library of Poland's copy, on Wikimedia Commons;",
+    );
+    expect(text).toContain(
+      "A second copy, the Universidad Complutense de Madrid's, was photographed partly folded: archive.org bub_gb_XjfzMnomDQoC, leaf n294.",
     );
     expect(html).toContain(
       '<a href="https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n294/mode/1up">',
     );
+    // The mirror's link is the plate's only link: its href is the file page.
+    expect(
+      html.split(`href="${pageUrl(MIRRORED_PAGES.kircherPlate)}"`).length - 1,
+    ).toBe(1);
     expect(text).not.toContain("neither the nations");
   });
 
@@ -71,6 +79,7 @@ describe("the book's sources", () => {
       "kircher272",
       "kircher273",
       "kircher287",
+      "kircherPlate",
     ] as const) {
       const page = MIRRORED_PAGES[key];
       const href = pageUrl(page).replace("&", "&amp;");

@@ -16,18 +16,25 @@ import apparatus from "../../../dist/kabbalah/lenain/apparatus.js";
 /**
  * Another copy read at the place a note concerns: the 1823 printing, or the
  * handwritten copy of it in Paris (Ms 5365). The edition transcribes a later
- * reissue, and these say whether a slip is the reissue's or Lenain's.
+ * reissue, and these say whether a slip is the reissue's or Lenain's. Where
+ * an entry departs from Kircher's plate of the names of God by nation, his
+ * source for that column, the plate's ray is a witness too.
  */
 export interface NoteWitness {
-  source: "print1823" | "ms5365";
-  /** "1823 printing, p. 57" or "Ms 5365, leaf n66". */
+  source: "print1823" | "ms5365" | "kircherPlate";
+  /** "1823 printing, p. 57", "Ms 5365, leaf n66" or "Kircher's plate, ray 50". */
   label: string;
-  /** The page ("57") or the archive.org leaf ("n66"). */
+  /** The page ("57"), the archive.org leaf ("n66") or the ray ("ray 50"). */
   at: string;
-  /** That page or leaf, online. */
+  /** That page, leaf or plate, online. */
   url: string;
   /** What it prints there; empty where it gives nothing. */
   reads: string;
+  /**
+   * The app's mirror of it, by its key in the app's manifest of mirrored
+   * pages, which the site opens in a lightbox instead of following `url`.
+   */
+  mirror?: string;
 }
 
 export interface Note {

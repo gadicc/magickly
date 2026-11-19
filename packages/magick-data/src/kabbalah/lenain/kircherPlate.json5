@@ -1,0 +1,243 @@
+// Kircher's plate of the seventy-two names of God, each with its nation:
+// Athanasius Kircher, Oedipus Aegyptiacus, vol. II part 1 (Rome, 1653), the
+// fold-out headed "Iconismus inserendus tom. II Fol. 287", which p. 287
+// introduces ("schema quod sequitur"). Lenain cites pp. 273 and 287 under his
+// first cabalistic table, and the table's last two columns, the nation and
+// its name of God, follow this plate's two outer rings row for row, from 1
+// (Hebræi) to 72 (Thraces, KALO). See plan 033, "Other witnesses".
+//
+// The copy read is the National Library of Poland's, as Wikimedia Commons
+// serves it, which Commons marks public domain:
+//   file page  https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg
+//   original   https://upload.wikimedia.org/wikipedia/commons/6/60/Kircher-Diagram_of_the_names_of_God_%2822593924%29.jpg
+//              a JPEG of 2926 × 4000 pixels, SHA-256
+//              02d659c4e1326866bae618389de6baeef5ff9b121f4e57121faa116bc1ccbea6
+//   Polona     https://polona.pl/item/athanasii-kircheri-soc-iesu-oedipi-aegyptiaci-tomus-t-2-ps-1-gymnasium-siue,OTAyNjM5Ng/289/
+//              (the library's own viewer, image 289)
+// It is mirrored in public/sources/ (src/sources/mirroredPages.ts,
+// `kircherPlate`). Another copy, the Universidad Complutense de Madrid's
+// (archive.org bub_gb_XjfzMnomDQoC, leaf n294), was photographed with the
+// wheel's left part folded over.
+//
+// Read on 18 and 19 November 2026 from that original by a machine reader (Claude
+// Opus 5.5, reasoning high) that was not told Lenain's table or entries, cell by cell
+// from close crops and a polar unwrapping of the wheel about its centre.
+//
+// The alignment. Only the two outer rings have seventy-two cells: the names
+// of God, and inside them the nations; their dividers line up. The numbers 1
+// to 72 run clockwise, each engraved in the gap between two of the sun's
+// spikes, over a divider, so the geometry alone does not say whether a
+// number belongs to the cell clockwise of it or the one anticlockwise. Each
+// was given to the cell clockwise of it. That puts 1 on Hebræi and 72 on
+// Thraces, which is where the plate's own sequence breaks (…Bœotij,
+// Phryges, Thraces | Hebræi, Syri, Chaldęi…), and it is the numbering
+// Lenain's table follows row for row. The other reading would make Thraces
+// the first.
+//
+// `godName` and `nation` are as engraved: ſ is the long s, ę the e with a
+// hook, a tilde marks an omitted n, ij is kept, abbreviations and points are
+// kept, and Greek, Hebrew, Syriac, Arabic and Armenian are in their own
+// scripts, capitals and minuscules as cut. `confidence` is the letters'
+// (medium or low; high where it is left out), not the alignment's. `note`
+// says what the reader saw where it is not plain.
+//
+// Out of scope: the rings inside these two (Latin attributes of God, Hebrew
+// letters numbered 1 to 42, single Hebrew letters) have forty-two cells, not
+// seventy-two, do not follow the rays, and are not transcribed; nor is the
+// twelve-pointed star at the centre or the trees around the wheel.
+//
+// `departures` is ours: each place where one of Lenain's entries departs
+// from its ray, in the nation (`people`) or the name of God (`godName`),
+// beyond transliteration. Transliteration is a different spelling of the
+// same name in another alphabet or the same letters: V for U, Y for I, TH
+// for T, a letter doubled or not (GOTT, Goth), a Greek name in roman
+// letters (Θεὸς, Théos), the Tetragrammaton as Jehovah, الله as Allah,
+// Θωντ as Teut or Theuth, and an alternative spelling Lenain adds with "ou"
+// (Idio ou Iddio, Biub ou Biud). A second name joined with "et", a
+// different word, a different people, or nothing at all is a departure.
+// `gloss` says in English who Kircher's nation are; `cause` is a likely
+// cause, given only where the letters show it; `tableAgrees` marks a
+// departure of the entry alone, where Lenain's table, on both plates, has
+// Kircher's nation. Each becomes an editorial
+// note (scripts/seventyTwoAngels/apparatus.ts), with what the 1823 printing
+// prints there from witnesses.json5, beside this file. Lenain's words stay
+// the edition's data; the notes say what his source has.
+//
+// `nations` is ours too: every ray whose nation the entry does not depart
+// from, with the entry's French beside Kircher's Latin, each pair accepted
+// by hand as the same people (Galli, la France; Sinæ, les Chinois). A test
+// holds every entry to this list or to `departures`, never both, so a new
+// reading of either side that changes a nation fails. The 37th and 38th
+// have no French: their entries name no people, but give the name as the
+// philosophers' and the cabalists' (`remarks`).
+//
+// `remarks` are rows whose entry names no nation although it is not silent
+// about whose name it is: the first table shows them beside the empty cell.
+//
+// A ray's `remark` is said beside its row in the first table: the
+// engraver's slip on ray 1, and that ray 7's letters are a guess.
+{
+  rays: [
+    {"ray": 1, "godName": "יהרה", "nation": "Hebræi", "confidence": "medium", "remark": "Engraved יהרה, with a resh where the Tetragrammaton has vav: the engraver's slip, recorded and not corrected.", "note": "Yod, he, a letter as wide as the he with no left leg, he: a resh where the Tetragrammaton has vav (ray 3's vav is narrower). The engraver's slip, recorded and not corrected; the alternative is a vav with an oversized head."},
+    {"ray": 2, "godName": "ܐܠܗܐ", "nation": "Syri", "confidence": "medium", "note": "Syriac, crudely cut: read right to left as alaph, lamadh, he, alaph. The Unicode letters interpret the shapes."},
+    {"ray": 3, "godName": "אלוה", "nation": "Chaldęi", "confidence": "medium", "note": "The first letter is Y-shaped, an alef without its lower-left foot (or a tsade without its base); the other three are clear."},
+    {"ray": 4, "godName": "الله", "nation": "Arabes", "confidence": "medium", "note": "Rough Arabic, three uprights and a closed final loop, read alif, lam, lam, ha."},
+    {"ray": 5, "godName": "Θωντ", "nation": "Ægyptij", "confidence": "medium", "note": "Θ, ω, a pointed letter drawn like ν but perhaps meant as υ (Θωυτ), τ."},
+    {"ray": 6, "godName": "ABGD", "nation": "Æthiopes"},
+    {"ray": 7, "godName": "աբաբ", "nation": "Armeni", "confidence": "low", "remark": "The Armenian letters are a best guess at the engraved shapes, not a confident reading.", "note": "Armenian-like minuscules, each pair under a titlo; the letters are a best guess at the shapes, not a confident reading of the Armenian."},
+    {"ray": 8, "godName": "MOTI", "nation": "Georgiani"},
+    {"ray": 9, "godName": "AGZI", "nation": "Abyſsini", "note": "The Z has a crossbar (Ƶ), as in ray 71."},
+    {"ray": 10, "godName": "ΣΥΡΙ", "nation": "Persæ", "note": "Greek capitals, which could also be taken as Latin SYPI."},
+    {"ray": 11, "godName": "DEVS", "nation": "Latini"},
+    {"ray": 12, "godName": "Θεὸς", "nation": "Græci", "note": "A capital Θ, then minuscules ε, ὸ and a final sigma shaped like a Latin s."},
+    {"ray": 13, "godName": "BOOG", "nation": "Illyrici"},
+    {"ray": 14, "godName": "DIOS", "nation": "Hispani"},
+    {"ray": 15, "godName": "IDIO", "nation": "Itali", "confidence": "medium", "note": "A faint D-like bowl beside the I, as if a D had been corrected or the stroke has worn: perhaps DDIO."},
+    {"ray": 16, "godName": "DIEV", "nation": "Galli"},
+    {"ray": 17, "godName": "GOTT", "nation": "Germani"},
+    {"ray": 18, "godName": "BOOG", "nation": "Poloni"},
+    {"ray": 19, "godName": "BOGI", "nation": "Hungari"},
+    {"ray": 20, "godName": "TIOS", "nation": "Mosci"},
+    {"ray": 21, "godName": "BVEG", "nation": "Bohemi"},
+    {"ray": 22, "godName": "GOOD", "nation": "Angli", "note": "Smaller, lighter capitals than its neighbours'."},
+    {"ray": 23, "godName": "DIEH", "nation": "Hyberni"},
+    {"ray": 24, "godName": "ESAR", "nation": "Hetrusci"},
+    {"ray": 25, "godName": "ORSY", "nation": "Magi"},
+    {"ray": 26, "godName": "AGDI", "nation": "Saraceni"},
+    {"ray": 27, "godName": "ΘƐΟϹ", "nation": "Coptitæ", "note": "Uncial capitals: Θ, an open epsilon (Ɛ), Ο, a lunate sigma (Ϲ)."},
+    {"ray": 28, "godName": "ADAD", "nation": "Assyrij", "note": "The nation's final ij carries a diaeresis."},
+    {"ray": 29, "godName": "ZIMI", "nation": "Peruani"},
+    {"ray": 30, "godName": "TVRA", "nation": "Indi"},
+    {"ray": 31, "godName": "TELI", "nation": "Sinæ"},
+    {"ray": 32, "godName": "ANOT", "nation": "Tartari"},
+    {"ray": 33, "godName": "AGAD", "nation": "Ins: Heſper:", "note": "The nation is abbreviated with colons (Insulae Hesperides)."},
+    {"ray": 34, "godName": "ANEB", "nation": "Congani"},
+    {"ray": 35, "godName": "ANVP", "nation": "Angolani"},
+    {"ray": 36, "godName": "ALLA", "nation": "Mauri"},
+    {"ray": 37, "godName": "ABDA", "nation": "Philosophi"},
+    {"ray": 38, "godName": "AGLA", "nation": "Cabaliſtæ"},
+    {"ray": 39, "godName": "GOOT", "nation": "Scoti"},
+    {"ray": 40, "godName": "GOED", "nation": "Belgæ"},
+    {"ray": 41, "godName": "GVDI", "nation": "Islandi"},
+    {"ray": 42, "godName": "BIVB", "nation": "Canadẽſes", "note": "A tilde over the e for the omitted n (Canadenses)."},
+    {"ray": 43, "godName": "SOLV", "nation": "Caleforniij", "note": "The nation's ij is dotted."},
+    {"ray": 44, "godName": "BOSA", "nation": "Mexicani"},
+    {"ray": 45, "godName": "HOBA", "nation": "Quitenses"},
+    {"ray": 46, "godName": "PIVR", "nation": "Para.quaij", "note": "The nation has a point between Para and quaij (Paraguay)."},
+    {"ray": 47, "godName": "HANA", "nation": "Chilenses"},
+    {"ray": 48, "godName": "ZACA", "nation": "Iaponij"},
+    {"ray": 49, "godName": "MORA", "nation": "Philip:Insu", "note": "A colon, and a hook under the final u as an abbreviation mark."},
+    {"ray": 50, "godName": "POLA", "nation": "Samatrani"},
+    {"ray": 51, "godName": "BILA", "nation": "Narsingi"},
+    {"ray": 52, "godName": "ABAG", "nation": "Melindi"},
+    {"ray": 53, "godName": "OBRA", "nation": "Maldiuij"},
+    {"ray": 54, "godName": "BORA", "nation": "Zaflanẽſes", "note": "A tilde over the e for the omitted n (Zaflanenses)."},
+    {"ray": 55, "godName": "ALAI", "nation": "Ormusij"},
+    {"ray": 56, "godName": "ILLI", "nation": "Adeni"},
+    {"ray": 57, "godName": "POPA", "nation": "Cyrænęi"},
+    {"ray": 58, "godName": "PARA", "nation": "Ælamitæ"},
+    {"ray": 59, "godName": "ELLA", "nation": "Meſopotam", "note": "Abbreviated at the cell's edge."},
+    {"ray": 60, "godName": "GENA", "nation": "Tibethenſes"},
+    {"ray": 61, "godName": "SILA", "nation": "Bactriani"},
+    {"ray": 62, "godName": "SVNA", "nation": "Carmani"},
+    {"ray": 63, "godName": "MIRI", "nation": "Camboij"},
+    {"ray": 64, "godName": "ALLI", "nation": "Mogores"},
+    {"ray": 65, "godName": "TARA", "nation": "Gymnoſophi"},
+    {"ray": 66, "godName": "PORA", "nation": "Brachmani"},
+    {"ray": 67, "godName": "BOGO", "nation": "Albanenſes"},
+    {"ray": 68, "godName": "ΔƐΟS", "nation": "Cretenses", "confidence": "medium", "note": "Δ, an open epsilon (Ɛ), O, and a letter shaped like a Latin S."},
+    {"ray": 69, "godName": "ΔΗΟS", "nation": "Peloponeſij", "confidence": "medium", "note": "Δ, Η, O, and a letter shaped like a Latin S, as in ray 68."},
+    {"ray": 70, "godName": "ARIS", "nation": "Bœotij"},
+    {"ray": 71, "godName": "ZEVT", "nation": "Phryges", "note": "The Z has a crossbar (Ƶ); the V and T are cursive, υ- and τ-like."},
+    {"ray": 72, "godName": "KALO", "nation": "Thraces"},
+  ],
+  departures: [
+    {"no": 2, "field": "people", "gloss": "the Syrians"},
+    {"no": 2, "field": "godName"},
+    {"no": 3, "field": "people", "gloss": "the Chaldeans"},
+    {"no": 3, "field": "godName"},
+    {"no": 7, "field": "people", "gloss": "the Armenians"},
+    {"no": 7, "field": "godName"},
+    {"no": 10, "field": "godName", "cause": "Siré and Eipi look like the one engraved ΣΥΡΙ read twice, as Greek (Siré) and as Latin capitals (E, I, P, I); it is a departure because Lenain gives two names, joined by « et », where the plate has one."},
+    {"no": 26, "field": "godName", "cause": "The plate gives one name; Abdi is not on it."},
+    {"no": 35, "field": "people", "gloss": "the Angolans"},
+    {"no": 41, "field": "people", "gloss": "the Icelanders", "cause": "Islandi was likely read as Irlandais, its s taken for an r."},
+    {"no": 45, "field": "godName"},
+    {"no": 46, "field": "godName"},
+    {"no": 49, "field": "godName"},
+    {"no": 50, "field": "people", "gloss": "the Sumatrans", "cause": "Samatrani, as the plate spells it, was likely read as Samaritains."},
+    {"no": 51, "field": "people", "gloss": "the people of Narsinga, in southern India"},
+    {"no": 53, "field": "people", "gloss": "the people of the Maldives", "cause": "Maldiuij was likely read as Maltais."},
+    {"no": 58, "field": "people", "gloss": "the Elamites", "cause": "Ælamitæ was likely read with its Æ as Cé."},
+    {"no": 61, "field": "people", "gloss": "the Bactrians"},
+    {"no": 64, "field": "people", "gloss": "the Mughals", "tableAgrees": true, "cause": "Mogols is the French for Kircher's Mogores; Mongols names another people."},
+    {"no": 68, "field": "people", "gloss": "the Cretans", "cause": "Lenain's sixty-eighth and sixty-ninth have the nations of Kircher's sixty-ninth and sixty-eighth: the two are exchanged."},
+    {"no": 68, "field": "godName"},
+    {"no": 69, "field": "people", "gloss": "the Peloponnesians", "cause": "Lenain's sixty-eighth and sixty-ninth have the nations of Kircher's sixty-ninth and sixty-eighth: the two are exchanged."},
+  ],
+  nations: [
+    {"no": 1, "nation": "Hebræi", "entry": "les Hébreux"},
+    {"no": 4, "nation": "Arabes", "entry": "les Arabes"},
+    {"no": 5, "nation": "Ægyptij", "entry": "les Égyptiens"},
+    {"no": 6, "nation": "Æthiopes", "entry": "les Éthiopiens"},
+    {"no": 8, "nation": "Georgiani", "entry": "les Géorgiens"},
+    {"no": 9, "nation": "Abyſsini", "entry": "les Abyssiniens"},
+    {"no": 10, "nation": "Persæ", "entry": "la langue des Perses"},
+    {"no": 11, "nation": "Latini", "entry": "les Latins"},
+    {"no": 12, "nation": "Græci", "entry": "les Grecs"},
+    {"no": 13, "nation": "Illyrici", "entry": "les Illyriens"},
+    {"no": 14, "nation": "Hispani", "entry": "la langue espagnole"},
+    {"no": 15, "nation": "Itali", "entry": "la langue italienne"},
+    {"no": 16, "nation": "Galli", "entry": "la France"},
+    {"no": 17, "nation": "Germani", "entry": "les Germains"},
+    {"no": 18, "nation": "Poloni", "entry": "les Polonais"},
+    {"no": 19, "nation": "Hungari", "entry": "les Hongrois"},
+    {"no": 20, "nation": "Mosci", "entry": "langue des Moscovites"},
+    {"no": 21, "nation": "Bohemi", "entry": "les Bohémiens"},
+    {"no": 22, "nation": "Angli", "entry": "la langue anglaise"},
+    {"no": 23, "nation": "Hyberni", "entry": "les Hibernais"},
+    {"no": 24, "nation": "Hetrusci", "entry": "les Etrusques"},
+    {"no": 25, "nation": "Magi", "entry": "les Mages"},
+    {"no": 26, "nation": "Saraceni", "entry": "les Sarrazins"},
+    {"no": 27, "nation": "Coptitæ", "entry": "les Cophtes"},
+    {"no": 28, "nation": "Assyrij", "entry": "les Assyriens"},
+    {"no": 29, "nation": "Peruani", "entry": "les Péruviens"},
+    {"no": 30, "nation": "Indi", "entry": "les Indiens"},
+    {"no": 31, "nation": "Sinæ", "entry": "les Chinois"},
+    {"no": 32, "nation": "Tartari", "entry": "les Tartares"},
+    {"no": 33, "nation": "Ins: Heſper:", "entry": "les Hespérides"},
+    {"no": 34, "nation": "Congani", "entry": "les peuples du Congo"},
+    {"no": 36, "nation": "Mauri", "entry": "les Maures"},
+    {"no": 37, "nation": "Philosophi", "entry": ""},
+    {"no": 38, "nation": "Cabaliſtæ", "entry": ""},
+    {"no": 39, "nation": "Scoti", "entry": "les Écossais"},
+    {"no": 40, "nation": "Belgæ", "entry": "les Belges"},
+    {"no": 42, "nation": "Canadẽſes", "entry": "les Canadiens"},
+    {"no": 43, "nation": "Caleforniij", "entry": "les Californiens"},
+    {"no": 44, "nation": "Mexicani", "entry": "les Mexicains"},
+    {"no": 45, "nation": "Quitenses", "entry": "les peuples de Quito"},
+    {"no": 46, "nation": "Para.quaij", "entry": "les peuples du Paraguay"},
+    {"no": 47, "nation": "Chilenses", "entry": "les peuples du Chili"},
+    {"no": 48, "nation": "Iaponij", "entry": "les Japonais"},
+    {"no": 49, "nation": "Philip:Insu", "entry": "les habitants des îles Philippines"},
+    {"no": 52, "nation": "Melindi", "entry": "les Melindais"},
+    {"no": 54, "nation": "Zaflanẽſes", "entry": "les Zaflaniens"},
+    {"no": 55, "nation": "Ormusij", "entry": "les peuples d'Ormuz"},
+    {"no": 56, "nation": "Adeni", "entry": "les peuple d'Aden"},
+    {"no": 57, "nation": "Cyrænęi", "entry": "les Ciréniens"},
+    {"no": 59, "nation": "Meſopotam", "entry": "les Mésopotamiens"},
+    {"no": 60, "nation": "Tibethenſes", "entry": "les peuples du Thibet"},
+    {"no": 62, "nation": "Carmani", "entry": "les anciens Carmaniens"},
+    {"no": 63, "nation": "Camboij", "entry": "les Camboens"},
+    {"no": 65, "nation": "Gymnoſophi", "entry": "les Gymnosophes"},
+    {"no": 66, "nation": "Brachmani", "entry": "les Brahmanes"},
+    {"no": 67, "nation": "Albanenſes", "entry": "les Albanais"},
+    {"no": 70, "nation": "Bœotij", "entry": "les Béotiens"},
+    {"no": 71, "nation": "Phryges", "entry": "les Phrygiens"},
+    {"no": 72, "nation": "Thraces", "entry": "la Thrace ou la Roumélie"},
+  ],
+  remarks: [
+    {"no": 37, "quote": "d'après les anciens Philosophes", "remark": "The entry names no nation, but gives the name « d'après les anciens Philosophes », as Kircher's Philosophi."},
+    {"no": 38, "quote": "Suivant les cabalistes, ce nom est tiré", "remark": "The entry names no nation, but derives the name from a verse « Suivant les cabalistes », as Kircher's Cabalistæ."},
+  ],
+}

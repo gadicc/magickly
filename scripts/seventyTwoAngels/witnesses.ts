@@ -17,6 +17,7 @@ export const WITNESSES_PATH =
 
 export type Verdict =
   | "reissue"
+  | "reissueChanged"
   | "lenain"
   | "reissueCorrected"
   | "agree"
@@ -25,6 +26,7 @@ export type Verdict =
 
 const VERDICTS = new Set<Verdict>([
   "reissue",
+  "reissueChanged",
   "lenain",
   "reissueCorrected",
   "agree",
@@ -48,15 +50,24 @@ export interface WitnessReading {
   remark?: string;
 }
 
-/** One witness as a note carries it, ready to link. */
+/**
+ * One witness as a note carries it, ready to link: a copy of Lenain, or
+ * Kircher's plate of the names of God by nation, his source for two columns.
+ */
 export interface Witness {
-  source: "print1823" | "ms5365";
-  /** "1823 printing, p. 57" or "Ms 5365, leaf n66". */
+  source: "print1823" | "ms5365" | "kircherPlate";
+  /** "1823 printing, p. 57", "Ms 5365, leaf n66" or "Kircher's plate, ray 50". */
   label: string;
-  /** The page ("57") or the archive.org leaf ("n66"). */
+  /** The page ("57"), the archive.org leaf ("n66") or the ray ("ray 50"). */
   at: string;
   url: string;
   reads: string;
+  /**
+   * The mirrored page that shows it (a key of `MIRRORED_PAGES` in
+   * src/sources/mirroredPages.ts), which the site opens in its lightbox
+   * instead of following `url`.
+   */
+  mirror?: string;
 }
 
 /** A row of the first table as the 1823 plate shows it. */
@@ -204,6 +215,25 @@ export function inNotation(field: string, reads: string): string | undefined {
 
 const lettersOf = (hebrew: string) => hebrew.replace(/\p{Mark}/gu, "");
 
+/** The fields whose value is a word or phrase of the entry's own. */
+const WORDED_FIELDS = new Set(["people", "godName"]);
+
+/**
+ * A nation or a name of God without what surrounds it in the entry: "la
+ * langue des Samaritains" and "les Samaritains" are both "samaritains".
+ * Case and accents are folded; the article and "la langue" are dropped.
+ */
+export function worded(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/\p{Mark}/gu, "")
+    .toLowerCase()
+    .trim()
+    .replace(/^(la )?langue\s+/, "")
+    .replace(/^(des|de la|du|d'|les|le|la|l')\s*/, "")
+    .trim();
+}
+
 /**
  * Whether a verdict fits what the note and the reading say, or why not. The
  * verdict is a person's judgement; this holds it to the values it is about,
@@ -211,11 +241,39 @@ const lettersOf = (hebrew: string) => hebrew.replace(/\p{Mark}/gu, "");
  * shares, or Lenain for one it does not.
  */
 export function verdictProblem(
-  note: { no: number; field: string; printed: string; used: string },
+  note: {
+    no: number;
+    field: string;
+    printed: string;
+    used: string;
+    kind?: string;
+  },
   reading: WitnessReading,
 ): string | undefined {
   const where = `Genius ${note.no} ${note.field}`;
   const reads = reading.print1823.reads;
+
+  if (reading.verdict === "reissueChanged" && !reads)
+    return `${where}: the reissue changed a value the 1823 printing does not give`;
+
+  // A nation or a name of God in a reading note is the entry's own value,
+  // so the 1823 entry's phrase can be held to it once the wording around
+  // the value is set aside. A correction's printed value may come from
+  // elsewhere (the seventy-second's KALO is the table's), so only readings.
+  if (WORDED_FIELDS.has(note.field) && note.kind === "reading") {
+    const ours = worded(note.printed);
+    const theirs = worded(reads);
+    if (reading.verdict === "lenain" && ours !== theirs)
+      return `${where}: the 1823 printing reads “${reads}”, not the reissue's “${note.printed}”, yet the verdict says they agree`;
+    if (
+      (reading.verdict === "reissue" || reading.verdict === "reissueChanged") &&
+      ours === theirs
+    )
+      return `${where}: the 1823 printing reads “${reads}”, as the reissue does, yet the verdict blames the reissue`;
+    if (reading.verdict === "agree" && ours !== theirs)
+      return `${where}: the 1823 printing reads “${reads}”, not “${note.printed}”, yet the verdict says it agrees`;
+    return undefined;
+  }
 
   if (note.field === "name.he") {
     const printed = lettersOf(note.printed);
@@ -286,10 +344,19 @@ export function witnessedWhy(
           : `${note.why} ${said}.`;
       break;
     }
-    case "lenain":
+    case "reissueChanged":
+      if (!print1823.reads)
+        throw new Error(`${where}: a change needs the 1823 reading`);
       why =
-        `${note.why} The 1823 printing has the same (${page}), so the slip ` +
-        `is Lenain's or his printer's, not the reissue's.`;
+        `${note.why} The reissue changed this: the 1823 printing reads ` +
+        `${quoted(print1823.reads)} (${page}).`;
+      break;
+    case "lenain":
+      why = WORDED_FIELDS.has(note.field)
+        ? `${note.why} The 1823 printing has the same (${page}), so the ` +
+          `difference is Lenain's, not the reissue's.`
+        : `${note.why} The 1823 printing has the same (${page}), so the slip ` +
+          `is Lenain's or his printer's, not the reissue's.`;
       break;
     case "reissueCorrected":
       if (!print1823.reads)

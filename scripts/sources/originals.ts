@@ -38,6 +38,32 @@ export function readHandFetched(
   return { bytes: new Uint8Array(readFileSync(path)) };
 }
 
+/**
+ * The name a downloadable original is kept under in `--originals` when the
+ * download is refused: only Commons's, as `commons-<file>`, the file's name
+ * on Commons with underscores for spaces. Others have none.
+ */
+export function keptCopyName(
+  page: Pick<MirroredPage, "scan">,
+): string | undefined {
+  return page.scan.site === "Wikimedia Commons"
+    ? `commons-${page.scan.file.replace(/ /g, "_")}`
+    : undefined;
+}
+
+/** A kept copy of a downloadable original, if there is one to read. */
+export function readKeptCopy(
+  page: Pick<MirroredPage, "scan">,
+  originals: string | undefined,
+): { bytes: Uint8Array } | undefined {
+  const name = keptCopyName(page);
+  if (!name || !originals) return undefined;
+  const path = join(originals, name);
+  return existsSync(path)
+    ? { bytes: new Uint8Array(readFileSync(path)) }
+    : undefined;
+}
+
 /** Why an original is not the one the manifest records; none if it is. */
 export async function originalProblem(
   page: Pick<MirroredPage, "id" | "original">,

@@ -46,19 +46,21 @@ too:
   last page Lenain cites; and p. 287 ([leaf n294](https://archive.org/details/A027083/page/n294/mode/1up)), where Kircher
   says every nation's name of God has four letters and introduces the plate
   of them that follows;
-- Kircher's plate, which that copy lacks
-  ([archive.org bub_gb_XjfzMnomDQoC, leaf n294](https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n294/mode/1up),
-  the Universidad Complutense de Madrid's copy, photographed partly folded):
-  seventy-two four-letter names of God, each with its nation, Lenain's Kalo
-  and Zeut among them. It is very likely the source of the first table's last
-  two columns, and has not yet been transcribed for this edition.
+- Kircher's plate after p. 287, which that copy lacks: seventy-two
+  four-letter names of God, each with its nation. The first table's last two
+  columns follow it row for row, and it has been transcribed for this
+  edition from the National Library of Poland's copy
+  ([Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg));
+  another, the Universidad Complutense de Madrid's, was photographed partly
+  folded ([archive.org bub_gb_XjfzMnomDQoC, leaf n294](https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n294/mode/1up)).
+  Where an entry departs from it, a note says so.
 
 <small>
 
 **About this edition**
 
 - **first cabalistic table** (reconstruction) — The table is a fold-out leaf, and the scan photographed it folded: only its last eleven rows were captured, and the page behind it is blank. The 1823 printing's copy (Google Books qt9SAAAAcAAJ, page 25) was photographed folded too, but further open, and shows rows 57 to 72, the fifty-seventh only in part. Rows 1 to 56 are on no image of the plate found. Every column the table carries — name, nation, divine name — is also given in the entry for each genius, so nothing it held is lost, only its arrangement.
-- **first cabalistic table, rows 1-56** (reconstruction) — Rows 62 to 72 are on the reissue's plate, and 57 to 72 on the 1823 printing's; 1 to 56 are on no image of Lenain's plate found. They are put back from each genius's own entry, which carries the same three columns, and are marked as reconstructed wherever they are shown — never written into the transcription, which is what the page prints. The method can be checked against the rows the plates do show, and the reconstructed table says how often it recovers each column; the misses are places where Lenain's table and his entries differ, such as Mogols for Mongols and Habuiah for Habuhiah. He names his own sources under the table — Kircher's Oedipus Aegyptiacus, tome 2, pages 273 and 287, and Agrippa's Occult Philosophy, book 3, pages 109 and 110, The Hague 1727 — and both have been consulted. Agrippa gives the seventy-two names in the spellings Lenain uses, without nations or names of God. Kircher gives the seventy-two angels by choir in Hebrew and Latin (pp. 271 to 273), and on p. 287 introduces a plate of seventy-two four-letter names of God, each with its nation; Kalo and Zeut, Lenain's last two, are on it, so it is very likely the source of the table's last two columns. The plate is not in the copy those pages were read from (archive.org A027083) but is in another (archive.org bub_gb_XjfzMnomDQoC, leaf n294), photographed partly folded, and has not been transcribed, so for rows 1 to 56 those two columns still rest on Lenain's entries.
+- **first cabalistic table, rows 1-56** (reconstruction) — Rows 62 to 72 are on the reissue's plate, and 57 to 72 on the 1823 printing's; 1 to 56 are on no image of Lenain's plate found. They are put back from each genius's own entry, which carries the same three columns, and are marked as reconstructed wherever they are shown — never written into the transcription, which is what the page prints. The method can be checked against the rows the plates do show, and the reconstructed table says how often it recovers each column; the misses are places where Lenain's table and his entries differ, such as Mogols for Mongols and Habuiah for Habuhiah. He names his own sources under the table — Kircher's Oedipus Aegyptiacus, tome 2, pages 273 and 287, and Agrippa's Occult Philosophy, book 3, pages 109 and 110, The Hague 1727 — and both have been consulted. Agrippa gives the seventy-two names in the spellings Lenain uses, without nations or names of God. Kircher gives the seventy-two angels by choir in Hebrew and Latin (pp. 271 to 273), and on p. 287 introduces a plate of seventy-two four-letter names of God, each with its nation, which the table's last two columns follow row for row, from the Hebrews to Thrace. The plate is not in the copy those pages were read from (archive.org A027083); it was transcribed from the National Library of Poland's copy (Wikimedia Commons, "Kircher-Diagram of the names of God (22593924).jpg"), and the reconstructed table sets each of its rays beside the row. Rows 1 to 56 still rest on Lenain's entries, not on his plate, but each now stands beside its source, and where an entry departs from the plate a note on it says how and whose the difference is.
 - **name.he** (reading) · U+05C4 — Lenain dots his Hebrew above the letter bodies, not within them and not beneath. Those dots are encoded here as U+05C4 HEBREW MARK UPPER DOT, which is what that position means; whether he intended the biblical punctum extraordinarium or a device of his own is not something the type can settle.
 
 </small>
@@ -1416,6 +1418,17 @@ Le génie contraire domine tout ce qui est nuisible aux êtres animés; il se pl
 
 <small>
 
+**Editorial notes**
+
+- **genius 2, godName** (reading) · Aydy, kept as printed — Kircher's plate, Lenain's source for this column, has ܐܠܗܐ as the name of God of ray 2; the entry has “Aydy”. The reading of the engraved letters is uncertain. Syriac, crudely cut: read right to left as alaph, lamadh, he, alaph. The Unicode letters interpret the shapes. The 1823 printing has the same (p. 47), so the difference is Lenain's, not the reissue's. [1823 printing, p. 47](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA47) · [Kircher's plate, ray 2 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
+- **genius 2, people** (reading) · la Turquie, kept as printed — Kircher's plate, Lenain's source for this column, has Syri (the Syrians) as the nation of ray 2; the entry has “la Turquie”. The 1823 printing has the same (p. 47), so the difference is Lenain's, not the reissue's. [1823 printing, p. 47](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA47) · [Kircher's plate, ray 2 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
+- **genius 3, godName** (reading) — Kircher's plate, Lenain's source for this column, has אלוה as the name of God of ray 3; the entry gives no name of God. The reading of the engraved letters is uncertain. The first letter is Y-shaped, an alef without its lower-left foot (or a tsade without its base); the other three are clear. The 1823 printing gives none either (p. 47). [1823 printing, p. 47](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA47) · [Kircher's plate, ray 3 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
+- **genius 3, people** (reading) — Kircher's plate, Lenain's source for this column, has Chaldęi (the Chaldeans) as the nation of ray 3; the entry gives no nation. The 1823 printing gives none either (p. 47). [1823 printing, p. 47](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA47) · [Kircher's plate, ray 3 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
+
+</small>
+
+<small>
+
 <details><summary>Reading notes</summary>
 
 - Hebrew text for Jeliel rendered as יליאל — image quality makes some diacritic-like marks above the letters uncertain, possibly vowel points not fully legible
@@ -1494,6 +1507,8 @@ Le génie contraire est l'ennemi des lumières; il domine la négligence, la par
 
 **Editorial notes**
 
+- **genius 7, godName** (reading) — Kircher's plate, Lenain's source for this column, has աբաբ as the name of God of ray 7; the entry gives no name of God. The engraved letters are a best guess. Armenian-like minuscules, each pair under a titlo; the letters are a best guess at the shapes, not a confident reading of the Armenian. The 1823 printing gives none either (p. 50). [1823 printing, p. 50](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA50) · [Kircher's plate, ray 7 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
+- **genius 7, people** (reading) — Kircher's plate, Lenain's source for this column, has Armeni (the Armenians) as the nation of ray 7; the entry gives no nation. The 1823 printing gives none either (p. 50). [1823 printing, p. 50](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA50) · [Kircher's plate, ray 7 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 - **genius 7, presidingDays** (correction) · 26/3, 6/6, 16/8, 28/10, 8/1 → 26/3, 6/6, 17/8, 28/10, 8/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 50), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n58). [1823 printing, p. 50](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA50) · [Ms 5365, leaf n58](https://archive.org/details/BIUSante_ms05365/page/n58/mode/1up)
 - **genius 8, invocation** (correction) · 2:20 — Neither the 1823 printing (p. 50) nor the reissue gives an hour for this genius; the one used here is from Lenain's tables. The manuscript copy Ms 5365 gives none either (leaf n59). [1823 printing, p. 50](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA50) · [Ms 5365, leaf n59](https://archive.org/details/BIUSante_ms05365/page/n59/mode/1up)
 - **genius 8, presidingDays** (correction) · 27/3, 7/6, 17/8, 29/10, 9/1 → 27/3, 7/6, 18/8, 29/10, 9/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 51), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n59). [1823 printing, p. 51](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA51) · [Ms 5365, leaf n59](https://archive.org/details/BIUSante_ms05365/page/n59/mode/1up)
@@ -1550,6 +1565,7 @@ Le génie contraire influe sur ceux qui négligent leur santé et leurs affaires
 **Editorial notes**
 
 - **genius 10, degrees** (correction) · 41-50 → 46-50 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 52), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n60). [1823 printing, p. 52](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA52) · [Ms 5365, leaf n60](https://archive.org/details/BIUSante_ms05365/page/n60/mode/1up)
+- **genius 10, godName** (reading) · Siré et Eipi, kept as printed — Kircher's plate, Lenain's source for this column, has ΣΥΡΙ as the name of God of ray 10; the entry has “Siré et Eipi”. Siré and Eipi look like the one engraved ΣΥΡΙ read twice, as Greek (Siré) and as Latin capitals (E, I, P, I); it is a departure because Lenain gives two names, joined by « et », where the plate has one. The 1823 printing has the same (p. 52), so the difference is Lenain's, not the reissue's. [1823 printing, p. 52](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA52) · [Kircher's plate, ray 10 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 - **genius 10, presidingDays** (correction) · 29/3, 9/6, 19/8, 31/10, 11/1 → 29/3, 9/6, 20/8, 31/10, 11/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 52), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n60). [1823 printing, p. 52](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA52) · [Ms 5365, leaf n60](https://archive.org/details/BIUSante_ms05365/page/n60/mode/1up)
 - **genius 11, presidingDays** (correction) · 30/3, 10/6, 20/8, 1/11, 12/1 → 30/3, 10/6, 21/8, 1/11, 12/1 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 52), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n61). [1823 printing, p. 52](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA52) · [Ms 5365, leaf n61](https://archive.org/details/BIUSante_ms05365/page/n61/mode/1up)
 
@@ -1775,6 +1791,14 @@ Le génie contraire domine les traîtres, les ambitieux et les conspirations.
 
 <small>
 
+**Editorial notes**
+
+- **genius 26, godName** (reading) · Agdy et Abdi, kept as printed — Kircher's plate, Lenain's source for this column, has AGDI as the name of God of ray 26; the entry has “Agdy et Abdi”. The plate gives one name; Abdi is not on it. The 1823 printing has the same (p. 62), so the difference is Lenain's, not the reissue's. [1823 printing, p. 62](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA62) · [Kircher's plate, ray 26 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
+
+</small>
+
+<small>
+
 <details><summary>Reading notes</summary>
 
 - The Hebrew for 'Haaiah' rendered as האאיה may not be precisely accurate given the small/blurry typeface
@@ -1895,6 +1919,7 @@ Le génie contraire domine la discorde; il provoque la guerre, les trahisons, et
 **Editorial notes**
 
 - **genius 34, name.he** (reading) · לּׄההיׄה → לההיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 67). The manuscript copy Ms 5365 has the same (leaf n75). The triad of the Shem HaMephorash, from Exodus 14:19–21, is להח: the verse has het where both printings have he. [1823 printing, p. 67](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA67) · [Ms 5365, leaf n75](https://archive.org/details/BIUSante_ms05365/page/n75/mode/1up)
+- **genius 35, people** (reading) — Kircher's plate, Lenain's source for this column, has Angolani (the Angolans) as the nation of ray 35; the entry gives no nation. The 1823 printing gives none either (p. 68). [1823 printing, p. 68](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA68) · [Kircher's plate, ray 35 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 
 </small>
 
@@ -2013,6 +2038,7 @@ Le génie contraire influe sur les apostats, les renégats, et sur tous ceux qui
 **Editorial notes**
 
 - **genius 41, name.he** (reading) · הההאׄלּׄ → הההאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 73). The manuscript copy Ms 5365 has the same (leaf n80). [1823 printing, p. 73](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA73) · [Ms 5365, leaf n80](https://archive.org/details/BIUSante_ms05365/page/n80/mode/1up)
+- **genius 41, people** (reading) · la langue irlandaise, kept as printed — Kircher's plate, Lenain's source for this column, has Islandi (the Icelanders) as the nation of ray 41; the entry has “la langue irlandaise”. Islandi was likely read as Irlandais, its s taken for an r. The 1823 printing has the same (p. 73), so the difference is Lenain's, not the reissue's. [1823 printing, p. 73](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA73) · [Kircher's plate, ray 41 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 
 </small>
 
@@ -2090,9 +2116,11 @@ Le génie contraire domine sur l'atmosphère ; il provoque les grandes chaleurs 
 
 **Editorial notes**
 
+- **genius 45, godName** (reading) · Hobo, kept as printed — Kircher's plate, Lenain's source for this column, has HOBA as the name of God of ray 45; the entry has “Hobo”. The 1823 printing has the same (p. 76), so the difference is Lenain's, not the reissue's. [1823 printing, p. 76](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA76) · [Kircher's plate, ray 45 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 - **genius 45, name.he** (reading) · סאׄלּׄיׄה → סאליה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 76). The manuscript copy Ms 5365 has the same (leaf n83). [1823 printing, p. 76](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA76) · [Ms 5365, leaf n83](https://archive.org/details/BIUSante_ms05365/page/n83/mode/1up)
 - **genius 45, psalm.la** (correction) · misericordia tua Domine adjuvebat me → adjuvabat — The page prints "adjuvebat" in italic, plainly and not as scan damage, where the psalter reads "adiuvabat" at Psalm 93:18. The entry's French keeps his spelling; this field gives the verse as the psalter has it. The 1823 printing has the same (p. 76), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n83). [1823 printing, p. 76](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA76) · [Ms 5365, leaf n83](https://archive.org/details/BIUSante_ms05365/page/n83/mode/1up)
 - **genius 46, degrees** (correction) · 226-130 → 226-230 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 76), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n83). [1823 printing, p. 76](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA76) · [Ms 5365, leaf n83](https://archive.org/details/BIUSante_ms05365/page/n83/mode/1up)
+- **genius 46, godName** (reading) · Pino, kept as printed — Kircher's plate, Lenain's source for this column, has PIVR as the name of God of ray 46; the entry has “Pino”. The 1823 printing has the same (p. 76), so the difference is Lenain's, not the reissue's. [1823 printing, p. 76](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA76) · [Kircher's plate, ray 46 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 - **genius 46, name.he** (reading) · עריׄאׄלּׄ → עריאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 76). The manuscript copy Ms 5365 has the same (leaf n83). [1823 printing, p. 76](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA76) · [Ms 5365, leaf n83](https://archive.org/details/BIUSante_ms05365/page/n83/mode/1up)
 - **genius 46, ordinal** (correction) · 36e → 46 — The entry stands between the 45th and the 47th, and the first cabalistic table numbers it 46. The reissue's resetting misprints this: the 1823 printing reads “46e” (p. 76). The manuscript copy Ms 5365 has the same (leaf n83). [1823 printing, p. 76](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA76) · [Ms 5365, leaf n83](https://archive.org/details/BIUSante_ms05365/page/n83/mode/1up)
 
@@ -2141,6 +2169,14 @@ Le génie contraire domine sur le luxe, la stérilité et l'inconstance; il met 
 
 <small>
 
+**Editorial notes**
+
+- **genius 49, godName** (reading) · Mara, kept as printed — Kircher's plate, Lenain's source for this column, has MORA as the name of God of ray 49; the entry has “Mara”. The 1823 printing has the same (p. 78), so the difference is Lenain's, not the reissue's. [1823 printing, p. 78](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA78) · [Kircher's plate, ray 49 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
+
+</small>
+
+<small>
+
 <details><summary>Reading notes</summary>
 
 - Hebrew for Mihael rendered as מיהאל based on visible letters; final letter shape slightly unclear
@@ -2161,6 +2197,7 @@ Le génie contraire influue sur les hommes égoïstes ; il domine sur la haine e
 **Editorial notes**
 
 - **genius 50, degrees** (correction) · 246-145 → 246-250 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 79), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n86). [1823 printing, p. 79](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA79) · [Ms 5365, leaf n86](https://archive.org/details/BIUSante_ms05365/page/n86/mode/1up)
+- **genius 50, people** (reading) · les Samaritains, kept as printed — Kircher's plate, Lenain's source for this column, has Samatrani (the Sumatrans) as the nation of ray 50; the entry has “les Samaritains”. Samatrani, as the plate spells it, was likely read as Samaritains. The 1823 printing has the same (p. 79), so the difference is Lenain's, not the reissue's. [1823 printing, p. 79](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA79) · [Kircher's plate, ray 50 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 
 </small>
 
@@ -2185,6 +2222,7 @@ Le génie contraire influe sur les chevaliers d'industrie, et sur tous ceux qui 
 **Editorial notes**
 
 - **genius 51, name.he** (reading) · ההשיה, kept as printed — Two readings of the scan agree on the reissue's letters. The 1823 printing agrees (p. 80). The triad of the Shem HaMephorash, from Exodus 14:19–21, is החש: the verse has het where both printings have he. [1823 printing, p. 80](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA80)
+- **genius 51, people** (reading) · les Barsiens, kept as printed — Kircher's plate, Lenain's source for this column, has Narsingi (the people of Narsinga, in southern India) as the nation of ray 51; the entry has “les Barsiens”. The 1823 printing has the same (p. 80), so the difference is Lenain's, not the reissue's. [1823 printing, p. 80](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA80) · [Kircher's plate, ray 51 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 
 </small>
 
@@ -2213,6 +2251,7 @@ Le génie contraire domine l'orgueil, le blasphême et la méchanceté; il influ
 - **genius 52, name.he** (reading) · עּממיׄה → עממיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 81). The manuscript copy Ms 5365 has the same (leaf n88). [1823 printing, p. 81](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA81) · [Ms 5365, leaf n88](https://archive.org/details/BIUSante_ms05365/page/n88/mode/1up)
 - **genius 53, degrees** (correction) · 216-265 → 261-265 — The reissue's resetting misprints this: the 1823 printing reads “261–265” (p. 82), as Lenain's own tables require. The manuscript copy Ms 5365 has the same (leaf n88). [1823 printing, p. 82](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA82) · [Ms 5365, leaf n88](https://archive.org/details/BIUSante_ms05365/page/n88/mode/1up)
 - **genius 53, name.he** (reading) · ננאׄאׄלּׄ → ננאאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 81). The manuscript copy Ms 5365 has the same (leaf n88). [1823 printing, p. 81](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA81) · [Ms 5365, leaf n88](https://archive.org/details/BIUSante_ms05365/page/n88/mode/1up)
+- **genius 53, people** (reading) · les Maltais, kept as printed — Kircher's plate, Lenain's source for this column, has Maldiuij (the people of the Maldives) as the nation of ray 53; the entry has “les Maltais”. Maldiuij was likely read as Maltais. The 1823 printing has the same (p. 82), so the difference is Lenain's, not the reissue's. [1823 printing, p. 82](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA82) · [Kircher's plate, ray 53 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 
 </small>
 
@@ -2297,6 +2336,7 @@ Le génie contraire domine sur les trahisons, cause la mésintelligence entre le
 
 - **genius 57, name.he** (reading) · נממיה, kept as printed — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 85). The manuscript copy Ms 5365 has the same (leaf n91). [1823 printing, p. 85](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA85) · [Ms 5365, leaf n91](https://archive.org/details/BIUSante_ms05365/page/n91/mode/1up)
 - **genius 58, name.he** (reading) · יׄיׄלּׄאׄלּׄ → יילאל — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 85). The manuscript copy Ms 5365 has the same (leaf n92). [1823 printing, p. 85](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA85) · [Ms 5365, leaf n92](https://archive.org/details/BIUSante_ms05365/page/n92/mode/1up)
+- **genius 58, people** (reading) · les Célamites, kept as printed — Kircher's plate, Lenain's source for this column, has Ælamitæ (the Elamites) as the nation of ray 58; the entry has “les Célamites”. Ælamitæ was likely read with its Æ as Cé. His table has “Les Célamites” on the 1823 plate (p. 25). The 1823 printing has the same (p. 85), so the difference is Lenain's, not the reissue's. [1823 printing, p. 85](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA85) · [Kircher's plate, ray 58 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 
 </small>
 
@@ -2334,6 +2374,14 @@ Le génie contraire est l'ennemi des lumières; il cause la ruine et la destruct
 60e. Mitzrael. מצראל Son attribut (Dieu qui soulage les opprimés). Il correspond au saint nom Géna, suivant la langue des peuples du Thibet. Son rayon commence depuis le 296e. degré de la sphère jusqu'au 300e., inclusivement, correspond à la 30e décade et au génie nommé Homoth. Il préside les jours suivants : 18 mai, 29 juillet, 9 octobre ; 20 décembre, 2 mars. L'invocation se fait depuis 7 heures 40 minutes du soir jusqu'à 8 heures, en prononçant le 18e. verset du psaume 144. (Justus Dominus in omnibus viis suis : et sanctus in omnibus operibus suis.) Il sert pour guérir les maladies d'esprit, et pour être délivrés de ceux qui nous persécutent ; il domine sur les personnages illustres qui se distinguent par leurs talents et leurs vertus ; il influe sur la fidélité et l'obéissance des subalternes envers leurs supérieurs. La personne qui est née sous cette influence réunira toutes les belles qualités du corps et de l'âme ; elle se distinguera par ses vertus, son esprit, son humeur agréable, et elle vivra longtemps.
 
 Le génie contraire domine sur tous les êtres insubordonnés, et influe sur toutes les mauvaises qualités physiques et morales.
+
+<small>
+
+**Editorial notes**
+
+- **genius 61, people** (reading) · les anciens Béthuliens, kept as printed — Kircher's plate, Lenain's source for this column, has Bactriani (the Bactrians) as the nation of ray 61; the entry has “les anciens Béthuliens”. His table has “Les Béthuliens” on the 1823 plate (p. 25). The 1823 printing has the same (p. 87), so the difference is Lenain's, not the reissue's. [1823 printing, p. 87](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA87) · [Kircher's plate, ray 61 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
+
+</small>
 
 <small>
 
@@ -2385,6 +2433,7 @@ Le génie contraire domine la folie et la prodigalité ; il influe sur tous ceux
 - **genius 64, choir** (correction) · anges → Archangels — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 90), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n96). [1823 printing, p. 90](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA90) · [Ms 5365, leaf n96](https://archive.org/details/BIUSante_ms05365/page/n96/mode/1up)
 - **genius 64, degrees** (correction) · 316-220 → 316-320 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 89), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 has the same (leaf n96). [1823 printing, p. 89](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA89) · [Ms 5365, leaf n96](https://archive.org/details/BIUSante_ms05365/page/n96/mode/1up)
 - **genius 64, name.he** (reading) · מהיאל, kept as printed — Two readings of the scan agree on the reissue's letters. The 1823 printing agrees (p. 89). The triad of the Shem HaMephorash, from Exodus 14:19–21, is מחי: the verse has het where both printings have he. [1823 printing, p. 89](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA89)
+- **genius 64, people** (reading) · les Mongols, kept as printed — Kircher's plate, Lenain's source for this column, has Mogores (the Mughals) as the nation of ray 64; the entry has “les Mongols”. Mogols is the French for Kircher's Mogores; Mongols names another people. His table has “Les Mogols” on both plates (p. 25). The reissue changed this: the 1823 printing reads “la langue des Mogols” (p. 89). [1823 printing, p. 89](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA89) · [Kircher's plate, ray 64 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 
 </small>
 
@@ -2452,7 +2501,9 @@ Le génie contraire domine l'erreur, les préjugés, et ceux qui propagent des s
 **Editorial notes**
 
 - **genius 68, degrees** (correction) · 337-340 → 336-340 — Lenain's own tables give otherwise, and the rest of the book keeps to them. The 1823 printing has the same (p. 92), so the slip is Lenain's or his printer's, not the reissue's. The manuscript copy Ms 5365 reads “337–310” (leaf n98), a copyist's variant. [1823 printing, p. 92](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA92) · [Ms 5365, leaf n98](https://archive.org/details/BIUSante_ms05365/page/n98/mode/1up)
+- **genius 68, godName** (reading) · Dépos, kept as printed — Kircher's plate, Lenain's source for this column, has ΔƐΟS as the name of God of ray 68; the entry has “Dépos”. The reading of the engraved letters is uncertain. Δ, an open epsilon (Ɛ), O, and a letter shaped like a Latin S. His table has “DÉPOS” on both plates (p. 25). The 1823 printing has the same (p. 92), so the difference is Lenain's, not the reissue's. [1823 printing, p. 92](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA92) · [Kircher's plate, ray 68 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 - **genius 68, name.he** (reading) · הבויׄה → חבויה — Two readings of the scan could not settle this name. The reissue's letters were read from the scan by Gadi Cohen, who reads Hebrew; the dots sit above the letters, not within them. The name given is not those letters but the 1823 printing's. The reissue's resetting misprints this: the 1823 printing reads “חבויה” (p. 92). The manuscript copy Ms 5365 reads “הבויה” (leaf n98), a copyist's variant. The triad of the Shem HaMephorash is חבו. [1823 printing, p. 92](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA92) · [Ms 5365, leaf n98](https://archive.org/details/BIUSante_ms05365/page/n98/mode/1up)
+- **genius 68, people** (reading) · les Péloponésiens, kept as printed — Kircher's plate, Lenain's source for this column, has Cretenses (the Cretans) as the nation of ray 68; the entry has “les Péloponésiens”. Lenain's sixty-eighth and sixty-ninth have the nations of Kircher's sixty-ninth and sixty-eighth: the two are exchanged. His table has “Les Péloponésiens” on both plates (p. 25). The 1823 printing has the same (p. 92), so the difference is Lenain's, not the reissue's. [1823 printing, p. 92](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA92) · [Kircher's plate, ray 68 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 
 </small>
 
@@ -2477,6 +2528,7 @@ Le génie contraire domine sur les procès, les testaments et les legs qui se fo
 **Editorial notes**
 
 - **genius 69, name.he** (reading) · ראחאל → ראהאל — Two readings of the scan agree on the reissue's letters. The name given is not those letters but the 1823 printing's. The reissue's resetting misprints this: the 1823 printing reads “ראהאל” (p. 92). The triad of the Shem HaMephorash is ראה. [1823 printing, p. 92](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA92)
+- **genius 69, people** (reading) · les Crétois, kept as printed — Kircher's plate, Lenain's source for this column, has Peloponeſij (the Peloponnesians) as the nation of ray 69; the entry has “les Crétois”. Lenain's sixty-eighth and sixty-ninth have the nations of Kircher's sixty-ninth and sixty-eighth: the two are exchanged. His table has “Les Crétois” on both plates (p. 25). The 1823 printing has the same (p. 92), so the difference is Lenain's, not the reissue's. [1823 printing, p. 92](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA92) · [Kircher's plate, ray 69 (numbered on the rim)](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg)
 - **genius 70, name.he** (reading) · יׄבמיׄה → יבמיה — Two readings of the scan could not settle this name. Read from the scan by Gadi Cohen, who reads Hebrew. The dots sit above the letters, not within them. The 1823 printing agrees (p. 93). The manuscript copy Ms 5365 has the same (leaf n99). [1823 printing, p. 93](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA93) · [Ms 5365, leaf n99](https://archive.org/details/BIUSante_ms05365/page/n99/mode/1up)
 
 </small>
@@ -3481,77 +3533,79 @@ Checked against the rows the plates show in full (row 57, only partly legible, l
 
 Where both plates show a row, they differ 4 times: row 62's name is blank on the reissue's plate and “Iahhel” on the 1823; row 66's nation is “Les Brahmanes” on the reissue's plate and “Les Brachmanes” on the 1823; row 69's name of God is “DÉOS” on the reissue's plate and “DÊOS” on the 1823; row 71's name is “Haiuiel” on the reissue's plate and “Haiaiel” on the 1823. Those rows are given here as the reissue's plate has them, since that is the copy this edition transcribes.
 
-| # | Genius | Peuple | Name of God | Source |
-| --- | --- | --- | --- | --- |
-| 1 | Vehuiah | Les Hébreux | JEHOVAH | reconstructed |
-| 2 | Jeliel | La Turquie | AYDY | reconstructed |
-| 3 | Sitaël |  |  | reconstructed |
-| 4 | Elemiah | Les Arabes | ALLAH | reconstructed |
-| 5 | Mahasiah | Les Égyptiens | TEUT OU THEUTH | reconstructed |
-| 6 | Lelahel | Les Éthiopiens | ABGD | reconstructed |
-| 7 | Achaiah |  |  | reconstructed |
-| 8 | Cahethel | Les Géorgiens | MOTI | reconstructed |
-| 9 | Haziel | Les Abyssiniens | AGZI | reconstructed |
-| 10 | Aladiah | La langue des Perses | SIRÉ ET EIPI | reconstructed |
-| 11 | Lauviah | Les Latins | DEUS | reconstructed |
-| 12 | Hahaiah | Les Grecs | THÉOS | reconstructed |
-| 13 | Iezalel | Les Illyriens | BOOG | reconstructed |
-| 14 | Mebahel | La langue espagnole | DIOS | reconstructed |
-| 15 | Hariel | La langue italienne | IDIO OU IDDIO | reconstructed |
-| 16 | Hakamiah | La France | DIEU | reconstructed |
-| 17 | Lauviah | Les Germains | GOTH | reconstructed |
-| 18 | Caliel | Les Polonais | BOOG | reconstructed |
-| 19 | Leuviah | Les Hongrois | BOGY | reconstructed |
-| 20 | Pahaliah | Langue des Moscovites | TIOS | reconstructed |
-| 21 | Nelchael | Les Bohémiens | BUEG | reconstructed |
-| 22 | Ieiaiel | La langue anglaise | GOOD | reconstructed |
-| 23 | Melahel | Les Hibernais | DIEH | reconstructed |
-| 24 | Hahiuiah | Les Etrusques | ESAR | reconstructed |
-| 25 | Nith-Haiah | Les Mages | ORSY | reconstructed |
-| 26 | Haaiah | Les Sarrazins | AGDY ET ABDI | reconstructed |
-| 27 | Ierathel | Les Cophtes | TÉOS | reconstructed |
-| 28 | Séheiah | Les Assyriens | ADAD | reconstructed |
-| 29 | Reiiel | Les Péruviens | ZIMI | reconstructed |
-| 30 | Omael | Les Indiens | TURA | reconstructed |
-| 31 | Lecabel | Les Chinois | TELI | reconstructed |
-| 32 | Vasariah | Les Tartares | ANOT | reconstructed |
-| 33 | Iehuiah | Les Hespérides | AGAD | reconstructed |
-| 34 | Lehahiah | Les peuples du Congo | ANEB | reconstructed |
-| 35 | Chavakiah |  | ANUP | reconstructed |
-| 36 | Menadel | Les Maures | ALLA | reconstructed |
-| 37 | Aniel |  | ABDA | reconstructed |
-| 38 | Haamiah |  | AGLA | reconstructed |
-| 39 | Rehael | Les Écossais | GOOT | reconstructed |
-| 40 | Ieiazel | Les Belges | GOED | reconstructed |
-| 41 | Hahahel | La langue irlandaise | GUDI | reconstructed |
-| 42 | Mikael | Les Canadiens | BIUB OU BIUD | reconstructed |
-| 43 | Veualiah | Les Californiens | SOLU | reconstructed |
-| 44 | Ielahiah | Les Mexicains | BOSA | reconstructed |
-| 45 | Sealiah | Les peuples de Quito | HOBO | reconstructed |
-| 46 | Ariel | Les peuples du Paraguay | PINO | reconstructed |
-| 47 | Asaliah | Les peuples du Chili | HANA | reconstructed |
-| 48 | Mihael | Les Japonais | ZACA | reconstructed |
-| 49 | Vehuel | Les habitants des îles Philippines | MARA | reconstructed |
-| 50 | Daniel | Les Samaritains | POLA | reconstructed |
-| 51 | Hahasiah | Les Barsiens | BILA | reconstructed |
-| 52 | Imamiah | Les Melindais | ABAG | reconstructed |
-| 53 | Nanael | Les Maltais | OBRA | reconstructed |
-| 54 | Nithael | Les Zaflaniens | BORA | reconstructed |
-| 55 | Mebahiah | Les peuples d'Ormuz | ALAY | reconstructed |
-| 56 | Poiel | Les peuple d'Aden | ILLI | reconstructed |
-| 57 | Nemamiah | Les Ciréniens | POPA | on the 1823 plate, partly legible |
-| 58 | Ieialel | Les Célamites | PARA | on the 1823 plate |
-| 59 | Harahel | La Mésopotamie | ELLA | on the 1823 plate |
-| 60 | Mitzrael | Le Thibet | GÉNA | on the 1823 plate |
-| 61 | Umabel | Les Béthuliens | SILA | on the 1823 plate |
-| 62 |  | Les Carmaniens | SUNA | on the reissue's plate |
-| 63 | Anauel | Les Camboens | MIRI | on the reissue's plate |
-| 64 | Mehiel | Les Mogols | ALLI | on the reissue's plate |
-| 65 | Damabiah | Les Gymnosophes | TARA | on the reissue's plate |
-| 66 | Manakel | Les Brahmanes | PORA | on the reissue's plate |
-| 67 | Eiael | Les Albanais | BOGO | on the reissue's plate |
-| 68 | Habuiah | Les Péloponésiens | DÉPOS | on the reissue's plate |
-| 69 | Rochel | Les Crétois | DÉOS | on the reissue's plate |
-| 70 | Jabamiah | Les Béotiens | ARIS | on the reissue's plate |
-| 71 | Haiuiel | Les Phrygiens | ZEUT | on the reissue's plate |
-| 72 | Mumiah | La Thrace | KALO | on the reissue's plate |
+Beside each row is the same ray of Kircher's plate of the names of God by nation (Oedipus Aegyptiacus II.1, 1653, the plate after p. 287), which Lenain cites under his table and whose two outer rings the table's last two columns follow row for row, from the Hebrews to Thrace. Allowing for spelling — V for U, a Greek name in roman letters — the entries give Kircher's name of God in 63 of the 72 rows and his nation in 59, the 37th and 38th among them by attribution: their entries name no people, but give the name as that of Kircher's Philosophi and Cabaliſtæ. They depart from him in the nation in rows 2, 3, 7, 35, 41, 50, 51, 53, 58, 61, 64, 68 and 69, and in the name of God in rows 2, 3, 7, 10, 26, 45, 46, 49 and 68; an editorial note on each such entry says what the plate has and whether the difference is Lenain's or the reissue's. Kircher's names and nations are given as engraved, from the National Library of Poland's copy of [the plate](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg); “reading uncertain” marks a name whose engraved letters could not be read with confidence.
+
+| # | Genius | Peuple | Name of God | Kircher's nation | Kircher's name of God | Source |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | Vehuiah | Les Hébreux | JEHOVAH | Hebræi | יהרה (reading uncertain) | reconstructed. Engraved יהרה, with a resh where the Tetragrammaton has vav: the engraver's slip, recorded and not corrected. |
+| 2 | Jeliel | La Turquie | AYDY | Syri | ܐܠܗܐ (reading uncertain) | reconstructed; differs from Kircher in nation and name of God |
+| 3 | Sitaël |  |  | Chaldęi | אלוה (reading uncertain) | reconstructed; the entry names neither a nation nor a name of God |
+| 4 | Elemiah | Les Arabes | ALLAH | Arabes | الله (reading uncertain) | reconstructed |
+| 5 | Mahasiah | Les Égyptiens | TEUT OU THEUTH | Ægyptij | Θωντ (reading uncertain) | reconstructed |
+| 6 | Lelahel | Les Éthiopiens | ABGD | Æthiopes | ABGD | reconstructed |
+| 7 | Achaiah |  |  | Armeni | աբաբ (reading uncertain) | reconstructed; the entry names neither a nation nor a name of God. The Armenian letters are a best guess at the engraved shapes, not a confident reading. |
+| 8 | Cahethel | Les Géorgiens | MOTI | Georgiani | MOTI | reconstructed |
+| 9 | Haziel | Les Abyssiniens | AGZI | Abyſsini | AGZI | reconstructed |
+| 10 | Aladiah | La langue des Perses | SIRÉ ET EIPI | Persæ | ΣΥΡΙ | reconstructed; differs from Kircher in name of God |
+| 11 | Lauviah | Les Latins | DEUS | Latini | DEVS | reconstructed |
+| 12 | Hahaiah | Les Grecs | THÉOS | Græci | Θεὸς | reconstructed |
+| 13 | Iezalel | Les Illyriens | BOOG | Illyrici | BOOG | reconstructed |
+| 14 | Mebahel | La langue espagnole | DIOS | Hispani | DIOS | reconstructed |
+| 15 | Hariel | La langue italienne | IDIO OU IDDIO | Itali | IDIO (reading uncertain) | reconstructed |
+| 16 | Hakamiah | La France | DIEU | Galli | DIEV | reconstructed |
+| 17 | Lauviah | Les Germains | GOTH | Germani | GOTT | reconstructed |
+| 18 | Caliel | Les Polonais | BOOG | Poloni | BOOG | reconstructed |
+| 19 | Leuviah | Les Hongrois | BOGY | Hungari | BOGI | reconstructed |
+| 20 | Pahaliah | Langue des Moscovites | TIOS | Mosci | TIOS | reconstructed |
+| 21 | Nelchael | Les Bohémiens | BUEG | Bohemi | BVEG | reconstructed |
+| 22 | Ieiaiel | La langue anglaise | GOOD | Angli | GOOD | reconstructed |
+| 23 | Melahel | Les Hibernais | DIEH | Hyberni | DIEH | reconstructed |
+| 24 | Hahiuiah | Les Etrusques | ESAR | Hetrusci | ESAR | reconstructed |
+| 25 | Nith-Haiah | Les Mages | ORSY | Magi | ORSY | reconstructed |
+| 26 | Haaiah | Les Sarrazins | AGDY ET ABDI | Saraceni | AGDI | reconstructed; differs from Kircher in name of God |
+| 27 | Ierathel | Les Cophtes | TÉOS | Coptitæ | ΘƐΟϹ | reconstructed |
+| 28 | Séheiah | Les Assyriens | ADAD | Assyrij | ADAD | reconstructed |
+| 29 | Reiiel | Les Péruviens | ZIMI | Peruani | ZIMI | reconstructed |
+| 30 | Omael | Les Indiens | TURA | Indi | TVRA | reconstructed |
+| 31 | Lecabel | Les Chinois | TELI | Sinæ | TELI | reconstructed |
+| 32 | Vasariah | Les Tartares | ANOT | Tartari | ANOT | reconstructed |
+| 33 | Iehuiah | Les Hespérides | AGAD | Ins: Heſper: | AGAD | reconstructed |
+| 34 | Lehahiah | Les peuples du Congo | ANEB | Congani | ANEB | reconstructed |
+| 35 | Chavakiah |  | ANUP | Angolani | ANVP | reconstructed; the entry names no nation |
+| 36 | Menadel | Les Maures | ALLA | Mauri | ALLA | reconstructed |
+| 37 | Aniel |  | ABDA | Philosophi | ABDA | reconstructed. The entry names no nation, but gives the name « d'après les anciens Philosophes », as Kircher's Philosophi. |
+| 38 | Haamiah |  | AGLA | Cabaliſtæ | AGLA | reconstructed. The entry names no nation, but derives the name from a verse « Suivant les cabalistes », as Kircher's Cabalistæ. |
+| 39 | Rehael | Les Écossais | GOOT | Scoti | GOOT | reconstructed |
+| 40 | Ieiazel | Les Belges | GOED | Belgæ | GOED | reconstructed |
+| 41 | Hahahel | La langue irlandaise | GUDI | Islandi | GVDI | reconstructed; differs from Kircher in nation |
+| 42 | Mikael | Les Canadiens | BIUB OU BIUD | Canadẽſes | BIVB | reconstructed |
+| 43 | Veualiah | Les Californiens | SOLU | Caleforniij | SOLV | reconstructed |
+| 44 | Ielahiah | Les Mexicains | BOSA | Mexicani | BOSA | reconstructed |
+| 45 | Sealiah | Les peuples de Quito | HOBO | Quitenses | HOBA | reconstructed; differs from Kircher in name of God |
+| 46 | Ariel | Les peuples du Paraguay | PINO | Para.quaij | PIVR | reconstructed; differs from Kircher in name of God |
+| 47 | Asaliah | Les peuples du Chili | HANA | Chilenses | HANA | reconstructed |
+| 48 | Mihael | Les Japonais | ZACA | Iaponij | ZACA | reconstructed |
+| 49 | Vehuel | Les habitants des îles Philippines | MARA | Philip:Insu | MORA | reconstructed; differs from Kircher in name of God |
+| 50 | Daniel | Les Samaritains | POLA | Samatrani | POLA | reconstructed; differs from Kircher in nation |
+| 51 | Hahasiah | Les Barsiens | BILA | Narsingi | BILA | reconstructed; differs from Kircher in nation |
+| 52 | Imamiah | Les Melindais | ABAG | Melindi | ABAG | reconstructed |
+| 53 | Nanael | Les Maltais | OBRA | Maldiuij | OBRA | reconstructed; differs from Kircher in nation |
+| 54 | Nithael | Les Zaflaniens | BORA | Zaflanẽſes | BORA | reconstructed |
+| 55 | Mebahiah | Les peuples d'Ormuz | ALAY | Ormusij | ALAI | reconstructed |
+| 56 | Poiel | Les peuple d'Aden | ILLI | Adeni | ILLI | reconstructed |
+| 57 | Nemamiah | Les Ciréniens | POPA | Cyrænęi | POPA | on the 1823 plate, partly legible |
+| 58 | Ieialel | Les Célamites | PARA | Ælamitæ | PARA | on the 1823 plate; differs from Kircher in nation |
+| 59 | Harahel | La Mésopotamie | ELLA | Meſopotam | ELLA | on the 1823 plate |
+| 60 | Mitzrael | Le Thibet | GÉNA | Tibethenſes | GENA | on the 1823 plate |
+| 61 | Umabel | Les Béthuliens | SILA | Bactriani | SILA | on the 1823 plate; differs from Kircher in nation |
+| 62 |  | Les Carmaniens | SUNA | Carmani | SVNA | on the reissue's plate |
+| 63 | Anauel | Les Camboens | MIRI | Camboij | MIRI | on the reissue's plate |
+| 64 | Mehiel | Les Mogols | ALLI | Mogores | ALLI | on the reissue's plate |
+| 65 | Damabiah | Les Gymnosophes | TARA | Gymnoſophi | TARA | on the reissue's plate |
+| 66 | Manakel | Les Brahmanes | PORA | Brachmani | PORA | on the reissue's plate |
+| 67 | Eiael | Les Albanais | BOGO | Albanenſes | BOGO | on the reissue's plate |
+| 68 | Habuiah | Les Péloponésiens | DÉPOS | Cretenses | ΔƐΟS (reading uncertain) | on the reissue's plate; differs from Kircher in nation and name of God |
+| 69 | Rochel | Les Crétois | DÉOS | Peloponeſij | ΔΗΟS (reading uncertain) | on the reissue's plate; differs from Kircher in nation |
+| 70 | Jabamiah | Les Béotiens | ARIS | Bœotij | ARIS | on the reissue's plate |
+| 71 | Haiuiel | Les Phrygiens | ZEUT | Phryges | ZEVT | on the reissue's plate |
+| 72 | Mumiah | La Thrace | KALO | Thraces | KALO | on the reissue's plate |

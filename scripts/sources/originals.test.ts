@@ -10,8 +10,10 @@ import {
 } from "../../src/sources/mirroredPages.ts";
 import {
   encodeMirror,
+  keptCopyName,
   originalProblem,
   readHandFetched,
+  readKeptCopy,
   sha256,
 } from "./originals.ts";
 
@@ -55,6 +57,35 @@ describe("a hand-fetched original", () => {
       error:
         "kircher-oedipus-aegyptiacus-1653-p273: downloaded, not fetched by hand",
     });
+  });
+});
+
+describe("a kept copy of a downloadable original", () => {
+  it("is named for a Commons file only", () => {
+    expect(keptCopyName(MIRRORED_PAGES.kircherPlate)).toBe(
+      "commons-Kircher-Diagram_of_the_names_of_God_(22593924).jpg",
+    );
+    expect(keptCopyName(MIRRORED_PAGES.kircher273)).toBeUndefined();
+    expect(keptCopyName(google)).toBeUndefined();
+  });
+
+  it("is read from --originals when it is there, and otherwise not", async () => {
+    expect(
+      readKeptCopy(MIRRORED_PAGES.kircherPlate, undefined),
+    ).toBeUndefined();
+    expect(readKeptCopy(MIRRORED_PAGES.kircherPlate, dir)).toBeUndefined();
+    const bytes = await grey(8, 11);
+    writeFileSync(
+      join(dir, "commons-Kircher-Diagram_of_the_names_of_God_(22593924).jpg"),
+      bytes,
+    );
+    expect(
+      sha256(
+        readKeptCopy(MIRRORED_PAGES.kircherPlate, dir)?.bytes ??
+          new Uint8Array(),
+      ),
+    ).toBe(sha256(bytes));
+    expect(readKeptCopy(MIRRORED_PAGES.kircher273, dir)).toBeUndefined();
   });
 });
 

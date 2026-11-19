@@ -18,7 +18,7 @@ import {
   presidingDaysOf,
   signOf,
 } from "magick-data/kabbalah/seventyTwoAngels/derived";
-import { hebrewRuns } from "@/app/books/la-science-cabalistique/hebrewRuns";
+import { scriptRuns } from "@/app/books/la-science-cabalistique/hebrewRuns";
 import Witnesses from "@/app/books/la-science-cabalistique/Witnesses";
 import { angelSlug } from "@/lib/angelSlugs";
 import {
@@ -77,11 +77,21 @@ function lettersOf(pointed: string) {
   return [...pointed].filter((c) => !/\p{Mark}/u.test(c)).join("");
 }
 
-/** Hebrew inside a note's text, marked as the reading edition marks it. */
+/**
+ * Hebrew inside a note's text, marked as the reading edition marks it, and
+ * any other script (a name from Kircher's plate) with its language and
+ * direction.
+ */
 function withHebrew(text: string, keyPrefix: string) {
-  return hebrewRuns(text, keyPrefix, (run, key) => (
-    <Hebrew key={key}>{run}</Hebrew>
-  ));
+  return scriptRuns(text, keyPrefix, (run, key, { lang, dir }) =>
+    lang === "he" ? (
+      <Hebrew key={key}>{run}</Hebrew>
+    ) : (
+      <span key={key} lang={lang} dir={dir}>
+        {run}
+      </span>
+    ),
+  );
 }
 
 /** Lenain's days belong to the year, not to one of them; 2001 is common. */

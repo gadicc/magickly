@@ -2,8 +2,8 @@
  * Pages of public-domain books that our pages cite, mirrored in
  * `public/sources/` so a reader can see the cited page without leaving
  * the site (plan 080, "The sigils' sources"; plan 033, "Other
- * witnesses"). Each is one page of an archive.org or Google Books scan,
- * resized and re-encoded as WebP by `scripts/sources/mirror.mts`
+ * witnesses"). Each is one page of an archive.org, Google Books or
+ * Wikimedia Commons scan, resized and re-encoded as WebP by `scripts/sources/mirror.mts`
  * (`pnpm sources:mirror`), which checks the original against
  * `original.sha256`; `public/sources/README.md` gives each file's source
  * and the basis for its public-domain status.
@@ -18,6 +18,12 @@ export interface PageRegion {
   y: number;
   width: number;
   height: number;
+  /**
+   * Outline a ring instead of the rectangle: the ellipse inscribed in it,
+   * and inside that a second, this fraction of its size, with the same
+   * centre. For the rings of a wheel, such as Kircher's names of God.
+   */
+  ring?: { inner: number };
 }
 
 /** One leaf of an archive.org item. */
@@ -42,7 +48,21 @@ export interface GoogleBooksScan {
   page: number;
 }
 
-export type Scan = ArchiveScan | GoogleBooksScan;
+/**
+ * A file on Wikimedia Commons: an image of a plate, which Commons serves at
+ * a stable URL a script can download.
+ */
+export interface CommonsScan {
+  site: "Wikimedia Commons";
+  /** The file's name on Commons, without "File:". */
+  file: string;
+  /** The original's download URL on upload.wikimedia.org. */
+  download: string;
+  /** The whole book, in the viewer of the library that scanned it. */
+  book: string;
+}
+
+export type Scan = ArchiveScan | GoogleBooksScan | CommonsScan;
 
 export interface MirroredPage {
   /** The file's name in `public/sources/`, without `.webp`. */
@@ -88,18 +108,30 @@ export const googleBooksPageUrl = (
 export const googleBooksBookUrl = (scan: Pick<GoogleBooksScan, "id">) =>
   `https://books.google.com/books?id=${scan.id}`;
 
+/** A file's page on Wikimedia Commons. */
+export const commonsFileUrl = (scan: Pick<CommonsScan, "file">) =>
+  `https://commons.wikimedia.org/wiki/File:${scan.file.replace(/ /g, "_")}`;
+
 /** The scanned page on the site that published it: a `SourceLink`'s href. */
 export const pageUrl = ({ scan }: Pick<MirroredPage, "scan">) =>
-  scan.site === "archive.org" ? archivePageUrl(scan) : googleBooksPageUrl(scan);
+  scan.site === "archive.org"
+    ? archivePageUrl(scan)
+    : scan.site === "Google Books"
+      ? googleBooksPageUrl(scan)
+      : commonsFileUrl(scan);
 
 /** The whole scanned book on the site that published it. */
 export const bookUrl = ({ scan }: Pick<MirroredPage, "scan">) =>
-  scan.site === "archive.org" ? archiveBookUrl(scan) : googleBooksBookUrl(scan);
+  scan.site === "archive.org"
+    ? archiveBookUrl(scan)
+    : scan.site === "Google Books"
+      ? googleBooksBookUrl(scan)
+      : scan.book;
 
 /**
  * Where the mirror's original comes from: archive.org's full-size JPEG of
- * the leaf, downloaded, or a Google Books page image fetched by hand and
- * read from the `--originals` directory under this name.
+ * the leaf or the Commons original, downloaded, or a Google Books page image
+ * fetched by hand and read from the `--originals` directory under this name.
  */
 export const originalOf = ({
   scan,
@@ -108,7 +140,9 @@ export const originalOf = ({
     ? {
         url: `https://archive.org/download/${scan.item}/page/n${scan.leaf}.jpg`,
       }
-    : { file: `googlebooks-${scan.id}-PA${scan.page}.png` };
+    : scan.site === "Google Books"
+      ? { file: `googlebooks-${scan.id}-PA${scan.page}.png` }
+      : { url: scan.download };
 
 /** Where the site serves the mirrored page. */
 export const mirrorPath = (page: Pick<MirroredPage, "id">) =>
@@ -369,6 +403,45 @@ export const MIRRORED_PAGES = {
       bytes: 253674,
       sha256:
         "616ed4befc67676ab210696fa470f7713e22fd687bf0f0d99f6a5fa8e913fc2b",
+    },
+  },
+  kircherPlate: {
+    id: "kircher-oedipus-aegyptiacus-1653-plate-p287",
+    scan: {
+      site: "Wikimedia Commons",
+      file: "Kircher-Diagram of the names of God (22593924).jpg",
+      download:
+        "https://upload.wikimedia.org/wikipedia/commons/6/60/Kircher-Diagram_of_the_names_of_God_%2822593924%29.jpg",
+      // The whole volume; the plate is its image 289.
+      book: "https://polona.pl/item/athanasii-kircheri-soc-iesu-oedipi-aegyptiaci-tomus-t-2-ps-1-gymnasium-siue,OTAyNjM5Ng/",
+    },
+    label:
+      "Kircher, Oedipus Aegyptiacus, vol. II part 1 (1653), the plate after p. 287",
+    copy: "the National Library of Poland's copy",
+    cited:
+      "the wheel's two outer rings, seventy-two names of God and, inside them, their nations",
+    // The wheel's centre is at (1467, 2004) of 2926 × 4000; the names'
+    // ring ends about 1150 pixels out (1140 up and down), and the nations'
+    // begins about 825 out, 0.72 of that.
+    highlight: {
+      x: 0.106,
+      y: 0.216,
+      width: 0.789,
+      height: 0.57,
+      ring: { inner: 0.72 },
+    },
+    original: {
+      sha256:
+        "02d659c4e1326866bae618389de6baeef5ff9b121f4e57121faa116bc1ccbea6",
+      width: 2926,
+      height: 4000,
+    },
+    output: {
+      width: 1600,
+      height: 2187,
+      bytes: 779994,
+      sha256:
+        "5c6a24a7756e9d219283f396de5e0ad9ee1f14a1c79fa53ecf657d38fff40125",
     },
   },
 } as const satisfies Record<string, MirroredPage>;

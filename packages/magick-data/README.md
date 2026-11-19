@@ -263,7 +263,8 @@ or `null`.
 - `magick-data/kabbalah/lenain/volume`, `…/notes`, `…/pieces` and
   `…/firstTable`: Lenain's *La Science Cabalistique* leaf by leaf, the
   editorial apparatus, the text folded into paragraphs that run across
-  leaves, and his first table reconstructed.
+  leaves, and his first table reconstructed, each row beside its source on
+  Kircher's plate of the names of God by nation.
 - `magick-data/astrology/kameas`: the planetary kameas (magic squares),
   Saturn's 3 × 3 to the Moon's 9 × 9, keyed by the planet table's ids
   (`kameas.luna`) and frozen, row by row from the top. They are computed
@@ -414,6 +415,7 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `kabbalah/kerubim.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `kabbalah/lenain/apparatus.json5` | [Lenain](#lenain) | 2026-11-12 |
 | `kabbalah/lenain/evidence.json5` | [Lenain](#lenain) | 2026-11-12 |
+| `kabbalah/lenain/kircherPlate.json5` | [Lenain](#lenain): Kircher's plate of the seventy-two names of God by nation (1653), the source of Lenain's first table's last two columns, read from the National Library of Poland's copy on Wikimedia Commons; and where Lenain's entries depart from it | 2026-11-19 |
 | `kabbalah/lenain/pages.json5` | [Lenain](#lenain) | 2026-11-12 |
 | `kabbalah/lenain/witnesses.json5` | [Lenain](#lenain): what the 1823 printing and the manuscript copy of it print where a note turns on a value, read from their page images | 2026-11-18 |
 | `kabbalah/paths.json5` | [Correspondences](#correspondences) | 2026-11-12 |
@@ -458,6 +460,17 @@ handwritten copy of it
 Licence ouverte). Each reading is a short value with its page or leaf, read
 from the page image: the 1823 printing is public domain, and the manuscript's
 images are offered under the Licence ouverte.
+
+**`lenain/kircherPlate.json5`** is the plate Lenain names as the source of
+his first table's last two columns: Athanasius Kircher, *Oedipus
+Aegyptiacus*, vol. II part 1 (Rome, 1653), the fold-out after p. 287, its
+seventy-two names of God and their nations as engraved, read from the
+National Library of Poland's copy
+([Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg),
+marked public domain; SHA-256 of the image read in the file's header).
+Kircher died in 1680, the names are facts, and **no rights are asserted
+over them**. The file also records, as ours, where Lenain's entries depart
+from the plate.
 
 What is offered under CC BY 4.0 is the work done on top: the English translated
 from that French, the choice and arrangement of fields, the editorial apparatus,

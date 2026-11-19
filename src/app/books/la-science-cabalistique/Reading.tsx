@@ -12,7 +12,7 @@ import { Fragment, type ReactNode } from "react";
 // French: they are set in Frank Ruhl Libre (the root layout's stylesheet),
 // whose build adds U+05C4, the upper dot Lenain points his letters with
 // (plan 079).
-import { hebrewRuns } from "./hebrewRuns";
+import { scriptRuns } from "./hebrewRuns";
 import styles from "./reading.module.css";
 import Witnesses from "./Witnesses";
 
@@ -41,11 +41,18 @@ function facsimileUrl(label: string, sequence: string) {
  * the damage is already visible in the data: "Vehuiah .והויה" has the stop on
  * the wrong side of the name. Each run is marked with its language and
  * direction so the browser's bidi algorithm has something to work with, and so
- * a screen reader switches voice rather than spelling it out.
+ * a screen reader switches voice rather than spelling it out. The names from
+ * Kircher's plate a note may quote (Syriac, Arabic, Armenian, Greek) are
+ * marked the same way.
  */
 function withHebrew(text: string, keyPrefix: string): ReactNode[] {
-  return hebrewRuns(text, keyPrefix, (run, key) => (
-    <span key={key} lang="he" dir="rtl" className={styles.hebrew}>
+  return scriptRuns(text, keyPrefix, (run, key, { lang, dir }) => (
+    <span
+      key={key}
+      lang={lang}
+      dir={dir}
+      className={lang === "he" ? styles.hebrew : undefined}
+    >
       {run}
     </span>
   ));

@@ -31,6 +31,10 @@ import AngelPage from "./Angel";
  * And once more for plan 088's S4, which added the Rose Cross sigil's
  * section after the table (its heading, the sentence linking the
  * generator and the two downloads). Nothing else in the text changed.
+ *
+ * And again for plan 033's Kircher plate (19 November 2026): Ariel's
+ * name of God, Pino, departs from the plate's PIVR, so a note now says so,
+ * citing the 1823 printing and the plate. Nothing else in the text changed.
  */
 const GOLDEN = readFileSync(
   path.join(import.meta.dirname, "angel.golden.txt"),

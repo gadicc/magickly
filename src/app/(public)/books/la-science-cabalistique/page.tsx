@@ -15,11 +15,11 @@ import styles from "../../../books/la-science-cabalistique/reading.module.css";
 const PATH = "/books/la-science-cabalistique";
 
 /**
- * Kircher's plate of the seventy-two names of God by nation, which follows
- * p. 287 in the Complutense copy but not in the Seville copy we mirror. It
- * stays an outside link: it is photographed partly folded and not yet read.
+ * Kircher's plate of the seventy-two names of God by nation in the
+ * Complutense copy, photographed partly folded: the second copy, beside the
+ * National Library of Poland's, which is mirrored and was transcribed.
  */
-const KIRCHER_PLATE =
+const KIRCHER_PLATE_COMPLUTENSE =
   "https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n294/mode/1up";
 
 /** The Amiens library's records of its two copies of the 1823 printing. */
@@ -169,16 +169,20 @@ export default function BookPage() {
                 letters and introduces the plate of them that follows.
               </li>
               <li>
-                Kircher&apos;s plate after p. 287, which the copy above lacks:{" "}
-                <a href={KIRCHER_PLATE}>
+                Kircher&apos;s{" "}
+                <PageLink page="kircherPlate">plate after p. 287</PageLink>,
+                which the copy above lacks: seventy-two four-letter names of
+                God, each with its nation. The first table&apos;s last two
+                columns follow it row for row, and it is transcribed here from
+                the National Library of Poland&apos;s copy, on Wikimedia
+                Commons; the reconstructed table sets each ray beside its row,
+                and a note on each entry that departs from it says how. A second
+                copy, the Universidad Complutense de Madrid&apos;s, was
+                photographed partly folded:{" "}
+                <a href={KIRCHER_PLATE_COMPLUTENSE}>
                   archive.org bub_gb_XjfzMnomDQoC, leaf n294
                 </a>
-                , the Universidad Complutense de Madrid&apos;s copy,
-                photographed partly folded. It gives seventy-two four-letter
-                names of God, each with its nation, Lenain&apos;s Kalo and Zeut
-                among them, and is very likely the source of his table&apos;s
-                last two columns; it has not yet been transcribed for this
-                edition.
+                .
               </li>
             </ul>
           </li>

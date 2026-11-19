@@ -5,7 +5,16 @@ import {
   firstTable,
   firstTableAgreement,
   firstTableCounts,
+  kircherDepartures,
+  kircherNations,
+  kircherRays,
+  kircherRemarks,
+  kircherSentence,
+  plateCells,
   plateDifferences,
+  sameGodName,
+  sourceCell,
+  transliterated,
 } from "./lenain/firstTable.ts";
 import { piecesOf, segmentsOf } from "./lenain/pieces.ts";
 import {
@@ -59,7 +68,13 @@ interface Note {
   printed: string;
   used: string;
   why: string;
-  witnesses?: { source: string; label: string; url: string; reads: string }[];
+  witnesses?: {
+    source: string;
+    label: string;
+    url: string;
+    reads: string;
+    mirror?: string;
+  }[];
 }
 
 interface Witnessed {
@@ -386,5 +401,219 @@ describe("the first table", () => {
       { no: 69, column: "godName", plate1909: "DÉOS", plate1823: "DÊOS" },
       { no: 71, column: "name", plate1909: "Haiuiel", plate1823: "Haiaiel" },
     ]);
+  });
+});
+
+describe("Kircher's plate, the first table's source", () => {
+  const angels: { no: number; people: { fr: string }; godName: string }[] =
+    read("./seventyTwoAngels.json5");
+  const french: string[] = read("./seventyTwoAngelsText/fr.json5");
+  const departures = kircherDepartures();
+  const departs = (no: number, field: string) =>
+    departures.some((d) => d.no === no && d.field === field);
+
+  it("has seventy-two rays in order, each with a name and a nation", () => {
+    const rays = kircherRays();
+    expect(rays.map((ray) => ray.ray)).toEqual(
+      Array.from({ length: 72 }, (_, i) => i + 1),
+    );
+    for (const ray of rays) {
+      expect(ray.godName, `ray ${ray.ray}`).not.toBe("");
+      expect(ray.nation, `ray ${ray.ray}`).not.toBe("");
+    }
+    // The sequence breaks between Thraces and Hebræi, where the numbering
+    // begins; and the first ray keeps the engraver's resh.
+    expect([rays[0].nation, rays[71].nation]).toEqual(["Hebræi", "Thraces"]);
+    expect(rays[0].godName).toBe("יהרה");
+    expect(rays[0].note).toContain("engraver's slip");
+    expect(rays[71].godName).toBe("KALO");
+  });
+
+  it("transliterates as the plate's header says", () => {
+    expect(transliterated("GOTT")).toBe(transliterated("Goth"));
+    expect(transliterated("Θεὸς")).toBe(transliterated("Théos"));
+    expect(transliterated("ΘƐΟϹ")).toBe(transliterated("Téos"));
+    expect(transliterated("BVEG")).toBe(transliterated("Bueg"));
+    expect(transliterated("ΔΗΟS")).toBe(transliterated("Déos"));
+    expect(transliterated("HOBA")).not.toBe(transliterated("Hobo"));
+    const ray = (no: number) => kircherRays()[no - 1];
+    expect(sameGodName("Idio ou Iddio", ray(15))).toBe(true);
+    expect(sameGodName("Agdy et Abdi", ray(26))).toBe(false);
+    expect(sameGodName("", ray(3))).toBe(false);
+    // A name the rules cannot read is held to its engraved form too, so a
+    // changed transcription fails rather than passing on the French alone.
+    expect(sameGodName("Jehovah", ray(1))).toBe(true);
+    expect(sameGodName("Jehovah", { ...ray(1), godName: "יהוה" })).toBe(false);
+    expect(sameGodName("Allah", { ...ray(4), godName: "ألله" })).toBe(false);
+  });
+
+  // The rule is only half the check: a name of God that differs from the
+  // plate's beyond it must be a recorded departure, and a recorded one must
+  // differ, so a new reading of either side that moves a name fails here.
+  it("records every name of God that departs from it, and no other", () => {
+    for (const angel of angels) {
+      const ray = kircherRays()[angel.no - 1];
+      expect(
+        departs(angel.no, "godName"),
+        `genius ${angel.no}: ${angel.godName} beside ${ray.godName}`,
+      ).toBe(!sameGodName(angel.godName, ray));
+    }
+  });
+
+  it("holds the plates' names of God to it too", () => {
+    for (const angel of angels) {
+      const ray = kircherRays()[angel.no - 1];
+      const { plate1909, plate1823 } = plateCells(angel.no);
+      for (const row of [plate1909, plate1823])
+        if (row?.godName && !row.partly)
+          expect(
+            sameGodName(row.godName, ray),
+            `row ${angel.no}: ${row.godName} beside ${ray.godName}`,
+          ).toBe(!departs(angel.no, "godName"));
+    }
+  });
+
+  // A nation cannot be compared with its Latin by rule, so every pair is
+  // listed: accepted as the same people, or recorded as a departure, never
+  // both. A new reading of an entry or a ray that moves a nation fails.
+  it("holds every entry's nation to an accepted pair or a recorded departure, never both", () => {
+    const accepted = new Map(kircherNations().map((pair) => [pair.no, pair]));
+    for (const angel of angels) {
+      const where = `genius ${angel.no}: ${angel.people.fr}`;
+      const pair = accepted.get(angel.no);
+      expect(Boolean(pair) !== departs(angel.no, "people"), where).toBe(true);
+      if (!pair) continue;
+      expect(pair.entry, where).toBe(angel.people.fr);
+      expect(pair.nation, where).toBe(kircherRays()[angel.no - 1].nation);
+    }
+    // An accepted pair with no French is one whose entry gives the name as
+    // a group's (the philosophers', the cabalists'), and says so.
+    const attributed = kircherRemarks().map((remark) => remark.no);
+    expect(
+      kircherNations()
+        .filter((pair) => !pair.entry)
+        .map((pair) => pair.no),
+    ).toEqual(attributed);
+    for (const departure of departures.filter((d) => d.field === "people"))
+      expect(departure.gloss, `genius ${departure.no}`).toBeTruthy();
+  });
+
+  // Where only the entry departs, the plates must show the row with the 1823
+  // entry's word, which is not the reissue entry's.
+  it("checks a departure the table does not share against the plates", () => {
+    const worded = (value: string) =>
+      value
+        .normalize("NFD")
+        .replace(/\p{Mark}/gu, "")
+        .toLowerCase()
+        .replace(/^(la )?langue\s+/, "")
+        .replace(/^(des|les|le|la)\s+/, "");
+    const shared = departures.filter((d) => d.tableAgrees);
+    expect(shared.map((d) => `${d.no} ${d.field}`)).toEqual(["64 people"]);
+    for (const departure of shared) {
+      const { plate1909, plate1823 } = plateCells(departure.no);
+      const in1823 = witnessed.readings.find(
+        (r) => r.no === departure.no && r.field === departure.field,
+      )?.print1823.reads;
+      const entry = angels[departure.no - 1].people.fr;
+      for (const row of [plate1909, plate1823]) {
+        expect(row, `row ${departure.no}`).toBeDefined();
+        expect(worded(row?.nation ?? "")).toBe(worded(in1823 ?? ""));
+        expect(worded(row?.nation ?? "")).not.toBe(worded(entry));
+      }
+    }
+  });
+
+  it("quotes the entries its remarks rest on", () => {
+    for (const remark of kircherRemarks()) {
+      expect(french[remark.no - 1], `genius ${remark.no}`).toContain(
+        remark.quote,
+      );
+      expect(remark.remark).toContain(remark.quote.split(",")[0]);
+    }
+  });
+
+  it("gives every departure a note with its 1823 witness and its ray", () => {
+    for (const departure of departures) {
+      const note = notes.find(
+        (n) => n.no === departure.no && n.field === departure.field,
+      );
+      const where = `genius ${departure.no} ${departure.field}`;
+      expect(note, where).toBeDefined();
+      expect(note?.kind, where).toBe("reading");
+      // Lenain's words stay the data: the note keeps them.
+      expect(note?.used, where).toBe("");
+      expect(
+        note?.witnesses?.map((w) => w.source),
+        where,
+      ).toEqual(["print1823", "kircherPlate"]);
+      const plate = note?.witnesses?.[1];
+      expect(plate?.mirror, where).toBe("kircherPlate");
+      expect(plate?.label, where).toBe(
+        `Kircher's plate, ray ${departure.no} (numbered on the rim)`,
+      );
+      const reading = witnessed.readings.find(
+        (r) => r.no === departure.no && r.field === departure.field,
+      );
+      expect(reading?.print1823.at, where).toBeGreaterThan(0);
+    }
+    // And no note claims a departure the plate's data does not record.
+    expect(
+      notes.filter((n) => n.witnesses?.some((w) => w.source === "kircherPlate"))
+        .length,
+    ).toBe(departures.length);
+  });
+
+  it("tells the reissue's change from Lenain's own", () => {
+    const verdicts = Object.fromEntries(
+      departures.map((d) => [
+        `${d.no} ${d.field}`,
+        witnessed.readings.find((r) => r.no === d.no && r.field === d.field)
+          ?.verdict,
+      ]),
+    );
+    // Mogols in 1823, on both plates, and in Kircher (Mogores); Mongols is
+    // the reissue's entry alone.
+    expect(verdicts["64 people"]).toBe("reissueChanged");
+    expect(
+      Object.entries(verdicts)
+        .filter(([, verdict]) => verdict !== "lenain")
+        .map(([where, verdict]) => `${where} ${verdict}`),
+    ).toEqual([
+      "3 people agree",
+      "3 godName agree",
+      "7 people agree",
+      "7 godName agree",
+      "35 people agree",
+      "64 people reissueChanged",
+    ]);
+  });
+
+  it("sits beside every row of the first table, and says where it departs", () => {
+    const rows = firstTable();
+    for (const row of rows)
+      expect(row.kircher.ray, `row ${row.no}`).toBe(row.no);
+    const row = (no: number) => rows[no - 1];
+    expect(sourceCell(row(3))).toBe(
+      "reconstructed; the entry names neither a nation nor a name of God",
+    );
+    expect(sourceCell(row(50))).toBe(
+      "reconstructed; differs from Kircher in nation",
+    );
+    expect(sourceCell(row(68))).toBe(
+      "on the reissue's plate; differs from Kircher in nation and name of God",
+    );
+    // The table has Les Mogols, as Kircher; only the reissue's entry differs.
+    expect(sourceCell(row(64))).toBe("on the reissue's plate");
+    expect(sourceCell(row(37))).toContain("d'après les anciens Philosophes");
+    // The engraver's slip on ray 1, and ray 7's guess, beside their rows.
+    expect(sourceCell(row(1))).toContain("the engraver's slip");
+    expect(sourceCell(row(7))).toContain("best guess");
+    expect(kircherSentence()).toContain(
+      "his nation in 59, the 37th and 38th among them by attribution",
+    );
+    expect(kircherSentence()).toContain(
+      "the entries give Kircher's name of God in 63 of the 72 rows and his nation in 59",
+    );
   });
 });

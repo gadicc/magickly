@@ -346,8 +346,8 @@ its nation (Kalo and Zeut, Lenain's last two, are on it), so it is very likely
 the source of Lenain's last two columns. It is not in the Seville copy
 (`A027083`) but is in the Complutense copy, `bub_gb_XjfzMnomDQoC`, leaf n294
 (digitised by Google), photographed partly folded: the wheel's left part is
-folded over. It has not been transcribed, so in this edition rows 1 to 56 of
-those columns still rest on the entries (see Follow-ups).
+folded over. It has since been transcribed from an unfolded copy (below,
+"Kircher's plate").
 
 **The mirror** (18 November 2026). The pages the edition leans on hardest
 are now mirrored in the app and open in the lightbox of plan 080's "Source
@@ -366,10 +366,120 @@ caption credits "digitised by Google Books", as Google's notes on its scans
 ask. The reconstructed first table's account of the plates, the Markdown's
 (plain links: Markdown has no lightbox), the book's Sources list and the 72
 angels page's note link them. The per-note witness pages stay outside links
-(decided 18 November 2026), and so does Kircher's plate of the names of God
-by nation (above), which is in another copy and partly folded; if more pages
-are wanted, the mirror moves to the app's file storage rather than growing
-here.
+(decided 18 November 2026). Kircher's plate of the names of God by nation
+stayed an outside link that day, as the only copy found was partly folded;
+it was mirrored the next (below). If more pages are wanted, the mirror moves
+to the app's file storage rather than growing here.
+
+**Kircher's plate** (19 November 2026). Lenain's first table follows
+Kircher's plate of the seventy-two names of God by nation, the fold-out
+"Iconismus inserendus tom. II Fol. 287" in *Oedipus Aegyptiacus* II.1
+(1653), row for row: a wheel of seventy-two rays, each with a four-letter
+name of God in its outer ring and that name's nation in the ring inside it.
+An unfolded copy, the National Library of Poland's, is on Wikimedia Commons
+("Kircher-Diagram of the names of God (22593924).jpg", 2926 × 4000, SHA-256
+`02d659c4…bea6`, marked public domain; Polona item `OTAyNjM5Ng`, image 289).
+A machine reader not told Lenain's table transcribed its seventy-two rays,
+as engraved, into `packages/magick-data/src/kabbalah/lenain/kircherPlate.json5`,
+whose header gives the method. The rays' numbers stand in the gaps between
+the sun's spikes, over the cell dividers, so the geometry alone does not
+say which cell a number belongs to; giving each to the cell clockwise of it
+puts 1 on Hebræi and 72 on Thraces (KALO), which is where the plate's own
+sequence breaks, and Lenain's table follows that numbering row for row.
+The first ray's name is engraved יהרה, a resh for the Tetragrammaton's
+vav: the engraver's slip, recorded and not corrected. The rings inside
+these two have forty-two cells, do not follow the rays, and were not
+transcribed.
+
+Where an entry departs from its ray, the departure is recorded in the same
+file by hand, and the apparatus gives it a note (kind `reading`: the entry
+keeps Lenain's words, as decided, so nothing is corrected; the note says
+what his source has). Where the line falls: a different spelling of the
+same name in another alphabet or the same letters is transliteration, not a
+departure (V for U, Y for I, TH for T, a letter doubled or not, Greek in
+roman letters, the Tetragrammaton as Jehovah, الله as Allah, Θωντ as Teut
+or Theuth, an alternative Lenain adds with "ou"); a second name joined with
+"et", a different word, a different people, or nothing at all is one. A
+test holds every entry's name of God, and every plate cell's, to that rule
+and to the recorded list, in both directions. A nation cannot be compared
+with its Latin by rule, so every one is listed: the 59 rays an entry does
+not depart from are recorded as accepted pairs (Galli, la France), and a
+test holds every entry to an accepted pair or a recorded departure, never
+both. The 1823 printing was then read for the nation and the name of God
+at every departure, by a reader not told either value, and recorded in
+`witnesses.json5`; the build holds each verdict to that reading (`lenain`
+must match the entry, `reissue` and `reissueChanged` must differ from it,
+once "la langue des" and the article are set aside):
+
+| Row | Kircher | Lenain's entry | Whose |
+| --- | --- | --- | --- |
+| 2 | Syri, ܐܠܗܐ | la Turquie, Aydy | Lenain's (1823 p. 47) |
+| 3 | Chaldęi, אלוה | no nation, no name | Lenain's (p. 47) |
+| 7 | Armeni, an Armenian name | no nation, no name | Lenain's (p. 50) |
+| 10 | Persæ, ΣΥΡΙ | Perses, "Siré et Eipi" | Lenain's (p. 52) |
+| 26 | Saraceni, AGDI | Sarrazins, "Agdy et Abdi" | Lenain's (p. 62) |
+| 35 | Angolani, ANVP | no nation, Anup | Lenain's (p. 68) |
+| 41 | Islandi | la langue irlandaise | Lenain's (p. 73) |
+| 45 | HOBA | Hobo | Lenain's (p. 76) |
+| 46 | PIVR | Pino | Lenain's (p. 76) |
+| 49 | MORA | Mara | Lenain's (p. 78) |
+| 50 | Samatrani | les Samaritains | Lenain's (p. 79) |
+| 51 | Narsingi | les Barsiens | Lenain's (p. 80) |
+| 53 | Maldiuij | les Maltais | Lenain's (p. 82) |
+| 58 | Ælamitæ | les Célamites | Lenain's (p. 85; both plates) |
+| 61 | Bactriani | les anciens Béthuliens | Lenain's (p. 87; the 1823 plate) |
+| 64 | Mogores | les Mongols | the reissue's: 1823 has Mogols (p. 89), as both plates |
+| 68 | Cretenses, ΔƐΟS | les Péloponésiens, Dépos | Lenain's (p. 92; both plates) |
+| 69 | Peloponeſij | les Crétois | Lenain's (p. 92; both plates) |
+
+Row 10's two names look like the one engraved ΣΥΡΙ read twice, as Greek
+(Siré) and as Latin capitals (E, I, P, I); it is a departure because Lenain
+gives two names, joined by "et", where the plate has one.
+
+So every departure is Lenain's but one: the reissue turned his Mogols
+(Kircher's Mogores, the Mughals) into Mongols, a new verdict,
+`reissueChanged`, since it is a change rather than a misprint. Lenain's
+68 and 69 have Kircher's two nations exchanged. Two entries the table
+leaves without a nation are not departures: the 37th gives Abda
+« d'après les anciens Philosophes » and the 38th derives Agla from a verse
+« Suivant les cabalistes », Kircher's Philosophi and Cabalistæ; the table
+says so beside them. The 1823 printing also reads "Alla" for the fourth's
+name of God where the reissue has "Allah", which is not a departure from
+the plate and has no note.
+
+The reconstructed table (page and Markdown) now sets Kircher's nation and
+name of God beside every row, labelled as Lenain's source, with each
+departure named in its source column and a paragraph of counts computed
+from the recorded departures: the entries give Kircher's name of God in 63
+of the 72 rows and his nation in 59, the 37th and 38th among them by
+attribution. A name whose letters the reader marked medium or low
+confidence (rays 1 to 5, 7, 15, 68 and 69) is marked "reading uncertain"
+in words, and the notes on those names say so; ray 1's slip and ray 7's
+guessed Armenian are said beside their rows. The Syriac, Arabic, Armenian
+and Greek names, in the table and in the notes, are marked with their
+language and direction (`syr`, `ar`, `hy`, `grc`), as the Hebrew is; no
+font is loaded for them (the font rule covers Hebrew only), so they fall
+back to the reader's system fonts. Rows 1 to 56 are still put back from
+the entries, not read from Lenain's plate, but each now stands beside its
+source.
+
+The plate is mirrored (`kircherPlate` in `src/sources/mirroredPages.ts`, a
+new scan kind for Wikimedia Commons: the file page as the link, the stable
+`upload.wikimedia.org` URL as the original, Polona as "the whole book"),
+1600 pixels wide, 779,994 bytes, with the two outer rings outlined as a
+ring rather than a rectangle. The book's Sources list, the reconstructed
+table and every departure's note link it; the Complutense copy stays
+listed as the second copy. That takes the mirror to 3,780,504 bytes, so the
+cap in `src/sources/mirroredPages.test.ts` was raised from 3.5 MB to 4.5
+MB, deliberately: this is the source the first table's every row is set
+beside, and a reader checking a note needs to see it. The room left is for
+a page more; past that, the app's file storage. Wikimedia refused the
+script's own download with HTTP 429 on 19 November 2026 while serving curl
+the same file, so `pnpm sources:mirror` (which names itself
+`magickli-sources-mirror/1.0`) tries the download first and reads a copy
+fetched by hand from `--originals` only when it is refused (403 or 429) or
+the request fails, saying which it used; any other status stops the run.
+The hash is checked either way.
 
 ## Follow-ups
 
@@ -390,8 +500,4 @@ here.
   shelfmarks 42247 and M 2762, not digitised. A photograph of p. 25 with the
   plate unfolded and of pp. 46–51 from either would settle the first table and
   the open he/het names, 1, 4, 5, 7 and 8 (see "Other witnesses").
-- Transcribe Kircher's plate of the seventy-two names of God by nation
-  (archive.org `bub_gb_XjfzMnomDQoC`, leaf n294, partly folded) and compare it
-  with Lenain's nations and names of God, including the reconstructed rows 1
-  to 56; a copy photographed unfolded would give the folded-over part.
 

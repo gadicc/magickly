@@ -870,6 +870,10 @@ Follow-ups are separate from the completed migration work:
   held to their triads from Exodus 14:19–21 by a test: eight are Lenain's own spellings and 66 his own ending
   (מנקאה), each with a note. TODO: the
   Hebrew of 1, 4, 5, 7 and 8 wants a sharper 1823 image than the scan.
+  The first table now sits beside its source, Kircher's plate of the names
+  of God by nation, transcribed and mirrored (19 November; [plan 033](033-lenain-edition.md#other-witnesses-18-november-2026)):
+  eighteen entries depart from it, each with a note, and all the departures
+  are Lenain's but one, the reissue's Mongols for his Mogols (64).
 - TODO: the sigils the 72 angels page has promised since 2023. The plates in
   the public-domain scan would serve, but only the OCR sidecar is in the repo,
   not the PDF. Vaughan's blog images are his own work.

@@ -6,9 +6,11 @@ import {
   differencesSentence,
   firstTable,
   firstTableCounts,
+  kircherSentence,
   partlyClause,
   plateRange,
-  SOURCE_LABEL,
+  sourceCell,
+  uncertainty,
 } from "magick-data/kabbalah/lenain/firstTable";
 import {
   footnoteText,
@@ -85,12 +87,14 @@ too:
   last page Lenain cites; and p. 287 ([leaf n294](https://archive.org/details/A027083/page/n294/mode/1up)), where Kircher
   says every nation's name of God has four letters and introduces the plate
   of them that follows;
-- Kircher's plate, which that copy lacks
-  ([archive.org bub_gb_XjfzMnomDQoC, leaf n294](https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n294/mode/1up),
-  the Universidad Complutense de Madrid's copy, photographed partly folded):
-  seventy-two four-letter names of God, each with its nation, Lenain's Kalo
-  and Zeut among them. It is very likely the source of the first table's last
-  two columns, and has not yet been transcribed for this edition.
+- Kircher's plate after p. 287, which that copy lacks: seventy-two
+  four-letter names of God, each with its nation. The first table's last two
+  columns follow it row for row, and it has been transcribed for this
+  edition from the National Library of Poland's copy
+  ([Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg));
+  another, the Universidad Complutense de Madrid's, was photographed partly
+  folded ([archive.org bub_gb_XjfzMnomDQoC, leaf n294](https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n294/mode/1up)).
+  Where an entry departs from it, a note says so.
 
 `;
 
@@ -247,20 +251,34 @@ export function renderMarkdown(pages: BookPage[] = bookPages()): string {
   // The plates' pages link the scans: Markdown has no lightbox.
   const reissuePlate = pageUrl(MIRRORED_PAGES.lenainReissue25);
   const plate1823 = pageUrl(MIRRORED_PAGES.lenain25);
+  const kircherPlate = pageUrl(MIRRORED_PAGES.kircherPlate);
   const reconstruction = [
     "## The first cabalistic table, reconstructed",
     `The plate is a fold-out, and both copies scanned caught it folded. The reissue's ([p. 25](${reissuePlate})) shows rows ${later.from} to ${later.to}. The 1823 printing's ([p. 25](${plate1823})) was opened further and shows rows ${original.from} to ${original.to}${partlyClause()}; the ${counts.plate1823} rows it alone shows are given below from it. The ${counts.reconstructed} rows marked *reconstructed* are **not from either plate** — they are put back from each genius's own entry, which gives the same three columns.`,
     checkedSentence(),
     ...(differences ? [differences] : []),
+    `${kircherSentence()} Kircher's names and nations are given as engraved, from the National Library of Poland's copy of [the plate](${kircherPlate}); “reading uncertain” marks a name whose engraved letters could not be read with confidence.`,
     table(
       firstTable().map((row) => [
         String(row.no),
         row.name,
         row.nation,
         row.godName,
-        `${SOURCE_LABEL[row.source]}${row.partly ? ", partly legible" : ""}`,
+        row.kircher.nation,
+        uncertainty(row.kircher)
+          ? `${row.kircher.godName} (${uncertainty(row.kircher)})`
+          : row.kircher.godName,
+        sourceCell(row),
       ]),
-      ["#", "Genius", "Peuple", "Name of God", "Source"],
+      [
+        "#",
+        "Genius",
+        "Peuple",
+        "Name of God",
+        "Kircher's nation",
+        "Kircher's name of God",
+        "Source",
+      ],
     ),
   ].join("\n\n");
 
