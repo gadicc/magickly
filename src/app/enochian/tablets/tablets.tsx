@@ -11,8 +11,13 @@ import {
   Select,
   Switch,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import Tablet, { type TabletSquare } from "magick-components/enochian/Tablet";
+import Tablet, {
+  type TabletSquare,
+  tabletViewBox,
+} from "magick-components/enochian/Tablet";
 import tabletNotes, {
   sourceText,
   sourceUrl,
@@ -43,8 +48,10 @@ import {
   versionLetter,
   viewOf,
 } from "./squareReadings";
+import styles from "./tablets.module.css";
+import { type TabletId, tabletQuery, useTabletUrl } from "./urlState";
 
-const TABLET_NAMES: Record<(typeof TABLET_IDS)[number], string> = {
+const TABLET_NAMES: Record<TabletId, string> = {
   earth: "Earth",
   air: "Air",
   water: "Water",
@@ -130,7 +137,15 @@ function Topic({ topic }: { topic: TabletTopic }) {
 }
 
 /** What each version and source has in a square, and the note on it. */
-function SquareDetail({ id, square }: { id: string; square: TabletSquare }) {
+function SquareDetail({
+  id,
+  square,
+  heading,
+}: {
+  id: string;
+  square: TabletSquare;
+  heading: "h3" | "h4";
+}) {
   const note = squareNote(id, square.row, square.column);
   const versions = TABLET_VERSIONS.flatMap((version) => {
     const view = viewOf(id, version);
@@ -158,7 +173,7 @@ function SquareDetail({ id, square }: { id: string; square: TabletSquare }) {
   );
   return (
     <Box sx={{ mt: 1 }}>
-      <Typography variant="subtitle1" component="h4">
+      <Typography variant="subtitle1" component={heading}>
         {squareName(square)}
       </Typography>
       <Typography variant="body2" sx={{ fontWeight: "bold", mt: 1 }}>
@@ -191,7 +206,7 @@ function Comparison({
   other,
   text,
 }: {
-  id: (typeof TABLET_IDS)[number];
+  id: TabletId;
   version: TabletVersionId;
   other: TabletVersionId;
   text: string | undefined;
@@ -255,7 +270,7 @@ function VersionSection({
   id,
   note,
 }: {
-  id: (typeof TABLET_IDS)[number];
+  id: TabletId;
   note: TabletVersionNote;
 }) {
   return (
@@ -298,15 +313,24 @@ function VersionSection({
 }
 
 export default function Tablets() {
-  const [id, setId] = React.useState<(typeof TABLET_IDS)[number]>("earth");
-  const [version, setVersion] = React.useState<TabletVersionId>(
-    DEFAULT_TABLET_VERSION,
-  );
+  const [{ tablet: id, version }, setChoice] = useTabletUrl();
   const [reversed, setReversed] = React.useState(true);
   const [alt, setAlt] = React.useState(false);
   const [showSquares, setShowSquares] = React.useState(false);
   const [selected, setSelected] = React.useState<TabletSquare>();
+  // A chosen square belongs to its tablet: another tablet, from the
+  // select or from the URL (Back, a link), clears it.
+  const [selectedOn, setSelectedOn] = React.useState(id);
+  if (selectedOn !== id) {
+    setSelectedOn(id);
+    setSelected(undefined);
+  }
   const { EnochianFontToggle, enochianFont } = useEnochianFont();
+  // Two columns from `md` (tablets.module.css). The prerendered page is
+  // the narrow one; the squares and second letters it moves are only
+  // shown after a reader turns them on.
+  const theme = useTheme();
+  const wide = useMediaQuery(theme.breakpoints.up("md"));
   const ref = React.useRef<SVGSVGElement>(null);
   const link = {
     slug: "enochian-tablet" as const,
@@ -339,10 +363,12 @@ export default function Tablets() {
   const seconds = (viewOf(id, version)?.marks ?? []).filter(
     (mark) => mark.alt?.length,
   );
+  const [, , viewWidth, viewHeight] = tabletViewBox(id);
   /**
    * A square chosen on the tablet: a second tap on it clears it, as its
    * button does, and its detail, which may be off a phone's screen below
-   * the list, is scrolled into view.
+   * the list or below the panel's fold beside the tablet, is scrolled
+   * into view.
    */
   const pickOnTablet = (square: TabletSquare) => {
     const same = chosen?.row === square.row && chosen?.column === square.column;
@@ -352,133 +378,190 @@ export default function Tablets() {
   React.useEffect(() => {
     if (!scrollToDetail) return;
     setScrollToDetail(false);
-    detail.current?.scrollIntoView?.({ block: "nearest", behavior: "smooth" });
+    const still = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    detail.current?.scrollIntoView?.({
+      block: "nearest",
+      behavior: still ? "instant" : "smooth",
+    });
   }, [scrollToDetail]);
+
+  // The square whose button had focus when the squares moved across the
+  // breakpoint, for their new place to focus again; cleared after every
+  // commit, so it never outlives the move.
+  const refocus = React.useRef<string | null>(null);
+  React.useLayoutEffect(() => {
+    refocus.current = null;
+  });
+  const squaresSection = showSquares && (
+    <SquaresSection
+      id={id}
+      marked={marked}
+      chosen={chosen}
+      choose={setSelected}
+      detail={detail}
+      heading={wide ? "h2" : "h3"}
+      refocus={refocus}
+    />
+  );
+  const exportControls = (
+    <ExportControls
+      // One key in both places keeps it mounted across the breakpoint,
+      // and with it any "Copied" feedback it is showing.
+      key="export"
+      target={ref}
+      filename={downloadName(componentImageFilename(link), {
+        alt,
+        reversed,
+        showSquares,
+      })}
+      // The downloads draw what is shown.
+      link={linkNote ? undefined : link}
+      linkNote={linkNote}
+      share={() =>
+        window.location.pathname + tabletQuery({ tablet: id, version })
+      }
+    />
+  );
 
   return (
     <Container sx={{ p: 2 }}>
-      <Box
-        sx={{ display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center" }}
+      <div
+        className={styles.layout}
+        style={
+          {
+            "--tablet-ratio": viewWidth / viewHeight,
+          } as React.CSSProperties
+        }
       >
-        <FormControl>
-          <InputLabel id="tablet-select-label">Tablet</InputLabel>
-          <Select
-            labelId="tablet-select-label"
-            id="tablet-select"
-            value={id}
-            label="Tablet"
-            onChange={(e) => {
-              setId(e.target.value as (typeof TABLET_IDS)[number]);
-              setSelected(undefined);
+        <div className={styles.controls}>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+              alignItems: "center",
             }}
           >
-            {TABLET_IDS.map((tablet) => (
-              <MenuItem key={tablet} value={tablet}>
-                {TABLET_NAMES[tablet]}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl>
-          <InputLabel id="version-select-label">Version</InputLabel>
-          <Select
-            labelId="version-select-label"
-            id="version-select"
-            value={version}
-            label="Version"
-            onChange={(e) => setVersion(e.target.value as TabletVersionId)}
-          >
-            {TABLET_VERSIONS.map((each) => (
-              <MenuItem key={each} value={each}>
-                {versionTitle(each)}
-                {each === DEFAULT_TABLET_VERSION ? " (default)" : ""}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <EnochianFontToggle />
-      </Box>
-      <Box sx={{ display: "flex", flexWrap: "wrap", columnGap: 1 }}>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={reversed}
-              onChange={(event) => setReversed(event.target.checked)}
-            />
-          }
-          label="Reversed letters"
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={alt}
-              onChange={(event) => setAlt(event.target.checked)}
-            />
-          }
-          label="Second letters"
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={showSquares}
-              onChange={(event) => setShowSquares(event.target.checked)}
-            />
-          }
-          label="Show where the sources differ"
-        />
-      </Box>
-      <br />
-
-      <Box
-        // The tablet, its sigil and the note in a sigil's place are drawn
-        // on white paper: a light card behind them in dark.
-        className={plateClass}
-        sx={{
-          "& [data-square]": { cursor: "pointer" },
-          "& > svg": { maxWidth: "100%", height: "auto" },
-        }}
-      >
-        <Tablet
-          tablet={id}
-          version={version}
-          mirrorReversed={reversed}
-          showSecondLetters={alt}
-          frame
-          enochianStyle={enochianFont ? EnochianFont.style : undefined}
-          ref={ref}
-          highlights={
-            showSquares
-              ? { squares: marked, selected: chosen, onSelect: pickOnTablet }
-              : undefined
-          }
-        />
-      </Box>
-      {alt && (
-        <Typography component="details" variant="body2" sx={{ mt: 1 }}>
-          <summary>Second letters in {squares(seconds.length)}</summary>
-          <Box component="ul" sx={{ pl: 3, my: 0.5 }}>
-            {seconds.map((mark) => (
-              <li key={`${mark.row},${mark.column}`}>
-                {squareName(mark)}: {mark.alt?.join(", ")}
-              </li>
-            ))}
+            <FormControl>
+              <InputLabel id="tablet-select-label">Tablet</InputLabel>
+              <Select
+                labelId="tablet-select-label"
+                id="tablet-select"
+                value={id}
+                label="Tablet"
+                onChange={(e) =>
+                  setChoice({ tablet: e.target.value as TabletId })
+                }
+              >
+                {TABLET_IDS.map((tablet) => (
+                  <MenuItem key={tablet} value={tablet}>
+                    {TABLET_NAMES[tablet]}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl>
+              <InputLabel id="version-select-label">Version</InputLabel>
+              <Select
+                labelId="version-select-label"
+                id="version-select"
+                value={version}
+                label="Version"
+                onChange={(e) =>
+                  setChoice({ version: e.target.value as TabletVersionId })
+                }
+              >
+                {TABLET_VERSIONS.map((each) => (
+                  <MenuItem key={each} value={each}>
+                    {versionTitle(each)}
+                    {each === DEFAULT_TABLET_VERSION ? " (default)" : ""}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <EnochianFontToggle />
           </Box>
-        </Typography>
-      )}
-      <ExportControls
-        target={ref}
-        filename={downloadName(componentImageFilename(link), {
-          alt,
-          reversed,
-          showSquares,
-        })}
-        // The downloads draw what is shown.
-        link={linkNote ? undefined : link}
-        linkNote={linkNote}
-      />
-      <div style={{ textAlign: "center", fontSize: "90%" }}>
-        Enochian Font:{" "}
-        <a href="https://fonts2u.com/enochian-plain.font">enochian-plain</a>
+          <Box sx={{ display: "flex", flexWrap: "wrap", columnGap: 1 }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={reversed}
+                  onChange={(event) => setReversed(event.target.checked)}
+                />
+              }
+              label="Reversed letters"
+            />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={alt}
+                  onChange={(event) => setAlt(event.target.checked)}
+                />
+              }
+              label="Second letters"
+            />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showSquares}
+                  onChange={(event) => setShowSquares(event.target.checked)}
+                />
+              }
+              label="Show where the sources differ"
+            />
+          </Box>
+        </div>
+
+        <Box
+          // The tablet, its sigil and the note in a sigil's place are drawn
+          // on white paper: a light card behind them in dark.
+          className={`${plateClass} ${styles.tablet}`}
+          sx={{
+            "& [data-square]": { cursor: "pointer" },
+            "& > svg": { maxWidth: "100%", height: "auto" },
+          }}
+        >
+          <Tablet
+            tablet={id}
+            version={version}
+            mirrorReversed={reversed}
+            showSecondLetters={alt}
+            frame
+            enochianStyle={enochianFont ? EnochianFont.style : undefined}
+            ref={ref}
+            highlights={
+              showSquares
+                ? { squares: marked, selected: chosen, onSelect: pickOnTablet }
+                : undefined
+            }
+          />
+        </Box>
+
+        <div className={styles.panel}>
+          {wide && squaresSection}
+          {/* Beside the tablet the downloads come first; on a phone,
+              under the tablet, the second letters it draws. */}
+          {wide && exportControls}
+          {alt && (
+            <Typography component="details" variant="body2" sx={{ mt: 1 }}>
+              <summary>Second letters in {squares(seconds.length)}</summary>
+              <Box component="ul" sx={{ pl: 3, my: 0.5 }}>
+                {seconds.map((mark) => (
+                  <li key={`${mark.row},${mark.column}`}>
+                    {squareName(mark)}: {mark.alt?.join(", ")}
+                  </li>
+                ))}
+              </Box>
+            </Typography>
+          )}
+          {!wide && exportControls}
+          <div style={{ textAlign: "center", fontSize: "90%" }}>
+            Enochian Font:{" "}
+            <a href="https://fonts2u.com/enochian-plain.font">enochian-plain</a>
+          </div>
+        </div>
       </div>
 
       <Box component="section" aria-labelledby="tablet-about" sx={{ mt: 3 }}>
@@ -487,85 +570,12 @@ export default function Tablets() {
         </Typography>
         <Typography variant="body1">{tabletNote.text}</Typography>
         <Sources sources={tabletNote.sources} />
-        {showSquares && (
-          <Box
-            component="section"
-            aria-labelledby="tablet-squares"
-            sx={{ mt: 2 }}
-          >
-            <Typography variant="h6" component="h3" id="tablet-squares">
-              Squares where the sources differ
-            </Typography>
-            <Typography variant="body2">
-              Outlined on the tablet: where the versions differ in more than
-              case, hold second letters, a doubt or a reversed letter, or have a
-              note. Choose one, here or on the tablet, to see what each version
-              and source has in it.
-            </Typography>
-            <Box
-              component="ol"
-              aria-labelledby="tablet-squares"
-              sx={{
-                listStyle: "none",
-                p: 0,
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 0.5,
-              }}
-            >
-              {marked.map((square) => {
-                const isChosen =
-                  chosen?.row === square.row &&
-                  chosen?.column === square.column;
-                return (
-                  <li key={`${square.row},${square.column}`}>
-                    <Button
-                      size="small"
-                      variant={isChosen ? "contained" : "outlined"}
-                      aria-pressed={isChosen}
-                      onClick={() => setSelected(isChosen ? undefined : square)}
-                    >
-                      {squareName(square)}
-                    </Button>
-                  </li>
-                );
-              })}
-            </Box>
-            <Typography
-              variant="body2"
-              aria-live="polite"
-              sx={{ fontWeight: "bold" }}
-            >
-              {chosen ? squareSummary(id, chosen) : ""}
-            </Typography>
-            <div ref={detail}>
-              {chosen && <SquareDetail id={id} square={chosen} />}
-            </div>
-          </Box>
-        )}
+        {!wide && squaresSection}
       </Box>
 
       {note && <VersionSection id={id} note={note} />}
 
-      <Box
-        component="section"
-        aria-labelledby="tablets-versions"
-        sx={{ mt: 3 }}
-      >
-        <Typography variant="h5" component="h2" id="tablets-versions">
-          About these tablets
-        </Typography>
-        <Typography variant="body1">{tabletNotes.intro}</Typography>
-        <Typography variant="h6" component="h3" sx={{ mt: 1 }}>
-          How the versions differ
-        </Typography>
-        {tabletNotes.differences.map((topic) => (
-          <Topic key={topic.id} topic={topic} />
-        ))}
-        <Typography variant="body2" sx={{ mt: 1 }}>
-          {tabletNotes.tablets.union.text}
-        </Typography>
-      </Box>
+      <AboutTablets />
       <br />
       <OpenSource
         files={[
@@ -576,5 +586,139 @@ export default function Tablets() {
         ]}
       />
     </Container>
+  );
+}
+
+/**
+ * The squares where the sources differ: their list, the live region and
+ * the chosen square's detail. In the panel beside the tablet on a wide
+ * screen (`heading` h2), and in the tablet's note on a narrow one (h3).
+ *
+ * It and `AboutTablets` follow `Tablets` because site search reads the
+ * page's literal text in source order (`src/search/README.md`): kept in
+ * the order the page reads, the published catalogue does not change.
+ */
+function SquaresSection({
+  id,
+  marked,
+  chosen,
+  choose,
+  detail,
+  heading,
+  refocus,
+}: {
+  id: TabletId;
+  marked: readonly TabletSquare[];
+  chosen: TabletSquare | undefined;
+  choose: (square: TabletSquare | undefined) => void;
+  detail: React.RefObject<HTMLDivElement | null>;
+  heading: "h2" | "h3";
+  /** The square to focus on mounting, as the old place left it. */
+  refocus: React.RefObject<string | null>;
+}) {
+  const list = React.useRef<HTMLOListElement>(null);
+  // Crossing the breakpoint unmounts the section in one place and mounts
+  // it in the other. Its cleanup runs before its buttons leave the page,
+  // so it can see which had focus; the new one focuses the same square.
+  React.useLayoutEffect(() => {
+    const buttons = list.current;
+    const square = refocus.current;
+    if (square)
+      buttons
+        ?.querySelector<HTMLElement>(`[data-square-key="${square}"]`)
+        ?.focus();
+    return () => {
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && buttons?.contains(active))
+        refocus.current = active.dataset.squareKey ?? null;
+    };
+  }, [refocus]);
+  return (
+    <Box
+      component="section"
+      aria-labelledby="tablet-squares"
+      sx={{ mt: heading === "h2" ? 0 : 2 }}
+    >
+      <Typography
+        variant={heading === "h2" ? "h5" : "h6"}
+        component={heading}
+        id="tablet-squares"
+      >
+        Squares where the sources differ
+      </Typography>
+      <Typography variant="body2">
+        Outlined on the tablet: where the versions differ in more than case,
+        hold second letters, a doubt or a reversed letter, or have a note.
+        Choose one, here or on the tablet, to see what each version and source
+        has in it.
+      </Typography>
+      <Box
+        component="ol"
+        ref={list}
+        aria-labelledby="tablet-squares"
+        sx={{
+          listStyle: "none",
+          p: 0,
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 0.5,
+        }}
+      >
+        {marked.map((square) => {
+          const isChosen =
+            chosen?.row === square.row && chosen?.column === square.column;
+          return (
+            <li key={`${square.row},${square.column}`}>
+              <Button
+                size="small"
+                variant={isChosen ? "contained" : "outlined"}
+                aria-pressed={isChosen}
+                data-square-key={`${square.row},${square.column}`}
+                onClick={() => choose(isChosen ? undefined : square)}
+              >
+                {squareName(square)}
+              </Button>
+            </li>
+          );
+        })}
+      </Box>
+      <Typography
+        variant="body2"
+        aria-live="polite"
+        sx={{ fontWeight: "bold" }}
+      >
+        {chosen ? squareSummary(id, chosen) : ""}
+      </Typography>
+      <div ref={detail}>
+        {chosen && (
+          <SquareDetail
+            id={id}
+            square={chosen}
+            heading={heading === "h2" ? "h3" : "h4"}
+          />
+        )}
+      </div>
+    </Box>
+  );
+}
+
+/** About the tablets and their versions, whichever is chosen. */
+function AboutTablets() {
+  return (
+    <Box component="section" aria-labelledby="tablets-versions" sx={{ mt: 3 }}>
+      <Typography variant="h5" component="h2" id="tablets-versions">
+        About these tablets
+      </Typography>
+      <Typography variant="body1">{tabletNotes.intro}</Typography>
+      <Typography variant="h6" component="h3" sx={{ mt: 1 }}>
+        How the versions differ
+      </Typography>
+      {tabletNotes.differences.map((topic) => (
+        <Topic key={topic.id} topic={topic} />
+      ))}
+      <Typography variant="body2" sx={{ mt: 1 }}>
+        {tabletNotes.tablets.union.text}
+      </Typography>
+    </Box>
   );
 }

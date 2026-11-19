@@ -1,0 +1,101 @@
+/*
+ * The tablets page from MUI's `md` up (plan 090, decision 1): the tablet
+ * on the left, its choices and panel on the right. Below `md` the page
+ * stacks as it always has: the choices, the tablet, then the panel.
+ *
+ * The tablet's box fits both ways, whatever the tablet's shape: at most
+ * the column's width, and at most the screen's height less the app bar
+ * (`--app-bar`, which SiteChrome publishes: 64px from 600px wide) and the
+ * container's padding above the tablet (16px), as much again below it,
+ * and the drawing's edge: its 1px frame each side, and in dark the
+ * plate's 8px padding (`plate.module.css`). That is 114px in dark, 98px
+ * in light. `--tablet-ratio`, the drawing's width over its height, is set
+ * by the page from the tablet's viewBox.
+ */
+
+/* A blank line under the choices on a phone, where a <br /> used to be. */
+@media (max-width: 899.95px) {
+  .controls {
+    margin-bottom: 1.5em;
+    margin-bottom: 1lh;
+  }
+}
+
+@media (min-width: 900px) {
+  .layout {
+    /* The narrowest the column goes, and its width where nothing caps it. */
+    --tablet-fit: 440px;
+    --tablet-edge: 2px;
+    /* Where the tablet starts: under the app bar and the padding. */
+    --tablet-top: calc(var(--app-bar, 64px) + 16px);
+    display: grid;
+    --tablet-column: max(440px, min(var(--tablet-fit), 55%));
+    grid-template-columns: var(--tablet-column) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "tablet controls"
+      "tablet panel";
+    column-gap: 32px;
+    align-items: start;
+  }
+  :global(.dark) .layout {
+    --tablet-edge: 18px;
+  }
+  .controls {
+    grid-area: controls;
+  }
+  .tablet {
+    grid-area: tablet;
+  }
+  /* No line's descent below the drawing, which the cap does not allow. */
+  .tablet > svg {
+    display: block;
+  }
+  .panel {
+    grid-area: panel;
+  }
+}
+
+/*
+ * The height cap and the sticky box, only where the cap leaves a square
+ * at least 30px. A square is 15.49 of the Watchtower page's 297 units
+ * (20 units in the grid's 244 × 264 viewBox, fitted to 210 × 297 and
+ * scaled by 0.9: `tabletSvg.tsx`), so 30px squares need a drawing 575px
+ * tall, and with the 114px around it in dark, a screen 690px tall. The
+ * dark figure is used for both themes on purpose: light, with 98px,
+ * would qualify from about 673px, but one threshold keeps the layout the
+ * same in both. (A media query cannot read `--app-bar`; 690px assumes
+ * its 64px.) Shorter, the tablet takes the column's width and scrolls
+ * with the page; the column's 440px still gives squares of about 31px.
+ */
+@media (min-width: 900px) and (min-height: 690px) {
+  .layout {
+    --tablet-fit: calc(
+      (100vh - var(--tablet-top) - 16px - var(--tablet-edge)) *
+      var(--tablet-ratio) +
+      var(--tablet-edge)
+    );
+  }
+  /*
+   * The small viewport where the browser has one: on a tablet's Safari
+   * with its toolbar showing, 100vh reaches under the toolbar. Inside
+   * @supports, since a custom property takes an unknown unit without
+   * complaint and would only fail where it is used.
+   */
+  @supports (height: 100svh) {
+    .layout {
+      --tablet-fit: calc(
+        (100svh - var(--tablet-top) - 16px - var(--tablet-edge)) *
+        var(--tablet-ratio) +
+        var(--tablet-edge)
+      );
+    }
+  }
+  .tablet {
+    /* Where it starts, below the app bar, as the halls' rail; it does not
+     * follow the bar as it hides. */
+    position: sticky;
+    top: var(--tablet-top);
+    width: min(100%, var(--tablet-fit));
+  }
+}

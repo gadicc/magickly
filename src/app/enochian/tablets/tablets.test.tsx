@@ -1,9 +1,70 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from "@testing-library/react";
+import { hydrateRoot } from "react-dom/client";
+import { renderToString } from "react-dom/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Tablets, { downloadName } from "./tablets";
 
-afterEach(cleanup);
+const PAGE = "/enochian/tablets";
+
+beforeEach(() => window.history.replaceState(null, "", PAGE));
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
+
+/**
+ * A screen that matches these media queries, as MUI's `useMediaQuery`
+ * and the page's reduced-motion check read them; jsdom has no
+ * `matchMedia`, so the page is otherwise the narrow one.
+ */
+const screenMatching = (...matching: RegExp[]) =>
+  vi.stubGlobal("matchMedia", (query: string) => ({
+    matches: matching.some((pattern) => pattern.test(query)),
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  }));
+const WIDE = /min-width:\s*900px/;
+const STILL = /prefers-reduced-motion: reduce/;
+
+/**
+ * A screen that starts narrow or wide and can cross the `md` breakpoint,
+ * telling `useMediaQuery` as a browser would.
+ */
+function resizableScreen(wide: boolean) {
+  const listeners = new Set<() => void>();
+  vi.stubGlobal("matchMedia", (query: string) => ({
+    get matches() {
+      return WIDE.test(query) && wide;
+    },
+    media: query,
+    onchange: null,
+    addEventListener: (_type: string, listener: () => void) =>
+      listeners.add(listener),
+    removeEventListener: (_type: string, listener: () => void) =>
+      listeners.delete(listener),
+    addListener: (listener: () => void) => listeners.add(listener),
+    removeListener: (listener: () => void) => listeners.delete(listener),
+    dispatchEvent: () => false,
+  }));
+  return (next: boolean) =>
+    act(() => {
+      wide = next;
+      for (const listener of listeners) listener();
+    });
+}
 
 /** The tablet the page draws: its 156 letters, top row first. */
 const drawn = (container: HTMLElement) => {
@@ -312,5 +373,284 @@ describe("/enochian/tablets while differences are shown", () => {
     expect(
       screen.getByText("No image link while differences are shown."),
     ).toBeTruthy();
+  });
+});
+
+describe("/enochian/tablets' choices in its URL", () => {
+  const choose = (combobox: string, name: RegExp | string) => {
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: combobox }));
+    fireEvent.click(screen.getByRole("option", { name }));
+  };
+
+  it("opens the tablet and version a link names", () => {
+    window.history.replaceState(null, "", `${PAGE}?tablet=fire&version=dee`);
+    const { container } = render(<Tablets />);
+    expect(screen.getByRole("combobox", { name: "Tablet" }).textContent).toBe(
+      "Fire",
+    );
+    expect(screen.getByRole("combobox", { name: "Version" }).textContent).toBe(
+      "Dee's, 1584",
+    );
+    expect(drawn(container)).toHaveLength(154);
+  });
+
+  it("falls back to the defaults for values it does not know", () => {
+    window.history.replaceState(null, "", `${PAGE}?tablet=union&version=x`);
+    const { container } = render(<Tablets />);
+    expect(drawn(container).slice(0, 4).join("")).toBe("bOaZ");
+    expect(screen.getByRole("combobox", { name: "Version" }).textContent).toBe(
+      "The Golden Dawn's (default)",
+    );
+  });
+
+  it("replaces the URL as the choices change, leaving out the defaults", () => {
+    const pushState = vi.spyOn(window.history, "pushState");
+    render(<Tablets />);
+    choose("Tablet", "Air");
+    expect(window.location.search).toBe("?tablet=air");
+    choose("Version", "The Equinox's");
+    expect(window.location.search).toBe("?tablet=air&version=equinox");
+    choose("Tablet", "Earth");
+    expect(window.location.search).toBe("?version=equinox");
+    choose("Version", /^The Golden Dawn's/);
+    expect(window.location.pathname + window.location.search).toBe(PAGE);
+    expect(pushState).not.toHaveBeenCalled();
+  });
+
+  it("follows the URL when it changes under it", () => {
+    const { container } = render(<Tablets />);
+    act(() => {
+      window.history.replaceState(null, "", `${PAGE}?tablet=water`);
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    });
+    expect(drawn(container).slice(0, 4).join("")).toBe("TaOA");
+  });
+
+  it("copies a page link that restores the choices", async () => {
+    const writeText = vi.fn(async (_text: string) => {});
+    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+    render(<Tablets />);
+    choose("Tablet", "Fire");
+    choose("Version", "Raphael's, 1587");
+    fireEvent.click(screen.getByRole("button", { name: "Copy page link" }));
+    expect(await screen.findByText("Copied page link")).toBeTruthy();
+    expect(writeText).toHaveBeenLastCalledWith(
+      `${window.location.origin}${PAGE}?tablet=fire&version=raphael`,
+    );
+  });
+});
+
+describe("/enochian/tablets beside its panel on a wide screen", () => {
+  it("puts the squares where the sources differ in the panel, under their own h2", () => {
+    screenMatching(WIDE);
+    const { container } = render(<Tablets />);
+    fireEvent.click(
+      screen.getByRole("switch", { name: "Show where the sources differ" }),
+    );
+    const heading = container.querySelector("#tablet-squares");
+    expect(heading?.tagName).toBe("H2");
+    // Beside the tablet, before the tablet's note below both columns.
+    const note = screen.getByRole("heading", { name: "The Earth tablet" });
+    expect(
+      (heading?.compareDocumentPosition(note) ?? 0) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      note.closest("section")?.querySelector("#tablet-squares"),
+    ).toBeNull();
+    const first = screen
+      .getByRole("list", { name: "Squares where the sources differ" })
+      .querySelector("button") as HTMLElement;
+    fireEvent.click(first);
+    expect(
+      screen.getByRole("heading", { level: 3, name: first.textContent ?? "" }),
+    ).toBeTruthy();
+    const levels = [...container.querySelectorAll("h2, h3, h4")].map((each) =>
+      Number(each.tagName[1]),
+    );
+    expect(levels[0]).toBe(2);
+    for (let i = 1; i < levels.length; i++)
+      expect(levels[i] - levels[i - 1]).toBeLessThanOrEqual(1);
+  });
+
+  it("lists the second letters after the downloads, as on a phone before them", () => {
+    const order = () => {
+      fireEvent.click(screen.getByRole("switch", { name: "Second letters" }));
+      const list = screen.getByText(/^Second letters in \d+ squares$/);
+      const downloads = screen.getByRole("button", { name: "Download SVG" });
+      const following =
+        list.compareDocumentPosition(downloads) &
+        Node.DOCUMENT_POSITION_FOLLOWING;
+      cleanup();
+      return following ? "before" : "after";
+    };
+    render(<Tablets />);
+    expect(order()).toBe("before");
+    screenMatching(WIDE);
+    render(<Tablets />);
+    expect(order()).toBe("after");
+  });
+
+  it("scrolls a square chosen on the tablet into view, at once under reduced motion", () => {
+    const scrollIntoView = vi.fn();
+    const own = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = scrollIntoView;
+    try {
+      for (const [matching, behavior] of [
+        [[WIDE], "smooth"],
+        [[WIDE, STILL], "instant"],
+      ] as const) {
+        screenMatching(...matching);
+        const { container } = render(<Tablets />);
+        fireEvent.click(
+          screen.getByRole("switch", { name: "Show where the sources differ" }),
+        );
+        fireEvent.click(container.querySelector("[data-square]") as Element);
+        expect(scrollIntoView).toHaveBeenLastCalledWith({
+          block: "nearest",
+          behavior,
+        });
+        cleanup();
+      }
+    } finally {
+      Element.prototype.scrollIntoView = own;
+    }
+  });
+});
+
+describe("/enochian/tablets across the breakpoint", () => {
+  it("keeps focus on the square whose button had it", () => {
+    const resize = resizableScreen(false);
+    render(<Tablets />);
+    fireEvent.click(
+      screen.getByRole("switch", { name: "Show where the sources differ" }),
+    );
+    const buttons = () =>
+      [
+        ...screen
+          .getByRole("list", { name: "Squares where the sources differ" })
+          .querySelectorAll("button"),
+      ] as HTMLElement[];
+    const third = buttons()[2];
+    const name = third.textContent;
+    third.focus();
+    resize(true);
+    expect(document.querySelector("#tablet-squares")?.tagName).toBe("H2");
+    expect(document.activeElement).not.toBe(third);
+    expect(document.activeElement).toBe(buttons()[2]);
+    expect(document.activeElement?.textContent).toBe(name);
+    resize(false);
+    expect(document.querySelector("#tablet-squares")?.tagName).toBe("H3");
+    expect(document.activeElement?.textContent).toBe(name);
+    // Without focus in the list, nothing is focused for it.
+    (document.activeElement as HTMLElement).blur();
+    resize(true);
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it("keeps the downloads, and their feedback, mounted", async () => {
+    const resize = resizableScreen(false);
+    const writeText = vi.fn(async (_text: string) => {});
+    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+    render(<Tablets />);
+    const before = screen.getByRole("button", { name: "Download SVG" });
+    fireEvent.click(screen.getByRole("button", { name: "Copy page link" }));
+    expect(await screen.findByText("Copied page link")).toBeTruthy();
+    resize(true);
+    expect(screen.getByRole("button", { name: "Download SVG" })).toBe(before);
+    expect(screen.getByText("Copied page link")).toBeTruthy();
+    resize(false);
+    expect(screen.getByRole("button", { name: "Download SVG" })).toBe(before);
+  });
+
+  it("prerenders the default tablet and hydrates a shared link on a wide screen", async () => {
+    window.history.replaceState(null, "", `${PAGE}?tablet=fire&version=dee`);
+    resizableScreen(true);
+    const html = renderToString(<Tablets />);
+    expect(html).toContain(">Earth<");
+    expect(html).not.toContain(">Fire<");
+    // React marks the joins in "The {name} tablet" with empty comments.
+    expect(html.replaceAll("<!-- -->", "")).toContain("The Earth tablet");
+    const container = document.createElement("div");
+    container.innerHTML = html;
+    document.body.appendChild(container);
+    const errors = vi.spyOn(console, "error");
+    const recoverable: unknown[] = [];
+    let root: ReturnType<typeof hydrateRoot> | undefined;
+    try {
+      await act(async () => {
+        root = hydrateRoot(container, <Tablets />, {
+          onRecoverableError: (error) => recoverable.push(error),
+        });
+      });
+      expect(recoverable).toEqual([]);
+      expect(
+        errors.mock.calls.filter((call) =>
+          /hydrat|did not match/i.test(String(call[0])),
+        ),
+      ).toEqual([]);
+      expect(screen.getByRole("combobox", { name: "Tablet" }).textContent).toBe(
+        "Fire",
+      );
+      expect(
+        screen.getByRole("combobox", { name: "Version" }).textContent,
+      ).toBe("Dee's, 1584");
+      expect(drawn(container)).toHaveLength(154);
+    } finally {
+      act(() => root?.unmount());
+      container.remove();
+    }
+  });
+});
+
+describe("/enochian/tablets' URL as it writes it", () => {
+  const choose = (combobox: string, name: RegExp | string) => {
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: combobox }));
+    fireEvent.click(screen.getByRole("option", { name }));
+  };
+
+  it("keeps other params and the hash", () => {
+    window.history.replaceState(null, "", `${PAGE}?ref=mail#tablet-about`);
+    render(<Tablets />);
+    choose("Tablet", "Water");
+    expect(window.location.search).toBe("?ref=mail&tablet=water");
+    expect(window.location.hash).toBe("#tablet-about");
+    choose("Tablet", "Earth");
+    expect(window.location.search).toBe("?ref=mail");
+    expect(window.location.hash).toBe("#tablet-about");
+  });
+
+  it("drops a value it does not know when it writes another choice", () => {
+    window.history.replaceState(null, "", `${PAGE}?tablet=foo`);
+    render(<Tablets />);
+    expect(window.location.search).toBe("?tablet=foo");
+    choose("Version", "Dee's, 1584");
+    expect(window.location.search).toBe("?version=dee");
+  });
+});
+
+describe("/enochian/tablets' chosen square", () => {
+  it("is cleared when the tablet changes, from the URL as from the select", () => {
+    render(<Tablets />);
+    fireEvent.click(
+      screen.getByRole("switch", { name: "Show where the sources differ" }),
+    );
+    const list = () =>
+      screen.getByRole("list", { name: "Squares where the sources differ" });
+    const first = list().querySelector("button") as HTMLElement;
+    fireEvent.click(first);
+    expect(first.getAttribute("aria-pressed")).toBe("true");
+    const live = () =>
+      document.querySelector('[aria-live="polite"]')?.textContent;
+    expect(live()).not.toBe("");
+    const navigate = (search: string) =>
+      act(() => {
+        window.history.replaceState(null, "", `${PAGE}${search}`);
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      });
+    navigate("?tablet=water");
+    navigate("");
+    expect(list().querySelector('[aria-pressed="true"]')).toBeNull();
+    expect(live()).toBe("");
   });
 });
