@@ -4,6 +4,27 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Build a release, or promote a reviewed configuration variant
+        type: choice
+        options: [build, promote-existing]
+        default: build
+      deployment_url:
+        description: Existing immutable staged Production URL (promotion only)
+        type: string
+      deployment_id:
+        description: Exact existing staged deployment ID (promotion only)
+        type: string
+      expected_production_id:
+        description: Expected current canonical deployment ID (promotion only)
+        type: string
+      source_sha:
+        description: Full SHA shared by staged, live and workflow sources (promotion only)
+        type: string
+      expires_at_ms:
+        description: Absolute Unix milliseconds; at most one hour away (promotion only)
+        type: string
 
 permissions:
   contents: read
@@ -18,7 +39,7 @@ jobs:
     uses: ./.github/workflows/ci.yml
 
   release:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && inputs.mode != 'promote-existing'
     needs: quality
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -169,3 +190,85 @@ jobs:
       - name: Tell IndexNow which pages changed
         continue-on-error: true
         run: node scripts/indexnow.mjs submit "$RUNNER_TEMP/indexnow-before.json"
+
+  # Configuration variants use the SAME workflow identity and release lock.
+  # Inputs carry provider identities only, never private settings or credentials.
+  promote_existing:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' && inputs.mode == 'promote-existing'
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: Production
+      url: ${{ inputs.deployment_url }}
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      DEPLOYMENT_URL: ${{ inputs.deployment_url }}
+      EXPECTED_DEPLOYMENT_ID: ${{ inputs.deployment_id }}
+      EXPECTED_PRODUCTION_DEPLOYMENT_ID: ${{ inputs.expected_production_id }}
+      EXPECTED_SOURCE_SHA: ${{ inputs.source_sha }}
+      PROMOTION_EXPIRES_AT_MS: ${{ inputs.expires_at_ms }}
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
+        with:
+          runtime: node@24
+          cache: true
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            pnpm-workspace.yaml
+          install: false
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec loom init
+      - run: pnpm exec loom check --production
+
+      - name: Prepare the pinned promotion CLI before the final guard
+        run: |
+          mkdir -m 700 "$RUNNER_TEMP/promotion-cli"
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const { packageManager } = require('./package.json');
+          fs.writeFileSync(path.join(process.env.RUNNER_TEMP, 'promotion-cli/package.json'),
+            JSON.stringify({ private: true, packageManager }));
+          NODE
+          pnpm --dir "$RUNNER_TEMP/promotion-cli" add --ignore-scripts --save-exact vercel@59.13.1
+
+      - name: Guard the existing artifact and production baseline
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/existing-promotion.mjs
+
+      - name: Verify the existing staged application
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: node scripts/release-checks.mjs staged
+
+      - name: Guard and launch the bounded configuration promotion
+        id: existing_promotion
+        continue-on-error: true
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PROMOTION_CLI_ROOT: ${{ runner.temp }}/promotion-cli
+        run: node scripts/existing-promotion-launch.mjs
+
+      # As in a normal release, a CLI failure is not a rollback witness.
+      - name: Resolve promotion and verify production alias
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: node scripts/release-checks.mjs promoted
+
+      - name: Require known local promotion-process closure
+        if: ${{ always() && steps.existing_promotion.outcome != 'skipped' }}
+        env:
+          DISPATCHED: ${{ steps.existing_promotion.outputs.dispatched }}
+          CLOSED: ${{ steps.existing_promotion.outputs.closed }}
+          CANCELLED: ${{ steps.existing_promotion.outputs.cancelled }}
+        run: test "$DISPATCHED" = true && test "$CLOSED" = true && test "$CANCELLED" = false

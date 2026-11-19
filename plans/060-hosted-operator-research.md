@@ -286,3 +286,51 @@ well as the shared role flags/membership/all-ownership projection and persistent
 artifact relation/PID checks. Keep source-only route validation distinct from
 actual managed cleanup/health acceptance. See
 [cleanup input contract and scheduler boundary](../src/chat-research/MANAGED-RUNTIME.md#independent-disabled-cleanup-entry).
+
+
+## Serialized configuration-promotion preparation
+
+The release workflow has an optional, explicit `promote-existing` dispatch mode.
+Its separate job uses the existing Production environment, workflow identity,
+quality dependency and workflow-level `production-release` concurrency group.
+The ordinary push/build/migration release path is preserved. This source change
+installs no private configuration, source publication, schedule or model window,
+and dispatching a real operation still needs its own concrete adoption.
+
+The generic inputs are an immutable staged URL/ID, the expected canonical ID,
+a full source SHA and an absolute expiry at most one hour away. Pass inputs via
+environment variables, never shell interpolation. No private book, operator,
+passage, credential or configuration document belongs in a dispatch input.
+
+`scripts/existing-promotion.mjs` requires staged, currently live, workflow and
+latest-main source declarations to agree. Configuration promotion therefore
+cannot skip a new source revision's migration. It checks the exact project,
+READY Production target, current canonical alias and project target, and settled
+alias-job identity twice. The workflow runs that guard before staged OIDC smoke
+and again inside a bounded launcher immediately before spawning the prepared
+CLI. Package resolution happens earlier in an isolated runner directory. The
+launcher preserves absolute and monotonic ends, forwards only release CLI
+settings, and confirms owned process-group closure; unknown closure remains a
+failed final gate even if read-only provider settlement passes. Cancellation is
+separately required false by that gate; SIGINT/SIGTERM handling and runner
+tracking preserve local cleanup, and known leader exit forbids later numeric
+group signals. Existing
+staged/settlement checks also
+pin the target ID and source. CLI failure still runs provider settlement; an
+uncertain or cancelled attempt never authorizes automatic replay or rollback.
+Queueing and quality checks do not restart the caller's expiry.
+
+The lock serializes cooperating GitHub releases, not dashboard/API operations.
+Rechecks are snapshots, not an atomic compare-and-swap; external promotions can
+still race. Pending workflow replacement or cancellation is not FIFO delivery
+or proof that promotion did not occur. See [GitHub concurrency](https://docs.github.com/en/actions/concepts/workflows-and-actions/concurrency).
+Declared source metadata is not artifact byte attestation or private-custody
+acceptance. The private deployment owner must separately bind the exact staged
+payload, configuration, target and approved scope. No provider response bodies
+are printed or uploaded by these guards. Actual protected smoke and canonical
+settlement remain necessary after adoption.
+
+Ordinary future releases intentionally omit deployment-only research opt-ins.
+That can interrupt operator availability; it never retires independent cleanup
+or its outstanding retention obligations. Expert labels, image delivery and the
+legacy-chat cutover remain separate.

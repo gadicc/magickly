@@ -110,7 +110,10 @@ export function createReleaseChecks(env, options = {}) {
       value.url !== url.hostname ||
       value.target !== "production" ||
       value.readyState !== "READY" ||
-      !value.id
+      !value.id ||
+      (env.EXPECTED_DEPLOYMENT_ID && value.id !== env.EXPECTED_DEPLOYMENT_ID) ||
+      (env.EXPECTED_SOURCE_SHA &&
+        value.meta?.githubCommitSha !== env.EXPECTED_SOURCE_SHA)
     )
       throw new Error("Staged deployment identity or readiness mismatch");
     return { id: value.id, origin: url.origin };

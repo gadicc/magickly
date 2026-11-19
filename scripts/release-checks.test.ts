@@ -126,6 +126,17 @@ describe("production release state checks", () => {
     ).toBe(true);
   });
   it.each([
+    { EXPECTED_DEPLOYMENT_ID: "different" },
+    { EXPECTED_SOURCE_SHA: "a".repeat(40) },
+  ])(
+    "pins an existing-promotion target before requesting OIDC",
+    async (change) => {
+      const { checks, calls } = harness([deployment], change);
+      await expect(checks.staged()).rejects.toThrow("mismatch");
+      expect(calls).toHaveLength(1);
+    },
+  );
+  it.each([
     { projectId: "other-project" },
     { target: "preview" },
     { readyState: "BUILDING" },
