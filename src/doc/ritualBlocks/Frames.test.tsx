@@ -89,7 +89,9 @@ describe("the task frame (plan 089, decision 1)", () => {
   it("gives a single officer's colours to the frame, for its rule and name", () => {
     const view = render(<Task kind="do" role="hierophant" />);
     const frame = frameOf(view.container);
-    expect(frame.style.getPropertyValue("--ritual-role")).toBe("red");
+    expect(frame.style.getPropertyValue("--ritual-role")).toBe(
+      roles.hierophant.color,
+    );
     expect(frame.style.getPropertyValue("--ritual-role-dark")).toBe("#ff7a7a");
     const name = [...frame.querySelectorAll("span")].find(
       (span) => span.textContent === "Hierophant",
@@ -118,7 +120,7 @@ describe("the task frame (plan 089, decision 1)", () => {
     ];
     expect(
       names.map((name) => name.style.getPropertyValue("--ritual-role")),
-    ).toEqual(["red", "#c55"]);
+    ).toEqual([roles.hierophant.color, roles.keryx.color]);
   });
 
   it("draws the rule from the officer's colour with a neutral fallback", () => {

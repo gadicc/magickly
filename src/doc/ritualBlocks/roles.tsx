@@ -17,70 +17,83 @@ export interface RitualRolePresentation {
   darkColor?: string;
 }
 
-/** Lamens take their size from the role line (`.roleSymbol svg`), in em. */
+/**
+ * Lamens take their size from the role line (`.roleSymbol svg`), in em.
+ *
+ * The officers' colours (plan 089, "Officer colours"): every light `color`
+ * reads at 4.5:1 or more on the bubbles, the surface and the reader's own
+ * tints, and every `darkColor` on the dark ones. The Hierophant keeps the
+ * red of the lamen and collar, the Stolistes the blue of water, and the
+ * Dadouchos takes fire's orange; the Keryx is teal only to stand apart
+ * from the Hierophant, the Hegemon steel blue for the white robe, which
+ * cannot be text. `roles.test.tsx` pins both and keeps one hall's
+ * officers apart.
+ */
 export const roles: Record<string, RitualRolePresentation> = {
   imperator: {
     name: "Imperator",
     symbol: <Lamen officer="imperator" />,
-    color: "red",
+    color: "#c80000",
     darkColor: "#ff7a7a",
   },
   praemonstrator: {
     name: "Praemonstrator",
     symbol: <Lamen officer="praemonstrator" />,
-    color: "blue",
-    darkColor: "#8ab4f8",
+    color: "#0000ff",
+    darkColor: "#7aa2ff",
   },
   cancellarius: {
     name: "Cancellarius",
     symbol: <Lamen officer="cancellarius" />,
-    color: "#ca0",
+    color: "#776000",
     darkColor: "#e6c34a",
   },
   hierophant: {
     name: "Hierophant",
     symbol: <Lamen officer="hierophant" />,
-    color: "red",
+    color: "#c80000",
     darkColor: "#ff7a7a",
   },
   pastHierophant: {
     name: "Past Hierophant",
     symbol: <Lamen officer="pastHierophant" />,
-    color: "red",
+    color: "#c80000",
     darkColor: "#ff7a7a",
   },
   hiereus: {
     name: "Hiereus",
     symbol: <Lamen officer="hiereus" />,
-    color: "black",
+    color: "#000000",
     darkColor: "#e4e8ef",
   },
   hegemon: {
     name: "Hegemon",
     symbol: <Lamen officer="hegemon" />,
-    color: "#aaa",
+    color: "#3d6a8a",
+    darkColor: "#a0d0e0",
   },
   keryx: {
     name: "Keryx",
     symbol: <Lamen officer="keryx" />,
-    color: "#c55",
-    darkColor: "#ee8f8f",
+    color: "#00756e",
+    darkColor: "#5ccabf",
   },
   stolistes: {
     name: "Stolistes",
     symbol: <Lamen officer="stolistes" />,
     color: "#55c",
-    darkColor: "#a3a6ff",
+    darkColor: "#b7a6ff",
   },
   dadouchos: {
     name: "Dadouchos",
     symbol: <Lamen officer="dadouchos" />,
-    color: "#cc5",
+    color: "#b04500",
+    darkColor: "#ffa04a",
   },
   sentinel: {
     name: "Sentinel",
     symbol: <Lamen officer="sentinel" />,
-    color: "#777",
+    color: "#666666",
     darkColor: "#a6adb8",
   },
   // The Portal's officers (plan 061, stage F): the hall's adept roles.
@@ -91,29 +104,41 @@ export const roles: Record<string, RitualRolePresentation> = {
   chiefAdept: {
     name: "Chief Adept",
     symbol: <Lamen officer="chiefAdept" />,
-    color: "#b8860b",
+    color: "#896200",
     darkColor: "#e0b24a",
   },
   secondAdept: {
     name: "Second Adept",
     symbol: <Lamen officer="secondAdept" />,
-    color: "#d06000",
+    color: "#aa4e04",
     darkColor: "#ff9d55",
   },
   thirdAdept: {
     name: "Third Adept",
     symbol: <Lamen officer="thirdAdept" />,
-    color: "#108010",
+    color: "#007a03",
     darkColor: "#62c962",
   },
-  candidate: { name: "Candidate", symbol: "🤠", color: "#fcf" },
-  aspirant: { name: "Aspirant", symbol: "🤒", color: "#fcf" },
-  member: { name: "Member", color: "#ccc" },
+  candidate: {
+    name: "Candidate",
+    symbol: "🤠",
+    color: "#a3329c",
+    darkColor: "#ffccff",
+  },
+  aspirant: {
+    name: "Aspirant",
+    symbol: "🤒",
+    color: "#a3329c",
+    darkColor: "#ffccff",
+  },
+  // The members are the body of the hall, not an office: their name takes
+  // the text's own colour and their directions the neutral rule.
+  member: { name: "Member" },
   psaltis: {
     name: "Psaltis",
     symbol: "🎵",
-    color: "#c55",
-    darkColor: "#ee8f8f",
+    color: "#00756e",
+    darkColor: "#5ccabf",
   },
 };
 
