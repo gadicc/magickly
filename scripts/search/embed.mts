@@ -7,29 +7,24 @@ import {
 } from "node:fs";
 import { resolve } from "node:path";
 import { buildSearchCatalogue } from "../../src/search/catalogue";
-import { VECTOR_ARTIFACT } from "../../src/search/embeddings/artifact";
 import {
   EMBEDDING_PROFILES,
   embeddingInput,
   unitVector,
 } from "../../src/search/embeddings/profiles";
 import { embedSearchInputs } from "../../src/search/embeddings/provider";
+import { publishMatrix } from "../../src/search/embeddings/publish";
 import {
   fuseSearchResults,
   rankVectors,
 } from "../../src/search/embeddings/rank";
 import {
   catalogueDigest,
-  digest,
   embeddingCacheKey,
   embeddingDocumentInput,
   embeddingRecords,
+  embeddingRowKey,
 } from "../../src/search/embeddings/records";
-import {
-  assembleVectorArtifact,
-  publishRows,
-} from "../../src/search/embeddings/rows";
-import type { SearchEmbeddingManifest } from "../../src/search/embeddings/store";
 import { createSearchEngine } from "../../src/search/engine";
 import { SEARCH_PROBES } from "./evaluation";
 
@@ -177,39 +172,20 @@ for (const profile of profiles) {
       });
     }
   if (mode === "publish") {
-    // The committed rows (plan 087): the same bytes, one file per row. Written
-    // before the manifest, so a failure here leaves the old manifest in place.
-    const { written, pruned } = publishRows(
+    // Rows, matrix, manifest and artifact (publish.ts), shared with
+    // search:assemble. The artifact is rebuilt there, not by a trailing
+    // `&& pnpm search:build` in package.json, where pnpm would append the
+    // profile argument to that last command instead of this script.
+    const published = publishMatrix(
       root,
       profile,
-      values.map((value) => embeddingCacheKey(profile, value)),
+      catalogueDigest(catalogue),
+      records.map((record) => embeddingRowKey(profile, record)),
       bytes,
     );
     console.log(
-      `${profile.key}: wrote ${written} rows, pruned ${pruned.length}`,
-    );
-    mkdirSync(resolve(root, "public/search-vectors"), { recursive: true });
-    const sha256 = digest(bytes);
-    const file = `${profile.key}-${sha256.slice(0, 12)}.bin`;
-    writeFileSync(resolve(root, "public/search-vectors", file), bytes);
-    const manifest: SearchEmbeddingManifest = {
-      version: 1,
-      selected: profile.key,
-      catalogueSha256: catalogueDigest(catalogue),
-      profiles: [{ profile, file, sha256, rows: records.length }],
-    };
-    writeFileSync(
-      resolve(root, "src/search/embeddings/manifest.json"),
-      JSON.stringify(manifest, null, 2) + "\n",
-    );
-    // Rebuild the ignored artifact search:build assembles, so /api/search
-    // sees the new rows without another build. Done here, not as a trailing
-    // `&& pnpm search:build` in package.json, where pnpm would append the
-    // profile argument to that last command instead of this script.
-    mkdirSync(resolve(root, "src/search/generated"), { recursive: true });
-    writeFileSync(
-      resolve(root, VECTOR_ARTIFACT),
-      assembleVectorArtifact(root, profile).bytes,
+      `${profile.key}: wrote ${published.written} rows, pruned ${published.pruned.length}; ` +
+        `${published.file}, removed ${published.removed.join(", ") || "nothing"}`,
     );
   }
   report.push({

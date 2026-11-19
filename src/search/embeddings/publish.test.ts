@@ -1,0 +1,170 @@
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { parseVectorArtifact, VECTOR_ARTIFACT } from "./artifact";
+import { EMBEDDING_PROFILES, type EmbeddingProfile } from "./profiles";
+import {
+  MANIFEST,
+  MATRIX_DIRECTORY,
+  matrixFromRows,
+  missingRows,
+  publishMatrix,
+} from "./publish";
+import { digest } from "./records";
+import { encodeRow, listRowKeys, writeRows } from "./rows";
+import type { SearchEmbeddingManifest } from "./store";
+
+const profile: EmbeddingProfile = {
+  ...EMBEDDING_PROFILES[0],
+  key: "test-profile",
+  dimensions: 4,
+};
+const other: EmbeddingProfile = { ...profile, key: "other-profile" };
+const key = (seed: string) => seed.padEnd(64, "0");
+// b2's norm is 1.0005, inside the rows' tolerance: decoding it and
+// renormalising (unitVector) before re-encoding would change its bytes.
+const offUnit = new Uint8Array(
+  new Float32Array([0, 0, 0.6, 0.8].map((v) => v * 1.0005)).buffer,
+);
+const rows = [
+  [key("a1"), encodeRow([0.6, 0.8, 0, 0], 4)],
+  [key("b2"), offUnit],
+  [key("c3"), encodeRow([0, 1, 0, 0], 4)],
+] as const;
+const manifest = (root: string): SearchEmbeddingManifest =>
+  JSON.parse(readFileSync(join(root, MANIFEST), "utf8"));
+
+let root: string;
+beforeEach(() => {
+  root = mkdtempSync(join(tmpdir(), "magickli-search-publish-"));
+  mkdirSync(join(root, "src/search/embeddings"), { recursive: true });
+});
+afterEach(() => rmSync(root, { recursive: true, force: true }));
+
+describe("matrixFromRows", () => {
+  it("concatenates the committed rows' exact bytes in the keys' order", () => {
+    writeRows(root, profile.key, 4, rows);
+    const matrix = matrixFromRows(root, profile, [key("c3"), key("a1")]);
+    expect(matrix.equals(Buffer.concat([rows[2][1], rows[0][1]]))).toBe(true);
+  });
+  it("names the rows that are not committed", () => {
+    writeRows(root, profile.key, 4, rows.slice(0, 1));
+    expect(
+      missingRows(root, profile, [key("a1"), key("d4"), key("e5")]),
+    ).toEqual([1, 2]);
+    expect(() => matrixFromRows(root, profile, [key("a1"), key("d4")])).toThrow(
+      `1 of 2 rows are not committed: ${key("d4")}`,
+    );
+  });
+  it("rejects a row of the wrong size rather than copying it", () => {
+    writeRows(root, profile.key, 4, rows.slice(0, 1));
+    expect(() =>
+      matrixFromRows(root, { ...profile, dimensions: 3 }, [key("a1")]),
+    ).toThrow(/bytes/);
+  });
+});
+
+describe("publishMatrix", () => {
+  it("writes rows, the hashed matrix, the manifest and the artifact", () => {
+    const keys = rows.map(([k]) => k);
+    const matrix = Buffer.concat(rows.map(([, bytes]) => bytes));
+    const published = publishMatrix(root, profile, "catalogue", keys, matrix);
+    const sha256 = digest(matrix);
+    expect(published).toEqual({
+      file: `test-profile-${sha256.slice(0, 12)}.bin`,
+      sha256,
+      written: 3,
+      pruned: [],
+      removed: [],
+    });
+    expect(
+      readFileSync(join(root, MATRIX_DIRECTORY, published.file)).equals(matrix),
+    ).toBe(true);
+    expect(manifest(root)).toEqual({
+      version: 1,
+      selected: "test-profile",
+      catalogueSha256: "catalogue",
+      profiles: [{ profile, file: published.file, sha256, rows: 3 }],
+    });
+    const artifact = parseVectorArtifact(
+      readFileSync(join(root, VECTOR_ARTIFACT)),
+    );
+    expect(artifact.profile).toBe("test-profile");
+    expect(artifact.keys).toEqual([...keys].sort());
+  });
+
+  it("reproduces a published matrix from its committed rows alone", () => {
+    const keys = rows.map(([k]) => k);
+    const matrix = Buffer.concat(rows.map(([, bytes]) => bytes));
+    const first = publishMatrix(root, profile, "catalogue", keys, matrix);
+    const again = publishMatrix(
+      root,
+      profile,
+      "catalogue",
+      keys,
+      matrixFromRows(root, profile, keys),
+    );
+    expect(again).toEqual({ ...first, written: 0 });
+  });
+
+  it("prunes unreferenced rows and removes only the profile's earlier matrices", () => {
+    writeRows(root, profile.key, 4, rows);
+    writeRows(root, other.key, 4, rows);
+    const directory = join(root, MATRIX_DIRECTORY);
+    mkdirSync(directory, { recursive: true });
+    const stale = "test-profile-0123456789ab.bin";
+    const kept = [
+      "other-profile-0123456789ab.bin",
+      "test-profile-extra-0123456789ab.bin",
+      "notes.txt",
+    ];
+    for (const name of [stale, ...kept])
+      writeFileSync(join(directory, name), "");
+    const keys = [key("a1"), key("c3")];
+    const published = publishMatrix(
+      root,
+      profile,
+      "catalogue",
+      keys,
+      matrixFromRows(root, profile, keys),
+    );
+    expect(published.pruned).toEqual([key("b2")]);
+    expect(published.removed).toEqual([stale]);
+    expect(readdirSync(directory).sort()).toEqual(
+      [published.file, ...kept].sort(),
+    );
+    expect(listRowKeys(root, profile.key)).toEqual(keys);
+    expect(listRowKeys(root, other.key)).toHaveLength(3);
+  });
+
+  it("keeps the earlier matrix when the manifest cannot be written", () => {
+    const directory = join(root, MATRIX_DIRECTORY);
+    mkdirSync(directory, { recursive: true });
+    const stale = "test-profile-0123456789ab.bin";
+    writeFileSync(join(directory, stale), "");
+    mkdirSync(join(root, MANIFEST));
+    expect(() =>
+      publishMatrix(root, profile, "catalogue", [key("a1")], rows[0][1]),
+    ).toThrow();
+    expect(existsSync(join(directory, stale))).toBe(true);
+    expect(existsSync(join(root, VECTOR_ARTIFACT))).toBe(false);
+  });
+
+  it("leaves the manifest alone when the rows cannot be written", () => {
+    writeFileSync(join(root, MANIFEST), "old\n");
+    expect(() =>
+      publishMatrix(root, profile, "catalogue", [key("a1")], new Uint8Array(4)),
+    ).toThrow(/does not match/);
+    expect(readFileSync(join(root, MANIFEST), "utf8")).toBe("old\n");
+    expect(existsSync(join(root, MATRIX_DIRECTORY))).toBe(false);
+  });
+});

@@ -58,7 +58,25 @@ public model pricing against a conservative $1 input estimate before provider
 work and disables provider retries. A cache under `.private/site-search` is
 keyed by the full profile and exact prepared input, so only changed passages
 need new embeddings. Cached query probes can be reused as well. Review the
-generated manifest and binary with changes to the public content.
+generated manifest and binary with changes to the public content. A publish
+deletes the profile's earlier matrix in `public/search-vectors`.
+
+When two branches have each published, a merge or rebase conflicts on the
+manifest, and git may also report the two matrices as a rename/rename
+conflict of the one they replaced. Every row either side needed is committed
+under `search-vectors/`, so resolve the manifest to either side's valid JSON
+(`search:build` parses it), keep both sides' row files (if both added the
+same row, either file will do), stage any matrix, and run
+
+```sh
+pnpm search:assemble gemini-embedding-2-768-search-v1
+```
+
+It does what `search:publish` does with the vectors it reads from the
+committed rows alone, copying their bytes: no provider, credentials or
+network, so it costs nothing. It stops before writing anything if a record
+has no committed row, naming the page; that text needs `search:publish`.
+It deletes every other matrix of the profile, whichever you staged.
 
 Builds never silently re-embed. If the catalogue digest differs, semantic
 search is unavailable and ordinary text search continues. The index loader

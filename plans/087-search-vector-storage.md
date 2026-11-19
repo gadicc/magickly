@@ -340,6 +340,13 @@ What S2 must also handle is listed under S2.
 
 ### S2. Publish, coverage and recipe
 
+Already built, outside S2 (19 November 2026): `search:assemble` publishes
+from committed rows alone, after a merge where two branches had each
+published, and `search:publish` shares its last steps with it
+(`src/search/embeddings/publish.ts`, which also deletes the profile's
+earlier matrix). S2's lookup order can reuse `matrixFromRows`, which copies
+row bytes as the first item below requires.
+
 `search:publish` reads committed rows, then the worktree's private cache,
 then the provider; writes new rows and prunes orphans (S1 already writes
 and prunes). The coverage report and the zero-coverage rule (decision 3);
