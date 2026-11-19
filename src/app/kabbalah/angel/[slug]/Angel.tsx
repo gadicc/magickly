@@ -22,8 +22,8 @@ import { scriptRuns } from "@/app/books/la-science-cabalistique/hebrewRuns";
 import Witnesses from "@/app/books/la-science-cabalistique/Witnesses";
 import { angelSlug } from "@/lib/angelSlugs";
 import {
-  ANGEL_SIGIL_ALT,
   angelJsonLd,
+  angelSigilAltMessage,
   angelSigilFiles,
   angelSigilGeneratorHref,
   angelSigilText,
@@ -237,8 +237,9 @@ export default function AngelPage({
 
       <AngelSigil
         name={angel.name.en}
+        number={angel.no}
         hebrew={angelSigilText(angel)}
-        alt={ANGEL_SIGIL_ALT}
+        alt={angelSigilAltMessage(angel)}
         png={sigil.png}
         svg={sigil.svg}
         generatorHref={angelSigilGeneratorHref(angel)}

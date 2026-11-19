@@ -20,6 +20,7 @@ interface SigilFile {
  */
 export default function AngelSigil({
   name,
+  number,
   hebrew,
   alt,
   png,
@@ -28,9 +29,11 @@ export default function AngelSigil({
 }: {
   /** The angel's name in English: "Vehuiah". */
   name: string;
+  /** The angel's number, 1 to 72; the alt text names it where needed. */
+  number: number;
   /** The text the sigil traces: "והויה". */
   hebrew: string;
-  /** The alt text's message (`ANGEL_SIGIL_ALT`), translated here. */
+  /** The alt text's message (`angelSigilAltMessage`), translated here. */
   alt: string;
   png: SigilFile & { width: number; height: number };
   svg: SigilFile;
@@ -51,7 +54,7 @@ export default function AngelSigil({
         src={png.path}
         width={png.width}
         height={png.height}
-        alt={t(alt, { name, hebrew })}
+        alt={t(alt, { name, number, hebrew })}
         loading="lazy"
         className={`${styles.sigil} ${plateClass}`}
       />

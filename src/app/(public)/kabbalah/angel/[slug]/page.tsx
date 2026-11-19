@@ -1,6 +1,8 @@
 import { loadAngelTexts } from "magick-data/kabbalah/seventyTwoAngels/text";
 import { notFound } from "next/navigation";
 import { angelBySlug, angelSlugs } from "@/lib/angelSlugs";
+import { angelSigilSocialImage } from "@/seo/angelSigils";
+import { socialCardImage } from "@/seo/cards";
 import { angelPage } from "@/seo/entities";
 import { seoMetadata } from "@/seo/metadata";
 import Angel from "../../../../kabbalah/angel/[slug]/Angel";
@@ -15,9 +17,23 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: PageProps<"/kabbalah/angel/[slug]">) {
-  const page = angelPage((await params).slug);
-  if (!page) notFound();
-  return seoMetadata(page.path, page);
+  const { slug } = await params;
+  const page = angelPage(slug);
+  const angel = angelBySlug(slug);
+  if (!page || !angel) notFound();
+  const metadata = seoMetadata(page.path, page);
+  // The page's card first, then the sigil, as the temple halls add their
+  // drawing (plan 062, decision 11).
+  return {
+    ...metadata,
+    openGraph: {
+      ...metadata.openGraph,
+      images: [
+        socialCardImage(page.path, page.title),
+        angelSigilSocialImage(angel),
+      ],
+    },
+  };
 }
 
 export default async function AngelRoute({

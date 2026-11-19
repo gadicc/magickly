@@ -9,6 +9,7 @@ import {
   angelSigilFiles,
   angelSigilGeneratorHref,
   angelSigilQuery,
+  angelSigilSocialImage,
   angelSigilText,
 } from "./angelSigils";
 
@@ -112,5 +113,35 @@ describe("an angel page's structured data", () => {
     });
     // The SVG states only its viewBox, so no pixel size is claimed.
     expect(svg).not.toHaveProperty("width");
+  });
+});
+
+describe("the two Lauviahs", () => {
+  it("are numbered where they are named, as their slugs are, and no one else", () => {
+    const numbered = angels.filter((angel) =>
+      angelSigilAlt(angel).includes(" of the 72"),
+    );
+    expect(numbered.map((angel) => angel.no)).toEqual([11, 17]);
+    expect(angelSigilAlt(angels[10])).toBe(
+      "The Rose Cross sigil of Lauviah, angel 11 of the 72, לאויה, traced on the Golden Dawn's rose of 22 letters",
+    );
+    const [, png17] = angelJsonLd(angels[16])["@graph"];
+    expect(png17).toMatchObject({
+      name: "Rose Cross sigil of Lauviah, angel 17 (לאויה)",
+      caption: angelSigilAlt(angels[16]),
+    });
+    // Same name, same sigil, told apart by number.
+    expect(angelSigilAlt(angels[10])).not.toBe(angelSigilAlt(angels[16]));
+  });
+});
+
+describe("the sigil as a share image", () => {
+  it("is the static PNG at its size, described by its alt text", () => {
+    expect(angelSigilSocialImage(vehuiah)).toEqual({
+      url: "/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png",
+      width: 1024,
+      height: 1024,
+      alt: angelSigilAlt(vehuiah),
+    });
   });
 });

@@ -6,7 +6,9 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { angelBySlug, angelSlug } from "@/lib/angelSlugs";
 import { expectEntityPage, textOf } from "../../../../../tests/entityPage";
-import AngelRoute from "../../../(public)/kabbalah/angel/[slug]/page";
+import AngelRoute, {
+  generateMetadata,
+} from "../../../(public)/kabbalah/angel/[slug]/page";
 import AngelPage from "./Angel";
 
 /**
@@ -65,6 +67,21 @@ describe("the angel page", () => {
     const ariel = angelBySlug("ariel");
     expect(ariel?.no).toBe(46);
     expect(textOf(await body(46))).toBe(GOLDEN);
+  });
+
+  it("shares the page's card, then the sigil", async () => {
+    const metadata = await generateMetadata(params("lauviah-17"));
+    const images = metadata.openGraph?.images as { url: string; alt: string }[];
+    expect(images).toHaveLength(2);
+    expect(images[0].url).toMatch(/^\/og\//);
+    expect(images[1]).toMatchObject({
+      url: "/kabbalah/angel/lauviah-17/lauviah-17-rose-cross-sigil.png",
+      width: 1024,
+      height: 1024,
+      alt: expect.stringContaining("Lauviah, angel 17 of the 72"),
+    });
+    // The rest of the page's metadata is as it was.
+    expect(metadata.alternates?.canonical).toBe("/kabbalah/angel/lauviah-17");
   });
 
   it("hands the body the angel's own texts", async () => {

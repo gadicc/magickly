@@ -27,6 +27,11 @@ msgid "The Rose Cross sigil of {name}, {hebrew}, traced on the Golden Dawn's ros
 msgstr "סיגיל צלב הוורד של {name}, {hebrew}, משורטט על ורד 22 האותיות של השחר הזהוב"
 
 #. js-lingui-explicit-id
+#: src/seo/angelSigils.ts
+msgid "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, traced on the Golden Dawn's rose of 22 letters"
+msgstr "סיגיל צלב הוורד של {name}, המלאך ה־{number} מתוך 72, {hebrew}, משורטט על ורד 22 האותיות של השחר הזהוב"
+
+#. js-lingui-explicit-id
 #: src/search/SearchButton.tsx
 msgid "Search the site"
 msgstr "חיפוש באתר"

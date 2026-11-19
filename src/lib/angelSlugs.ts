@@ -26,6 +26,15 @@ const counts = new Map<string, number>();
 for (const angel of angels)
   counts.set(base(angel.name.en), (counts.get(base(angel.name.en)) ?? 0) + 1);
 
+/**
+ * Whether a genius shares its name with another (Lauviah, the 11th and the
+ * 17th): where it does, its slug, and anything else that names it, carries
+ * its number as well.
+ */
+export function angelNameShared(no: number): boolean {
+  return (counts.get(base(angels[no - 1].name.en)) ?? 0) > 1;
+}
+
 /** The slug for one genius: its name, and its number only where it must. */
 export function angelSlug(no: number): string {
   const angel = angels[no - 1];

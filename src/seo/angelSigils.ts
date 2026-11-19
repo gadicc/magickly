@@ -1,6 +1,6 @@
 import { setupI18n } from "@lingui/core";
 import angels, { type Angel } from "magick-data/kabbalah/seventyTwoAngels";
-import { angelSlug } from "@/lib/angelSlugs";
+import { angelNameShared, angelSlug } from "@/lib/angelSlugs";
 import { messages as english } from "@/locales/en/messages.js";
 import { GD_HALL_LICENCE } from "@/render/contracts/gdHall";
 import {
@@ -9,6 +9,7 @@ import {
   sigilWordCount,
 } from "@/render/contracts/roseSigil";
 import { breadcrumbList, entityTrail } from "./Breadcrumbs";
+import type { SocialImage } from "./pages";
 import { SITE_ORGANIZATION, SITE_URL } from "./site";
 
 /**
@@ -109,9 +110,23 @@ export function angelSigilQuery(angel: Angel, file: AngelSigilFile) {
 export const ANGEL_SIGIL_ALT =
   /*i18n*/ "The Rose Cross sigil of {name}, {hebrew}, traced on the Golden Dawn's rose of 22 letters";
 
+/**
+ * The alt text of a genius whose name another shares (the two Lauviahs,
+ * whose names and so whose sigils are the same): with its number, as its
+ * slug has it, so that the two images are not described word for word
+ * alike.
+ */
+export const ANGEL_SIGIL_ALT_NUMBERED =
+  /*i18n*/ "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, traced on the Golden Dawn's rose of 22 letters";
+
+/** The alt text's message for an angel: numbered where the name is shared. */
+export const angelSigilAltMessage = (angel: Angel) =>
+  angelNameShared(angel.no) ? ANGEL_SIGIL_ALT_NUMBERED : ANGEL_SIGIL_ALT;
+
 /** The values the alt text names. */
 export const angelSigilAltValues = (angel: Angel) => ({
   name: angel.name.en,
+  number: angel.no,
   hebrew: angelSigilText(angel),
 });
 
@@ -121,7 +136,21 @@ const englishI18n = setupI18n({ locale: "en", messages: { en: english } });
 
 /** The alt text in English, as the structured data's caption. */
 export const angelSigilAlt = (angel: Angel) =>
-  englishI18n._(ANGEL_SIGIL_ALT, angelSigilAltValues(angel));
+  englishI18n._(angelSigilAltMessage(angel), angelSigilAltValues(angel));
+
+/**
+ * The sigil's PNG as an angel page's second Open Graph image, after the
+ * page's card, as the temple halls add theirs (plan 062, decision 11).
+ */
+export function angelSigilSocialImage(angel: Angel): SocialImage {
+  const { png } = angelSigilFiles(angel);
+  return {
+    url: png.path,
+    width: png.width,
+    height: png.height,
+    alt: angelSigilAlt(angel),
+  };
+}
 
 /**
  * Regardie's page of the sigil rules, as the generator cites it and the
@@ -155,7 +184,7 @@ export function angelJsonLd(angel: Angel) {
     "@id": `${page}#sigil-${id}`,
     contentUrl: `${SITE_URL}${file.path}`,
     url: page,
-    name: `Rose Cross sigil of ${angel.name.en} (${angelSigilText(angel)})`,
+    name: `Rose Cross sigil of ${angel.name.en}${angelNameShared(angel.no) ? `, angel ${angel.no}` : ""} (${angelSigilText(angel)})`,
     caption: angelSigilAlt(angel),
     encodingFormat: file.format === "png" ? "image/png" : "image/svg+xml",
     ...(file.width && { width: file.width, height: file.height }),

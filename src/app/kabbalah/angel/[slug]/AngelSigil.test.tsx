@@ -18,6 +18,7 @@ const render = (locale: "en" | "he") =>
     >
       <AngelSigil
         name="Vehuiah"
+        number={1}
         hebrew="והויה"
         alt={ANGEL_SIGIL_ALT}
         png={{
