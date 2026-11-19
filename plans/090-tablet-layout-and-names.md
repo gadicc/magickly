@@ -193,18 +193,20 @@ squares. It has no data file of its own.
 
 - `tabletNames(view: TabletView): TabletName[]` gives one version's names.
   A name holds:
-  - `id`: positional and the same in every version (`cross-row-left`,
-    `cross-col6-up`, `king`, `top-left-servient-3`), since "Air" and
+  - `id`: positional and the same in every version (`senior-row-left`,
+    `senior-col6-up`, `king`, `top-left-servient-3`), since "Air" and
     "Kerubic" are the Golden Dawn's attributions, not Dee's;
   - `kind`: `holyName`, `senior`, `king`, `crossColumn`, `crossRow`,
     `topRow`, `servient`, and in stage 4 `union` and `kerubicArchangel`;
   - `quarter` where it has one (`topLeft` … `bottomRight`);
   - `squares`, in reading order;
   - `spelling`, the version's letters, a `null` square shown as `?`.
-- A `topRow` or `servient` name carries its `rotations`, each one letter
-  further left, which are a property of the one name, not names of their
-  own. The Golden Dawn names each square of a servient row by the rotation
-  that starts there (vol. 4 pp.325–326).
+- A `topRow` name carries its `rotations`, each one letter further left,
+  which are a property of the one name, not names of their own; Dee was
+  given them, so every version has them. A `servient` name carries them
+  only in the Golden Dawn's versions, which name each square of a servient
+  row by the rotation that starts there (vol. 4 pp.325–326); Dee's record
+  gives his servient angels unrotated.
 - The King has one spelling in the Golden Dawn's versions (eight squares)
   and two in Dee's and Raphael's (`king` with `spellings`: the six squares
   and either centre letter), as stage 0 found in Dee's record.
@@ -248,16 +250,18 @@ down, column 7 down).
 ### 4. The names are tested against cited lists, and link to the dictionary
 
 - **Correctness:** stage 2's tests check the names against stage 0's cited
-  lists. Of the Golden Dawn's 221 entries, 184 are produced along the paths
-  (177 by the `gd` version, 7 more by Dee's or the Equinox's letters), 23
-  are pronunciations or demon roots and not paths, and 14 are the cited
+  lists. Of the Golden Dawn's 221 entries, 188 are produced along the paths
+  (181 by the `gd` version, 7 more by Dee's or the Equinox's letters), 20
+  are pronunciations or demon roots and not paths, and 13 are the cited
   spellings of decision 3 or are misprints (Equinox I.7's OCAAD for OLAAD);
-  the test pins each group. Of Dee's ORO names, 36 of 58 are produced by
+  the test derives each group and checks every entry's label against the
+  paths. Of Dee's ORO names, 36 of 58 are produced by
   his 1584 grid; the rest are pronunciations, 1659 misprints, his
   early guesses at the King, Black Cross names and names read backward,
   each listed.
 - **The dictionary:** a test counts, per version, the names whose spelling
-  (or a variant) is a headword, and pins the count. A change in the data
+  (or another version's) is a headword, case and u/v folded, and pins the
+  count. A change in the data
   that loses a match fails it. This decides links; it does not vouch for
   the names.
 - **Links:** a name links to its dictionary entry where one of its
@@ -430,7 +434,8 @@ pages to leaves matter, since the items' page maps are missing or off:
 | --- | --- |
 | `IsraelRegardie-TheGoldenDawn-Vol4-1940` | page = leaf + 8 on pp.270–331 (p.270 = n262, as `tablets.json5` has); its page map is empty |
 | `IsraelRegardie-TheGoldenDawn-Vol3-1939` | pp.73–77 = n66–n70; no page map |
-| `crowley-equinox_202110`, *The Equinox* I.7 | pp.235–237 = n247–n249, by the printed folios; the page map is a few leaves off here |
+| `crowley-equinox_202110`, *The Equinox* I.7 | pp.235–237 = n247–n249, by the printed folios (n247 checked on the scan); the page map is a few leaves off here |
+| `crowley-equinox_202110`, *The Equinox* I.8 | page = leaf − 30, by the printed folios |
 | `truefaithfulrela00deej` | leaf = the page map's `leafNum` − 1, checked on page images |
 
 ### The Golden Dawn (Regardie 1940, vol. 4, the Book of the Concourse of the Forces, unless noted)
@@ -440,7 +445,7 @@ pages to leaves matter, since the items' page maps are missing or off:
 | Row 7 the line of the Holy Spirit; columns 6 and 7 of the Father and the Son | pp.276, 278 | n268, n270 |
 | The three holy names, row 7 as 3, 4, 5 letters, for all four tablets | p.276 | n268 |
 | The King, the eight-square whirl (diagram) | pp.276–277 | n268–n269 |
-| The Kings of all four tablets | Equinox I.7 p.235 | n247 |
+| The holy names, the Kings and the Seniors of the four tablets | Equinox I.7 p.235 | n247 |
 | The Seniors, from the centre squares outward, seven letters, with Air's six | p.277 | n269 |
 | The Seniors' planets and the King's Sun; the rules hold for all four tablets | p.278 | n270 |
 | The sub-angles' elements by position, as the tablets' own arrangement | pp.278, 281–282 (also p.275) | n270, n273–n274 (n267) |
@@ -509,6 +514,31 @@ stage 2 commits the name lists as its test fixture.
    waits for a stage that republishes search.
 2. **The names in magick-data.** `TabletNames.ts`, the notes in
    `tabletNotes.json5`, the export, smoke test and README; no version bump.
+   **Built 19 November 2026** (`309d6c34`). The module exports `tabletNames`,
+   `findTabletName` (not `tabletName`, which magick-components already
+   exports as the image's label), `isTabletNameId`, `TABLET_NAME_IDS`,
+   `TABLET_QUARTERS`, `TABLET_QUARTER_ID_PREFIXES`,
+   `TABLET_NAME_TRADITIONS` (each version's tradition, `gd` or `dee`,
+   which decides the King, the servient rotations and the attributions),
+   `tabletNameVariants` (for display: other versions' readings, hiding
+   case- and u/v-only differences) and `tabletNameSpellings` (the link
+   candidates of decision 4: the version's spelling first, then every
+   other version's). Where it departs from the decisions above: the Golden
+   Dawn's attribution values are in `TabletNames.ts`, with their citations
+   in the notes, so the module does not load the notes; a Union view gives
+   no names until stage 4; and the module has a `TEXTS` entry in
+   `fieldManifest.ts` with no sources, as `astrology/kameas` has, which the
+   package's tests require of every published module. NROAM, NAAOM and
+   AISMT are filed under their top rows' ids with `kerubicArchangel: true`
+   until stage 4 gives the archangels ids of their own. The fixture is a
+   TypeScript module under `src/enochian/fixtures/`, neither exported nor
+   packed. Dictionary headwords, case and u/v folded, over the 152 names:
+   directly gd 140, regardie 134, equinox 131, dee 135, raphael 150; with
+   every version's reading, 152 for each. A fresh Opus review found two
+   errors, both fixed before the gate: four holy names from vol. 3 p.73
+   were filed as pronunciations though they are path spellings (the counts
+   above are after the fix), and Dee's servient names had been given the
+   Golden Dawn's rotations.
    Tests: 38 names a Watchtower, the King's whirl, the rotations, the cited
    lists, the pinned dictionary counts per version, Dee's two gaps, the
    component's cross and quarter helpers held to the same paths.
@@ -521,7 +551,8 @@ stage 2 commits the name lists as its test fixture.
 4. **The Tablet of Union.** Decision 7 (the contract per id, the catalogue,
    the explorer, the republish if identity moves), `UnionGrid`'s
    highlights, its names, the Kerubic archangels and the servient names
-   with their Union letter (decision 8).
+   with their Union letter (decision 8), with ids of their own; NROAM,
+   NAAOM and AISMT move to the archangels' ids then.
 5. **Release.** magick-data 0.3.0 and the magick-components minor
    (decision 10); plan 000's status and follow-ups.
 
