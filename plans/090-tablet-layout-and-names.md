@@ -3,7 +3,8 @@
 Status: drafted 18 November 2026 and amended after a Fable 5.2 review the
 same day (see [Review](#review-18-november-2026)). Stage 0, the sources,
 done on 19 November 2026 (see [Sources](#sources-stage-0-19-november-2026));
-the decisions below are amended from it. For Gadi's review; no code built. Read [current status](000-current-status.md) first. The
+the decisions below are amended from it. Stage 1, the desktop layout,
+built on 19 November 2026 on `gate/tablet-names` (see Stages). Read [current status](000-current-status.md) first. The
 number was free on every branch and worktree when drafted (088 and 089 are
 claimed on other branches); claim it again when committing.
 
@@ -492,6 +493,20 @@ stage 2 commits the name lists as its test fixture.
    capped and in place, the URL holding the choices; the differences behind
    their switch in the right column; the phone layout unchanged. Checked in
    a browser at the sizes in Verification.
+   **Built 19 November 2026** (`2caae0e1`). Squares measured in a browser:
+   42 px at 1440 × 900, 35 at 1366 × 768, 32.5 at 1280 × 720, 31.5 at
+   900 × 700; under 690 px tall the tablet scrolls with the page. The
+   allowance is 98 px in light and 114 px in dark, and the threshold of
+   690 px is the dark figure, used for both. The cap uses the small
+   viewport (`svh`) where there is one. A fresh Opus review found no
+   blocker or major issue; its minor findings were fixed before the gate
+   (the iPad toolbar, focus across the breakpoint, the chosen square on a
+   tablet change, the app bar's height, tests for hydration, the downloads
+   and the URL's other parameters). Left for Gadi: on a wide but short
+   screen (under 690 px tall) the tablet keeps its 440 px column and leaves
+   space beside it; and the page's help text (`TabletsText.tsx`) does not
+   yet mention "Copy page link", which changes the search text and so
+   waits for a stage that republishes search.
 2. **The names in magick-data.** `TabletNames.ts`, the notes in
    `tabletNotes.json5`, the export, smoke test and README; no version bump.
    Tests: 38 names a Watchtower, the King's whirl, the rotations, the cited
