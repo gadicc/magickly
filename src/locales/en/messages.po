@@ -1456,8 +1456,8 @@ msgstr "Sources"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/SigilsText.tsx
-msgid "Israel Regardie, <0>The Golden Dawn</0>, volume 4 (Aries Press, Chicago, 1940): the rules on <1>page 57</1>; Metatron and Elohim on <2>page 58</2>; the sigils of the names of Binah on <3>pages 59</3> and <4>60</4>. The scans are on archive.org; the book may still be in copyright, so its pages are linked rather than shown here."
-msgstr "Israel Regardie, <0>The Golden Dawn</0>, volume 4 (Aries Press, Chicago, 1940): the rules on <1>page 57</1>; Metatron and Elohim on <2>page 58</2>; the sigils of the names of Binah on <3>pages 59</3> and <4>60</4>. The scans are on archive.org; the book may still be in copyright, so its pages are linked rather than shown here."
+msgid "Israel Regardie, <0>The Golden Dawn</0>, volume 4 (Aries Press, Chicago, 1940): the rules on <1>page 57</1>; Metatron and Elohim on <2>page 58</2>; the sigils of the names of Binah on <3>pages 59</3> and <4>60</4>. The scans are on archive.org. The book is in the public domain in the United States but still in copyright elsewhere, so its pages are linked rather than shown here."
+msgstr "Israel Regardie, <0>The Golden Dawn</0>, volume 4 (Aries Press, Chicago, 1940): the rules on <1>page 57</1>; Metatron and Elohim on <2>page 58</2>; the sigils of the names of Binah on <3>pages 59</3> and <4>60</4>. The scans are on archive.org. The book is in the public domain in the United States but still in copyright elsewhere, so its pages are linked rather than shown here."
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/SigilsText.tsx

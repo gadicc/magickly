@@ -32,9 +32,11 @@ Regardie, *The Golden Dawn*, vol. 4 (Aries Press, Chicago, 1940), "Sigils",
 archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`: the rules on p. 57
 (leaf n51); Metatron and Elohim drawn on p. 58 (leaf n52); the sigils under
 Binah on pp. 59–60 (leaves n53, n54). Vol. 3 (1939), p. 53, defers to it;
-*The Equinox* and *777* give no drawing rules. Whether the 1940 copyright
-was renewed is unverified, so we cite the pages and take facts from them,
-nothing more. No modern source was checked.
+*The Equinox* and *777* give no drawing rules. Vol. 4 was never renewed
+and is public domain in the US, but in copyright elsewhere to the end of
+2055 ([plan 091](091-regardie-golden-dawn-copyright.md)), so we cite the
+pages and take facts from them, nothing more. No modern source was
+checked.
 
 | # | Rule | Source | The engine before this plan (`f63f14eb`) |
 | --- | --- | --- | --- |
@@ -454,9 +456,10 @@ per-figure annotations of Vaughan's work.
 Below the generator, the page sets out the rules, what Regardie's figures
 show and how the generator applies them (`SigilsText.tsx`, in English and
 Hebrew), with Regardie's pp. 57–60 linked on archive.org rather than
-mirrored, since the volume's renewal status is unverified
-(`src/sources/mirroredPages.ts` holds only works out of copyright
-everywhere).
+mirrored: the volume is public domain in the US but in copyright
+elsewhere ([plan 091](091-regardie-golden-dawn-copyright.md)), and
+`src/sources/mirroredPages.ts` holds only works out of copyright
+everywhere.
 
 ## Decisions
 

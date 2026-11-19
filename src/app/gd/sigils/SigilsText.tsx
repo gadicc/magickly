@@ -7,8 +7,9 @@ import { SITE_REPOSITORY } from "@/seo/site";
 /**
  * Regardie's *The Golden Dawn*, vol. 4 (Aries Press, Chicago, 1940), on
  * archive.org: the sigil rules on p. 57 (leaf n51) and the worked figures
- * on pp. 58–60 (leaves n52–n54), as plan 088 cites them. Whether its
- * copyright was renewed is not established, so its pages are linked, never
+ * on pp. 58–60 (leaves n52–n54), as plan 088 cites them. It was never
+ * renewed, so it is public domain in the US, but it is in copyright
+ * elsewhere to the end of 2055 (plan 091), so its pages are linked, never
  * mirrored (`src/sources/mirroredPages.ts` holds only works out of
  * copyright everywhere).
  */
@@ -185,7 +186,7 @@ export default function SigilsText() {
         <li>
           <UiRichText
             message={
-              /*i18n*/ "Israel Regardie, <0>The Golden Dawn</0>, volume 4 (Aries Press, Chicago, 1940): the rules on <1>page 57</1>; Metatron and Elohim on <2>page 58</2>; the sigils of the names of Binah on <3>pages 59</3> and <4>60</4>. The scans are on archive.org; the book may still be in copyright, so its pages are linked rather than shown here."
+              /*i18n*/ "Israel Regardie, <0>The Golden Dawn</0>, volume 4 (Aries Press, Chicago, 1940): the rules on <1>page 57</1>; Metatron and Elohim on <2>page 58</2>; the sigils of the names of Binah on <3>pages 59</3> and <4>60</4>. The scans are on archive.org. The book is in the public domain in the United States but still in copyright elsewhere, so its pages are linked rather than shown here."
             }
             components={{
               0: <i />,

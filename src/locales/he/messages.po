@@ -1456,8 +1456,8 @@ msgstr "מקורות"
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/SigilsText.tsx
-msgid "Israel Regardie, <0>The Golden Dawn</0>, volume 4 (Aries Press, Chicago, 1940): the rules on <1>page 57</1>; Metatron and Elohim on <2>page 58</2>; the sigils of the names of Binah on <3>pages 59</3> and <4>60</4>. The scans are on archive.org; the book may still be in copyright, so its pages are linked rather than shown here."
-msgstr "ישראל רגרדי, <0>The Golden Dawn</0>, כרך 4 (Aries Press, שיקגו, 1940): הכללים ב<1>עמוד 57</1>; מטטרון ואלהים ב<2>עמוד 58</2>; הסיגילים של שמות בינה ב<3>עמודים 59</3> ו־<4>60</4>. הסריקות נמצאות ב־archive.org; ייתכן שהספר עדיין מוגן בזכויות יוצרים, ולכן עמודיו מקושרים ולא מוצגים כאן."
+msgid "Israel Regardie, <0>The Golden Dawn</0>, volume 4 (Aries Press, Chicago, 1940): the rules on <1>page 57</1>; Metatron and Elohim on <2>page 58</2>; the sigils of the names of Binah on <3>pages 59</3> and <4>60</4>. The scans are on archive.org. The book is in the public domain in the United States but still in copyright elsewhere, so its pages are linked rather than shown here."
+msgstr "ישראל רגרדי, <0>The Golden Dawn</0>, כרך 4 (Aries Press, שיקגו, 1940): הכללים ב<1>עמוד 57</1>; מטטרון ואלהים ב<2>עמוד 58</2>; הסיגילים של שמות בינה ב<3>עמודים 59</3> ו־<4>60</4>. הסריקות נמצאות ב־archive.org. הספר נמצא בנחלת הכלל בארצות הברית אך עדיין מוגן בזכויות יוצרים במקומות אחרים, ולכן עמודיו מקושרים ולא מוצגים כאן."
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/SigilsText.tsx
