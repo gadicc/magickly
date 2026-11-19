@@ -101,7 +101,7 @@ export default function HallPage({ hall }: { hall: GdHallEntry }) {
             className={styles.image}
           />
           <figcaption className={styles.caption}>
-            Floor plan © 2026 Magick.ly,{" "}
+            Floor plan © 2026 Gadi Cohen,{" "}
             <Link href={GD_HALL_LICENCE.url}>CC BY 4.0</Link>, drawn by
             magick-components (MIT). Free to reuse with credit (
             <Link href="#licence">how</Link>).
@@ -189,7 +189,7 @@ export default function HallPage({ hall }: { hall: GdHallEntry }) {
 
           <h2 id="licence">Licence</h2>
           <p>
-            This floor plan is © 2026 Magick.ly and licensed under{" "}
+            This floor plan is © 2026 Gadi Cohen and licensed under{" "}
             <Link href={GD_HALL_LICENCE.url}>CC BY 4.0</Link>: a Creative
             Commons licence sits on top of copyright, and this one lets anyone
             use, change and sell the image, with credit. Give the title, the

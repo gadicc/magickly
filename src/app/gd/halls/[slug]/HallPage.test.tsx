@@ -55,7 +55,7 @@ function expectLicensable(image: Record<string, unknown>) {
   // may draw under MIT; still CC BY 4.0, by Magick.ly.
   expect(image.creditText).toBe("Magick.ly, drawn by magick-components (MIT)");
   expect(image.copyrightNotice).toBe(
-    "© 2026 Magick.ly. Licensed under CC BY 4.0",
+    "© 2026 Gadi Cohen. Licensed under CC BY 4.0",
   );
   expect(image.acquireLicensePage).toBe("https://magick.ly/about#licence");
 }
@@ -91,7 +91,7 @@ describe("a temple hall's page", () => {
       }
       const text = textOf(markup);
       expect(text).toContain(
-        "Floor plan © 2026 Magick.ly, CC BY 4.0, drawn by magick-components (MIT). Free to reuse with credit (how)",
+        "Floor plan © 2026 Gadi Cohen, CC BY 4.0, drawn by magick-components (MIT). Free to reuse with credit (how)",
       );
       expect(text).toContain(
         `${gdHallTitle(hall)}, by Magick.ly, drawn by magick-components (MIT), https://magick.ly/gd/halls/${slug}, CC BY 4.0`,

@@ -200,7 +200,7 @@ export const GD_HALL_LICENCE = {
   name: "CC BY 4.0",
   creator: "Magick.ly",
   creditText: "Magick.ly, drawn by magick-components (MIT)",
-  copyrightNotice: "© 2026 Magick.ly. Licensed under CC BY 4.0",
+  copyrightNotice: "© 2026 Gadi Cohen. Licensed under CC BY 4.0",
   acquireLicensePage: `${SITE_URL}/about#licence`,
 } as const;
 

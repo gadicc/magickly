@@ -677,10 +677,16 @@ their titles and descriptions, which S4 leaves alone.
 - **A share image.** The sigil's PNG is each angel page's second Open
   Graph image, after the page's card, as the halls' drawings are (plan
   062, decision 11).
-- **Open: the copyright notice.** The JSON-LD reuses the halls'
+- **The copyright notice.** The JSON-LD reused the halls'
   `copyrightNotice`, "© 2026 Magick.ly", while the About and Open source
   pages say "Copyright (c) 2020–2026 Gadi Cohen", and Magick.ly is not a
-  legal entity. Gadi to decide; it applies to the halls as well.
+  legal entity. A notice names the owner, so it is now "© 2026 Gadi
+  Cohen" (Gadi, 19 November), in the halls' and the sigils' structured
+  data, in the rights the hall files carry, and in the hall pages' credit
+  line and licence section; the credit stays "Magick.ly, drawn by
+  magick-components (MIT)", which names the site, not an owner. Every
+  hall's SVG and PNG pins moved with it, and no source. Plan 062's text
+  keeps the old notice as history.
 
 ### Commits
 
@@ -692,3 +698,4 @@ their titles and descriptions, which S4 leaves alone.
 | f4889048 | `indexed: false` on the `rose-sigil` contract |
 | fa2b4549 | The generator links the angels' pages (decision 6) |
 | 36a3c91c | The Lauviahs numbered; the sigil as a share image |
+| d8ff65f4 | The embeddings refreshed for the generator's link |
