@@ -175,8 +175,9 @@ Follow-ups are separate from the completed migration work:
   (under its own profile, `magickli-rose-sigil-image-v1`) and the debug view draw with it, each
   word its own sigil. The COBYLA optimiser is retired: its source is kept
   as `roseSigilOptimizer.ts.old`, `gd/roseSigilOptimizer` and `nlopt-js`
-  are gone from the package and the app (a breaking change; the next
-  release is 0.4.0), and the engine is exported for the kamea
+  are gone from the package and the app (a breaking change, released as
+  0.4.0: bumped on 19 November, published by CI when `main` is pushed),
+  and the engine is exported for the kamea
   ([plan 088](088-rose-sigil-oracle.md)).
 - 13 November 2026: Dependabot alerts #362 (zod), #364 (glob) and #366
   (minimatch) fixed by a `@vercel/functions` bump and parent-scoped

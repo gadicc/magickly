@@ -497,7 +497,11 @@ the rest as recommended.
 8. **Tested domain: words of up to 12 letters.** The contract and the page
    take 32 letters in all; a longer word is drawn best effort, and the page
    says when a figure fails its own checks. (Orchestrator's call, 18
-   November, on the beyond-domain rates above; Gadi to confirm.)
+   November, on the beyond-domain rates above; confirmed by Gadi on
+   19 November.) The longest word among magick-data's Hebrew names is
+   8 letters, the Moon's בתרשיתים; the longest word in the Hebrew Bible
+   (Esther 9:3, והאחשדרפנים) has 11. A name written with a maqaf
+   (אלהים־גיבור) is refused today and has to be typed with a space.
 
 ## Review (18 November 2026)
 
