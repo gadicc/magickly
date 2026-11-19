@@ -76,7 +76,9 @@ has no dark mode; Gadi asked for it to be planned on its own.
    Hierophant `#ff7a7a`, Praemonstrator `#8ab4f8`, Hiereus `#e4e8ef`,
    Cancellarius `#e6c34a`, Keryx and Psaltis `#ee8f8f`, Stolistes
    `#a3a6ff`, Sentinel `#a6adb8`, Chief Adept `#e0b24a`, Second Adept
-   `#ff9d55`, Third Adept `#62c962`. The browser toolbar's dark colour is
+   `#ff9d55`, Third Adept `#62c962`. (Plan 089's "Officer colours",
+   19 November 2026, replaced several of these and the light colours;
+   `roles.tsx` holds the current ones.) The browser toolbar's dark colour is
    `#303e58`, what `AppBar.darkBg` renders under MUI's elevation
    overlay. The `#60a5fa` info-`Alert` override
    stays the base style and gets a dark override with
@@ -502,8 +504,9 @@ was rerun on the final tree to confirm (see "Build").
   per Next's guide).
 - TODO: dark captures of the help screenshots, served with
   `<picture media="(prefers-color-scheme: dark)">` or by class.
-- TODO: light-mode readability of the Candidate (`#fcf`), Member
-  (`#ccc`) and Hegemon (`#aaa`) role names on white.
+- ~~TODO: light-mode readability of the Candidate (`#fcf`), Member
+  (`#ccc`) and Hegemon (`#aaa`) role names on white.~~ Done in plan 089,
+  "Officer colours" (19 November 2026).
 - TODO: a dark `background_color` for the PWA splash, which the manifest
   cannot vary by scheme.
 - TODO: when the reader's choice is the opposite of the device's, the

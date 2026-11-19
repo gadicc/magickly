@@ -208,9 +208,10 @@ depend on `Paper`.
 
 ## Deferred (same UX pass, 18 November 2026)
 
-1. Role-name contrast in light (Member `#ccc`, Hegemon `#aaa`,
+1. ~~Role-name contrast in light (Member `#ccc`, Hegemon `#aaa`,
    Candidate `#fcf`, Dadouchos `#cc5` on white), and the same colours
-   as rules on the beige surface: darker light variants.
+   as rules on the beige surface: darker light variants.~~ Done on
+   19 November 2026: see "Officer colours".
 2. Floating button: accessible name ("SpeedDial basic example") and
    untranslated tooltips; Jump to Next aims the cue at the screen's
    bottom edge. (Its stray `))` child went in stage C: it was also
@@ -228,6 +229,71 @@ depend on `Paper`.
    JSX text ("Ritual not found", "More Variables"), so any wording
    change in the reader needs a `search:publish`; the reader's interface
    text probably should not be indexed at all.
+
+## Officer colours (19 November 2026)
+
+Deferred item 1. The light colours were measured on the four light
+backgrounds a name sits on (bubble, the reader's own bubble, the
+surface and the reader's own direction tint): of the 14 distinct light
+colours, 10 fell below 4.5:1 on white and 11 on one background or
+more; only the Praemonstrator, Hiereus and Stolistes passed everywhere.
+The Candidate, Member and Dadouchos were below 2:1 on white, the
+Hegemon and Cancellarius below 2.4:1 there and 2:1 on the surface. Dark
+mode passed throughout.
+
+Three options were drawn on the Neophyte reader: the same hues darkened
+mechanically (A), names in ink with colour only in the directions' rule
+(B), and a hand-tuned palette (C). A merged the Hegemon, Sentinel and
+Member into one grey and the Cancellarius and Dadouchos into one olive;
+B left the speech bubbles without colour. Gadi chose C, then its
+refinement C′ (19 November 2026), after saying the original colours were
+chosen in a hurry and need not be kept, except where they carry meaning:
+
+| Officer | Light | Dark | Reason |
+| --- | --- | --- | --- |
+| Hierophant, Imperator, Past Hierophant | `#c80000` | `#ff7a7a` | The red of the lamen and collar |
+| Praemonstrator | `#0000ff` | `#7aa2ff` | Unchanged in light; dark moved off the Stolistes |
+| Cancellarius | `#776000` | `#e6c34a` | Ochre |
+| Hiereus | `#000000` | `#e4e8ef` | Unchanged |
+| Hegemon | `#3d6a8a` | `#a0d0e0` | Steel blue for the white robe, which cannot be text |
+| Keryx, Psaltis | `#00756e` | `#5ccabf` | Teal only to stand apart from the Hierophant's red |
+| Stolistes | `#55c` | `#b7a6ff` | The blue of water; dark moved off the Praemonstrator |
+| Dadouchos | `#b04500` | `#ffa04a` | Fire's orange, red being the Hierophant's |
+| Sentinel | `#666666` | `#a6adb8` | Grey |
+| Chief, Second, Third Adept | `#896200`, `#aa4e04`, `#007a03` | unchanged | Their rubric colours, darker |
+| Candidate, Aspirant | `#a3329c` | `#ffccff` | Magenta, the ceremony's focus |
+| Member | none | none | The body of the hall, not an office |
+
+Where a light hue changed, its dark colour follows it (the Hegemon was
+grey and the Dadouchos yellow in dark). `roles.test.tsx` pins 4.5:1 for
+every name on every background in both schemes, and an OKLab distance
+of at least 0.07 between the officers who share a hall (the outer
+order's, and the Portal's), with `src/colourContrast.ts` holding the
+measures `theme.test.ts` now shares. The old colours were distinct
+but unreadable; C's first values brought the Cancellarius and Dadouchos
+to 0.037 and the Hegemon and Sentinel to 0.043. With C′ the
+closest outer-order pair is 0.071 in light (Hegemon, Sentinel) and 0.081
+in dark (Praemonstrator, Stolistes), and the Portal's 0.073 (Chief and
+Second Adept).
+
+Accepted, after Fable's review the same day:
+
+- The uncoloured Member reads as the Hiereus: the same ink as black in
+  light, and `text.primary`, which is the Hiereus's dark colour, in
+  dark. The lamen tells them apart, as it already did for the "All
+  officers" and "Everyone" labels; a Member's direction rule is the
+  neutral one, close to the Sentinel's grey.
+- Officers of different halls may be close: the Dadouchos and the
+  Second Adept (both orange), the Cancellarius and the Chief Adept (both
+  gold). No built-in hall puts them together; a temple's own ritual
+  that does would see two near-identical names, told apart by lamen.
+- In dark, the Dadouchos's orange is yellower than in light, and the
+  Stolistes's blue nearer lavender, so the Praemonstrator is the bluer
+  of the two there.
+- Every light colour sits near the same lightness, which 4.5:1 forces,
+  so colour-blind readers may confuse some pairs (by a rough
+  deuteranopia simulation, the Hierophant and Dadouchos). The name is
+  always written and the lamen drawn, so colour is never the only sign.
 
 ## Build (18 November 2026)
 
