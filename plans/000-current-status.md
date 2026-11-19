@@ -194,8 +194,8 @@ Follow-ups are separate from the completed migration work:
   [plan 066](066-october-dependency-refresh.md#13-november-2026-dependabot-alerts),
   with when to drop the overrides.
 
-- TODO: rose sigils after plan 088's S2: S3's
-  side-by-side sheet against Vaughan (local only); S5, the kamea profile;
+- TODO: rose sigils after plan 088's S2: Gadi's review of S3's
+  side-by-side sheet against Vaughan (built, local only); S5, the kamea profile;
   and the A‑B‑A‑B‑A class the engine cannot place
   ([plan 088](088-rose-sigil-oracle.md#stages)). S4 is built (below);
   Gadi reviews its decisions, and decides whether to take the

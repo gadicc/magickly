@@ -42,6 +42,7 @@ describe("the sigil oracle report", () => {
         figures: [
           {
             n: 1,
+            page: 2,
             spelling: "מטטרון",
             letters: [
               letter({ circle: true }),
@@ -54,6 +55,7 @@ describe("the sigil oracle report", () => {
           },
           {
             n: 2,
+            page: 3,
             spelling: "גדי",
             letters: [
               letter({ circle: true }),
@@ -96,7 +98,15 @@ describe("the sigil oracle report", () => {
     expect(o4.figures[1].differences).toEqual([
       "letter 2 (?) beads: ours 0, his 1",
     ]);
+    // S3's sheet: ours beside his, the disagreeing figure listed; with
+    // no PDF in the directory there are no crops of his.
+    const sheet = readFileSync(join(external, "side-by-side.html"), "utf8");
+    expect(sheet).toContain('Disagreeing: <a href="#n2">#2</a>.');
+    expect(sheet).toContain("<figcaption>Vaughan, page 3</figcaption>");
+    expect(sheet.match(/<svg /g)).toHaveLength(2);
+    expect(sheet).toContain("No crop: no PDF or pdftoppm.");
     // O4 writes into the external directory alone.
     expect(existsSync(join(out, "o4-comparison.json"))).toBe(false);
+    expect(existsSync(join(out, "side-by-side.html"))).toBe(false);
   }, 60_000);
 });

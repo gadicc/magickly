@@ -449,7 +449,7 @@ per-figure annotations of Vaughan's work.
 | S0 (done) | Vaughan's figures annotated twice, independently, at native resolution (crops, as `scripts/seventyTwoAngels/hebrew.ts` learned for Lenain's Hebrew), and reconciled; `names.json`'s #45 (Samekh, not Shin) fixed | Gadi |
 | S1 (done) | Oracle first: layout interface with the rose and a kamea stub, hand fixtures, corpus, O1 reference (written blind), O2 with fixed thresholds and a feasibility proof for the worst case (ללהאל: two strokes and a noose within the slack at Aleph), O3 ink decoder, mutation suite, report script | The oracle flags every row of "What is wrong today" and every mutant, and passes the hand fixtures |
 | S2 (done) | `planSigil`, rule placement, renderer; R2 (words) in the package, page and contract; the golden tests that pin today's squiggles and one COBYLA layout (`roseSigilGeometry.test.ts:101-113`, `147-156`, `291-306`) replaced by O1–O3; `points` deprecated, the optimiser retired (decision 7); a contact sheet of every corpus vertex 0.5–3 units off its chord, drawn at 1 unit, for judging R4's tolerance | O1–O3 green on the exhaustive corpus, O2 including the 1-ulp check; the image route's cache key changes with the drawing |
-| S3 (in part) | O4 against Vaughan; disagreements classified and counted here. Marks compared (67 of 72 agree, [S0](#s0-the-annotations-18-november-2026)); the side-by-side sheet is not built | Gadi reviews the side-by-side sheet locally |
+| S3 (built) | O4 against Vaughan; disagreements classified and counted here. Marks compared (67 of 72 agree, [S0](#s0-the-annotations-18-november-2026)); the side-by-side sheet is built, outside the repository ([S3](#s3-the-side-by-side-sheet-19-november-2026)) | Gadi reviews the side-by-side sheet locally |
 | S4 (built) | The 72 angels pages: sigils rendered at build, cached, linked to `/gd/sigils?text=…`; caching and SEO decided then | [Its own section](#s4-the-angels-pages-19-november-2026); Gadi reviews the decisions |
 | S5 (later) | Kamea profile and layout on `Kamea`. What S1 found: Zazel's figure (p. 81) has a circle at both ends and no bar, Taphthartharath's (p. 85) neither circle nor bar, and both draw a return to a cell as a rounded U beside the outgoing stroke; p. 85's printed Mercury square swaps three pairs of cells against Agrippa's (none the name uses); a 1-unit noose tolerance is 0.1 cell, which on a 9×9 square catches near-diagonal passes | Its own plan |
 
@@ -579,8 +579,22 @@ passed the hand fixtures; it then matched the reference on every text.
   and this revision).
 
 Still unchecked: Safari and Firefox (headless Chromium only, for the
-draw-on); the side-by-side sheet against Vaughan; Regardie's renewal
-status.
+draw-on); the side-by-side sheet against Vaughan (built since, [S3](#s3-the-side-by-side-sheet-19-november-2026));
+Regardie's renewal status (settled since, plan 091).
+
+## S3: the side-by-side sheet (19 November 2026)
+
+With `SIGIL_ORACLE_EXTERNAL` set, `pnpm sigils:oracle` now also writes
+`side-by-side.html` into that directory: each of Vaughan's figures,
+cropped by `pdftoppm` from the PDF in the directory into its
+`side-by-side/` folder, beside our figure of his spelling on the Golden
+Dawn's rose, with O4's differences, the annotators' notes and a mark
+where his spelling is not the site's. The figures that disagree are
+linked at the top. Like O4's files, the page and the crops stay in that
+directory, never in `--out` or the repository; without a PDF or
+`pdftoppm` the page has our figures alone. The smoke test checks the
+page on its made-up annotation. Run on 19 November: 67 of 72 agree, as
+in S0; the five that do not are #7, #26, #43, #70 and #72.
 
 ## S4: the angels' pages (19 November 2026)
 

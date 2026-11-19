@@ -33,7 +33,8 @@
  * `--tiny` runs a handful of cases of each kind, for the smoke test.
  */
 
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
@@ -689,7 +690,10 @@ interface ExternalLetter {
 
 interface ExternalFigure {
   n: number;
+  /** The PDF's page that holds the figure. */
+  page: number;
   spelling: string;
+  notes?: string;
   letters: ExternalLetter[];
 }
 
@@ -767,6 +771,7 @@ function runO4(dir: string) {
     figures: figures.length,
     agree,
   };
+  sideBySide(dir, annotation.figures, figures);
   writeFileSync(
     join(dir, "o4-comparison.json"),
     `${JSON.stringify({ summary, figures }, null, 2)}\n`,
@@ -785,6 +790,94 @@ function runO4(dir: string) {
     ].join("\n"),
   );
   return summary;
+}
+
+/**
+ * S3's side-by-side sheet, `side-by-side.html` in `dir`: each of
+ * Vaughan's figures, cropped from the PDF in `dir` by `pdftoppm` into
+ * `dir/side-by-side/`, beside our figure of his spelling on the
+ * Golden Dawn's rose, with O4's differences and the annotators' notes.
+ * His spellings that differ from the site's are marked. Everything is
+ * written into `dir`; without a PDF or `pdftoppm` the page has ours alone.
+ */
+function sideBySide(
+  dir: string,
+  his: readonly ExternalFigure[],
+  compared: readonly { n: number; agrees: boolean; differences: string[] }[],
+) {
+  const pdf = readdirSync(dir).find((f) => f.toLowerCase().endsWith(".pdf"));
+  const images = join(dir, "side-by-side");
+  mkdirSync(images, { recursive: true });
+  const site = new Map(SEVENTY_TWO_NAMES.map((c) => [c.number, c.text]));
+  const crop = (page: number): string | undefined => {
+    if (!pdf) return undefined;
+    const name = `vaughan-${String(page).padStart(2, "0")}`;
+    try {
+      // 100 dpi; the box holds the figure with its title on every page.
+      execFileSync("pdftoppm", [
+        ...["-png", "-r", "100", "-singlefile"],
+        ...["-x", "40", "-y", "150", "-W", "720", "-H", "750"],
+        ...["-f", String(page), "-l", String(page)],
+        join(dir, pdf),
+        join(images, name),
+      ]);
+      return `side-by-side/${name}.png`;
+    } catch {
+      return undefined;
+    }
+  };
+  const rows = his.map((figure) => {
+    const verdict = compared.find((c) => c.n === figure.n);
+    const siteSpelling = site.get(figure.n);
+    const image = crop(figure.page);
+    const ours = roseFigure(figure.spelling, "gd").replace(
+      /^<svg /,
+      '<svg width="360" height="360" ',
+    );
+    const notes = [
+      siteSpelling && siteSpelling !== figure.spelling
+        ? `<p class="spelling">His spelling; the site's is <span lang="he">${escape(siteSpelling)}</span>.</p>`
+        : "",
+      verdict?.agrees
+        ? '<p class="agree">Marks agree (O4).</p>'
+        : `<ul class="differ">${(verdict?.differences ?? []).map((d) => `<li>${escape(d)}</li>`).join("")}</ul>`,
+      figure.notes ? `<p class="notes">${escape(figure.notes)}</p>` : "",
+    ].join("");
+    return `<section id="n${figure.n}" class="${verdict?.agrees ? "" : "disagree"}">
+<h2>#${figure.n} <span lang="he">${escape(figure.spelling)}</span></h2>
+<div class="pair">
+<figure>${image ? `<img src="${image}" width="360" alt="Vaughan #${figure.n}">` : "<p>No crop: no PDF or pdftoppm.</p>"}<figcaption>Vaughan, page ${figure.page}</figcaption></figure>
+<figure>${ours}<figcaption>Ours (gd rose, his spelling)</figcaption></figure>
+<div class="verdict">${notes}</div>
+</div>
+</section>`;
+  });
+  const disagreeing = compared.filter((c) => !c.agrees);
+  writeFileSync(
+    join(dir, "side-by-side.html"),
+    `<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Rose sigils: Vaughan beside ours</title>
+<style>
+body { font: 15px/1.4 system-ui, sans-serif; margin: 16px; background: #fff; color: #111; }
+[lang="he"] { font-family: "Frank Ruhl Libre", serif; font-size: 1.2em; }
+section { border-top: 1px solid #ccc; padding: 8px 0; }
+section.disagree { background: #fff6f0; }
+.pair { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+figure { margin: 0; }
+figcaption { font-size: 13px; color: #555; text-align: center; }
+.verdict { max-width: 360px; }
+.agree { color: #060; }
+.differ { color: #a00; padding-left: 18px; }
+.notes { color: #555; font-size: 13px; }
+</style></head><body>
+<h1>Rose sigils: Vaughan beside ours</h1>
+<p>Noose tolerance ${ROSE_SIGIL_PROFILE.nooseTolerance} unit(s). ${compared.length - disagreeing.length} of ${compared.length} figures agree on their marks. Local only: never commit this page or its images.</p>
+<p>Disagreeing: ${disagreeing.map((c) => `<a href="#n${c.n}">#${c.n}</a>`).join(", ") || "none"}.</p>
+${rows.join("\n")}
+</body></html>
+`,
+  );
 }
 
 // ---------------------------------------------------------------- the report
