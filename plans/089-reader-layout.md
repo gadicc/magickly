@@ -3,8 +3,9 @@
 Status: decisions settled with Gadi on 18 November 2026 from the mock-up
 sheets (width option D, marking option D); the design reviewed
 adversarially by Fable on 18 November 2026 (see "Review"); the
-continuation rule (decision 3) settled with Gadi the same day; not yet
-built. Read
+continuation rule (decision 3) settled with Gadi the same day; **built
+on 18 November 2026** on `gate/reader-layout` (see "Build" and
+"Commits"). Read
 [current status](000-current-status.md) first. The other findings of the
 same UX pass are deferred and listed under "Deferred".
 
@@ -210,13 +211,87 @@ depend on `Paper`.
 1. Role-name contrast in light (Member `#ccc`, Hegemon `#aaa`,
    Candidate `#fcf`, Dadouchos `#cc5` on white), and the same colours
    as rules on the beige surface: darker light variants.
-2. Floating button: accessible name ("SpeedDial basic example"),
-   untranslated tooltips, stray `))` child; Jump to Next aims the cue
-   at the screen's bottom edge.
+2. Floating button: accessible name ("SpeedDial basic example") and
+   untranslated tooltips; Jump to Next aims the cue at the screen's
+   bottom edge. (Its stray `))` child went in stage C: it was also
+   indexed as the built-in rituals' search prose.)
 3. Text size not saved across reloads.
 4. A pinned "Reading as …" chip below 1,200 px.
 5. Rehearsal mode (hide my lines; my lines plus their cues).
 6. Screen wake lock while reading; linkable line numbers.
+7. The editor preview (`chrome={false}`) scrolls in its own pane, but
+   the count measures against the window and Jump back scrolls the
+   window: both stale or inert there (Jump back was already).
+8. The variables panel in the rail has no "Reading as" label; the
+   "My role" select's own label stands in.
+9. The public `/doc/*` search prose is extracted from `DocRender.tsx`'s
+   JSX text ("Ritual not found", "More Variables"), so any wording
+   change in the reader needs a `search:publish`; the reader's interface
+   text probably should not be indexed at all.
+
+## Build (18 November 2026)
+
+Stages A, B and C as planned, each a gated commit (see "Commits").
+Implementation ran in Opus 5.5 subagents at high effort from briefs
+written from this plan; the plan's review and the final review in Fable
+5.2 at high.
+
+**How each stage was checked.** A CI-equivalent gate in the worktree
+(Node 24, the CI placeholder environment): `biome check`, `typecheck`,
+`test:coverage`, `i18n:check`, `build` and `loom check`. Heavy load from
+other sessions timed out unrelated tests twice (24 and 2 files); each
+passed when re-run alone. Pages were looked at in the worktree's own dev
+server (127.0.0.1, CI placeholder settings, the built-in Neophyte),
+through headless Chromium at 375/390, 1,100, 1,240 and 1,440 px, light
+and dark. Docs screenshots came from `magickli-docs-capture`.
+
+- *A:* the four reader and editor shots came out byte-identical (they
+  show only the ritual's opening title and hall).
+- *B:* `reader-phone` regenerated (the title's gutters and surface).
+- *C:* `reader-phone` again (the floating button's count, now in tasks)
+  and the new `reader-desktop`, shown on the temples help page with a
+  clause on the side panel's Halls.
+
+**Deviations.** Speech bubbles left `Paper` too, not only directions,
+so both kinds share one element (the bubble's look moved to CSS). The
+reader's own directions use `success.main` for their rule rather than a
+new token. A same-role run tucks every direction after its first speech
+(say, do, do), not only the one straight after it. When `myRole` is
+absent or hidden the floating button's jump is disabled rather than
+inert. Contents and table-of-contents jumps (titles and halls) replace
+the address's hash instead of adding history entries; `revealHall` has a
+replace mode for them. The reader no longer writes `ref` and `forMe`
+onto ritual rows (the old count's bookkeeping); `forMe` had reached
+saved content before.
+
+**Final review.** Fable 5.2 (high) reviewed the branch with stage C
+uncommitted: no critical or high findings. Fixed before committing C:
+hall jumps adding history; `replaceState` keeping Next's `__NA` state
+(the router would then drop the hash); `aria-live` on the count; a gap
+under the title in short rituals with the rails (`auto 1fr` rows); the
+say, do, do indent; an empty Contents card; no current section at the
+top; "More Variables" not re-measuring; Jump back hiding Jump to next in
+the rail; tests for the measuring wiring (role change, scroll, closed
+summaries, footnote tasks, `aria-current`). Left: items 7 and 8 under
+"Deferred".
+
+**Search.** Stage C changes the public search catalogue (the temples
+help copy and the built-in rituals' prose), so its commit carries the
+republished embeddings (`search:publish
+gemini-embedding-2-768-search-v1`, run by Gadi on 19 November after
+the branch was rebased onto main's sigil publish: 15 rows replaced,
+3,079 in all). The full gate passed on that tree: 13,700 tests,
+build and `loom check`.
+
+## Commits
+
+| Commit | Change |
+| --- | --- |
+| 361f62da | The plan |
+| 2dc29a51 | Stage A: rubric directions |
+| ee3bccd7 | Stage B: the reader shell and reading column |
+| 582f81b6 | Stage C: rails, the next-line count, help and search |
+| (the next) | This plan brought up to date |
 
 ## Mock-ups
 
