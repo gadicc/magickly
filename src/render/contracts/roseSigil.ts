@@ -150,6 +150,10 @@ export const roseSigil: ComponentImageContract<RoseSigilProps> = {
   rasterDefaultOf: (props) => sigilRasterDefault(sigilWordCount(props.text)),
   keys: ["text", "rose", "version"],
   personal: true,
+  // The 72 angels' sigils are published as static files under their pages
+  // (plan 088, S4), the copies to index; the route's stay out, which
+  // `personal` already says for every other text.
+  indexed: false,
   parse(searchParams) {
     const text = canonicalSigilText(searchParams.get("text") ?? "");
     if (text === null) invalid();

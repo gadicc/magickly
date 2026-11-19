@@ -97,6 +97,19 @@ describe("component image responses", () => {
     );
   });
 
+  it("keeps an angel's sigil's route copy out of the index", async () => {
+    // Its canonical copies are the static files under /kabbalah/angel/<slug>
+    // (plan 088, S4); the generator's links and downloads still work.
+    const response = await componentImageResponse(
+      "rose-sigil",
+      new Request(
+        `https://magick.ly/api/render/rose-sigil?text=${encodeURIComponent("והויה")}`,
+      ),
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get("x-robots-tag")).toBe("noindex");
+  });
+
   it("keeps the temple halls' route copies out of the index", async () => {
     // Their canonical copies are the static files under /gd/halls/<slug>.
     const response = await componentImageResponse(

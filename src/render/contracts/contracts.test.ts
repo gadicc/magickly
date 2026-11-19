@@ -224,6 +224,8 @@ describe("component image contracts", () => {
         InvalidComponentImageRequest,
       );
     expect(CONTRACTS["rose-sigil"].personal).toBe(true);
+    // The angels' sigils are indexed as static files (plan 088, S4).
+    expect(CONTRACTS["rose-sigil"].indexed).toBe(false);
     expect(CONTRACTS["astro-geomancy-chart"].personal).toBe(true);
     expect(CONTRACTS["tree-of-life"].personal).toBe(false);
     expect(
