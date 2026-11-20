@@ -2,6 +2,7 @@
 import {
   act,
   cleanup,
+  configure,
   fireEvent,
   render,
   screen,
@@ -23,6 +24,10 @@ import Translator from "./translator";
 vi.mock("@/auth/client", () => ({
   useSession: () => ({ data: null, isPending: false }),
 }));
+
+// Each test builds the translator afresh, which on a loaded CI shard takes
+// a few seconds; the 1s default for `waitFor` failed there (run 44694366508).
+configure({ asyncUtilTimeout: 5_000 });
 
 const PATH = "/enochian/translate";
 const TABLE = buildKeysTable();
@@ -388,7 +393,8 @@ describe("the translator page (plan 081, step E)", () => {
   });
 });
 
-describe("a long paste", () => {
+// 500 tiles took over 5s to render on CI (run 44694366508).
+describe("a long paste", { timeout: 15_000 }, () => {
   it("reads only the first 500 words, says so, and keeps all in the fragment", async () => {
     const { container } = arrive();
     const text = `${Array(MAX_WORDS).fill("light").join(" ")} master`;

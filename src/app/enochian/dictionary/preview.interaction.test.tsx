@@ -2,6 +2,7 @@
 import {
   act,
   cleanup,
+  configure,
   fireEvent,
   render,
   screen,
@@ -14,6 +15,10 @@ import { forgetTranslator } from "../translate/load";
 import { KEYS_TABLE_URL } from "../translate/lookup";
 import { MAX_WORDS } from "../translate/tokens";
 import Dictionary from "./dictionary";
+
+// Each test builds the translator afresh, which on a loaded CI shard takes
+// a few seconds; the 1s default for `waitFor` failed there (run 44694366508).
+configure({ asyncUtilTimeout: 5_000 });
 
 const TABLE = buildKeysTable();
 /** The note under English into Enochian, after its hidden separator. */
@@ -66,7 +71,9 @@ const link = () =>
     .getByRole("link", { name: "Open in the translator" })
     .getAttribute("href") ?? "";
 
-describe("the dictionary's preview of the translator (plan 081, decision 3)", () => {
+describe("the dictionary's preview of the translator (plan 081, decision 3)", {
+  timeout: 15_000,
+}, () => {
   it("shows nothing and loads nothing below three words", async () => {
     const { container } = render(<Dictionary uses={{}} />);
     type("light of");
