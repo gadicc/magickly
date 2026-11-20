@@ -4,7 +4,9 @@ Status: drafted 18 November 2026 and amended after a Fable 5.2 review the
 same day (see [Review](#review-18-november-2026)). Stage 0, the sources,
 done on 19 November 2026 (see [Sources](#sources-stage-0-19-november-2026));
 the decisions below are amended from it. Stage 1, the desktop layout,
-built on 19 November 2026 on `gate/tablet-names` (see Stages). Read [current status](000-current-status.md) first. The
+built on 19 November 2026 on `gate/tablet-names` (see Stages); stages 2
+to 4 built and merged on 19 and 20 November, and stage 5 releases
+magick-data 0.3.0 and magick-components 0.5.0. Done. Read [current status](000-current-status.md) first. The
 number was free on every branch and worktree when drafted (088 and 089 are
 claimed on other branches); claim it again when committing.
 
@@ -658,6 +660,18 @@ stage 2 commits the name lists as its test fixture.
    before the gate. `search:publish` embedded 14 passages.
 5. **Release.** magick-data 0.3.0 and the magick-components minor
    (decision 10); plan 000's status and follow-ups.
+   **Built 20 November 2026** (this commit). magick-data 0.2.1 to 0.3.0
+   (`enochian/tabletNames` and the notes' `names` section are new; a 0.x
+   minor) and magick-components 0.4.0 to 0.5.0 (`Tablet`'s highlights;
+   the README's Versions has its note), whose `workspace:^` range packs
+   as `^0.3.0`. The Provenance rows the release touches,
+   magick-data's `enochian/tabletNotes.json5` and magick-components'
+   `enochian/Tablet` (the highlights are our own drawing), are signed
+   2026-11-20: Gadi asked for them to be signed on his behalf that day.
+   `publish.yml`'s decision, run on this tree against the registry with
+   the workflow's flags: publish `magick-data@0.3.0`, new (latest is
+   0.2.1), and `magick-components@0.5.0`, new (latest is 0.4.0), both
+   under `latest`. The follow-ups below are copied to plan 000.
 
 Each stage is its own gated commit on a `gate/tablet-names` branch,
 implemented by subagents per the model policy (layout and the names tab
@@ -727,7 +741,7 @@ became of them:
 
 ## Follow-ups
 
-To be copied to plan 000's list when the plan is accepted:
+Copied to plan 000's list on 20 November 2026 (stage 5):
 
 - A "grid only" view for laptop screens (decision 1).
 - Open a name's dictionary entry in the dictionary's sheet on the tablets

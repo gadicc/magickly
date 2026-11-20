@@ -413,7 +413,7 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system, facts only: names, places, petals, colours, seed syllables and their elements, and one-to-five-word glosses of the Sanskrit names. The Wikipedia "Chakra" article the file cites is a reference; no share-alike text is copied | 2026-11-12 |
 | `enochian/keys.json5` | [The Enochian Keys](#the-enochian-keys) | 2026-11-12 |
 | `enochian/letters.json5` | [The Enochian letters](#the-enochian-letters) | 2026-11-12 |
-| `enochian/tabletNotes.json5` | Ours: notes on [the Enochian tablets](#the-enochian-tablets), citing their sources | 2026-11-14 |
+| `enochian/tabletNotes.json5` | Ours: notes on [the Enochian tablets](#the-enochian-tablets), citing their sources, with the rules by which `enochian/tabletNames` reads the names, the spellings the sources print that no path gives, and the dictionary's own spellings, each cited | 2026-11-20 |
 | `enochian/tablets.json5` | [The Enochian tablets](#the-enochian-tablets) | 2026-11-12 |
 | `gd/degrees.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `gd/grades.json5` | [Correspondences](#correspondences) | 2026-11-12 |

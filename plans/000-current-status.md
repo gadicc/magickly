@@ -177,6 +177,37 @@ Follow-ups are separate from the completed migration work:
   linking the angels' pages, with the embeddings refreshed; the halls'
   and sigils' copyright notice now names Gadi Cohen, not Magick.ly
   ([plan 088](088-rose-sigil-oracle.md#s4-the-angels-pages-19-november-2026)).
+- 19 to 20 November 2026: the tablets page's layout and the tablets'
+  names (plan 090), stages 1 to 4 merged, each gated. On a desktop the
+  tablet sits beside its panel and stays in place, sized to the screen,
+  with `?tablet=&version=` in the URL. magick-data's new
+  `enochian/tabletNames` reads each version's names off the paths
+  (holy names, King, Seniors, the Calvary crosses, the names above and
+  below the bar, and in the Golden Dawn's versions the Kerubic and
+  servient archangels with their Union letter), tested against the
+  sources' printed lists. The page's Names tab lists them; hovering one
+  rings its squares, choosing one dims the rest of the tablet and gives
+  its detail (rotations, the other versions' readings, cited spellings,
+  dictionary link), a square chooses its names, and the regions can be
+  tinted; on a phone the grid stays in place while the list scrolls.
+  The Tablet of Union is a fifth tablet on the page and the image route
+  (refused with Dee's and Raphael's versions). The four Watchtower
+  images' identity moved with the Union (their bytes did not), so a
+  catalog re-identifies them once. Released as magick-data 0.3.0 and
+  magick-components 0.5.0 (`Tablet`'s highlights), bumped on 20
+  November and published by CI when `main` is pushed; the two Provenance
+  rows they touch (`enochian/tabletNotes.json5`, `enochian/Tablet`) are
+  signed 2026-11-20 at Gadi's word
+  ([plan 090](090-tablet-layout-and-names.md)). TODO, from plan 090's
+  follow-ups: a "grid only" view for laptops and wide but short screens,
+  where the tablet leaves space beside it; open a name's dictionary
+  entry in a sheet on the tablets page instead of leaving it; link back
+  from a dictionary entry to its place on a tablet
+  (`?tablet=earth&name=…`, with the chosen name in the URL); hash each
+  tablet image's own readings only (a per-id input in the render
+  registry, plan 032), so one tablet's data stops re-identifying the
+  others; a Hebrew edition of the tablets page (its new strings are
+  translated, the older copy waits for plan 086's T9b).
 - 18 November 2026: rose sigils drawn by rule (plan 088, stage S2), on
   `gate/rose-sigil-oracle`, not merged: the package plans and places a
   sigil by the Golden Dawn's rules; the oracle passes all 72 names and

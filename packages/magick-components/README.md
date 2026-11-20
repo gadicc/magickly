@@ -658,6 +658,16 @@ import of that entry no longer resolves, and a bundler no longer needs
 `fs` stubbed out for the sigil. `RoseSigilImage`'s `points` prop still
 draws given points by the old rules, and is deprecated.
 
+0.5.0 gives `enochian/Tablet` its highlights (see
+[A tablet's highlights](#a-tablets-highlights)): `highlights` keeps
+`squares`, `selected` and `onSelect`, and adds `name` (the rest of the
+tablet dimmed, the name's first square flagged and its squares
+optionally numbered), `preview` (a ring round each square), `regions`
+(the Great Cross and the Calvary crosses tinted, the top rows hatched;
+Watchtowers only) and `anySquare` (`onSelect` for a click on any
+square). The Tablet of Union takes them too. With none of them set a
+tablet draws exactly as before. It depends on magick-data 0.3.0.
+
 ## Requirements
 
 React 19 and an ES module environment: Node 22 or later (`engines`
@@ -676,7 +686,7 @@ package's entries.
 | Drawing | Source | Signed off |
 | --- | --- | --- |
 | The planetary spirits' sigils (`astrology/PlanetarySpirit`) | Our own drawings of 13 November 2026 after John Heydon, *Theomagia*, vol. 1 (London, 1663/4), book I, ch. V, pp. 13 and 15 (archive.org `theomagiaortempl00heyd`, leaves n124 and n126): a few strokes of one width placed by eye over the scan, not traced. They replace tracings of a 1994 printing in copyright, which the repository's history keeps and the package does not | 2026-11-14 |
-| The Enochian tablets' letters (`enochian/Tablet`) | magick-data's `enochian/tablets.json5`, in each tradition's reading, signed off in its Sources; the tablet draws them as text | 2026-11-14 |
+| The Enochian tablets' letters (`enochian/Tablet`) | magick-data's `enochian/tablets.json5`, in each tradition's reading, signed off in its Sources; the tablet draws them as text. The highlights drawn over the squares (a ring, a veil, a flag, order numbers, the regions' tints and hatching) are our own, drawn in code | 2026-11-20 |
 | The Watchtowers' sigils (`enochian/Tablet`) | Drawn in code from lines, arcs and curves. The plain sigils, and the form of Air's in colour, after *The Equinox* I(7) (1912), Plate X (archive.org `crowley-equinox_202110`, "The Equinox Vol. 1, No. 7", leaf n256); the coloured Water and Fire sigils from Regardie's description, *The Golden Dawn*, vol. 4 (1940); Earth's a cross in four colours | 2026-11-14 |
 | The Air sigil's four Yods (`enochian/Tablet`) | Regardie, *The Golden Dawn*, vol. 4 (1940), p. 307 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaf n299) describes a Tau with four Yods above it; drawn as small flames after Plate X (above), hand-placed curves in code, not traced. That the Yods stand for the 4 over the T of Dee's Sigillum Dei Aemeth (*The Equinox* I(7), Plate II, leaf n238) is our inference, not a source's. They replace two fonts' glyphs, which the repository's history keeps | 2026-11-14 |
 | The kameas (`astrology/Kamea`) | A grid drawn in code around magick-data's squares (`magick-data/astrology/kameas`), which are Agrippa's, *De occulta philosophia* (Cologne, 1533), book II, ch. 22, pp. CXLIX–CLIII (archive.org `DeOccultaPhilosophiaLoc1533`, leaves n164–n168), checked cell by cell; where the 1533 printing repeats a number (Venus, row 4: 45 for 43, which its Hebrew table gives; the Moon, row 1: 45 for 54) the square has the number that makes it magic | 2026-11-14 |
