@@ -184,7 +184,7 @@ export interface TabletSquare {
 }
 
 /**
- * A name's squares to mark over a Watchtower's grid, in reading order (as
+ * A name's squares to mark over a tablet's grid, in reading order (as
  * magick-data's `enochian/tabletNames` gives them): a flag marks the
  * first.
  */
@@ -201,10 +201,12 @@ export interface TabletNameHighlight {
 }
 
 /**
- * What to draw over a Watchtower's grid, and what a click on a square
- * does. All of it is drawing and pointer only; a page that offers it
- * gives keyboard and screen-reader users the same choices in a list.
- * Nothing is drawn with dashes, which an export may strip.
+ * What to draw over a tablet's grid, and what a click on a square does.
+ * All of it is drawing and pointer only; a page that offers it gives
+ * keyboard and screen-reader users the same choices in a list. Nothing
+ * is drawn with dashes, which an export may strip. The Tablet of Union
+ * takes all of it but `regions`, which are a Watchtower's crosses and
+ * rows: it has none, so it ignores them.
  *
  * - `squares` are outlined, `selected` among them more boldly, and a
  *   click on one calls `onSelect`;
@@ -230,7 +232,10 @@ export interface TabletHighlights {
   name?: TabletNameHighlight;
   /** A name previewed: its squares ringed and flagged. */
   preview?: TabletNameHighlight;
-  /** Tint the Great Cross, the Calvary crosses and the top rows. */
+  /**
+   * Tint the Great Cross, the Calvary crosses and the top rows; a
+   * Watchtower's only, so the Tablet of Union ignores it.
+   */
   regions?: boolean;
 }
 
@@ -345,22 +350,64 @@ const mirrorAt = (cx: number) => `translate(${2 * cx} 0) scale(-1 1)`;
 /** A grid's square: 20 units, inside a 2-unit border. */
 const SQUARE = 20;
 const BORDER = 2;
-const squareX = (column: number) => column * SQUARE + BORDER;
-const squareY = (row: number) => row * SQUARE + BORDER;
 const squareKey = ({ row, column }: TabletSquare) => `${row},${column}`;
 
+/**
+ * Where a grid's squares are drawn: the top left corner of its first
+ * square, in the units of the `<svg>` it is drawn in, and its size.
+ */
+interface GridPlace {
+  readonly left: number;
+  readonly top: number;
+  readonly rows: number;
+  readonly columns: number;
+}
+
+/** A Watchtower's grid, in its own 244 × 264 `<svg>`. */
+const WATCHTOWER_GRID: GridPlace = {
+  left: BORDER,
+  top: BORDER,
+  rows: 13,
+  columns: 12,
+};
+
+/** The Tablet of Union's grid, centred on its page. */
+function unionGrid(tablet: TabletView): GridPlace {
+  const [, , pageWidth, pageHeight] = UNION_VIEWBOX;
+  const columns = tablet.grid[0]?.length ?? 0;
+  const rows = tablet.grid.length;
+  return {
+    left: (pageWidth - SQUARE * columns) / 2,
+    top: (pageHeight - SQUARE * rows) / 2,
+    rows,
+    columns,
+  };
+}
+
+const squareX = (column: number, grid: GridPlace = WATCHTOWER_GRID) =>
+  grid.left + column * SQUARE;
+const squareY = (row: number, grid: GridPlace = WATCHTOWER_GRID) =>
+  grid.top + row * SQUARE;
+
+/** Every square of a grid, top row first. */
+const allSquares = (grid: GridPlace): readonly TabletSquare[] =>
+  Array.from({ length: grid.rows * grid.columns }, (_, index) => ({
+    row: Math.floor(index / grid.columns),
+    column: index % grid.columns,
+  }));
+
 /** Every square of a Watchtower's grid, top row first. */
-const ALL_SQUARES: readonly TabletSquare[] = Array.from(
-  { length: 13 * 12 },
-  (_, index) => ({ row: Math.floor(index / 12), column: index % 12 }),
-);
+const ALL_SQUARES: readonly TabletSquare[] = allSquares(WATCHTOWER_GRID);
 
 /** Squares as one path of their outlines, for a single fill. */
-const squaresPath = (squares: readonly TabletSquare[]) =>
+const squaresPath = (
+  squares: readonly TabletSquare[],
+  grid: GridPlace = WATCHTOWER_GRID,
+) =>
   squares
     .map(
       ({ row, column }) =>
-        `M${squareX(column)} ${squareY(row)}h${SQUARE}v${SQUARE}h${-SQUARE}Z`,
+        `M${squareX(column, grid)} ${squareY(row, grid)}h${SQUARE}v${SQUARE}h${-SQUARE}Z`,
     )
     .join("");
 
@@ -394,9 +441,15 @@ function hatchPath(squares: readonly TabletSquare[]) {
 }
 
 /** A flag in the top left corner of a name's first square. */
-function StartFlag({ square }: { square: TabletSquare }) {
-  const x = squareX(square.column) + 0.6;
-  const y = squareY(square.row) + 0.6;
+function StartFlag({
+  square,
+  grid,
+}: {
+  square: TabletSquare;
+  grid: GridPlace;
+}) {
+  const x = squareX(square.column, grid) + 0.6;
+  const y = squareY(square.row, grid) + 0.6;
   return (
     <path
       data-start=""
@@ -415,12 +468,14 @@ function StartFlag({ square }: { square: TabletSquare }) {
 function OrderNumber({
   square,
   number,
+  grid,
 }: {
   square: TabletSquare;
   number: number;
+  grid: GridPlace;
 }) {
-  const cx = squareX(square.column) + 4.8;
-  const cy = squareY(square.row) + SQUARE - 4.8;
+  const cx = squareX(square.column, grid) + 4.8;
+  const cy = squareY(square.row, grid) + SQUARE - 4.8;
   return (
     <g data-order={number}>
       <circle
@@ -447,11 +502,17 @@ function OrderNumber({
 }
 
 /** The flag and the numbers of a name, over its squares. */
-function NameMarks({ name }: { name: TabletNameHighlight }) {
+function NameMarks({
+  name,
+  grid,
+}: {
+  name: TabletNameHighlight;
+  grid: GridPlace;
+}) {
   const [first] = name.squares;
   return (
     <>
-      {first && <StartFlag square={first} />}
+      {first && <StartFlag square={first} grid={grid} />}
       {name.numbers?.map((number, index) => {
         const square = name.squares[index];
         return (
@@ -460,6 +521,7 @@ function NameMarks({ name }: { name: TabletNameHighlight }) {
               key={`n-${squareKey(square)}-${number}`}
               square={square}
               number={number}
+              grid={grid}
             />
           )
         );
@@ -473,28 +535,35 @@ function NameMarks({ name }: { name: TabletNameHighlight }) {
  * outlined in dark violet, its first flagged and, where given, each
  * numbered. One layer over the drawing, so the letters are untouched.
  */
-function ChosenName({ name }: { name: TabletNameHighlight }) {
+function ChosenName({
+  name,
+  grid,
+}: {
+  name: TabletNameHighlight;
+  grid: GridPlace;
+}) {
   const on = new Set(name.squares.map(squareKey));
   const unique = [...new Map(name.squares.map((s) => [squareKey(s), s]))];
   return (
     <g data-highlight="name">
       <path
         d={squaresPath(
-          ALL_SQUARES.filter((square) => !on.has(squareKey(square))),
+          allSquares(grid).filter((square) => !on.has(squareKey(square))),
+          grid,
         )}
         style={{ fill: "white", fillOpacity: 0.72 }}
       />
       {unique.map(([key, { row, column }]) => (
         <rect
           key={`o-${key}`}
-          x={squareX(column) + 0.7}
-          y={squareY(row) + 0.7}
+          x={squareX(column, grid) + 0.7}
+          y={squareY(row, grid) + 0.7}
           width={SQUARE - 1.4}
           height={SQUARE - 1.4}
           style={{ fill: "none", stroke: HIGHLIGHT_INK, strokeWidth: 1.4 }}
         />
       ))}
-      <NameMarks name={name} />
+      <NameMarks name={name} grid={grid} />
     </g>
   );
 }
@@ -503,7 +572,13 @@ function ChosenName({ name }: { name: TabletNameHighlight }) {
  * A name previewed: a violet ring with a white edge round each square,
  * and its first flagged, the rest of the tablet as drawn.
  */
-function PreviewedName({ name }: { name: TabletNameHighlight }) {
+function PreviewedName({
+  name,
+  grid,
+}: {
+  name: TabletNameHighlight;
+  grid: GridPlace;
+}) {
   const unique = [...new Map(name.squares.map((s) => [squareKey(s), s]))];
   const ring = (
     key: string,
@@ -513,8 +588,8 @@ function PreviewedName({ name }: { name: TabletNameHighlight }) {
   ) => (
     <rect
       key={key}
-      x={squareX(square.column) + 1.4}
-      y={squareY(square.row) + 1.4}
+      x={squareX(square.column, grid) + 1.4}
+      y={squareY(square.row, grid) + 1.4}
       width={SQUARE - 2.8}
       height={SQUARE - 2.8}
       style={{ fill: "none", stroke, strokeWidth: width }}
@@ -526,7 +601,7 @@ function PreviewedName({ name }: { name: TabletNameHighlight }) {
       {unique.map(([key, square]) =>
         ring(`r-${key}`, square, HIGHLIGHT_RING, 2.4),
       )}
-      <NameMarks name={{ squares: name.squares }} />
+      <NameMarks name={{ squares: name.squares }} grid={grid} />
     </g>
   );
 }
@@ -579,17 +654,105 @@ function RegionHatch() {
  * The square a click on the grid landed in, read from the clicked
  * square's own rect or letter: their `x` and `y` lie inside it.
  */
-function squareOfTarget(target: EventTarget | null): TabletSquare | undefined {
+function squareOfTarget(
+  target: EventTarget | null,
+  grid: GridPlace,
+): TabletSquare | undefined {
   if (!(target instanceof Element)) return undefined;
   const x = Number(target.getAttribute("x"));
   const y = Number(target.getAttribute("y"));
   if (!target.hasAttribute("x") || Number.isNaN(x) || Number.isNaN(y))
     return undefined;
-  const column = Math.floor((x - BORDER) / SQUARE);
-  const row = Math.floor((y - BORDER) / SQUARE);
-  return row >= 0 && row < 13 && column >= 0 && column < 12
+  // The frame round the grid, which starts where its first square does on
+  // the Tablet of Union, is no square.
+  if (Number(target.getAttribute("width")) > SQUARE) return undefined;
+  const column = Math.floor((x - grid.left) / SQUARE);
+  const row = Math.floor((y - grid.top) / SQUARE);
+  return row >= 0 && row < grid.rows && column >= 0 && column < grid.columns
     ? { row, column }
     : undefined;
+}
+
+/**
+ * The click handler for `anySquare`: any square of the grid calls
+ * `onSelect`, but an outlined one, which calls it itself. Nothing without
+ * both.
+ */
+function pickerOf(highlights: TabletHighlights | undefined, grid: GridPlace) {
+  const onSelect = highlights?.onSelect;
+  return highlights?.anySquare && onSelect
+    ? (event: React.MouseEvent<SVGSVGElement>) => {
+        if (
+          event.target instanceof Element &&
+          event.target.closest("[data-square]")
+        )
+          return;
+        const square = squareOfTarget(event.target, grid);
+        if (square) onSelect(square);
+      }
+    : undefined;
+}
+
+/** A chosen name and a previewed one, over the letters. */
+function NameLayers({
+  highlights,
+  grid,
+  regions,
+}: {
+  highlights: TabletHighlights | undefined;
+  grid: GridPlace;
+  regions?: boolean;
+}) {
+  return (
+    (regions || highlights?.name || highlights?.preview) && (
+      // Drawing only: a click goes through to the square beneath.
+      <g style={{ pointerEvents: "none" }}>
+        {regions && <RegionHatch />}
+        {highlights?.name && <ChosenName name={highlights.name} grid={grid} />}
+        {highlights?.preview && (
+          <PreviewedName name={highlights.preview} grid={grid} />
+        )}
+      </g>
+    )
+  );
+}
+
+/** The squares outlined, the selected one more boldly, each clickable. */
+function OutlinedSquares({
+  highlights,
+  grid,
+}: {
+  highlights: TabletHighlights | undefined;
+  grid: GridPlace;
+}) {
+  return highlights?.squares.map(({ row, column }) => {
+    const chosen =
+      highlights.selected?.row === row &&
+      highlights.selected?.column === column;
+    return (
+      // A pointer shortcut: the page's list is the accessible way to
+      // choose a square.
+      <rect
+        key={`h-${row}-${column}`}
+        data-square={`${row},${column}`}
+        x={squareX(column, grid) + 1}
+        y={squareY(row, grid) + 1}
+        width={SQUARE - 2}
+        height={SQUARE - 2}
+        style={{
+          fill: "transparent",
+          stroke: chosen ? "#c0f" : "#e0f",
+          strokeWidth: chosen ? 3 : 1.6,
+          strokeDasharray: chosen ? undefined : "3 2",
+        }}
+        onClick={
+          highlights.onSelect
+            ? () => highlights.onSelect?.({ row, column })
+            : undefined
+        }
+      />
+    );
+  });
 }
 
 function Grid({
@@ -672,20 +835,7 @@ function Grid({
     return { ground, letters };
   };
 
-  const onSelect = highlights?.onSelect;
-  const pickAny =
-    highlights?.anySquare && onSelect
-      ? (event: React.MouseEvent<SVGSVGElement>) => {
-          // An outlined square calls `onSelect` itself.
-          if (
-            event.target instanceof Element &&
-            event.target.closest("[data-square]")
-          )
-            return;
-          const square = squareOfTarget(event.target);
-          if (square) onSelect(square);
-        }
-      : undefined;
+  const pickAny = pickerOf(highlights, WATCHTOWER_GRID);
 
   return (
     <svg
@@ -728,42 +878,12 @@ function Grid({
           }),
         )
       )}
-      {(regions || highlights?.name || highlights?.preview) && (
-        // Drawing only: a click goes through to the square beneath.
-        <g style={{ pointerEvents: "none" }}>
-          {regions && <RegionHatch />}
-          {highlights?.name && <ChosenName name={highlights.name} />}
-          {highlights?.preview && <PreviewedName name={highlights.preview} />}
-        </g>
-      )}
-      {highlights?.squares.map(({ row, column }) => {
-        const chosen =
-          highlights.selected?.row === row &&
-          highlights.selected?.column === column;
-        return (
-          // A pointer shortcut: the page's list is the accessible way to
-          // choose a square.
-          <rect
-            key={`h-${row}-${column}`}
-            data-square={`${row},${column}`}
-            x={column * size + border + 1}
-            y={row * size + border + 1}
-            width={size - 2}
-            height={size - 2}
-            style={{
-              fill: "transparent",
-              stroke: chosen ? "#c0f" : "#e0f",
-              strokeWidth: chosen ? 3 : 1.6,
-              strokeDasharray: chosen ? undefined : "3 2",
-            }}
-            onClick={
-              highlights.onSelect
-                ? () => highlights.onSelect?.({ row, column })
-                : undefined
-            }
-          />
-        );
-      })}
+      <NameLayers
+        highlights={highlights}
+        grid={WATCHTOWER_GRID}
+        regions={regions}
+      />
+      <OutlinedSquares highlights={highlights} grid={WATCHTOWER_GRID} />
       <rect
         x={0}
         y={0}
@@ -786,23 +906,29 @@ function Grid({
  */
 const UNION_LINE_COLORS = ["#d4a000", "#2255cc", "black", "#e22"];
 
-/** The Tablet of Union, its squares at a Watchtower's size, on its page. */
+/**
+ * The Tablet of Union, its squares at a Watchtower's size, on its page,
+ * with what `highlights` asks for over it, as a Watchtower's grid draws
+ * it (but `regions`, which the Union has none of). Its root's click
+ * handler is the page's (`pickerOf`), since it draws in no `<svg>` of
+ * its own.
+ */
 function UnionGrid({
   tablet,
   options,
   enochianStyle,
+  highlights,
 }: {
   tablet: TabletView;
   options: LetterOptions;
   enochianStyle?: CSSProperties;
+  highlights?: TabletHighlights;
 }) {
   const enochianFont = enochianStyle !== undefined;
   const reversed = reversedSquares(tablet, options);
-  const size = 20;
-  const [, , pageWidth, pageHeight] = UNION_VIEWBOX;
-  const columns = tablet.grid[0]?.length ?? 0;
-  const left = (pageWidth - size * columns) / 2;
-  const top = (pageHeight - size * tablet.grid.length) / 2;
+  const size = SQUARE;
+  const grid = unionGrid(tablet);
+  const { left, top, columns } = grid;
   return (
     <>
       {tablet.grid
@@ -835,6 +961,8 @@ function UnionGrid({
             </React.Fragment>
           );
         })}
+      <NameLayers highlights={highlights} grid={grid} />
+      <OutlinedSquares highlights={highlights} grid={grid} />
       <rect
         x={left}
         y={top}
@@ -938,9 +1066,9 @@ export interface TabletProps {
    */
   showSecondLetters?: boolean;
   /**
-   * What to draw over a Watchtower's grid: squares outlined, a chosen
-   * name with the rest dimmed, a name previewed in a ring, the regions
-   * tinted; and squares to choose by pointer (`TabletHighlights`).
+   * What to draw over a tablet's grid: squares outlined, a chosen name
+   * with the rest dimmed, a name previewed in a ring, a Watchtower's
+   * regions tinted; and squares to choose by pointer (`TabletHighlights`).
    */
   highlights?: TabletHighlights;
   /**
@@ -999,6 +1127,12 @@ export function TabletSvg({
       ? sigils[id as keyof typeof sigils]
       : undefined;
   const options = { reversed: mirrorReversed, alt: showSecondLetters };
+  // The Tablet of Union draws in the root itself, so its clicks are taken
+  // here; a Watchtower's grid takes its own.
+  const pickUnion =
+    tablet?.kind === "union"
+      ? pickerOf(highlights, unionGrid(tablet))
+      : undefined;
 
   return (
     <svg
@@ -1011,6 +1145,7 @@ export function TabletSvg({
       aria-label={ariaLabel}
       aria-hidden={ariaHidden}
       ref={ref}
+      onClick={pickUnion}
     >
       {data && !tablet ? (
         <Missing
@@ -1023,6 +1158,7 @@ export function TabletSvg({
           tablet={tablet}
           options={options}
           enochianStyle={enochianStyle}
+          highlights={highlights}
         />
       ) : (
         tablet && (

@@ -93,11 +93,20 @@ describe("the real public search catalogue", () => {
     expect(ids.includes("aethyrs")).toBe(aethyrs.length > 0);
   });
 
-  it("indexes the Golden Dawn's names of the four Watchtowers on the tablets page", () => {
+  it("indexes the Golden Dawn's names of the four Watchtowers and the Union on the tablets page", () => {
     const text = Object.fromEntries(tabletNamesText());
-    expect(Object.keys(text).sort()).toEqual(["air", "earth", "fire", "water"]);
+    expect(Object.keys(text).sort()).toEqual([
+      "air",
+      "earth",
+      "fire",
+      "union",
+      "water",
+    ]);
     expect(text.earth).toMatch(
-      /^Holy names: Mor Dial Hctga\. King: Iczhihal\. Seniors: Laidrom Aczinor Lzinopo Alhctga Ahmlicv Liiansa\. Air of Earth: Angpoi Unnax Boza Aira Ormn Rsni Iznr\./,
+      /^Holy names: Mor Dial Hctga\. King: Iczhihal\. Seniors: Laidrom Aczinor Lzinopo Alhctga Ahmlicv Liiansa\. Air of Earth: Angpoi Unnax Boza Aira Ormn Rsni Iznr; with the Union's letters: Nboza Aaira Aormn Arsni Aiznr\./,
+    );
+    expect(text.union).toBe(
+      "Lines: Exarp Hcoma Nanta Bitom. First column: Ehnb.",
     );
     const page = catalogue.documents.find(
       (each) => each.path === "/enochian/tablets",
@@ -107,11 +116,20 @@ describe("the real public search catalogue", () => {
         .filter((section) => section.id.startsWith("names-"))
         .map((section) => section.title),
     ).toEqual([
-      ...tabletNamesText().map(
-        ([id]) => `The ${id[0]?.toUpperCase()}${id.slice(1)} tablet's names`,
+      ...tabletNamesText().map(([id]) =>
+        id === "union"
+          ? "The Tablet of Union's names"
+          : `The ${id[0]?.toUpperCase()}${id.slice(1)} tablet's names`,
       ),
     ]);
-    for (const name of ["Laidrom", "Bataivah", "Boza", "Edlprnaa"])
+    for (const name of [
+      "Laidrom",
+      "Bataivah",
+      "Boza",
+      "Edlprnaa",
+      "Nboza",
+      "Exarp",
+    ])
       expect(
         engine.search(name).map((result) => result.path),
         name,

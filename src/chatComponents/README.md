@@ -5,9 +5,9 @@ They are not registered with today's `/chat` routes and do not change its
 existing corpus, prompts, message history or allowance.
 
 Three initial capabilities return versioned, serializable presentation data:
-Tree of Life, an Enochian Watchtower, and a published temple hall. Their
-arguments pass through strict schemas and the site's existing pure rendering
-contracts. They return a text fallback and a site-owned link. They never
+Tree of Life, an Enochian Watchtower or the Tablet of Union, and a
+published temple hall. Their arguments pass through strict schemas and the
+site's existing pure rendering contracts. They return a text fallback and a site-owned link. They never
 accept JSX, HTML, arbitrary URLs, private layouts or model-invented data.
 
 The integration step should add a typed component part to the new runtime's

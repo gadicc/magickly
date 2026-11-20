@@ -23,10 +23,12 @@ import {
 import tabletNotes, {
   attributionNote,
   citedSpellings,
+  dictionarySpellings,
   nameRules,
   sourceUrl,
 } from "./TabletNotes.ts";
 import tablets, {
+  type EnochianTabletID,
   type EnochianWatchtowerID,
   TABLET_VERSIONS,
   type TabletVersionId,
@@ -36,14 +38,14 @@ import tablets, {
 
 /** A tablet in a version, which the test expects to exist. */
 const view = (id: string, version: TabletVersionId = "gd") => {
-  const found = tabletVersion(tablets[id as EnochianWatchtowerID], version);
+  const found = tabletVersion(tablets[id as EnochianTabletID], version);
   if (!found) throw new Error(`no ${version} ${id}`);
   return found;
 };
 
 /** One name, which the test expects to exist. */
 const nameOf = (
-  id: EnochianWatchtowerID,
+  id: EnochianTabletID,
   nameId: string,
   version: TabletVersionId = "gd",
 ): TabletName => {
@@ -60,14 +62,25 @@ const GD_VERSIONS: readonly TabletVersionId[] = TABLET_VERSIONS.filter(
   (version) => TABLET_NAME_TRADITIONS[version] === "gd",
 );
 
+/** The 38 names read off a Watchtower's letters alone, in every version. */
+const own = (names: readonly TabletName[]) =>
+  names.filter((name) => !name.unionLetter);
+
 describe("tabletNames", () => {
-  it("reads 38 names off each Watchtower, with the same ids in every version", () => {
-    expect(TABLET_NAME_IDS).toHaveLength(38);
-    expect(new Set(TABLET_NAME_IDS).size).toBe(38);
+  it("reads 38 names off each Watchtower, 58 with the Union's letters, with the same ids in every version", () => {
+    // 58 a Watchtower's in the Golden Dawn's versions, then the Union's 5.
+    expect(TABLET_NAME_IDS).toHaveLength(63);
+    expect(new Set(TABLET_NAME_IDS).size).toBe(63);
+    const watchtower = TABLET_NAME_IDS.slice(0, 58);
     for (const id of WATCHTOWER_IDS)
       for (const version of TABLET_VERSIONS) {
         const names = tabletNames(view(id, version));
-        expect(names.map((name) => name.id)).toEqual([...TABLET_NAME_IDS]);
+        const golden = GD_VERSIONS.includes(version);
+        expect(names.map((name) => name.id)).toEqual(
+          golden
+            ? watchtower
+            : watchtower.filter((nameId) => !nameId.endsWith("archangel")),
+        );
         const kinds: Record<string, number> = {};
         for (const name of names)
           kinds[name.kind] = (kinds[name.kind] ?? 0) + 1;
@@ -79,8 +92,16 @@ describe("tabletNames", () => {
           crossRow: 4,
           topRow: 4,
           servient: 16,
+          ...(golden ? { kerubicArchangel: 4, servientArchangel: 16 } : {}),
         });
       }
+    expect(TABLET_NAME_IDS.slice(58)).toEqual([
+      "union-row-1",
+      "union-row-2",
+      "union-row-3",
+      "union-row-4",
+      "union-column-1",
+    ]);
     expect(TABLET_NAME_IDS.slice(0, 10)).toEqual([
       "holy-1",
       "holy-2",
@@ -93,7 +114,7 @@ describe("tabletNames", () => {
       "senior-col6-down",
       "senior-col7-down",
     ]);
-    expect(TABLET_NAME_IDS.slice(10, 17)).toEqual([
+    expect(TABLET_NAME_IDS.slice(10, 22)).toEqual([
       "top-left-cross-column",
       "top-left-cross-row",
       "top-left-top-row",
@@ -101,8 +122,16 @@ describe("tabletNames", () => {
       "top-left-servient-2",
       "top-left-servient-3",
       "top-left-servient-4",
+      "top-left-kerubic-archangel",
+      "top-left-servient-1-archangel",
+      "top-left-servient-2-archangel",
+      "top-left-servient-3-archangel",
+      "top-left-servient-4-archangel",
     ]);
     expect(isTabletNameId("bottom-right-servient-4")).toBe(true);
+    expect(isTabletNameId("bottom-right-servient-4-archangel")).toBe(true);
+    expect(isTabletNameId("union-column-1")).toBe(true);
+    expect(isTabletNameId("union-column-2")).toBe(false);
     expect(isTabletNameId("senior-row-up")).toBe(false);
   });
 
@@ -115,9 +144,10 @@ describe("tabletNames", () => {
     };
     for (const name of tabletNames(view("earth"))) {
       expect(name.spelling).toBe(
-        name.squares
-          .map(({ row, column }) => view("earth").grid[row][column] ?? "?")
-          .join(""),
+        (name.unionLetter?.letter ?? "") +
+          name.squares
+            .map(({ row, column }) => view("earth").grid[row][column] ?? "?")
+            .join(""),
       );
       if (!name.quarter) {
         expect(
@@ -148,7 +178,7 @@ describe("tabletNames", () => {
     // Of the 156 squares, 136 lie in one name, 16 in two and 2 in three;
     // the two centre squares lie in six (plan 090, Background).
     const count = new Map<number, number>();
-    for (const name of tabletNames(view("air")))
+    for (const name of own(tabletNames(view("air"))))
       for (const { row, column } of name.squares)
         count.set(row * 12 + column, (count.get(row * 12 + column) ?? 0) + 1);
     const histogram: Record<number, number> = {};
@@ -276,12 +306,17 @@ describe("tabletNames", () => {
         // Dawn's (Regardie 1940, vol. 4, pp.325-326).
         if (
           name.kind === "topRow" ||
-          (name.kind === "servient" && GD_VERSIONS.includes(version))
+          (name.kind === "servient" && GD_VERSIONS.includes(version)) ||
+          name.unionLetter
         ) {
           expect(name.rotations, name.id).toHaveLength(4);
           expect(name.rotations?.[0]).toBe(name.spelling);
-          for (const rotation of name.rotations ?? [])
+          for (const rotation of name.rotations ?? []) {
             expect([...rotation].sort()).toEqual([...name.spelling].sort());
+            // The Union's letter stays first.
+            if (name.unionLetter)
+              expect(rotation[0]).toBe(name.unionLetter.letter);
+          }
         } else expect(name.rotations, name.id).toBeUndefined();
       }
     // Earth of Fire's servient row, each square named by its rotation
@@ -313,6 +348,7 @@ describe("tabletNames", () => {
       "dee fire top-right-cross-row",
       "dee fire top-right-top-row",
     ]);
+    // The Golden Dawn's versions fill them, so its archangels have none.
   });
 
   it("gives the Golden Dawn's attributions in its versions only", () => {
@@ -320,7 +356,7 @@ describe("tabletNames", () => {
       const names = tabletNames(view("water", version));
       const golden = GD_VERSIONS.includes(version);
       for (const name of names) {
-        if (!golden || name.kind === "holyName")
+        if (!golden || name.kind === "holyName" || name.kind === "unionColumn")
           expect(name.attribution, `${version} ${name.id}`).toBeUndefined();
         else expect(name.attribution, `${version} ${name.id}`).toBeDefined();
       }
@@ -356,9 +392,111 @@ describe("tabletNames", () => {
     }
   });
 
-  it("gives the Tablet of Union no names yet, and is frozen and cached", () => {
-    expect(tabletNames(view("union"))).toEqual([]);
+  it("reads the Tablet of Union's four lines and first column", () => {
+    for (const version of GD_VERSIONS) {
+      const names = tabletNames(view("union", version));
+      expect(names.map((name) => [name.id, name.kind, name.spelling])).toEqual([
+        ["union-row-1", "union", "EXARP"],
+        ["union-row-2", "union", "HCOMA"],
+        ["union-row-3", "union", "NANTA"],
+        ["union-row-4", "union", "BITOM"],
+        ["union-column-1", "unionColumn", "EHNB"],
+      ]);
+      expect(names.map((name) => name.attribution?.element)).toEqual([
+        "air",
+        "water",
+        "earth",
+        "fire",
+        undefined,
+      ]);
+      for (const name of names) {
+        expect(name.quarter).toBeUndefined();
+        expect(name.rotations).toBeUndefined();
+        expect(name.unionLetter).toBeUndefined();
+      }
+    }
+    expect(nameOf("union", "union-column-1").squares).toEqual(
+      [0, 1, 2, 3].map((row) => ({ row, column: 0 })),
+    );
+    // Dee's and Raphael's versions have no Tablet of Union.
+    expect(tabletVersion(tablets.union, "dee")).toBeUndefined();
+    expect(tabletNameVariants(tablets.union, "union-row-1")).toEqual([]);
     expect(tabletNameVariants(tablets.union, "king")).toEqual([]);
+  });
+
+  it("puts the Union's letters before the Kerubic and servient rows, in the Golden Dawn's versions", () => {
+    // Regardie 1940, vol. 4, p.280: the first letter of the tablet's line
+    // before each Kerubic name, the other four before the servient rows
+    // by the quarter's element, in the order Air, Water, Earth, Fire.
+    const line = {
+      air: "EXARP",
+      water: "HCOMA",
+      earth: "NANTA",
+      fire: "BITOM",
+    };
+    const order = { topLeft: 1, topRight: 2, bottomLeft: 3, bottomRight: 4 };
+    for (const id of WATCHTOWER_IDS)
+      for (const version of GD_VERSIONS)
+        for (const name of tabletNames(view(id, version))) {
+          if (!name.unionLetter) {
+            expect(name.kind).not.toMatch(/Archangel$/);
+            continue;
+          }
+          const column =
+            name.kind === "kerubicArchangel"
+              ? 0
+              : order[name.quarter as TabletQuarter];
+          expect(name.unionLetter).toEqual({
+            letter: line[id][column],
+            row: { air: 0, water: 1, earth: 2, fire: 3 }[id],
+            column,
+          });
+          // The same squares as the row it is built on.
+          const base = nameOf(
+            id,
+            name.id.replace(
+              name.kind === "kerubicArchangel"
+                ? "kerubic-archangel"
+                : "-archangel",
+              name.kind === "kerubicArchangel" ? "top-row" : "",
+            ),
+            version,
+          );
+          expect(name.squares).toEqual(base.squares);
+          expect(name.spelling).toBe(name.unionLetter.letter + base.spelling);
+          expect(name.quarter).toBe(base.quarter);
+          expect(name.attribution).toEqual(base.attribution);
+        }
+    // Air of Air's archangel in its rotations, and Fire of Water's
+    // servient rows with Water's Fire letter, as p.280 prints them.
+    expect(
+      nameOf("air", "top-left-kerubic-archangel").rotations?.map((each) =>
+        each.toUpperCase(),
+      ),
+    ).toEqual(["ERZLA", "EZLAR", "ELARZ", "EARZL"]);
+    expect(
+      [1, 2, 3, 4].map((index) =>
+        nameOf(
+          "water",
+          `bottom-right-servient-${index}-archangel`,
+        ).spelling.toUpperCase(),
+      ),
+    ).toEqual(["AXPCN", "AVASA", "ADAPI", "ARNIL"]);
+    // Earth's lower quarters, as the rule gives them on the Golden Dawn's
+    // letters; the sources' spellings are cited (decision 8).
+    expect(
+      nameOf("earth", "bottom-left-kerubic-archangel").spelling.toUpperCase(),
+    ).toBe("NRCNC");
+    expect(
+      nameOf("earth", "bottom-right-kerubic-archangel").spelling.toUpperCase(),
+    ).toBe("NISMT");
+    for (const version of ["dee", "raphael"] as const)
+      expect(
+        tabletNames(view("air", version)).filter((name) => name.unionLetter),
+      ).toEqual([]);
+  });
+
+  it("is frozen and cached", () => {
     const names = tabletNames(view("air"));
     expect(tabletNames(view("air"))).toBe(names);
     expect(Object.isFrozen(names)).toBe(true);
@@ -395,9 +533,22 @@ describe("tabletNameVariants", () => {
   });
 
   it("never mixes letters: each variant is one version's reading", () => {
-    for (const id of WATCHTOWER_IDS)
+    // The versions that have a name: the Union's letters are the Golden
+    // Dawn's alone.
+    const having = (id: EnochianTabletID, nameId: string) =>
+      TABLET_VERSIONS.filter((each) => {
+        const found = tabletVersion(tablets[id], each);
+        return found && findTabletName(found, nameId);
+      });
+    for (const id of [...WATCHTOWER_IDS, "union"] as const)
       for (const version of TABLET_VERSIONS)
         for (const nameId of TABLET_NAME_IDS) {
+          if (!having(id, nameId).includes(version)) {
+            expect(tabletNameVariants(tablets[id], nameId, version)).toEqual(
+              [],
+            );
+            continue;
+          }
           const mine = nameOf(id, nameId, version);
           const variants = tabletNameVariants(tablets[id], nameId, version);
           const listed = variants.flatMap((variant) => variant.versions);
@@ -413,7 +564,7 @@ describe("tabletNameVariants", () => {
                     String(mine.spellings?.map(fold)),
               ).toBe(false);
             }
-          for (const other of TABLET_VERSIONS)
+          for (const other of having(id, nameId))
             if (other !== version && !listed.includes(other))
               expect(
                 fold(nameOf(id, nameId, other).spelling),
@@ -424,10 +575,18 @@ describe("tabletNameVariants", () => {
 });
 
 describe("the names' notes", () => {
-  it("cite where every kind is read, in every version", () => {
-    const kinds = new Set(tabletNames(view("air")).map((name) => name.kind));
-    for (const kind of kinds)
-      for (const version of TABLET_VERSIONS) {
+  it("cite where every kind is read, in every version that reads it", () => {
+    const kindsOf = (version: TabletVersionId) =>
+      new Set(
+        (["air", "union"] as const).flatMap((id) => {
+          const found = tabletVersion(tablets[id], version);
+          return found ? tabletNames(found).map((name) => name.kind) : [];
+        }),
+      );
+    for (const version of TABLET_VERSIONS) {
+      const kinds = kindsOf(version);
+      expect(kinds.size, version).toBe(GD_VERSIONS.includes(version) ? 11 : 7);
+      for (const kind of kinds) {
         const rules = nameRules(kind, version);
         expect(rules, `${kind} ${version}`).toHaveLength(1);
         expect(rules[0].sources.length).toBeGreaterThan(0);
@@ -435,10 +594,15 @@ describe("the names' notes", () => {
         for (const source of rules[0].sources)
           expect(source.work).toMatch(
             GD_VERSIONS.includes(version)
-              ? /^(regardie1940|equinox1912)$/
+              ? /^(regardie1940|regardie1939|equinox1912)$/
               : /^casaubon1659$/,
           );
       }
+      // None for a kind the version does not read.
+      for (const kind of ["kerubicArchangel", "union"])
+        if (!kinds.has(kind as TabletName["kind"]))
+          expect(nameRules(kind, version)).toEqual([]);
+    }
     expect(nameRules("nonesuch", "gd")).toEqual([]);
     expect(nameRules("king", "nonesuch")).toEqual([]);
     expect(sourceUrl(nameRules("king", "dee")[0].sources[2])).toBe(
@@ -479,7 +643,8 @@ describe("the names' notes", () => {
       const tail = fold(each.spelling.slice(each.prefix?.length ?? 0));
       // No version's reading, nor any rotation of it, gives it.
       for (const version of TABLET_VERSIONS) {
-        const name = nameOf(each.tablet, each.id, version);
+        const name = findTabletName(view(each.tablet, version), each.id);
+        if (!name) continue;
         const readings = [
           ...(name.rotations ?? []),
           ...(name.spellings ?? [name.spelling]),
@@ -494,16 +659,18 @@ describe("the names' notes", () => {
         (entry) =>
           entry.name === each.spelling &&
           entry.tablet === each.tablet &&
-          entry.kind ===
-            (each.kerubicArchangel ? "kerubicArchangel" : gd.kind) &&
+          entry.kind === gd.kind &&
           entry.quarter === gd.quarter,
       );
       expect(placed.length, each.spelling).toBeGreaterThan(0);
       for (const entry of placed)
         expect(entry.status, each.spelling).toBe(each.reason);
-      expect(Boolean(each.kerubicArchangel), each.spelling).toBe(
-        gd.kind === "topRow",
+      // A prefix is a Kerubic archangel's, and every archangel's has one.
+      expect(Boolean(each.prefix), each.spelling).toBe(
+        gd.kind === "kerubicArchangel",
       );
+      // What the Watchtower's own squares read, without a Union letter.
+      const read = fold(gd.spelling.slice(gd.unionLetter ? 1 : 0));
       if (each.reason === "spelling")
         expect(
           editDistance(fold(each.spelling), fold(gd.spelling)),
@@ -540,6 +707,7 @@ describe("the names' notes", () => {
       }
       if (each.reason === "secondLetters") {
         expect(each.prefix).toBe(union[unionRow[each.tablet]][0]);
+        expect(each.prefix).toBe(gd.unionLetter?.letter);
         const letters = [...tail];
         const seconds = gd.squares.filter(({ row, column }, index) => {
           const all = lettersOf(row, column).map(fold);
@@ -549,11 +717,74 @@ describe("the names' notes", () => {
         expect(seconds.length, each.spelling).toBeGreaterThanOrEqual(3);
       }
       if (each.reason === "prefix") {
-        expect(tail).toBe(fold(gd.spelling));
+        expect(tail).toBe(read);
         expect(each.prefix).not.toBe(union[unionRow[each.tablet]][0]);
       }
     }
     expect(citedSpellings("air", "king")).toEqual([]);
+    // Earth's two lower archangels: the rule's spellings and the cited ones
+    // beside them (plan 090, decision 8).
+    expect(
+      citedSpellings("earth", "bottom-left-kerubic-archangel").map(
+        (each) => each.spelling,
+      ),
+    ).toEqual(["NROAM"]);
+    expect(
+      citedSpellings("earth", "bottom-right-kerubic-archangel").map(
+        (each) => each.spelling,
+      ),
+    ).toEqual(["NAAOM", "AISMT"]);
+  });
+
+  it("give the dictionary's own prefixes as the dictionary's", () => {
+    // `WE`'s second spellings of the Kerubic archangels (plan 090,
+    // decision 8): each a headword the dictionary calls a Kerubic
+    // archangel, its Kerubic name some version's reading of that quarter's
+    // top row, with a letter of the Union other than the rule's.
+    const { text, spellings } = tabletNotes.names.dictionary;
+    expect(text).toMatch(/Whole Enochian Dictionary/);
+    expect(spellings).toHaveLength(12);
+    const meanings = (word: string) =>
+      (dictionary[word as keyof typeof dictionary]?.meanings ?? []).map(
+        (each) => each.meaning,
+      );
+    /** Every version's reading of the top row an archangel is built on. */
+    const kerubic = (id: EnochianWatchtowerID, nameId: string) =>
+      tabletNameSpellings(
+        tablets[id],
+        nameId.replace("kerubic-archangel", "top-row"),
+      ).map(fold);
+    for (const each of spellings) {
+      const gd = nameOf(each.tablet, each.id);
+      expect(gd.kind, each.spelling).toBe("kerubicArchangel");
+      expect(meanings(each.spelling).join(), each.spelling).toMatch(
+        /Kerubic Archangel/,
+      );
+      expect(kerubic(each.tablet, each.id)).toContain(
+        fold(each.spelling.slice(1)),
+      );
+      expect(each.spelling[0]).not.toBe(gd.unionLetter?.letter);
+      expect(dictionarySpellings(each.tablet, each.id)).toContain(each);
+      // No Golden Dawn source prints it.
+      expect(
+        GD_CITED_NAMES.filter((entry) => entry.name === each.spelling),
+      ).toEqual([]);
+    }
+    // Every headword the dictionary calls a Kerubic archangel whose letter
+    // is not the rule's, and whose Kerubic name a quarter reads, is listed.
+    const listed = new Set(spellings.map((each) => each.spelling));
+    for (const id of WATCHTOWER_IDS)
+      for (const name of tabletNames(view(id)))
+        if (name.kind === "kerubicArchangel")
+          for (const [word] of Object.entries(dictionary))
+            if (
+              fold(word).length === 5 &&
+              kerubic(id, name.id).includes(fold(word.slice(1))) &&
+              word[0] !== name.unionLetter?.letter &&
+              /Kerubic Archangel/.test(meanings(word).join())
+            )
+              expect(listed.has(word), word).toBe(true);
+    expect(dictionarySpellings("air", "king")).toEqual([]);
   });
 });
 
@@ -584,29 +815,31 @@ function unionReadings(version: TabletVersionId): string[] {
   return [...rows, ...columns].map(fold);
 }
 
-const ELEMENT_INDEX: Record<TabletQuarter, number> = {
-  topLeft: 1,
-  topRight: 2,
-  bottomLeft: 3,
-  bottomRight: 4,
-};
-const UNION_ROW = { air: 0, water: 1, earth: 2, fire: 3 } as const;
-
 /**
  * Every reading a version's paths give for a cited name, by its tablet,
  * kind and quarter (plan 090, stage 0's comparison): the names'
  * spellings, their rotations, Dee's six-letter Seniors, a quarter's other
  * columns, the Union's rows and columns, and the Kerubic and servient
- * names with the Union letter the Golden Dawn puts before them (Regardie
- * 1940, vol. 4, p.280).
+ * archangels, the names with the Union letter the Golden Dawn puts before
+ * them (Regardie 1940, vol. 4, p.280), as `tabletNames` reads them.
  */
 function readings(entry: CitedName, version: TabletVersionId): string[] {
   const { tablet, kind, quarter } = entry;
   if (!tablet || !kind) return [];
-  if (tablet === "union")
+  if (tablet === "union") {
+    // Every line and column of the Union, so that a column no rule reads
+    // as a name would still be found; then the names the Union has.
+    const own = tabletVersion(tablets.union, version);
+    const names = own ? tabletNames(own) : [];
     return kind === "union" || kind === "unionColumn"
-      ? unionReadings(version)
+      ? [
+          ...unionReadings(version),
+          ...names
+            .filter((name) => name.kind === kind)
+            .map((name) => fold(name.spelling)),
+        ]
       : [];
+  }
   const own = tabletVersion(tablets[tablet], version);
   if (!own) return [];
   const names = tabletNames(own).filter(
@@ -619,12 +852,6 @@ function readings(entry: CitedName, version: TabletVersionId): string[] {
       ...(name.spellings ?? [name.spelling]),
       ...(name.rotations ?? []),
     ]);
-  const prefixed = (letterAt: number, wanted: TabletName["kind"]) => {
-    const union = tabletVersion(tablets.union, version);
-    if (!union || !quarter) return [];
-    const letter = union.grid[UNION_ROW[tablet]][letterAt] ?? "";
-    return all(ofKind(wanted)).map((each) => letter + each);
-  };
   let found: string[] = [];
   switch (kind) {
     case "holyName":
@@ -656,10 +883,9 @@ function readings(entry: CitedName, version: TabletVersionId): string[] {
       break;
     }
     case "kerubicArchangel":
-      found = prefixed(0, "topRow");
-      break;
     case "servientArchangel":
-      found = quarter ? prefixed(ELEMENT_INDEX[quarter], "servient") : [];
+      // The Golden Dawn's names with the Union's letters (vol. 4, p.280).
+      found = quarter ? all(ofKind(kind)) : [];
       break;
   }
   return found.map(fold);
@@ -806,31 +1032,84 @@ describe("the names in the dictionary", () => {
   // whose author and status are unknown (plan 090, decision 4). A change
   // in the data that loses a match fails here.
   const headwords = new Set(Object.keys(dictionary).map(fold));
-  const count = (version: TabletVersionId, candidates: boolean) =>
-    WATCHTOWER_IDS.flatMap((id) =>
-      tabletNames(view(id, version)).filter((name) =>
-        (candidates
-          ? tabletNameSpellings(tablets[id], name.id, version)
-          : (name.spellings ?? [name.spelling])
-        ).some((spelling) => headwords.has(fold(spelling))),
-      ),
-    ).length;
+  /** The names of a kind of a version's tablets that are headwords. */
+  const count = (
+    version: TabletVersionId,
+    candidates: boolean,
+    which: (name: TabletName) => boolean = (name) => !name.unionLetter,
+    ids: readonly EnochianTabletID[] = WATCHTOWER_IDS,
+  ) =>
+    ids.flatMap((id) => {
+      const found = tabletVersion(tablets[id], version);
+      return (found ? tabletNames(found) : []).filter(
+        (name) =>
+          which(name) &&
+          (candidates
+            ? tabletNameSpellings(tablets[id], name.id, version)
+            : (name.spellings ?? [name.spelling])
+          ).some((spelling) => headwords.has(fold(spelling))),
+      );
+    }).length;
+  const byVersion = (counted: (version: TabletVersionId) => number) =>
+    Object.fromEntries(
+      TABLET_VERSIONS.map((version) => [version, counted(version)]),
+    );
 
   it("finds each version's names as headwords, case and u/v folded, pinned", () => {
-    // The version's own spelling, and then with every version's reading
-    // as a link would try them (`tabletNameSpellings`). The candidates are
-    // the same readings whichever version leads, so the second count is
-    // the same for all: every name of the four tablets has a headword.
+    // The 38 names a Watchtower's letters give, 152 for the four: the
+    // version's own spelling, and then with every version's reading as a
+    // link would try them (`tabletNameSpellings`). The candidates are the
+    // same readings whichever version leads, so the second count is the
+    // same for all: every one of them has a headword.
+    expect(byVersion((version) => count(version, false))).toEqual({
+      gd: 140,
+      regardie: 134,
+      equinox: 131,
+      dee: 135,
+      raphael: 150,
+    });
+    expect(byVersion((version) => count(version, true))).toEqual({
+      gd: 152,
+      regardie: 152,
+      equinox: 152,
+      dee: 152,
+      raphael: 152,
+    });
+  });
+
+  it("finds the Union's names and the archangels, in the Golden Dawn's versions, pinned", () => {
+    // Plan 090, stage 4. The dictionary has the Kerubic archangels (from
+    // `WE`) but none of the servient rows with their Union letter.
+    const kind = (wanted: TabletName["kind"]) => (name: TabletName) =>
+      name.kind === wanted;
     expect(
-      Object.fromEntries(
-        TABLET_VERSIONS.map((version) => [version, count(version, false)]),
-      ),
-    ).toEqual({ gd: 140, regardie: 134, equinox: 131, dee: 135, raphael: 150 });
+      byVersion((version) => count(version, false, kind("kerubicArchangel"))),
+    ).toEqual({ gd: 14, regardie: 14, equinox: 12, dee: 0, raphael: 0 });
     expect(
-      Object.fromEntries(
-        TABLET_VERSIONS.map((version) => [version, count(version, true)]),
+      byVersion((version) => count(version, true, kind("kerubicArchangel"))),
+    ).toEqual({ gd: 14, regardie: 14, equinox: 14, dee: 0, raphael: 0 });
+    expect(
+      byVersion((version) => count(version, true, kind("servientArchangel"))),
+    ).toEqual({ gd: 0, regardie: 0, equinox: 0, dee: 0, raphael: 0 });
+    expect(
+      byVersion((version) => count(version, false, () => true, ["union"])),
+    ).toEqual({ gd: 4, regardie: 4, equinox: 4, dee: 0, raphael: 0 });
+    // Not headwords: Earth's two lower archangels as the rule reads them
+    // (the dictionary has NOCNC and NASMT, the sources NROAM, NAAOM and
+    // AISMT), and the Union's column.
+    expect(
+      [...WATCHTOWER_IDS, "union" as const].flatMap((id) =>
+        tabletNames(view(id))
+          .filter(
+            (name) =>
+              (name.kind === "kerubicArchangel" || !name.quarter) &&
+              !tabletNameSpellings(tablets[id], name.id).some((spelling) =>
+                headwords.has(fold(spelling)),
+              ),
+          )
+          .map((name) => name.spelling.toUpperCase()),
       ),
-    ).toEqual({ gd: 152, regardie: 152, equinox: 152, dee: 152, raphael: 152 });
+    ).toEqual(["NRCNC", "NISMT", "EHNB"]);
   });
 });
 
@@ -857,17 +1136,31 @@ describe("tabletNameSpellings", () => {
     expect(tabletNameSpellings(tablets.air, "holy-2").length).toBeGreaterThan(
       1,
     );
-    for (const id of WATCHTOWER_IDS)
-      for (const nameId of TABLET_NAME_IDS) {
+    for (const id of [...WATCHTOWER_IDS, "union"] as const)
+      for (const { id: nameId } of tabletNames(view(id))) {
         const all = tabletNameSpellings(tablets[id], nameId);
         expect(all[0]).toBe(nameOf(id, nameId).spelling);
         expect(new Set(all).size).toBe(all.length);
-        for (const version of TABLET_VERSIONS)
-          for (const spelling of nameOf(id, nameId, version).spellings ?? [
-            nameOf(id, nameId, version).spelling,
-          ])
+        for (const version of TABLET_VERSIONS) {
+          const found = tabletVersion(tablets[id], version);
+          const name = found && findTabletName(found, nameId);
+          for (const spelling of name
+            ? (name.spellings ?? [name.spelling])
+            : [])
             expect(all).toContain(spelling);
+        }
       }
+    // The archangels are the Golden Dawn's versions' alone.
+    expect(
+      tabletNameSpellings(tablets.earth, "bottom-left-kerubic-archangel"),
+    ).toEqual(["NRCnc", "NROnc"]);
+    expect(
+      tabletNameSpellings(
+        tablets.earth,
+        "bottom-left-kerubic-archangel",
+        "dee",
+      ),
+    ).toEqual([]);
     expect(tabletNameSpellings(tablets.union, "king")).toEqual([]);
     expect(tabletNameSpellings(tablets.air, "nonesuch")).toEqual([]);
   });

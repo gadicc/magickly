@@ -1686,8 +1686,28 @@ msgstr "Below the cross bar"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/nameWords.ts
+msgid "A Kerubic archangel"
+msgstr "A Kerubic archangel"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "A servient angel with its Union letter"
+msgstr "A servient angel with its Union letter"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "The first column"
+msgstr "The first column"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
 msgid "A Senior"
 msgstr "A Senior"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "The line of {element}"
+msgstr "The line of {element}"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/nameWords.ts
@@ -1708,6 +1728,12 @@ msgstr "The bottom left quarter"
 #: src/app/enochian/tablets/nameWords.ts
 msgid "The bottom right quarter"
 msgstr "The bottom right quarter"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+#: src/app/enochian/tablets/tablets.tsx
+msgid "The Tablet of Union"
+msgstr "The Tablet of Union"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/NamesPanel.tsx
@@ -1779,6 +1805,26 @@ msgstr "{name}, a servient angel: row {row}, squares {first}, {second}, {third} 
 #: src/app/enochian/tablets/nameWords.ts
 msgid "{name}, below the cross bar: row {row}, squares {first}, {second}, {third} and {fourth}"
 msgstr "{name}, below the cross bar: row {row}, squares {first}, {second}, {third} and {fourth}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, a Kerubic archangel: {letter} from the Tablet of Union, row {unionRow}, square {unionColumn}; then row {row}, squares {first}, {second}, {third} and {fourth}"
+msgstr "{name}, a Kerubic archangel: {letter} from the Tablet of Union, row {unionRow}, square {unionColumn}; then row {row}, squares {first}, {second}, {third} and {fourth}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, a servient angel with its Union letter: {letter} from the Tablet of Union, row {unionRow}, square {unionColumn}; then row {row}, squares {first}, {second}, {third} and {fourth}"
+msgstr "{name}, a servient angel with its Union letter: {letter} from the Tablet of Union, row {unionRow}, square {unionColumn}; then row {row}, squares {first}, {second}, {third} and {fourth}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, the line of {element}: row {row}, squares {from} to {to}"
+msgstr "{name}, the line of {element}: row {row}, squares {from} to {to}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/nameWords.ts
+msgid "{name}, the first column: column {column}, rows {from} to {to}"
+msgstr "{name}, the first column: column {column}, rows {from} to {to}"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/nameWords.ts
@@ -1857,6 +1903,11 @@ msgstr "Spelled otherwise in the sources:"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/NamesPanel.tsx
+msgid "The dictionary's spelling:"
+msgstr "The dictionary's spelling:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
 msgid "Where it is read:"
 msgstr "Where it is read:"
 
@@ -1872,8 +1923,23 @@ msgstr "The other names through its squares:"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
+msgid "The Tablet of Union is the same in both."
+msgstr "The Tablet of Union is the same in both."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "In the Tablet of Union, {squares} differ: {kinds}."
+msgstr "In the Tablet of Union, {squares} differ: {kinds}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
 msgid "No image link while a name, a square or the regions are shown."
 msgstr "No image link while a name, a square or the regions are shown."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "Tablet of Union"
+msgstr "Tablet of Union"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
@@ -1889,6 +1955,26 @@ msgstr "Names"
 #: src/app/enochian/tablets/tablets.tsx
 msgid "Differences"
 msgstr "Differences"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "The Tablet of Union reads the same in all three Golden Dawn sources, Regardie's of 1940, the Equinox of 1912 and Greer's edition: no square differs, so none is outlined. Dee's and Raphael's tables have no Tablet of Union."
+msgstr "The Tablet of Union reads the same in all three Golden Dawn sources, Regardie's of 1940, the Equinox of 1912 and Greer's edition: no square differs, so none is outlined. Dee's and Raphael's tables have no Tablet of Union."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "Raphael's table of 1587 has no Tablet of Union. The Tablet of Union is the Golden Dawn's: it sets out the letters of Dee's Black Cross, which binds his four tables together and is not yet drawn here."
+msgstr "Raphael's table of 1587 has no Tablet of Union. The Tablet of Union is the Golden Dawn's: it sets out the letters of Dee's Black Cross, which binds his four tables together and is not yet drawn here."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "Dee's tables of 1584 have no Tablet of Union. The Tablet of Union is the Golden Dawn's: it sets out the letters of Dee's Black Cross, which binds his four tables together and is not yet drawn here."
+msgstr "Dee's tables of 1584 have no Tablet of Union. The Tablet of Union is the Golden Dawn's: it sets out the letters of Dee's Black Cross, which binds his four tables together and is not yet drawn here."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "Show the Golden Dawn's version"
+msgstr "Show the Golden Dawn's version"
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/DocLoader.tsx

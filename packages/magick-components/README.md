@@ -542,6 +542,11 @@ with `anySquare`. Leave out `numbers` where the squares are too small to
 read them. The pointer is a shortcut only: offer the same choices in a
 list for keyboards and screen readers.
 
+The Tablet of Union (`tablet="union"`) takes the same highlights over
+its five by four squares, counted from 0 as its rows are: a line
+(`{ row: 0, column }` for EXARP) or its first column. It has no
+regions, so `regions` draws nothing there.
+
 ## What you supply
 
 - **An Enochian font.** `Tablet` draws the Latin transliteration unless you

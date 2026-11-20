@@ -108,9 +108,9 @@ export const PUBLIC_PAGES = {
   "/enochian/tablets": {
     title: "Enochian Elemental Tablets",
     description:
-      "The four Enochian Watchtowers in the Golden Dawn's version or Dee's " +
-      "of 1584 and 1587: the holy names, Kings and Seniors on each, and how " +
-      "the versions differ.",
+      "The Enochian Watchtowers in the Golden Dawn's version or Dee's, and " +
+      "the Golden Dawn's Tablet of Union: holy names, Kings, Seniors, " +
+      "archangels, and differences.",
   },
   "/gd": {
     title: "Golden Dawn",

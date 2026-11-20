@@ -4,7 +4,8 @@
  * pure contracts are imported. The contracts' query names are not the
  * components' props (`id` for `tablet`), so each component maps its
  * own, and a drawing the image cannot show (second letters on a tablet,
- * highlighted squares) has no image.
+ * highlighted squares, the Tablet of Union in a version without one) has
+ * no image.
  */
 import { componentImagePath } from "@/render/componentImageUrl";
 import { CONTRACTS, type ComponentImageSlug } from "@/render/contracts";

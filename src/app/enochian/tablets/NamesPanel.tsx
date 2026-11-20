@@ -24,13 +24,14 @@ import {
   type TabletQuarter,
   tabletNameVariants,
 } from "magick-data/enochian/tabletNames";
-import {
+import tabletNotes, {
   attributionNote,
   citedSpellings,
+  dictionarySpellings,
   nameRules,
 } from "magick-data/enochian/tabletNotes";
 import tablets, {
-  type EnochianWatchtowerID,
+  type EnochianTabletID,
   type TabletVersionId,
 } from "magick-data/enochian/tablets";
 import React from "react";
@@ -54,10 +55,13 @@ import {
 import { Sources, versionTitle } from "./Sources";
 import styles from "./tablets.module.css";
 
-/** A group of the list: the Great Cross, or a quarter. */
-type GroupKey = "cross" | TabletQuarter;
+/** A group of the list: the Great Cross, a quarter, or the Tablet of Union. */
+type GroupKey = "cross" | "union" | TabletQuarter;
 
-const groupOf = (name: TabletName): GroupKey => name.quarter ?? "cross";
+const groupOf = (name: TabletName): GroupKey =>
+  name.kind === "union" || name.kind === "unionColumn"
+    ? "union"
+    : (name.quarter ?? "cross");
 
 const sameSquare = (a: TabletSquare, b: TabletSquare) =>
   a.row === b.row && a.column === b.column;
@@ -68,6 +72,34 @@ export const namesThrough = (
   square: TabletSquare,
 ) =>
   names.filter((name) => name.squares.some((each) => sameSquare(each, square)));
+
+/**
+ * Whether `name` is an archangel built on `base`: a Kerubic or servient
+ * name with its letter of the Tablet of Union, on exactly the base's
+ * Watchtower squares.
+ */
+export const builtOn = (name: TabletName, base: TabletName) =>
+  Boolean(name.unionLetter) &&
+  !base.unionLetter &&
+  name.squares.length === base.squares.length &&
+  name.squares.every((square, index) =>
+    sameSquare(square, base.squares[index] as TabletSquare),
+  );
+
+/**
+ * The names through a square that a tap on it chooses between: the
+ * archangels built on another of them left out, since each is that
+ * name's with a letter of the Union before it and its detail offers
+ * them. A servient or top-row square is then one name, as before the
+ * archangels; a cross square still several.
+ */
+export const namesToChoose = (
+  names: readonly TabletName[],
+  square: TabletSquare,
+) => {
+  const through = namesThrough(names, square);
+  return through.filter((name) => !through.some((base) => builtOn(name, base)));
+};
 
 /** Whether the reader asked for less motion. */
 const still = () =>
@@ -82,9 +114,9 @@ const reveal = (element: Element | null | undefined) =>
 
 /**
  * The Names tab (plan 090, decision 5): the "Show the regions" switch and
- * its key, a square's names to choose from when one chosen on the tablet
- * lies in several, the names grouped as the tablet is built, and a live
- * region that says the chosen name and its squares.
+ * its key (a Watchtower's only), a square's names to choose from when one
+ * chosen on the tablet lies in several, the names grouped as the tablet
+ * is built, and a live region that says the chosen name and its squares.
  */
 export default function NamesPanel({
   tablet,
@@ -101,7 +133,7 @@ export default function NamesPanel({
   links,
   revealed,
 }: {
-  tablet: EnochianWatchtowerID;
+  tablet: EnochianTabletID;
   version: TabletVersionId;
   tradition: Tradition;
   names: readonly TabletName[];
@@ -121,7 +153,7 @@ export default function NamesPanel({
 }) {
   const { t } = useUiLanguage();
   const [expanded, setExpanded] = React.useState<ReadonlySet<GroupKey>>(
-    () => new Set(["cross"]),
+    () => new Set(["cross", "union"]),
   );
   // A name chosen from the tablet or from another's detail opens its group.
   const [openedFor, setOpenedFor] = React.useState<string>();
@@ -161,7 +193,8 @@ export default function NamesPanel({
     choose(id);
   };
   const through = square ? namesThrough(names, square) : [];
-  const groups: GroupKey[] = ["cross", ...TABLET_QUARTERS];
+  const union = tablet === "union";
+  const groups: GroupKey[] = union ? ["union"] : ["cross", ...TABLET_QUARTERS];
 
   return (
     <Box ref={panel}>
@@ -173,16 +206,19 @@ export default function NamesPanel({
           /*i18n*/ "Choose a name to see where it is read: the rest of the tablet is dimmed, a flag marks its first square, and on a large enough screen each square is numbered in reading order. Choose it again to let it go, or tap a square to find the names through it.",
         )}
       </Typography>
-      <FormControlLabel
-        control={
-          <Switch
-            checked={regions}
-            onChange={(event) => setRegions(event.target.checked)}
-          />
-        }
-        label={t(/*i18n*/ "Show the regions")}
-      />
-      {regions && <RegionKey tablet={tablet} t={t} />}
+      {/* The regions are a Watchtower's crosses and rows. */}
+      {!union && (
+        <FormControlLabel
+          control={
+            <Switch
+              checked={regions}
+              onChange={(event) => setRegions(event.target.checked)}
+            />
+          }
+          label={t(/*i18n*/ "Show the regions")}
+        />
+      )}
+      {regions && !union && <RegionKey tablet={tablet} t={t} />}
       {/* Heard, not seen: the square's box and the name's detail show it. */}
       <Typography variant="body2" aria-live="polite" sx={visuallyHidden}>
         {square
@@ -255,7 +291,7 @@ export default function NamesPanel({
             >
               <Typography component="span">
                 {groupLabel(
-                  group === "cross" ? undefined : group,
+                  group === "cross" || group === "union" ? undefined : group,
                   tablet,
                   tradition,
                   t,
@@ -468,7 +504,7 @@ function NameDetail({
   t,
 }: {
   name: TabletName;
-  tablet: EnochianWatchtowerID;
+  tablet: EnochianTabletID;
   version: TabletVersionId;
   tradition: Tradition;
   names: readonly TabletName[];
@@ -478,19 +514,25 @@ function NameDetail({
 }) {
   const variants = tabletNameVariants(tablets[tablet], name.id, version);
   const cited = citedSpellings(tablet, name.id);
+  const theirs = dictionarySpellings(tablet, name.id);
   const rules = nameRules(name.kind, version);
+  // The notes' attributions are a Watchtower's quarters and planets; the
+  // Union's lines have their element in their rule.
   const attribution =
-    tradition === "gd" && name.attribution
+    tradition === "gd" && name.attribution && tablet !== "union"
       ? attributionNote(name.attribution.element ? "element" : "planet")
       : undefined;
   const headword = linkedHeadword(links, tablet, version, name.id);
-  const others = names.filter(
-    (other) =>
-      other.id !== name.id &&
-      other.squares.some((square) =>
-        name.squares.some((own) => sameSquare(own, square)),
-      ),
-  );
+  // The archangel built on this name first, then the rest in order.
+  const others = names
+    .filter(
+      (other) =>
+        other.id !== name.id &&
+        other.squares.some((square) =>
+          name.squares.some((own) => sameSquare(own, square)),
+        ),
+    )
+    .sort((a, b) => Number(builtOn(b, name)) - Number(builtOn(a, name)));
   return (
     <Box
       sx={{
@@ -541,6 +583,16 @@ function NameDetail({
               <Sources sources={each.sources} />
             </Box>
           ))}
+        </>
+      )}
+      {theirs.length > 0 && (
+        <>
+          <Line label={t(/*i18n*/ "The dictionary's spelling:")}>
+            {theirs.map((each) => each.spelling).join(", ")}
+          </Line>
+          <Typography variant="body2" sx={{ pl: 1 }}>
+            {tabletNotes.names.dictionary.text}
+          </Typography>
         </>
       )}
       {(rules.length > 0 || attribution) && (

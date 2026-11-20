@@ -7,6 +7,7 @@ import {
   tabletNameSpellings,
 } from "magick-data/enochian/tabletNames";
 import tablets, {
+  type EnochianTabletID,
   TABLET_VERSIONS,
   type TabletVersionId,
   type TabletView,
@@ -87,7 +88,7 @@ function secondLetterSpellings(view: TabletView, id: string): string[] {
 
 /** One name's headword in one version of a tablet, if it has one. */
 export function nameHeadword(
-  tablet: (typeof WATCHTOWER_IDS)[number],
+  tablet: EnochianTabletID,
   version: TabletVersionId,
   id: TabletNameId,
   source: Headwords = dictionary,
@@ -105,25 +106,34 @@ export function nameHeadword(
   return undefined;
 }
 
-/** Every Watchtower name's headword, in every version. */
+/**
+ * Every name's headword on every tablet, the Watchtowers' and the Tablet
+ * of Union's, in every version that has the name. One key where every
+ * version with the name finds the same; the archangels and the Union's
+ * names are the Golden Dawn's versions' alone, so one key serves them
+ * where those three agree.
+ */
 export function tabletNameLinks(
   source: Headwords = dictionary,
 ): TabletNameLinks {
   const index = foldedIndex(source);
   const links: Record<string, Partial<Record<TabletNameId, NameLink>>> = {};
-  for (const tablet of WATCHTOWER_IDS) {
+  for (const tablet of [...WATCHTOWER_IDS, "union"] as const) {
     const names: Partial<Record<TabletNameId, NameLink>> = {};
     for (const id of TABLET_NAME_IDS) {
+      const having = TABLET_VERSIONS.filter((version) => {
+        const view = tabletVersion(tablets[tablet], version);
+        return view && findTabletName(view, id);
+      });
       const byVersion: Partial<Record<TabletVersionId, string>> = {};
-      for (const version of TABLET_VERSIONS) {
+      for (const version of having) {
         const found = nameHeadword(tablet, version, id, source, index);
         if (found) byVersion[version] = found;
       }
       const keys = new Set(Object.values(byVersion));
       if (keys.size === 0) continue;
       names[id] =
-        keys.size === 1 &&
-        Object.keys(byVersion).length === TABLET_VERSIONS.length
+        keys.size === 1 && Object.keys(byVersion).length === having.length
           ? [...keys][0]
           : byVersion;
     }
@@ -133,7 +143,7 @@ export function tabletNameLinks(
 }
 
 /**
- * What the page ships: every Watchtower name's headword in every version.
+ * What the page ships: every name's headword in every version.
  * Resolved once, at import, since the dictionary does not change while
  * the process runs.
  */

@@ -12,9 +12,10 @@
  * `magick-data/enochian/tabletNotes`, its archive.org `item`, `page` as
  * printed and `leaf`, the scan's `/page/n{leaf}`); nothing else of the
  * sources' text is copied. `kind` and `quarter` say where the source
- * places the name, by `tabletNames`' kinds and quarters, with the kinds it
- * has not got yet (the Union's, and names built with its letters or with
- * Dee's Black Cross); `note` is ours. `status` says what the name is:
+ * places the name, by `tabletNames`' kinds and quarters (the Union's and
+ * the archangels' among them since plan 090's stage 4), with the kinds it
+ * has not got (a quarter's other columns, and names built with Dee's
+ * Black Cross); `note` is ours. `status` says what the name is:
  *
  * - `path`: read along a path in some version's letters (the tests check
  *   which);
@@ -53,7 +54,7 @@ export type CitedNameStatus =
   | "backward"
   | "earlyGuess";
 
-/** Where a source places a name: `tabletNames`' kinds and those to come. */
+/** Where a source places a name: `tabletNames`' kinds and others. */
 export type CitedNameKind =
   | "holyName"
   | "king"

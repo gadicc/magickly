@@ -9,6 +9,7 @@ import {
 import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { componentImageFilename } from "@/render/componentImageUrl";
 import Tablets, { downloadName } from "./tablets";
 
 const PAGE = "/enochian/tablets";
@@ -82,7 +83,7 @@ const drawn = (container: HTMLElement) => {
 };
 
 describe("/enochian/tablets", () => {
-  it("offers the four Watchtowers by name and draws each", () => {
+  it("offers the four Watchtowers and the Union by name and draws each", () => {
     const { container } = render(<Tablets />);
     expect(drawn(container).slice(0, 4).join("")).toBe("bOaZ");
     const expected = {
@@ -95,12 +96,24 @@ describe("/enochian/tablets", () => {
       fireEvent.mouseDown(screen.getByRole("combobox", { name: "Tablet" }));
       expect(
         screen.getAllByRole("option").map((option) => option.textContent),
-      ).toEqual(["Earth", "Air", "Water", "Fire"]);
+      ).toEqual(["Earth", "Air", "Water", "Fire", "Tablet of Union"]);
       fireEvent.click(screen.getByRole("option", { name }));
       const letters = drawn(container);
       expect(letters, name).toHaveLength(156);
       expect(letters.slice(0, 4).join(""), name).toBe(first);
     }
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Tablet" }));
+    fireEvent.click(screen.getByRole("option", { name: "Tablet of Union" }));
+    expect(window.location.search).toBe("?tablet=union");
+    const union = container.querySelector('svg[viewBox="0 0 124 104"]');
+    expect(
+      [...(union?.querySelectorAll("text") ?? [])]
+        .map((text) => text.textContent)
+        .join(""),
+    ).toBe("EXARPHCOMANANTABITOM");
+    expect(
+      screen.getByRole("heading", { level: 2, name: "The Tablet of Union" }),
+    ).toBeDefined();
   });
 });
 
@@ -230,6 +243,15 @@ describe("/enochian/tablets' versions", () => {
         square: { row: 6, column: 5 },
       }),
     ).toBe("enochian-earth-tablet-row7-square6");
+    // The Tablet of Union's image names it, and a chosen line's id follows.
+    const union = componentImageFilename({
+      slug: "enochian-tablet",
+      props: { id: "union", font: "latin", version: "equinox" },
+    });
+    expect(union).toBe("enochian-union-tablet-equinox");
+    expect(downloadName(union, { ...shown, name: "union-row-3" })).toBe(
+      "enochian-union-tablet-equinox-union-row-3",
+    );
   });
 
   it("links the image in the version shown", () => {
@@ -407,7 +429,7 @@ describe("/enochian/tablets' choices in its URL", () => {
   });
 
   it("falls back to the defaults for values it does not know", () => {
-    window.history.replaceState(null, "", `${PAGE}?tablet=union&version=x`);
+    window.history.replaceState(null, "", `${PAGE}?tablet=Union&version=x`);
     const { container } = render(<Tablets />);
     expect(drawn(container).slice(0, 4).join("")).toBe("bOaZ");
     expect(screen.getByRole("combobox", { name: "Version" }).textContent).toBe(

@@ -98,4 +98,41 @@ describe("Tablet's squares chosen by pointer", () => {
     click(plain.querySelector('svg[viewBox="0 0 244 264"] text'));
     expect(onSelect).toHaveBeenCalledTimes(1);
   });
+
+  it("takes the same choices on the Tablet of Union, which draws in its root", () => {
+    const onSelect = vi.fn<(square: TabletSquare) => void>();
+    const page = mount(
+      <Tablet
+        tablet="union"
+        highlights={{
+          squares: [{ row: 3, column: 4 }],
+          anySquare: true,
+          onSelect,
+          name: { squares: [{ row: 0, column: 0 }] },
+          preview: { squares: [{ row: 1, column: 0 }] },
+        }}
+      />,
+    );
+    const svg = page.querySelector('svg[viewBox="0 0 124 104"]');
+    for (const layer of svg?.querySelectorAll(
+      "[data-highlight], [data-start]",
+    ) ?? [])
+      expect(
+        layer.closest(
+          '[style*="pointer-events:none"],[style*="pointer-events: none"]',
+        ),
+      ).toBeTruthy();
+    // NANTA's second square (row 3, square 2): its ground, then its letter.
+    click(svg?.querySelector('rect[x="32"][y="52"]'));
+    expect(onSelect).toHaveBeenLastCalledWith({ row: 2, column: 1 });
+    click(svg?.querySelectorAll("text")[19]);
+    expect(onSelect).toHaveBeenLastCalledWith({ row: 3, column: 4 });
+    // The outlined square calls once; the frame and the margin not at all.
+    const calls = onSelect.mock.calls.length;
+    click(svg?.querySelector('[data-square="3,4"]'));
+    expect(onSelect).toHaveBeenCalledTimes(calls + 1);
+    click(svg?.querySelector('rect[width="100"]'));
+    click(svg);
+    expect(onSelect).toHaveBeenCalledTimes(calls + 1);
+  });
 });

@@ -128,12 +128,9 @@ export interface CitedTabletSpelling {
   spelling: string;
   reason: CitedSpellingReason;
   /**
-   * The spelling is a Kerubic archangel's: the top row's name with a
-   * letter of the Tablet of Union before it. Filed under the top row's id
-   * until the archangels are names of their own.
+   * The letter of the Tablet of Union before the name, for a Kerubic
+   * archangel's spelling (`<quarter>-kerubic-archangel`).
    */
-  kerubicArchangel?: true;
-  /** The letter of the Tablet of Union before the name. */
   prefix?: string;
   /** The doubled squares read with both letters, by row and column from 0. */
   squares?: readonly { row: number; column: number }[];
@@ -141,11 +138,30 @@ export interface CitedTabletSpelling {
   sources: readonly TabletSource[];
 }
 
-/** The notes on the names read off the Watchtowers. */
+/** A spelling the dictionary gives a name that no source or rule gives. */
+export interface DictionaryTabletSpelling {
+  tablet: EnochianWatchtowerID;
+  id: TabletNameId;
+  spelling: string;
+}
+
+/**
+ * The dictionary's own spellings of the Kerubic archangels, with another
+ * letter of the Tablet of Union before the Kerubic name than the Golden
+ * Dawn's rule gives (plan 090, decision 8): what they are, in `text`, and
+ * each one on its name.
+ */
+export interface DictionaryTabletSpellings {
+  text: string;
+  spellings: readonly DictionaryTabletSpelling[];
+}
+
+/** The notes on the names read off the tablets. */
 export interface TabletNamesNotes {
   rules: readonly TabletNameRule[];
   attributions: readonly TabletNameAttributionNote[];
   cited: readonly CitedTabletSpelling[];
+  dictionary: DictionaryTabletSpellings;
 }
 
 /** Everything the notes hold. */
@@ -219,6 +235,19 @@ export function citedSpellings(
 ): readonly CitedTabletSpelling[] {
   return tabletNotes.names.cited.filter(
     (cited) => cited.tablet === tablet && cited.id === id,
+  );
+}
+
+/**
+ * The dictionary's own spellings of one name of one tablet, which no
+ * source or rule gives (`names.dictionary`): shown as the dictionary's.
+ */
+export function dictionarySpellings(
+  tablet: string,
+  id: string,
+): readonly DictionaryTabletSpelling[] {
+  return tabletNotes.names.dictionary.spellings.filter(
+    (each) => each.tablet === tablet && each.id === id,
   );
 }
 

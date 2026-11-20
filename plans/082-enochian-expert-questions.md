@@ -111,6 +111,23 @@ same items are on the list of what we need from the Library
 - **The words Casaubon's print lost** (Keys 13 to 16), for which
   Crowley's forms stand in, and Dee's accents and Aethyr spellings.
 
+## The tablets' names
+
+From [plan 090](090-tablet-layout-and-names.md), decision 8.
+
+- **The dictionary's second prefixes for the Kerubic archangels.** The
+  Golden Dawn puts the first letter of the tablet's own line of the
+  Tablet of Union before each Kerubic name (Regardie 1940, vol. 4,
+  p.280; all sixteen in vol. 3, pp.74–77). The dictionary's tablet
+  entries, from *The Whole Enochian Dictionary* (`WE`), give most
+  sub-angles a second spelling with another letter in front: ABOZA,
+  HTNBR, ETAAD, ADOPA and eight more (the twelve are listed in
+  `tabletNotes.json5`, `names.dictionary`). They follow a pattern by
+  position that no Golden Dawn source found gives. Where do they come
+  from? Until it is known, the site shows them as the dictionary's,
+  not the Order's. Send the twelve with the rule's spelling beside
+  each.
+
 ## Answered
 
 None yet.

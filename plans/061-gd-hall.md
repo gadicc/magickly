@@ -3238,7 +3238,13 @@ what waits for Gadi.
 - **`/enochian/tablets`** and the `enochian-tablet` image offer Water
   and Fire. The image contract has one viewBox for every id, which the
   Tablet of Union's page does not fit, so the Union is not on the page
-  or the route yet (Follow-ups). The image spec now reads each tablet's
+  or the route yet (Follow-ups). Since plan 090's stage 4 (19 November
+  2026) it is on both: the contract gives each id its viewBox, its PNG
+  size (the Union's 496 × 416, 4 pixels a unit as the Watchtowers' 840 ×
+  1188) and its dimensions, and refuses the Union in Dee's and
+  Raphael's versions; the spec hashes the Union's row too, so the
+  images' identity moved once more with no Watchtower's bytes moving.
+  The image spec now reads each tablet's
   `kind` and `marks` as well as its `grid`, and lists Water and Fire, so
   its inputs hash moved (pinned anew; Earth and Air bytes unchanged);
   the whole-data render sweep (`RENDER_INPUT_SWEEP=1`) passes. The SEO
@@ -5447,7 +5453,8 @@ tablets' colours (Air's own angle brown rather than mauve); drawing
 `alt` letters, and the reversed letters on Earth and Air once they
 carry marks; Water's sigil as Regardie and Greer draw it rather than
 the Equinox; the Tablet of Union on `/enochian/tablets` and the image
-route, which needs a viewBox per id in the render contract; a source
+route, which needs a viewBox per id in the render contract (done in
+plan 090, stage 4); a source
 `version` for the tablets (done in Tablet versions, with Earth and Air
 switched and second letters drawable); Dee's
 manuscripts read directly for it; a West-wall Watchtower drawn along
@@ -5489,8 +5496,7 @@ Black Cross, Dee's struck letters, Fire's x and p squares and the
 licence); Dee's Black Cross in the data after that; Gadi's calls on the
 two empty Fire squares and Cotton's x (both built as recommended); the
 1587 print's v in Fire's row 6 square 8; the Tablet
-of Union on the page and the image route, still waiting for a viewBox
-per id. The page and the hall checked in headless Chromium only (no
+of Union on the page and the image route (done in plan 090, stage 4). The page and the hall checked in headless Chromium only (no
 Firefox, Safari or real device).
 
 The seals and the kamea sigils, both deferred (Gadi, 24 October 2026):

@@ -338,6 +338,7 @@ import {
   tabletNames,
   type TabletName,
   type TabletNameId,
+  type TabletUnionLetter,
 } from "magick-data/enochian/tabletNames";
 import {
   citedSpellings,
@@ -375,6 +376,8 @@ export const firstName: TabletName | undefined = air
   ? tabletNames(air)[0]
   : undefined;
 export const nameId: TabletNameId | undefined = firstName?.id;
+export const unionLetter: TabletUnionLetter | undefined =
+  firstName?.unionLetter;
 export const cited: readonly CitedTabletSpelling[] = citedSpellings(
   "earth",
   "senior-row-right",
@@ -508,7 +511,7 @@ import data from "magick-data";
 import sephirot from "magick-data/kabbalah/sephirot";
 import kameas from "magick-data/astrology/kameas";
 import tablets, { WATCHTOWER_IDS, tabletVersion } from "magick-data/enochian/tablets";
-import { citedSpellings, nameRules, squareNote, versionNote } from "magick-data/enochian/tabletNotes";
+import { citedSpellings, dictionarySpellings, nameRules, squareNote, versionNote } from "magick-data/enochian/tabletNotes";
 import { TABLET_NAME_IDS, tabletNames, tabletNameVariants } from "magick-data/enochian/tabletNames";
 import keys, { aethyrCall, aethyrs, checkedText, keyByNumber, keyVersion } from "magick-data/enochian/keys";
 import * as tools from "magick-data/tools";
@@ -542,8 +545,16 @@ assert.equal(versionNote("raphael")?.title, "Raphael's, 1587");
 assert.equal(tabletVersion(tablets.union)?.grid.map((row) => row.join("")).join(" "), "EXARP HCOMA NANTA BITOM");
 assert.equal(tabletVersion(tablets.union, "dee"), undefined);
 assert.equal(tabletVersion(tablets.fire, "dee")?.grid[0][11], null);
-assert.equal(TABLET_NAME_IDS.length, 38);
+assert.equal(TABLET_NAME_IDS.length, 63);
 const airNames = tabletNames(tabletVersion(tablets.air));
+assert.equal(airNames.length, 58);
+assert.equal(tabletNames(tabletVersion(tablets.air, "dee")).length, 38);
+assert.deepEqual(airNames.find((name) => name.id === "top-left-kerubic-archangel")?.unionLetter, { letter: "E", row: 0, column: 0 });
+assert.deepEqual(airNames.find((name) => name.id === "top-left-servient-1-archangel")?.unionLetter, { letter: "X", row: 0, column: 1 });
+assert.equal(airNames.find((name) => name.id === "top-left-servient-1-archangel")?.spelling, "XCzns");
+assert.deepEqual(tabletNames(tabletVersion(tablets.union)).map((name) => name.spelling), ["EXARP", "HCOMA", "NANTA", "BITOM", "EHNB"]);
+assert.equal(citedSpellings("earth", "bottom-left-kerubic-archangel")[0]?.spelling, "NROAM");
+assert.equal(dictionarySpellings("earth", "top-left-kerubic-archangel")[0]?.spelling, "ABOZA");
 assert.equal(airNames.find((name) => name.id === "king")?.spelling, "baTaiVah");
 assert.deepEqual(airNames.find((name) => name.id === "top-left-top-row")?.rotations, ["rZla", "Zlar", "larZ", "arZl"]);
 assert.deepEqual(tabletNames(tabletVersion(tablets.air, "dee")).find((name) => name.id === "king")?.spellings, ["baTaiVA", "baTaiVh"]);

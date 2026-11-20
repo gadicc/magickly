@@ -48,7 +48,7 @@ import { componentImageFilename } from "@/render/componentImageUrl";
 import { TABLET_IDS } from "@/render/contracts/enochianTablet";
 import useEnochianFont, { EnochianFont } from "../useEnochianFont";
 import type { TabletNameLinks } from "./dictionaryLinks";
-import NamesPanel, { namesThrough } from "./NamesPanel";
+import NamesPanel, { namesToChoose } from "./NamesPanel";
 import { Sources, versionTitle } from "./Sources";
 import {
   countDifferences,
@@ -61,7 +61,12 @@ import {
 import styles from "./tablets.module.css";
 import { type TabletId, tabletQuery, useTabletUrl } from "./urlState";
 
-const TABLET_NAMES: Record<TabletId, string> = {
+/**
+ * The Watchtowers by name. The Tablet of Union's name is a message of
+ * its own wherever it is shown (`t`), as the Watchtowers' copy waits for
+ * the page's translation (plan 086, T9b).
+ */
+const TABLET_NAMES: Record<Exclude<TabletId, "union">, string> = {
   earth: "Earth",
   air: "Air",
   water: "Water",
@@ -104,10 +109,13 @@ export function downloadName(image: string, shown: DrawnState): string {
 }
 
 /**
- * A square of the grid in the page's units: 20 of the grid's 244 × 264
- * viewBox, fitted to the 210 × 297 page and scaled by 0.9 (`tabletSvg.tsx`).
+ * A square of the grid as a share of the drawing's width: on a
+ * Watchtower, 20 of the grid's 244 × 264 viewBox, fitted to the 210 × 297
+ * page and scaled by 0.9; on the Tablet of Union, 20 of its 124-wide page
+ * (`tabletSvg.tsx`).
  */
-const SQUARE_UNITS = (20 * 210 * 0.9) / 244;
+const squareShare = (id: TabletId) =>
+  id === "union" ? 20 / 124 : (20 * 0.9) / 244;
 
 /**
  * Below this many pixels a square's reading-order number (about a sixth
@@ -118,19 +126,21 @@ const SQUARE_UNITS = (20 * 210 * 0.9) / 244;
 export const NUMBERED_SQUARE_PX = 30;
 
 /** How big the drawn squares are, in pixels; 0 until measured. */
-function useSquarePixels(ref: React.RefObject<SVGSVGElement | null>) {
+function useSquarePixels(
+  ref: React.RefObject<SVGSVGElement | null>,
+  share: number,
+) {
   const [pixels, setPixels] = React.useState(0);
   React.useEffect(() => {
     const svg = ref.current;
     if (!svg) return;
-    const measure = () =>
-      setPixels((svg.getBoundingClientRect().width * SQUARE_UNITS) / 210);
+    const measure = () => setPixels(svg.getBoundingClientRect().width * share);
     measure();
     if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(measure);
     observer.observe(svg);
     return () => observer.disconnect();
-  }, [ref]);
+  }, [ref, share]);
   return pixels;
 }
 
@@ -161,11 +171,12 @@ function useLayoutWidth(ref: React.RefObject<HTMLDivElement | null>) {
 /**
  * The reading order of a name's squares: 1 onwards, but Dee's and
  * Raphael's King reads one of its two centre squares seventh, so both
- * are 7.
+ * are 7, and an archangel's first letter is on the Tablet of Union, so
+ * its Watchtower squares are 2 onwards.
  */
 const readingOrder = (name: TabletName) =>
   name.squares.map((_, index) =>
-    name.spellings && index >= 6 ? 7 : index + 1,
+    name.spellings && index >= 6 ? 7 : index + (name.unionLetter ? 2 : 1),
   );
 
 /** The app bar's height, as SiteChrome publishes it. */
@@ -190,14 +201,18 @@ const appBarHeight = () =>
 function showSquares(
   svg: SVGSVGElement | null,
   squares: readonly TabletSquare[],
+  union: boolean,
 ) {
   const box = svg?.parentElement;
   if (!box || getComputedStyle(box).position === "sticky") return;
-  const grid = svg.querySelector('svg[viewBox="0 0 244 264"]');
+  // A Watchtower's grid is an <svg> of its own, its squares from 2, 2; the
+  // Tablet of Union draws in the root, its squares from 12, 12.
+  const grid = union ? svg : svg.querySelector('svg[viewBox="0 0 244 264"]');
+  const origin = union ? 12 : 2;
   const boxes = squares.flatMap(({ row, column }) => {
     // A square's ground, at its grid position (`tabletSvg.tsx`).
     const ground = grid?.querySelector(
-      `rect[x="${column * 20 + 2}"][y="${row * 20 + 2}"]`,
+      `rect[x="${column * 20 + origin}"][y="${row * 20 + origin}"][width="20"]`,
     );
     return ground ? [ground.getBoundingClientRect()] : [];
   });
@@ -336,6 +351,7 @@ function Comparison({
   other: TabletVersionId;
   text: string | undefined;
 }) {
+  const { t } = useUiLanguage();
   const count = countDifferences(id, version, other);
   if (!count) return null;
   const kinds = [
@@ -344,13 +360,21 @@ function Comparison({
     [count.case, "in case alone"],
     [count.empty, "left empty in one"],
   ] as const;
+  const how = kinds
+    .filter(([n]) => n > 0)
+    .map(([n, kind]) => `${n} ${kind}`)
+    .join(", ");
   const summary =
-    count.squares.length === 0
-      ? `The ${TABLET_NAMES[id]} tablet is the same in both.`
-      : `In the ${TABLET_NAMES[id]} tablet, ${squares(count.squares.length)} differ: ${kinds
-          .filter(([n]) => n > 0)
-          .map(([n, kind]) => `${n} ${kind}`)
-          .join(", ")}.`;
+    id === "union"
+      ? count.squares.length === 0
+        ? t(/*i18n*/ "The Tablet of Union is the same in both.")
+        : t(/*i18n*/ "In the Tablet of Union, {squares} differ: {kinds}.", {
+            squares: squares(count.squares.length),
+            kinds: how,
+          })
+      : count.squares.length === 0
+        ? `The ${TABLET_NAMES[id]} tablet is the same in both.`
+        : `In the ${TABLET_NAMES[id]} tablet, ${squares(count.squares.length)} differ: ${how}.`;
   return (
     <Box
       component="section"
@@ -450,31 +474,41 @@ export default function Tablets({
   // Names by default, with nothing highlighted (plan 090, decision 2).
   const [tab, setTab] = React.useState<PanelTab>("names");
   const [selected, setSelected] = React.useState<TabletSquare>();
-  // A chosen square belongs to its tablet: another tablet, from the
-  // select or from the URL (Back, a link), clears it.
+  // A square chosen on the tablet in the Names tab that lies in several
+  // names.
+  const [nameSquare, setNameSquare] = React.useState<TabletSquare>();
+  // A chosen square belongs to its tablet, in either tab: another tablet,
+  // from the select or from the URL (Back, a link), clears it. The
+  // Tablet of Union's squares are not a Watchtower's.
   const [selectedOn, setSelectedOn] = React.useState(id);
   if (selectedOn !== id) {
     setSelectedOn(id);
     setSelected(undefined);
+    setNameSquare(undefined);
   }
   // The Names tab: a chosen name and one previewed, by id, which is the
-  // same on every tablet and in every version; the regions; and a square
-  // chosen on the tablet that lies in several names.
+  // same on every tablet and in every version, and the regions.
   const [chosenId, setChosenId] = React.useState<TabletNameId>();
   const [previewId, setPreviewId] = React.useState<TabletNameId>();
   const [regions, setRegions] = React.useState(false);
-  const [nameSquare, setNameSquare] = React.useState<TabletSquare>();
   const [revealed, setRevealed] = React.useState(0);
-  // A name chosen in the list, whose squares are to be brought on screen.
-  const [squaresWanted, setSquaresWanted] =
-    React.useState<readonly TabletSquare[]>();
+  // A name chosen in the list, whose squares are to be brought on screen,
+  // and whether they are the Tablet of Union's.
+  const [squaresWanted, setSquaresWanted] = React.useState<{
+    squares: readonly TabletSquare[];
+    union: boolean;
+  }>();
   const { EnochianFontToggle, enochianFont } = useEnochianFont();
   // Two columns from `md` (tablets.module.css). The prerendered page is
   // the narrow one.
   const theme = useTheme();
   const wide = useMediaQuery(theme.breakpoints.up("md"));
   const ref = React.useRef<SVGSVGElement>(null);
-  const squarePixels = useSquarePixels(ref);
+  const union = id === "union";
+  const view = viewOf(id, version);
+  // Measured again when a drawing replaces the note of a version with no
+  // Tablet of Union.
+  const squarePixels = useSquarePixels(ref, view ? squareShare(id) : 0);
   const layout = React.useRef<HTMLDivElement>(null);
   useLayoutWidth(layout);
   const link = {
@@ -486,10 +520,12 @@ export default function Tablets({
     },
   };
   const marked = React.useMemo(() => differingSquares(id), [id]);
-  const view = viewOf(id, version);
   const names = view ? tabletNames(view) : [];
   const tradition = TABLET_NAME_TRADITIONS[version];
   const onNames = tab === "names";
+  // The regions are a Watchtower's: the Union draws none, and so a
+  // download or the image link does not count them there.
+  const regionsShown = regions && !union;
   const chosenName = names.find((name) => name.id === chosenId);
   const previewed =
     previewId === chosenId
@@ -503,22 +539,31 @@ export default function Tablets({
           square.row === selected.row && square.column === selected.column,
       )
     : undefined;
+  // The second letters the tablet draws in its corners, in words for
+  // readers who cannot see them.
+  const seconds = (view?.marks ?? []).filter((mark) => mark.alt?.length);
+  // What the choices draw differently from the published image, from
+  // what this view has: a choice that draws nothing here (second letters
+  // or plain letters where the view has none, the Differences tab where
+  // no square differs, as on the Tablet of Union) neither withholds the
+  // image link nor renames a download.
+  const altShown = alt && seconds.length > 0;
+  const plainShown =
+    !reversed && (view?.marks ?? []).some((mark) => mark.reversed);
+  const differencesShown = !onNames && marked.length > 0;
   // The image link draws the tablet as published: its reversed letters
   // mirrored, and nothing drawn over it.
-  const linkNote = !onNames
+  const linkNote = differencesShown
     ? "No image link while differences are shown."
-    : chosenName || regions || nameSquare
+    : onNames && (chosenName || regionsShown || nameSquare)
       ? t(
           /*i18n*/ "No image link while a name, a square or the regions are shown.",
         )
-      : alt || !reversed
+      : altShown || plainShown
         ? "No image link with second letters shown or reversed letters plain."
         : undefined;
   const tabletNote = tabletNotes.tablets[id];
   const note = versionNote(version);
-  // The second letters the tablet draws in its corners, in words for
-  // readers who cannot see them.
-  const seconds = (view?.marks ?? []).filter((mark) => mark.alt?.length);
   const [, , viewWidth, viewHeight] = tabletViewBox(id);
   /**
    * A square chosen on the tablet: a second tap on it clears it, as its
@@ -548,23 +593,27 @@ export default function Tablets({
     setNameSquare(undefined);
     setChosenId(name);
     const squares = names.find((each) => each.id === name)?.squares;
-    // A new array each time, so choosing again looks again.
-    if (squares) setSquaresWanted([...squares]);
+    // A new object each time, so choosing again looks again.
+    if (squares) setSquaresWanted({ squares, union });
   };
   React.useEffect(() => {
-    if (squaresWanted) showSquares(ref.current, squaresWanted);
+    if (squaresWanted)
+      showSquares(ref.current, squaresWanted.squares, squaresWanted.union);
   }, [squaresWanted]);
   /**
    * A square chosen on the tablet in the Names tab: its name pinned, or
-   * let go, where it lies in one; the names through it to choose from
-   * where it lies in several; a second tap on that square clears it.
+   * let go, where it lies in one (or in one and the archangel built on
+   * it); the names through it to choose from where it lies in several; a
+   * second tap on that square clears it.
    */
   const pickName = (square: TabletSquare) => {
     if (nameSquare?.row === square.row && nameSquare.column === square.column) {
       setNameSquare(undefined);
       return;
     }
-    const through = namesThrough(names, square);
+    // An archangel shares its base name's squares: the base is pinned,
+    // and its detail offers the archangel.
+    const through = namesToChoose(names, square);
     if (through.length === 1) {
       const [only] = through;
       setNameSquare(undefined);
@@ -583,7 +632,7 @@ export default function Tablets({
               : undefined,
         },
         preview: previewed && { squares: previewed.squares },
-        regions,
+        regions: regionsShown,
         squares: nameSquare ? [nameSquare] : [],
         selected: nameSquare,
         anySquare: true,
@@ -598,11 +647,11 @@ export default function Tablets({
       key="export"
       target={ref}
       filename={downloadName(componentImageFilename(link), {
-        alt,
-        reversed,
-        differences: !onNames,
+        alt: altShown,
+        reversed: !plainShown,
+        differences: differencesShown,
         name: onNames ? chosenName?.id : undefined,
-        regions: onNames && regions,
+        regions: onNames && regionsShown,
         square: onNames ? nameSquare : chosen,
       })}
       // The downloads draw what is shown.
@@ -618,7 +667,7 @@ export default function Tablets({
     <Container sx={{ p: 2 }}>
       <div
         ref={layout}
-        className={`${styles.layout} ${onNames ? styles.namesOpen : ""}`}
+        className={`${styles.layout} ${onNames && view ? styles.namesOpen : ""} ${union ? styles.union : ""}`}
         style={
           {
             "--tablet-ratio": viewWidth / viewHeight,
@@ -647,7 +696,9 @@ export default function Tablets({
               >
                 {TABLET_IDS.map((tablet) => (
                   <MenuItem key={tablet} value={tablet}>
-                    {TABLET_NAMES[tablet]}
+                    {tablet === "union"
+                      ? t(/*i18n*/ "Tablet of Union")
+                      : TABLET_NAMES[tablet]}
                   </MenuItem>
                 ))}
               </Select>
@@ -701,81 +752,93 @@ export default function Tablets({
           className={`${plateClass} ${styles.tablet}`}
           sx={{
             "& [data-square]": { cursor: "pointer" },
-            // Any square chooses its names in the Names tab.
+            // Any square chooses its names in the Names tab: a
+            // Watchtower's grid, or the Tablet of Union, which draws in
+            // the root.
             ...(onNames && {
-              '& svg[viewBox="0 0 244 264"]': { cursor: "pointer" },
+              '& svg[viewBox="0 0 244 264"], & > svg[viewBox="0 0 124 104"]': {
+                cursor: "pointer",
+              },
             }),
             "& > svg": { maxWidth: "100%", height: "auto" },
           }}
         >
-          <Tablet
-            tablet={id}
-            version={version}
-            mirrorReversed={reversed}
-            showSecondLetters={alt}
-            frame
-            enochianStyle={enochianFont ? EnochianFont.style : undefined}
-            ref={ref}
-            highlights={highlights}
-          />
+          {view ? (
+            <Tablet
+              tablet={id}
+              version={version}
+              mirrorReversed={reversed}
+              showSecondLetters={alt}
+              frame
+              enochianStyle={enochianFont ? EnochianFont.style : undefined}
+              ref={ref}
+              highlights={highlights}
+            />
+          ) : (
+            <NoTablet version={version} choose={setChoice} />
+          )}
         </Box>
 
         <div className={styles.panel}>
-          <Tabs
-            value={tab}
-            onChange={(_event, value: PanelTab) => setTab(value)}
-            aria-label={t(/*i18n*/ "What the panel shows")}
-            variant="fullWidth"
-            sx={{ borderBottom: 1, borderColor: "divider", mb: 1 }}
-          >
-            <Tab
-              value="names"
-              label={t(/*i18n*/ "Names")}
-              id="tablet-tab-names"
-              aria-controls="tablet-tabpanel"
-            />
-            <Tab
-              value="differences"
-              label={t(/*i18n*/ "Differences")}
-              id="tablet-tab-differences"
-              aria-controls="tablet-tabpanel"
-            />
-          </Tabs>
-          <div
-            role="tabpanel"
-            id="tablet-tabpanel"
-            aria-labelledby={`tablet-tab-${tab}`}
-          >
-            {onNames ? (
-              <NamesPanel
-                tablet={id}
-                version={version}
-                tradition={tradition}
-                names={names}
-                chosen={chosenName}
-                choose={chooseName}
-                preview={setPreviewId}
-                regions={regions}
-                setRegions={setRegions}
-                square={nameSquare}
-                clearSquare={() => setNameSquare(undefined)}
-                links={links}
-                revealed={revealed}
+          {view && (
+            <Tabs
+              value={tab}
+              onChange={(_event, value: PanelTab) => setTab(value)}
+              aria-label={t(/*i18n*/ "What the panel shows")}
+              variant="fullWidth"
+              sx={{ borderBottom: 1, borderColor: "divider", mb: 1 }}
+            >
+              <Tab
+                value="names"
+                label={t(/*i18n*/ "Names")}
+                id="tablet-tab-names"
+                aria-controls="tablet-tabpanel"
               />
-            ) : (
-              <SquaresSection
-                id={id}
-                marked={marked}
-                chosen={chosen}
-                choose={setSelected}
-                detail={detail}
+              <Tab
+                value="differences"
+                label={t(/*i18n*/ "Differences")}
+                id="tablet-tab-differences"
+                aria-controls="tablet-tabpanel"
               />
-            )}
-          </div>
+            </Tabs>
+          )}
+          {view && (
+            <div
+              role="tabpanel"
+              id="tablet-tabpanel"
+              aria-labelledby={`tablet-tab-${tab}`}
+            >
+              {onNames ? (
+                <NamesPanel
+                  tablet={id}
+                  version={version}
+                  tradition={tradition}
+                  names={names}
+                  chosen={chosenName}
+                  choose={chooseName}
+                  preview={setPreviewId}
+                  regions={regions}
+                  setRegions={setRegions}
+                  square={nameSquare}
+                  clearSquare={() => setNameSquare(undefined)}
+                  links={links}
+                  revealed={revealed}
+                />
+              ) : (
+                <SquaresSection
+                  id={id}
+                  marked={marked}
+                  chosen={chosen}
+                  choose={setSelected}
+                  detail={detail}
+                />
+              )}
+            </div>
+          )}
           {/* Beside the tablet the downloads come first; on a phone,
               under the tablet, the second letters it draws. */}
-          {wide && exportControls}
-          {alt && (
+          {wide && view && exportControls}
+          {altShown && (
             <Typography component="details" variant="body2" sx={{ mt: 1 }}>
               <summary>Second letters in {squares(seconds.length)}</summary>
               <Box component="ul" sx={{ pl: 3, my: 0.5 }}>
@@ -787,7 +850,7 @@ export default function Tablets({
               </Box>
             </Typography>
           )}
-          {!wide && exportControls}
+          {!wide && view && exportControls}
           <div style={{ textAlign: "center", fontSize: "90%" }}>
             Enochian Font:{" "}
             <a href="https://fonts2u.com/enochian-plain.font">enochian-plain</a>
@@ -797,7 +860,9 @@ export default function Tablets({
 
       <Box component="section" aria-labelledby="tablet-about" sx={{ mt: 3 }}>
         <Typography variant="h5" component="h2" id="tablet-about">
-          The {TABLET_NAMES[id]} tablet
+          {id === "union"
+            ? t(/*i18n*/ "The Tablet of Union")
+            : `The ${TABLET_NAMES[id]} tablet`}
         </Typography>
         <Typography variant="body1">{tabletNote.text}</Typography>
         <Sources sources={tabletNote.sources} />
@@ -846,12 +911,16 @@ function SquaresSection({
       <Typography variant="h5" component="h2" id="tablet-squares">
         Squares where the sources differ
       </Typography>
-      <Typography variant="body2">
-        Outlined on the tablet: where the versions differ in more than case,
-        hold second letters, a doubt or a reversed letter, or have a note.
-        Choose one, here or on the tablet, to see what each version and source
-        has in it.
-      </Typography>
+      {id === "union" ? (
+        <UnionAgrees />
+      ) : (
+        <Typography variant="body2">
+          Outlined on the tablet: where the versions differ in more than case,
+          hold second letters, a doubt or a reversed letter, or have a note.
+          Choose one, here or on the tablet, to see what each version and source
+          has in it.
+        </Typography>
+      )}
       <Box
         component="ol"
         aria-labelledby="tablet-squares"
@@ -890,6 +959,67 @@ function SquaresSection({
       <div ref={detail}>
         {chosen && <SquareDetail id={id} square={chosen} heading="h3" />}
       </div>
+    </Box>
+  );
+}
+
+/**
+ * The Tablet of Union's Differences tab: its letters are the same in all
+ * three Golden Dawn sources (a test holds this to the readings), so no
+ * square is outlined.
+ */
+function UnionAgrees() {
+  const { t } = useUiLanguage();
+  return (
+    <Typography variant="body2">
+      {t(
+        /*i18n*/ "The Tablet of Union reads the same in all three Golden Dawn sources, Regardie's of 1940, the Equinox of 1912 and Greer's edition: no square differs, so none is outlined. Dee's and Raphael's tables have no Tablet of Union.",
+      )}
+    </Typography>
+  );
+}
+
+/**
+ * In place of the Tablet of Union in a version without one (Dee's and
+ * Raphael's): why there is none, and a way to the versions that have it.
+ */
+function NoTablet({
+  version,
+  choose,
+}: {
+  version: TabletVersionId;
+  choose: (change: { version: TabletVersionId }) => void;
+}) {
+  const { t } = useUiLanguage();
+  return (
+    <Box
+      role="note"
+      sx={{
+        p: 2,
+        border: 1,
+        borderColor: "divider",
+        borderRadius: 1,
+        bgcolor: "background.paper",
+        color: "text.primary",
+      }}
+    >
+      <Typography variant="body1">
+        {version === "raphael"
+          ? t(
+              /*i18n*/ "Raphael's table of 1587 has no Tablet of Union. The Tablet of Union is the Golden Dawn's: it sets out the letters of Dee's Black Cross, which binds his four tables together and is not yet drawn here.",
+            )
+          : t(
+              /*i18n*/ "Dee's tables of 1584 have no Tablet of Union. The Tablet of Union is the Golden Dawn's: it sets out the letters of Dee's Black Cross, which binds his four tables together and is not yet drawn here.",
+            )}
+      </Typography>
+      <Button
+        variant="outlined"
+        size="small"
+        sx={{ mt: 1 }}
+        onClick={() => choose({ version: DEFAULT_TABLET_VERSION })}
+      >
+        {t(/*i18n*/ "Show the Golden Dawn's version")}
+      </Button>
     </Box>
   );
 }

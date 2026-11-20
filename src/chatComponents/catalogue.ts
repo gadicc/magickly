@@ -24,7 +24,8 @@ export const treeInput = z.strictObject({
 });
 
 export const tabletInput = z.strictObject({
-  element: z.enum(TABLET_IDS),
+  /** A Watchtower by its element, or `union`, the Tablet of Union. */
+  tablet: z.enum(TABLET_IDS),
   version: z.enum(TABLET_IMAGE_VERSIONS).default("gd"),
   font: z.enum(["latin", "enochian"]).default("latin"),
 });
@@ -34,7 +35,7 @@ export const hallInput = z.strictObject({ hall: z.enum(GD_HALL_SLUGS) });
 export const CHAT_COMPONENT_DESCRIPTIONS = {
   tree: "Display the site's Tree of Life using its existing correspondence data. Choose labels, colour scale and Hebrew or Hermetic letter attributions.",
   tablet:
-    "Display one Enochian elemental Watchtower in an explicitly selected textual version. This does not identify an uploaded image or infer which tradition a user means.",
+    "Display one Enochian elemental Watchtower, or the Tablet of Union, in an explicitly selected textual version. The Tablet of Union exists only in the Golden Dawn's versions (gd, regardie, equinox), not in Dee's or Raphael's. This does not identify an uploaded image or infer which tradition a user means.",
   hall: "Display a published Golden Dawn temple floor plan by its exact registered hall slug. These are public presets, not private temple layouts.",
 } as const;
 
@@ -61,15 +62,20 @@ export function prepareTree(value: unknown) {
 
 export function prepareTablet(value: unknown) {
   const input = tabletInput.parse(value);
+  // Refuses the Tablet of Union in a version that has none.
   const props = enochianTablet.parse(
-    params({ id: input.element, version: input.version, font: input.font }),
+    params({ id: input.tablet, version: input.version, font: input.font }),
   );
+  const title =
+    input.tablet === "union"
+      ? "Tablet of Union"
+      : `${input.tablet[0].toUpperCase()}${input.tablet.slice(1)} Watchtower`;
   return {
     version: 1 as const,
     component: "enochian-tablet" as const,
     props,
-    title: `${input.element[0].toUpperCase()}${input.element.slice(1)} Watchtower`,
-    text: `Enochian ${input.element} Watchtower, version ${input.version}, ${input.font} letters.`,
+    title,
+    text: `Enochian ${input.tablet === "union" ? "Tablet of Union" : `${input.tablet} Watchtower`}, version ${input.version}, ${input.font} letters.`,
     href: "/enochian/tablets",
   };
 }

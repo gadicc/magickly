@@ -817,6 +817,118 @@
       },
       {
         "kinds": [
+          "kerubicArchangel"
+        ],
+        "versions": [
+          "gd",
+          "regardie",
+          "equinox"
+        ],
+        "text": "The Golden Dawn puts a letter of the Tablet of Union before each Kerubic name, in each of its rotations, to make the lesser angle's Kerubic archangel: the first letter of the tablet's own line of the Union (E on Air, H on Water, N on Earth, B on Fire), the same for all four lesser angles. The consecration of the elemental weapons names all sixteen by this rule.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 280,
+            "leaf": 272
+          },
+          {
+            "work": "regardie1939",
+            "page": 74,
+            "leaf": 67
+          },
+          {
+            "work": "regardie1939",
+            "page": 75,
+            "leaf": 68
+          },
+          {
+            "work": "regardie1939",
+            "page": 76,
+            "leaf": 69
+          },
+          {
+            "work": "regardie1939",
+            "page": 77,
+            "leaf": 70
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "servientArchangel"
+        ],
+        "versions": [
+          "gd",
+          "regardie",
+          "equinox"
+        ],
+        "text": "The other four letters of the tablet's line of the Union go before the servient angels' names, in each of their rotations: one letter to each lesser angle, by its element in the order Air, Water, Earth, Fire, so that on Air (EXARP) the servient names of Air of Air take X, of Water of Air A, of Earth of Air R and of Fire of Air P.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 280,
+            "leaf": 272
+          },
+          {
+            "work": "regardie1940",
+            "page": 325,
+            "leaf": 317
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "union"
+        ],
+        "versions": [
+          "gd",
+          "regardie",
+          "equinox"
+        ],
+        "text": "The Golden Dawn reads each line of the Tablet of Union as a name of the element whose tablet it binds: EXARP of Air, HCOMA of Water, NANTA of Earth and BITOM of Fire.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 275,
+            "leaf": 267
+          },
+          {
+            "work": "regardie1940",
+            "page": 276,
+            "leaf": 268
+          },
+          {
+            "work": "regardie1940",
+            "page": 324,
+            "leaf": 316
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VIII",
+            "leaf": 246
+          }
+        ]
+      },
+      {
+        "kinds": [
+          "unionColumn"
+        ],
+        "versions": [
+          "gd",
+          "regardie",
+          "equinox"
+        ],
+        "text": "Of the Tablet of Union's columns the Golden Dawn reads only the first as a name, E.H.N.B., the first letters of the four lines; no source found reads another.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 330,
+            "leaf": 322
+          }
+        ]
+      },
+      {
+        "kinds": [
           "holyName"
         ],
         "versions": [
@@ -1124,9 +1236,8 @@
       },
       {
         "tablet": "earth",
-        "id": "bottom-left-top-row",
+        "id": "bottom-left-kerubic-archangel",
         "spelling": "NROAM",
-        "kerubicArchangel": true,
         "reason": "secondLetters",
         "prefix": "N",
         "text": "The Kerubic archangel, NANTA's first letter before the Kerubic name, read with Regardie's lower letters in three of the row's squares.",
@@ -1140,9 +1251,8 @@
       },
       {
         "tablet": "earth",
-        "id": "bottom-right-top-row",
+        "id": "bottom-right-kerubic-archangel",
         "spelling": "NAAOM",
-        "kerubicArchangel": true,
         "reason": "secondLetters",
         "prefix": "N",
         "text": "The Kerubic archangel, NANTA's first letter before the Kerubic name, read with Regardie's lower letters in all four of the row's squares.",
@@ -1198,12 +1308,11 @@
       },
       {
         "tablet": "earth",
-        "id": "bottom-right-top-row",
+        "id": "bottom-right-kerubic-archangel",
         "spelling": "AISMT",
-        "kerubicArchangel": true,
         "reason": "prefix",
         "prefix": "A",
-        "text": "A square of this row is named with A before the Kerubic name, where the Order's rule puts NANTA's first letter, N.",
+        "text": "A square of the Kerubic row is named with A before the Kerubic name, where the Order's rule puts NANTA's first letter, N.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1212,7 +1321,28 @@
           }
         ]
       }
-    ]
+    ],
+    // The dictionary's Kerubic archangels with another letter before the
+    // Kerubic name than the Order's rule gives (plan 090, decision 8).
+    // Listed so that a page can show them as the dictionary's; a test
+    // holds each to the dictionary and to the rule it departs from.
+    "dictionary": {
+      "text": "The Enochian dictionary's tablet entries come from an online compilation of unknown author, The Whole Enochian Dictionary. For most lesser angles it gives the Kerubic archangel a second spelling with another letter of the Tablet of Union in front, by a pattern that no Golden Dawn source found gives. They are listed here as the dictionary's, not the Order's.",
+      "spellings": [
+        { "tablet": "air", "id": "bottom-left-kerubic-archangel", "spelling": "HTNBR" },
+        { "tablet": "air", "id": "bottom-right-kerubic-archangel", "spelling": "HXGSD" },
+        { "tablet": "water", "id": "top-left-kerubic-archangel", "spelling": "ETAAD" },
+        { "tablet": "water", "id": "top-right-kerubic-archangel", "spelling": "ETDIM" },
+        { "tablet": "earth", "id": "top-left-kerubic-archangel", "spelling": "ABOZA" },
+        { "tablet": "earth", "id": "top-right-kerubic-archangel", "spelling": "APHRA" },
+        { "tablet": "earth", "id": "bottom-left-kerubic-archangel", "spelling": "POCNC" },
+        { "tablet": "earth", "id": "bottom-right-kerubic-archangel", "spelling": "PASMT" },
+        { "tablet": "fire", "id": "top-left-kerubic-archangel", "spelling": "ADOPA" },
+        { "tablet": "fire", "id": "top-right-kerubic-archangel", "spelling": "AANAA" },
+        { "tablet": "fire", "id": "bottom-left-kerubic-archangel", "spelling": "PPSAC" },
+        { "tablet": "fire", "id": "bottom-right-kerubic-archangel", "spelling": "PZIZA" }
+      ]
+    }
   },
   "squares": {
     "air": [

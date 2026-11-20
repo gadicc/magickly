@@ -20,6 +20,12 @@ describe("the tablets page's URL", () => {
       tablet: "fire",
       version: "gd",
     });
+    // The Tablet of Union, in a version that has it or not: the page
+    // says when it has none.
+    expect(parseTabletQuery("?tablet=union&version=dee")).toEqual({
+      tablet: "union",
+      version: "dee",
+    });
     expect(parseTabletQuery("?version=raphael&utm_source=x")).toEqual({
       tablet: "earth",
       version: "raphael",
@@ -28,7 +34,7 @@ describe("the tablets page's URL", () => {
 
   it("ignores values it does not know", () => {
     for (const search of [
-      "?tablet=union",
+      "?tablet=Union",
       "?tablet=Air",
       "?tablet=constructor",
       "?tablet=",

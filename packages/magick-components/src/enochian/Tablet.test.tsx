@@ -230,6 +230,14 @@ describe("Tablet", () => {
     for (const color of ["#d4a000", "#2255cc", "black", "#e22"])
       expect(markup).toContain(`fill:${color}`);
     expect(draw("union", true)).toContain("font-family:Enochian");
+    // Its default drawing, pinned before it took highlights (plan 090,
+    // stage 4): asking for none leaves these bytes.
+    expect(sha256(drawPlain("union", false, true))).toBe(
+      "042a545fd5b2c5561c3423f5a1a3e23c0f8cca1ee99bbf77a5caa2093edb7422",
+    );
+    expect(sha256(drawPlain("union", true, false))).toBe(
+      "7d7004c1405394afa0cfec3044178ebb85b8868bb61ae2fde91f53004bc7c463",
+    );
   });
 
   it("outlines the squares it is given, the selected one more boldly", () => {
@@ -544,6 +552,50 @@ describe("Tablet's highlight kinds", () => {
     expect(regionFromPosition(7, 0)).toBe("topRow");
     expect(regionFromPosition(8, 0)).toBe("calvaryCross");
     expect(regionFromPosition(12, 11)).toBe("servient");
+  });
+
+  it("draws the same kinds over the Tablet of Union, but no regions", () => {
+    // EXARP, the first line, chosen; HCOMA's H previewed.
+    const exarp = [0, 1, 2, 3, 4].map((column) => ({ row: 0, column }));
+    const markup = drawWith(
+      {
+        name: { squares: exarp, numbers: [1, 2, 3, 4, 5] },
+        preview: { squares: [{ row: 1, column: 0 }] },
+        squares: [{ row: 3, column: 4 }],
+        selected: { row: 3, column: 4 },
+        regions: true,
+      },
+      "union",
+    );
+    const chosen = layer(markup, "name");
+    // The veil over the other 15 squares, at the Union's place on its
+    // page (its grid starts at 12, 12).
+    const veil = chosen.match(
+      /<path d="([^"]*)" style="fill:white;fill-opacity:0.72"/,
+    );
+    expect(veil?.[1].match(/M/g)).toHaveLength(20 - 5);
+    expect(veil?.[1]).toMatch(/^M12 32h20v20h-20Z/);
+    expect(chosen.match(/stroke:#4a0072;stroke-width:1.4/g)).toHaveLength(5);
+    expect(chosen).toContain('d="M12.6 12.6h8L12.6 20.6Z"');
+    expect(chosen.match(/data-order=/g)).toHaveLength(5);
+    expect(layer(markup, "preview")).toContain('x="13.4" y="33.4"');
+    expect(markup).toContain('data-square="3,4" x="93" y="73"');
+    // No regions on the Union: nothing tinted or hatched.
+    expect(markup).not.toContain("data-region");
+    expect(markup).not.toContain("dasharray:3 2");
+    // The letters as before, and the frame still drawn last.
+    expect(letters(markup).slice(0, 20).join("")).toBe("EXARPHCOMANANTABITOM");
+    expect(markup).toMatch(
+      /stroke-width:4;stroke:black;fill:none"><\/rect><\/svg>$/,
+    );
+    // Asking for nothing leaves the Union as it was.
+    for (const highlights of [
+      { squares: [] },
+      { squares: [], regions: true, anySquare: true, onSelect: () => {} },
+    ])
+      expect(drawWith(highlights, "union")).toBe(
+        renderToStaticMarkup(<Tablet tablet="union" />),
+      );
   });
 
   it("names each Watchtower's ground", () => {

@@ -74,6 +74,21 @@ export const Tablet: ComponentExamples<ComponentProps<typeof TabletComponent>> =
         },
       },
       {
+        // NANTA, Earth's line of the Union, read across.
+        title: "The Tablet of Union, a line chosen",
+        props: {
+          tablet: "union",
+          frame: true,
+          highlights: {
+            squares: [],
+            name: {
+              squares: [0, 1, 2, 3, 4].map((column) => ({ row: 2, column })),
+              numbers: [1, 2, 3, 4, 5],
+            },
+          },
+        },
+      },
+      {
         title: "Fire, its regions",
         props: {
           tablet: "fire",

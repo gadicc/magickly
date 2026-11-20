@@ -100,10 +100,12 @@ describe("component image registry", () => {
     // tablet held every source's reading and the spec hashed them all
     // (plan 061, "Tablet versions") and the version rules with their
     // revision; Earth and Air moved to the Golden Dawn's letters with it,
-    // below.
+    // below. 1212086a… until the Tablet of Union joined the images (plan
+    // 090, stage 4) and the spec hashed its row with the Watchtowers';
+    // no Watchtower's bytes moved.
     [
       "enochian-tablet",
-      "1212086a363070af3b7b2eed54a28c9f2b967c8ccfefb1c8c152d2cdfd2327d8",
+      "d7fd15d88d703ff532767e52ad8af72eefd7b1e92f71fccd4de65f21bdc8560f",
     ],
     // a8a08155… until the candlestick drew the Equinox's figure of 1909
     // too (plan 080, "The rose's and the candlestick's versions"): the
@@ -186,6 +188,11 @@ describe("component image registry", () => {
     ["enochian-tablet", "id=air&height=297", 210, 297, 300],
     ["enochian-tablet", "font=enochian", 840, 1188, 300],
     ["enochian-tablet", "id=fire&version=dee", 840, 1188, 300],
+    // The Union's own page, 124 × 104 at 4 pixels a unit (plan 090,
+    // stage 4): its 20 letters and their squares.
+    ["enochian-tablet", "id=union", 496, 416, 40],
+    ["enochian-tablet", "id=union&version=equinox&font=enochian", 496, 416, 40],
+    ["enochian-tablet", "id=union&width=248", 248, 208, 40],
     ["seven-branched-candlestick", "", 1024, 1024, 60],
     ["seven-branched-candlestick", "version=modern", 1024, 1024, 60],
     ["table-of-shewbread", "", 1024, 1024, 130],
@@ -284,6 +291,14 @@ describe("component image registry", () => {
     // One tablet in each other version, reviewed as rasterised (plan 061,
     // "Tablet versions"): Regardie's sigil, the Equinox's in black, and
     // for Dee's and Raphael's tables the note where the sigil would be.
+    // The Tablet of Union's own page (plan 090, stage 4), reviewed as
+    // rasterised: its four lines in their elements' colours.
+    [
+      "enochian-tablet",
+      "id=union",
+      11_406,
+      "885d2e093bbf48815ca277ca0f5f30065fe4c07b08bccedca200bd18d839a19e",
+    ],
     [
       "enochian-tablet",
       "id=fire&version=regardie",

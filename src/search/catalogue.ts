@@ -8,6 +8,7 @@ import keys, { aethyrs, keyTitle, keyVersion } from "magick-data/enochian/keys";
 import {
   TABLET_QUARTERS,
   type TabletName,
+  type TabletQuarter,
   tabletNames,
 } from "magick-data/enochian/tabletNames";
 import tablets, {
@@ -129,35 +130,53 @@ const QUARTER_ELEMENTS = {
 } as const;
 
 /**
- * The Golden Dawn's names of each Watchtower, which the tablets page
- * reads off the letters in code and site search cannot find in its JSX
- * (plan 090, decision 9): "Holy names: Mor Dial Hctga. King: Iczhihal.
- * Seniors: … Air of Earth: …", spelled as the page lists them.
+ * The Golden Dawn's names of each Watchtower and of the Tablet of Union,
+ * which the tablets page reads off the letters in code and site search
+ * cannot find in its JSX (plan 090, decision 9): "Holy names: Mor Dial
+ * Hctga. King: Iczhihal. Seniors: … Air of Earth: …; with the Union's
+ * letters: Nboza …", and "Lines: Exarp Hcoma Nanta Bitom. First column:
+ * Ehnb.", spelled as the page lists them.
  */
 export function tabletNamesText(): [string, string][] {
   const shown = (name: TabletName) =>
     name.spelling.charAt(0).toUpperCase() +
     name.spelling.slice(1).toLowerCase();
-  return WATCHTOWER_IDS.flatMap((id) => {
+  const watchtowers = WATCHTOWER_IDS.flatMap((id): [string, string][] => {
     const view = tabletVersion(tablets[id], "gd");
     if (!view) return [];
     const names = tabletNames(view);
     const of = (kind: TabletName["kind"]) =>
       names.filter((name) => !name.quarter && name.kind === kind).map(shown);
+    const quarter = (each: TabletQuarter, union: boolean) =>
+      names
+        .filter(
+          (name) =>
+            name.quarter === each && Boolean(name.unionLetter) === union,
+        )
+        .map(shown)
+        .join(" ");
     const lines = [
       `Holy names: ${of("holyName").join(" ")}.`,
       `King: ${of("king").join(" ")}.`,
       `Seniors: ${of("senior").join(" ")}.`,
       ...TABLET_QUARTERS.map(
-        (quarter) =>
-          `${QUARTER_ELEMENTS[quarter]} of ${ELEMENTS[id]}: ${names
-            .filter((name) => name.quarter === quarter)
-            .map(shown)
-            .join(" ")}.`,
+        (each) =>
+          `${QUARTER_ELEMENTS[each]} of ${ELEMENTS[id]}: ${quarter(each, false)}; with the Union's letters: ${quarter(each, true)}.`,
       ),
     ];
     return [[id, lines.join(" ")]];
   });
+  const view = tabletVersion(tablets.union, "gd");
+  const union = view ? tabletNames(view) : [];
+  const of = (kind: TabletName["kind"]) =>
+    union
+      .filter((name) => name.kind === kind)
+      .map(shown)
+      .join(" ");
+  return [
+    ...watchtowers,
+    ["union", `Lines: ${of("union")}. First column: ${of("unionColumn")}.`],
+  ];
 }
 
 const ALIASES: Record<string, string[]> = {
@@ -291,7 +310,9 @@ export async function buildSearchCatalogue(): Promise<SearchCatalogue> {
     add(
       "/enochian/tablets",
       `names-${id}`,
-      `The ${ELEMENTS[id]} tablet's names`,
+      id === "union"
+        ? "The Tablet of Union's names"
+        : `The ${ELEMENTS[id]} tablet's names`,
       text,
     );
   for (const [word, entry] of Object.entries(dictionary))

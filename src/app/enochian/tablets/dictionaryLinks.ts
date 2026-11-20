@@ -16,7 +16,7 @@ export type NameLink =
   | string
   | Readonly<Partial<Record<TabletVersionId, string>>>;
 
-/** The headwords of each Watchtower's names, by tablet and name id. */
+/** The headwords of each tablet's names, by tablet and name id. */
 export type TabletNameLinks = Readonly<
   Record<string, Readonly<Partial<Record<TabletNameId, NameLink>>>>
 >;

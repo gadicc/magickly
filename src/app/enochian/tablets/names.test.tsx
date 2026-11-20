@@ -7,6 +7,7 @@ import {
   screen,
   within,
 } from "@testing-library/react";
+import tablets from "magick-data/enochian/tablets";
 import {
   afterEach,
   beforeEach,
@@ -17,6 +18,7 @@ import {
   vi,
 } from "vitest";
 import { tabletNameLinks } from "./nameLinks";
+import { differingSquares } from "./squareReadings";
 import Tablets from "./tablets";
 
 // Imported on the server only; the tests read it directly.
@@ -138,7 +140,8 @@ describe("/enochian/tablets' names", () => {
       screen.getByRole("button", { name: "Laidrom, A Senior, of Mars" }).dataset
         .nameId,
     ).toBe("senior-row-left");
-    // A quarter opens to its seven names.
+    // A quarter opens to its seven names, then the five with a letter of
+    // the Tablet of Union.
     expect(screen.queryByRole("list", { name: "Air of Earth" })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Air of Earth" }));
     expect(
@@ -153,6 +156,11 @@ describe("/enochian/tablets' names", () => {
       "Ormn, A servient angel",
       "Rsni, A servient angel",
       "Iznr, A servient angel",
+      "Nboza, A Kerubic archangel",
+      "Aaira, A servient angel with its Union letter",
+      "Aormn, A servient angel with its Union letter",
+      "Arsni, A servient angel with its Union letter",
+      "Aiznr, A servient angel with its Union letter",
     ]);
   });
 
@@ -420,11 +428,14 @@ describe("/enochian/tablets' squares in the Names tab", () => {
       Element.prototype.scrollIntoView = own;
     });
     const { container } = render(<Tablets links={LINKS} />);
+    // Row 3, square 1: Aira's, and its archangel Aaira's on the same
+    // squares, which Aira's detail offers; so Aira is pinned at once.
     fireEvent.click(squareOn(container, 2, 0));
     expect(scrollIntoView).toHaveBeenCalledTimes(1);
     expect(scrollIntoView.mock.contexts[0]).toBe(
       nameButton("Aira, A servient angel").closest("li"),
     );
+    expect(container.querySelector("[data-square-choice]")).toBeNull();
     // Not again when the tab is opened again.
     fireEvent.click(screen.getByRole("tab", { name: "Differences" }));
     fireEvent.click(screen.getByRole("tab", { name: "Names" }));
@@ -438,6 +449,41 @@ describe("/enochian/tablets' squares in the Names tab", () => {
     // Again lets it go.
     fireEvent.click(squareOn(container, 2, 0));
     expect(aira.getAttribute("aria-pressed")).toBe("false");
+    // A top row's square pins the Kerubic name, not its archangel.
+    fireEvent.click(squareOn(container, 0, 1));
+    expect(
+      nameButton("Boza, The Kerubic name").getAttribute("aria-pressed"),
+    ).toBe("true");
+    expect(container.querySelector("[data-square-choice]")).toBeNull();
+  });
+
+  it("offers a name's archangel first in its detail, and reaches it", () => {
+    const { container } = render(<Tablets links={LINKS} />);
+    fireEvent.click(squareOn(container, 2, 0));
+    const item = nameButton("Aira, A servient angel").closest(
+      "li",
+    ) as HTMLElement;
+    const others = within(item)
+      .getAllByRole("button")
+      .slice(1)
+      .map((button) => button.textContent);
+    expect(others[0]).toBe("Aaira · A servient angel with its Union letter");
+    fireEvent.click(within(item).getByRole("button", { name: /^Aaira · / }));
+    const aaira = nameButton("Aaira, A servient angel with its Union letter");
+    expect(aaira.getAttribute("aria-pressed")).toBe("true");
+    expect(document.activeElement).toBe(aaira);
+    expect(live(container)).toBe(
+      "Aaira, a servient angel with its Union letter: A from the Tablet of Union, row 3, square 2; then row 3, squares 1, 2, 4 and 5",
+    );
+    // And back: the archangel's detail offers the name it is built on.
+    const back = within(aaira.closest("li") as HTMLElement).getByRole(
+      "button",
+      { name: /^Aira · / },
+    );
+    fireEvent.click(back);
+    expect(
+      nameButton("Aira, A servient angel").getAttribute("aria-pressed"),
+    ).toBe("true");
   });
 
   it("lists the names through a square that lies in several", () => {
@@ -515,9 +561,9 @@ describe("/enochian/tablets' names by keyboard", () => {
     const names = screen
       .getAllByRole("button")
       .filter((button) => button.dataset.nameId);
-    // 38 names, each a native button with its state, none taken out of
-    // the tab order.
-    expect(names).toHaveLength(38);
+    // 58 names in the Golden Dawn's version, each a native button with its
+    // state, none taken out of the tab order.
+    expect(names).toHaveLength(58);
     for (const button of names) {
       expect(button.tagName).toBe("BUTTON");
       expect(button.getAttribute("aria-pressed")).toBe("false");
@@ -561,5 +607,149 @@ describe("/enochian/tablets' names across tablets and versions", () => {
     expect(
       screen.getByRole("link", { name: "MOR in the dictionary" }),
     ).toBeTruthy();
+  });
+});
+
+describe("/enochian/tablets' Tablet of Union", () => {
+  /** The Union's drawing, its own page. */
+  const unionSvg = (container: HTMLElement) =>
+    container.querySelector('svg[viewBox="0 0 124 104"]') as SVGSVGElement;
+
+  it("lists its four lines and its column, and draws a chosen one", () => {
+    window.history.replaceState(null, "", `${PAGE}?tablet=union`);
+    const { container } = render(<Tablets links={LINKS} />);
+    expect(groupHeadings()).toEqual(["The Tablet of Union"]);
+    expect(
+      within(screen.getByRole("list", { name: "The Tablet of Union" }))
+        .getAllByRole("button")
+        .map((button) => button.textContent),
+    ).toEqual([
+      "Exarp, The line of Air",
+      "Hcoma, The line of Water",
+      "Nanta, The line of Earth",
+      "Bitom, The line of Fire",
+      "Ehnb, The first column",
+    ]);
+    // No regions on the Union.
+    expect(screen.queryByRole("switch", { name: "Show the regions" })).toBe(
+      null,
+    );
+    fireEvent.click(nameButton("Nanta"));
+    expect(live(container)).toBe(
+      "Nanta, the line of Earth: row 3, squares 1 to 5",
+    );
+    const chosen = unionSvg(container).querySelector('[data-highlight="name"]');
+    expect(chosen?.querySelectorAll("rect")).toHaveLength(5);
+    const item = nameButton("Nanta").closest("li") as HTMLElement;
+    expect(
+      within(item).getByRole("link", { name: "NANTA in the dictionary" }),
+    ).toBeTruthy();
+    expect(item.textContent).toMatch(/BITOM of Fire/);
+    fireEvent.click(nameButton("Ehnb"));
+    expect(live(container)).toBe(
+      "Ehnb, the first column: column 1, rows 1 to 4",
+    );
+    expect(screen.queryByRole("link", { name: /in the dictionary/ })).toBe(
+      null,
+    );
+    // A square on the Union chooses its names: E is in two.
+    fireEvent.click(unionSvg(container).querySelector('rect[x="12"][y="12"]')!);
+    expect(live(container)).toBe(
+      "Row 1, square 1: in 2 names. Choose one below.",
+    );
+    fireEvent.click(unionSvg(container).querySelector('rect[x="52"][y="32"]')!);
+    expect(nameButton("Hcoma").getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("says its letters agree in every Golden Dawn source", () => {
+    // What the message says, held to the readings: three sources, no
+    // square differing or marked.
+    expect(Object.keys(tablets.union.readings)).toEqual([
+      "regardie1940",
+      "equinox1912",
+      "greer",
+    ]);
+    expect(differingSquares("union")).toEqual([]);
+    window.history.replaceState(null, "", `${PAGE}?tablet=union`);
+    const { container } = render(<Tablets links={LINKS} />);
+    fireEvent.click(screen.getByRole("tab", { name: "Differences" }));
+    expect(screen.getByRole("tabpanel").textContent).toMatch(
+      /reads the same in all three Golden Dawn sources/,
+    );
+    expect(container.querySelector("[data-square]")).toBeNull();
+    expect(
+      within(screen.getByRole("tabpanel")).queryAllByRole("listitem"),
+    ).toHaveLength(0);
+  });
+
+  it("says there is none in Dee's and Raphael's versions, rather than drawing an empty page", () => {
+    window.history.replaceState(null, "", `${PAGE}?tablet=union&version=dee`);
+    const { container } = render(<Tablets links={LINKS} />);
+    expect(unionSvg(container)).toBeNull();
+    expect(container.querySelector("[data-missing]")).toBeNull();
+    expect(screen.getByRole("note").textContent).toMatch(
+      /^Dee's tables of 1584 have no Tablet of Union/,
+    );
+    // No tabs and no downloads for a drawing that is not there.
+    expect(screen.queryByRole("tab")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Download SVG" })).toBeNull();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Show the Golden Dawn's version" }),
+    );
+    expect(window.location.search).toBe("?tablet=union");
+    expect(unionSvg(container)).toBeTruthy();
+    cleanup();
+    window.history.replaceState(
+      null,
+      "",
+      `${PAGE}?tablet=union&version=raphael`,
+    );
+    render(<Tablets links={LINKS} />);
+    expect(screen.getByRole("note").textContent).toMatch(
+      /^Raphael's table of 1587 has no Tablet of Union/,
+    );
+  });
+
+  it("shows a Kerubic archangel on its Watchtower, its Union letter in words", () => {
+    const width = vi
+      .spyOn(SVGSVGElement.prototype, "getBoundingClientRect")
+      .mockReturnValue({ width: 600 } as DOMRect);
+    onTestFinished(() => width.mockRestore());
+    const { container } = render(<Tablets links={LINKS} />);
+    fireEvent.click(screen.getByRole("button", { name: "Earth of Earth" }));
+    fireEvent.click(nameButton("Nrcnc"));
+    expect(live(container)).toBe(
+      "Nrcnc, a Kerubic archangel: N from the Tablet of Union, row 3, square 1; then row 8, squares 1, 2, 4 and 5",
+    );
+    // The Watchtower's four squares, numbered from 2: the first letter is
+    // the Union's.
+    expect(
+      [...grid(container).querySelectorAll("[data-order]")].map((each) =>
+        each.getAttribute("data-order"),
+      ),
+    ).toEqual(["2", "3", "4", "5"]);
+    const item = nameButton("Nrcnc").closest("li") as HTMLElement;
+    // The sources' spelling beside the rule's, and the dictionary's own.
+    expect(item.textContent).toContain("NROAM:");
+    expect(item.textContent).toContain("The dictionary's spelling: POCNC");
+    expect(item.textContent).toContain("Rotations: Nrcnc, Ncncr, Nncrc, Ncrcn");
+    expect(
+      within(item).getByRole("link", { name: "NOCNC in the dictionary" }),
+    ).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Fire of Earth" }));
+    fireEvent.click(nameButton("Nismt"));
+    const fire = nameButton("Nismt").closest("li") as HTMLElement;
+    expect(fire.textContent).toContain("NAAOM:");
+    expect(fire.textContent).toContain("AISMT:");
+  });
+
+  it("names the Union in its downloads", () => {
+    window.history.replaceState(null, "", `${PAGE}?tablet=union`);
+    render(<Tablets links={LINKS} />);
+    expect(
+      screen
+        .getAllByRole("link", { name: "Open SVG image link" })[0]
+        .getAttribute("href"),
+    ).toContain("id=union");
   });
 });

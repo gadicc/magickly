@@ -121,6 +121,8 @@
  * moved down 48: `tabletSvg.tsx`). The grid is then 207.6 units tall,
  * nearly the width.
  *
+ * The Tablet of Union, which has no sigil, sticks whole (below).
+ *
  * Only where that leaves a usable list beneath: a screen at least 560px
  * tall and no wider than 5/8 of its height. A 390 × 844 phone keeps about
  * 430px of list, a 320 × 568 one about 230px, a 600 × 960 tablet about
@@ -182,6 +184,35 @@
       var(--plate-pad) +
       5px +
       219.144 *
+      var(--tablet-scale) +
+      8px
+    );
+  }
+  /*
+   * The Tablet of Union has no sigil and is shorter than it is wide (124
+   * × 104 units), so the whole drawing sticks: its box's top just under
+   * the app bar, and a name brought into view stops below the box (the
+   * plate's padding twice, the frame, the drawing's 104 units) and 8px.
+   * Its drawing is a block, so no line's descent adds to the box.
+   */
+  .union.namesOpen .tablet,
+  .union.namesOpen .panel {
+    --tablet-scale: calc(
+      (var(--layout-width, calc(100vw - 32px)) - 2 * var(--plate-pad) - 2px) /
+      124
+    );
+    --tablet-sigil: 0px;
+  }
+  .union .tablet > svg {
+    display: block;
+  }
+  .union.namesOpen .namesItem {
+    scroll-margin-top: calc(
+      var(--app-bar, 56px) +
+      2 *
+      var(--plate-pad) +
+      2px +
+      104 *
       var(--tablet-scale) +
       8px
     );

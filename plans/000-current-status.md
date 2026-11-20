@@ -988,7 +988,8 @@ Follow-ups are separate from the completed migration work:
   Waiting for Gadi from stages G and H (decision renders outside the
   repository, plan 061; the colours at the end of the project): the
   Water and Fire letter choices (a variants table in plan 061), the
-  tablets' colours, and the Union on the page and the image route; from
+  tablets' colours, and the Union on the page and the image route
+  (done in [plan 090](090-tablet-layout-and-names.md), stage 4); from
   the versions, what Dee's two empty Fire squares mean and Cotton's x
   against Sloane's p (both built as recommended), Dee's Black Cross in
   the data, and the 1587 print's v in Fire's row 6 square 8. TODO: the British Library follow-up: re-check the catalogue

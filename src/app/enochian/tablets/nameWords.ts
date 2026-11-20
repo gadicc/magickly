@@ -63,9 +63,16 @@ const SENIOR_LINES: Readonly<Partial<Record<TabletNameId, string>>> = {
   "senior-col7-down": /*i18n*/ "A Senior, column 7 downward",
 };
 
-/** Each kind's label in the list, by tradition. */
+/**
+ * Each kind's label in the list, by tradition. The archangels and the
+ * Tablet of Union's names are the Golden Dawn's alone: Dee's and
+ * Raphael's versions never show them, so they have one label.
+ */
 const KIND_LABELS: Readonly<
-  Record<Exclude<TabletName["kind"], "senior">, Record<Tradition, string>>
+  Record<
+    Exclude<TabletName["kind"], "senior" | "union">,
+    Record<Tradition, string>
+  >
 > = {
   holyName: { gd: /*i18n*/ "A holy name", dee: /*i18n*/ "A name of God" },
   king: { gd: /*i18n*/ "The King, of the Sun", dee: /*i18n*/ "The King" },
@@ -82,7 +89,23 @@ const KIND_LABELS: Readonly<
     gd: /*i18n*/ "A servient angel",
     dee: /*i18n*/ "Below the cross bar",
   },
+  kerubicArchangel: {
+    gd: /*i18n*/ "A Kerubic archangel",
+    dee: /*i18n*/ "A Kerubic archangel",
+  },
+  servientArchangel: {
+    gd: /*i18n*/ "A servient angel with its Union letter",
+    dee: /*i18n*/ "A servient angel with its Union letter",
+  },
+  unionColumn: {
+    gd: /*i18n*/ "The first column",
+    dee: /*i18n*/ "The first column",
+  },
 };
+
+/** A line of the Tablet of Union's element, in words. */
+const lineElement = (name: TabletName, t: Translate) =>
+  t(ELEMENT_WORDS[name.attribution?.element ?? ""] ?? "");
 
 /** A name's label in the list: its role, or in Dee's versions its place. */
 export function nameLabel(
@@ -97,6 +120,10 @@ export function nameLabel(
             /*i18n*/ "A Senior")
         : (SENIOR_LINES[name.id] ?? /*i18n*/ "A Senior"),
     );
+  if (name.kind === "union")
+    return t(/*i18n*/ "The line of {element}", {
+      element: lineElement(name, t),
+    });
   return t(KIND_LABELS[name.kind][tradition]);
 }
 
@@ -118,7 +145,8 @@ const QUARTER_ELEMENTS: Readonly<Record<TabletQuarter, string>> = {
 
 /**
  * A group's heading: the Great Cross, or a quarter as the Golden Dawn
- * names it ("Air of Earth") or by its place in Dee's versions.
+ * names it ("Air of Earth") or by its place in Dee's versions; on the
+ * Tablet of Union, its one group.
  */
 export function groupLabel(
   quarter: TabletQuarter | undefined,
@@ -126,6 +154,7 @@ export function groupLabel(
   tradition: Tradition,
   t: Translate,
 ): string {
+  if (tablet === "union") return t(/*i18n*/ "The Tablet of Union");
   if (!quarter) return t(/*i18n*/ "The Great Cross");
   if (tradition === "dee") return t(QUARTER_PLACES[quarter]);
   return t(/*i18n*/ "{quarter} of {tablet}", {
@@ -167,6 +196,13 @@ export function nameInWords(
     second: one(squares[1]?.column ?? 0),
     third: one(squares[2]?.column ?? 0),
     fourth: one(squares[3]?.column ?? 0),
+  };
+  // An archangel's first letter, on the Tablet of Union.
+  const prefixed = {
+    ...four,
+    letter: name.unionLetter?.letter ?? "",
+    unionRow: one(name.unionLetter?.row ?? 0),
+    unionColumn: one(name.unionLetter?.column ?? 0),
   };
   switch (name.kind) {
     case "holyName":
@@ -231,6 +267,26 @@ export function nameInWords(
             /*i18n*/ "{name}, below the cross bar: row {row}, squares {first}, {second}, {third} and {fourth}",
             four,
           );
+    case "kerubicArchangel":
+      return t(
+        /*i18n*/ "{name}, a Kerubic archangel: {letter} from the Tablet of Union, row {unionRow}, square {unionColumn}; then row {row}, squares {first}, {second}, {third} and {fourth}",
+        prefixed,
+      );
+    case "servientArchangel":
+      return t(
+        /*i18n*/ "{name}, a servient angel with its Union letter: {letter} from the Tablet of Union, row {unionRow}, square {unionColumn}; then row {row}, squares {first}, {second}, {third} and {fourth}",
+        prefixed,
+      );
+    case "union":
+      return t(
+        /*i18n*/ "{name}, the line of {element}: row {row}, squares {from} to {to}",
+        { ...along, element: lineElement(name, t) },
+      );
+    case "unionColumn":
+      return t(
+        /*i18n*/ "{name}, the first column: column {column}, rows {from} to {to}",
+        down,
+      );
   }
 }
 

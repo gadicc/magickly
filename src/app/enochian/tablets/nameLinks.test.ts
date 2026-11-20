@@ -1,6 +1,5 @@
 import dictionary from "magick-data/enochian/dictionary";
 import {
-  TABLET_NAME_IDS,
   tabletNameSpellings,
   tabletNames,
 } from "magick-data/enochian/tabletNames";
@@ -20,15 +19,62 @@ const fold = (word: string) => word.toLowerCase().replaceAll("v", "u");
 
 describe("the tablets' names' dictionary links", () => {
   it("links every name of every Watchtower, in every version, to a headword", () => {
-    // Every name has a headword with every version's reading tried
-    // (magick-data's tabletNames test pins it: 152 for each version).
+    // Every name read off a Watchtower's own letters has a headword with
+    // every version's reading tried (magick-data's tabletNames test pins
+    // it: 152 for each version).
     for (const tablet of WATCHTOWER_IDS)
-      for (const version of TABLET_VERSIONS)
-        for (const id of TABLET_NAME_IDS) {
+      for (const version of TABLET_VERSIONS) {
+        const view = tabletVersion(tablets[tablet], version);
+        for (const { id, unionLetter } of view ? tabletNames(view) : []) {
+          if (unionLetter) continue;
           const key = linkedHeadword(TABLET_NAME_LINKS, tablet, version, id);
           expect(key, `${tablet} ${version} ${id}`).toBeDefined();
           expect(Object.hasOwn(dictionary, key as string)).toBe(true);
         }
+      }
+  });
+
+  it("links the Union's lines and the Kerubic archangels, not the servient ones", () => {
+    // Plan 090, stage 4: the names with a letter of the Union, and the
+    // Union's own, in the Golden Dawn's versions.
+    const unlinked: string[] = [];
+    for (const tablet of [...WATCHTOWER_IDS, "union"] as const)
+      for (const version of TABLET_VERSIONS) {
+        const view = tabletVersion(tablets[tablet], version);
+        for (const name of view ? tabletNames(view) : []) {
+          if (!name.unionLetter && tablet !== "union") continue;
+          const key = linkedHeadword(
+            TABLET_NAME_LINKS,
+            tablet,
+            version,
+            name.id,
+          );
+          if (key) expect(Object.hasOwn(dictionary, key)).toBe(true);
+          else if (name.kind !== "servientArchangel")
+            unlinked.push(`${tablet} ${version} ${name.spelling}`);
+          // The dictionary has no servient row with its Union letter.
+          if (name.kind === "servientArchangel") expect(key).toBeUndefined();
+        }
+      }
+    // Earth's two lower archangels, as the Equinox's letters read them,
+    // and the Union's column, have no headword. The Golden Dawn's and
+    // Regardie's reach the dictionary's NOCNC and NASMT by a second letter.
+    expect(unlinked).toEqual([
+      "earth equinox NROnc",
+      "earth equinox Niaom",
+      "union gd EHNB",
+      "union regardie EHNB",
+      "union equinox EHNB",
+    ]);
+    const links = tabletNameLinks();
+    expect(links.union?.["union-row-3"]).toBe("NANTA");
+    expect(links.earth?.["top-left-kerubic-archangel"]).toBe("NBOZA");
+    expect(
+      linkedHeadword(links, "earth", "gd", "bottom-left-kerubic-archangel"),
+    ).toBe("NOCNC");
+    expect(
+      linkedHeadword(links, "earth", "dee", "bottom-left-kerubic-archangel"),
+    ).toBeUndefined();
   });
 
   it("tries the version's own spelling first", () => {

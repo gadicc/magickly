@@ -38,7 +38,10 @@ describe("componentImage", () => {
 
   it("has none for what the image cannot draw", () => {
     expect(componentImage("RoseSigil", { text: "abc" })).toBe(null);
-    expect(componentImage("Tablet", { tablet: "union" })).toBe(null);
+    // No Tablet of Union in Dee's or Raphael's versions.
+    expect(componentImage("Tablet", { tablet: "union", version: "dee" })).toBe(
+      null,
+    );
     expect(
       componentImage("Tablet", { tablet: "water", showSecondLetters: true }),
     ).toBe(null);
@@ -53,6 +56,9 @@ describe("componentImage", () => {
   it("draws a tablet in its version, and the two fixed figures", () => {
     expect(componentImage("Tablet", { tablet: "fire", version: "dee" })).toBe(
       "/api/render/enochian-tablet?id=fire&version=dee",
+    );
+    expect(componentImage("Tablet", { tablet: "union" })).toBe(
+      "/api/render/enochian-tablet?id=union",
     );
     expect(componentImage("SevenBranchedCandlestick", {})).toBe(
       "/api/render/seven-branched-candlestick",

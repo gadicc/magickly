@@ -1,8 +1,15 @@
-import { WATCHTOWER_VIEWBOX } from "magick-components/enochian/Tablet";
+import {
+  tabletViewBox,
+  UNION_VIEWBOX,
+  WATCHTOWER_VIEWBOX,
+} from "magick-components/enochian/Tablet";
 import RoseSigilImage from "magick-components/gd/RoseSigilImage";
 import { ROSE_VERSIONS } from "magick-components/gd/roseSigilGeometry";
 import { CANDLESTICK_VERSIONS } from "magick-components/gd/SevenBranchedCandlestick";
-import { TABLET_VERSIONS } from "magick-data/enochian/tablets";
+import tablets, {
+  TABLET_VERSIONS,
+  tabletVersion,
+} from "magick-data/enochian/tablets";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -13,7 +20,14 @@ import {
   mothersFromString,
   mothersToString,
 } from "./astroGeomancyChart";
-import { TABLET_IMAGE_VERSIONS, TABLET_VIEWBOX } from "./enochianTablet";
+import {
+  TABLET_IDS,
+  TABLET_IMAGE_VERSIONS,
+  TABLET_VIEWBOX,
+  TABLET_VIEWBOXES,
+  UNION_IMAGE_VERSIONS,
+  UNION_TABLET_VIEWBOX,
+} from "./enochianTablet";
 import {
   COMPONENT_IMAGE_SLUGS,
   CONTRACTS,
@@ -80,6 +94,10 @@ describe("component image contracts", () => {
       "id=air&font=enochian&width=420",
       "id=fire&version=dee",
       "version=equinox&font=enochian",
+      "id=union",
+      "id=union&version=equinox&font=enochian",
+      "id=union&width=2000",
+      "id=union&height=104",
     ],
     "seven-branched-candlestick": [
       "",
@@ -303,9 +321,13 @@ describe("component image contracts", () => {
 
   it("takes each request's viewBox from viewBoxOf, else the fixed one", () => {
     // The other contracts draw one shape and keep their fixed viewBox;
-    // the halls and the sigil's words are not one shape.
+    // the halls, the sigil's words and the tablets (the Union's page is
+    // its own, below) are not one shape.
     for (const slug of COMPONENT_IMAGE_SLUGS.filter(
-      (slug) => slug !== "gd-hall" && slug !== "rose-sigil",
+      (slug) =>
+        slug !== "gd-hall" &&
+        slug !== "rose-sigil" &&
+        slug !== "enochian-tablet",
     )) {
       const contract = CONTRACTS[
         slug
@@ -326,8 +348,67 @@ describe("component image contracts", () => {
     expect(contractViewBox(sized, { wide: false })).toEqual([0, 0, 10, 20]);
   });
 
-  it("draws the tablets on the page the component draws them on", () => {
+  it("draws each tablet on the page the component draws it on", () => {
     expect([...TABLET_VIEWBOX]).toEqual([...WATCHTOWER_VIEWBOX]);
+    expect([...UNION_TABLET_VIEWBOX]).toEqual([...UNION_VIEWBOX]);
+    expect(Object.keys(TABLET_VIEWBOXES)).toEqual([...TABLET_IDS]);
+    const contract = CONTRACTS["enochian-tablet"];
+    for (const id of TABLET_IDS) {
+      expect([...TABLET_VIEWBOXES[id]], id).toEqual([...tabletViewBox(id)]);
+      expect(
+        contractViewBox(contract, parse("enochian-tablet", `id=${id}`)),
+      ).toEqual(TABLET_VIEWBOXES[id]);
+    }
+  });
+
+  it("rasterises each tablet at its own shape, 4 pixels a unit", () => {
+    const contract = CONTRACTS["enochian-tablet"];
+    const raster = (query: string) =>
+      contractRasterDefault(contract, parse("enochian-tablet", query));
+    // The Watchtowers' size, which their images have always had.
+    for (const id of ["earth", "air", "water", "fire"])
+      expect(raster(`id=${id}`)).toEqual({ width: 840, height: 1188 });
+    // 840 × 1188 would crop the Union's 124 × 104 page.
+    expect(raster("id=union")).toEqual({ width: 496, height: 416 });
+    for (const id of TABLET_IDS) {
+      const [, , width, height] = TABLET_VIEWBOXES[id];
+      expect(raster(`id=${id}`)).toEqual({
+        width: width * 4,
+        height: height * 4,
+      });
+    }
+  });
+
+  it("parses a tablet's dimensions against its own page", () => {
+    // 2,000 wide: 1,678 tall for the Union, inside the pixel limit; 2,829
+    // tall for a Watchtower, over it.
+    expect(parse("enochian-tablet", "id=union&width=2000")).toMatchObject({
+      width: 2000,
+    });
+    expect(() => parse("enochian-tablet", "id=earth&width=2000")).toThrow(
+      InvalidComponentImageRequest,
+    );
+  });
+
+  it("offers the Tablet of Union only in the versions that have it", () => {
+    expect([...UNION_IMAGE_VERSIONS]).toEqual(
+      TABLET_VERSIONS.filter((version) =>
+        Boolean(tabletVersion(tablets.union, version)),
+      ),
+    );
+    for (const version of UNION_IMAGE_VERSIONS)
+      expect(
+        parse("enochian-tablet", `id=union&version=${version}`).version,
+      ).toBe(version);
+    for (const version of ["dee", "raphael"])
+      expect(() =>
+        parse("enochian-tablet", `id=union&version=${version}`),
+      ).toThrow(InvalidComponentImageRequest);
+    expect(
+      CONTRACTS["enochian-tablet"].filename(
+        parse("enochian-tablet", "id=union&version=equinox&font=enochian"),
+      ),
+    ).toBe("enochian-union-tablet-equinox-glyphs");
   });
 
   it("offers the tablets' versions, the Golden Dawn's by default", () => {
@@ -397,7 +478,8 @@ describe("component image contracts", () => {
 
   it("rejects unknown tablets and keys on the new slugs", () => {
     for (const [slug, query] of [
-      ["enochian-tablet", "id=union"],
+      ["enochian-tablet", "id=Union"],
+      ["enochian-tablet", "id=union&version=dee"],
       ["enochian-tablet", "id=Earth"],
       ["enochian-tablet", "font=Enochian"],
       ["enochian-tablet", "font=hebrew"],
