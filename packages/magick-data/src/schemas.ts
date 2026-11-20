@@ -266,6 +266,56 @@ const planetaryNameReading = v.pipe(
   v.description("One witness's reading of the name."),
 );
 
+/** A count of pixels in a page image: a coordinate or a length. */
+const pixels = (description: string) =>
+  v.pipe(v.number(), v.integer(), v.minValue(0), v.description(description));
+
+/** A verdict on a character against a name's trace: see the data file. */
+const characterVerdict = v.picklist(["match", "partial", "no"]);
+
+/** One stroke of a character, as a blind reader recorded it. */
+const characterStroke = v.pipe(
+  v.strictObject({
+    closed: v.pipe(
+      v.boolean(),
+      v.description(
+        "Whether the stroke comes back to its own start, with no free end.",
+      ),
+    ),
+    vertices: v.pipe(
+      v.array(
+        v.pipe(
+          v.strictObject({
+            kind: v.pipe(
+              v.picklist(["end", "corner", "hairpin", "cusp", "curve"]),
+              v.description(
+                "What the vertex is: an `end` of the stroke; a `corner`, where it changes direction to a point; a `hairpin`, a rounded U, at its far point; a `cusp`, a notch, cap or kink in the line; or a `curve`, one end of an arc.",
+              ),
+            ),
+            x: pixels(
+              "Pixels from the region's left edge, in the full-size page image.",
+            ),
+            y: pixels(
+              "Pixels from the region's top edge, in the full-size page image.",
+            ),
+            mark: v.optional(
+              v.pipe(
+                v.picklist(["circle", "dot", "bar", "hook", "none", "other"]),
+                v.description(
+                  "At an end, the mark drawn there: a small `circle`, a `dot`, a `bar` across the line, a `hook` or curl, `none`, or some `other` mark.",
+                ),
+              ),
+            ),
+          }),
+          v.description("One vertex, in the stroke's order."),
+        ),
+      ),
+      v.description("The stroke's vertices, from one end to the other."),
+    ),
+  }),
+  v.description("One stroke: a line followed without lifting the pen."),
+);
+
 const byHouse = (value: v.GenericSchema): Entries =>
   Object.fromEntries(HOUSE_NUMBERS.map((no) => [no, value]));
 
@@ -750,6 +800,129 @@ export const schemas = {
     }),
     v.description(
       "Every number a witness prints beside a planetary name that is not the sum of the Hebrew it prints, and whose the difference is.",
+    ),
+  ),
+  planetaryNameCharacter: v.pipe(
+    v.strictObject({
+      id: v.pipe(
+        v.string(),
+        v.description(
+          "The row's id: the name's id and the witness's, joined by a hyphen (`agiel-agrippa1533`).",
+        ),
+      ),
+      witness: v.pipe(
+        v.picklist(["agrippa1533", "regardie1940"]),
+        v.description(
+          "Whose figure it is: Agrippa's 1533 printing, or the redrawing in Regardie's vol. 4 (1940), as the data file's header cites them.",
+        ),
+      ),
+      leaf: v.pipe(
+        archiveLeaf,
+        v.description(
+          "The archive.org leaf the figure is on, `n164`, in the item the data file's header names for the witness.",
+        ),
+      ),
+      region: v.pipe(
+        v.strictObject({
+          x: pixels("Pixels from the image's left edge to the box's."),
+          y: pixels("Pixels from the image's top edge to the box's."),
+          width: pixels("The box's width in pixels."),
+          height: pixels("The box's height in pixels."),
+        }),
+        v.description(
+          "The figure's box in archive.org's full-size image of the leaf, https://archive.org/download/<item>/page/<leaf>.jpg.",
+        ),
+      ),
+      verdict: v.pipe(
+        characterVerdict,
+        v.description(
+          "Ours, reconciled from two judges: `match`, the spelling's trace drawn freely (scale, rotation and mirroring free; a return a U, a wedge or parallel legs; two letters on one cell a notch or a cap); `partial`, the trace with the departures named; `no`, not recognisably any spelling's trace.",
+        ),
+      ),
+      spelling: v.pipe(
+        planetaryHebrew,
+        v.description(
+          "The Hebrew whose trace the figure is, or is nearest: a witness's `he` for the name in `planetaryName`, or the name's `division`.",
+        ),
+      ),
+      finals: v.pipe(
+        v.picklist(["ordinary", "final", "mixed"]),
+        v.description(
+          "How the trace counts final letters: at their ordinary values (and for any spelling with none), at 500 to 900, or `mixed`, some words each way, which `cellsRead` shows.",
+        ),
+      ),
+      cellsRead: v.optional(
+        v.pipe(
+          v.array(v.array(v.pipe(v.number(), v.integer(), v.minValue(1)))),
+          v.description(
+            "A partial's only: the cells of the planet's square the figure's vertices sit on, word by word, which are not the trace's.",
+          ),
+        ),
+      ),
+      departures: v.pipe(
+        v.array(v.string()),
+        v.description(
+          "Where the figure leaves the trace, in our words; empty for a match.",
+        ),
+      ),
+      marks: v.pipe(
+        v.string(),
+        v.description(
+          "The marks at the figure's ends and turns, in our words.",
+        ),
+      ),
+      judges: v.pipe(
+        v.strictObject({
+          opus: v.pipe(
+            characterVerdict,
+            v.description("The verdict of the judge run on Opus 5.5."),
+          ),
+          fable: v.pipe(
+            characterVerdict,
+            v.description("The verdict of the judge run on Fable 5.2."),
+          ),
+        }),
+        v.description(
+          "Each judge's own verdict, given apart before the two were reconciled.",
+        ),
+      ),
+      note: v.optional(
+        v.pipe(
+          v.string(),
+          v.description(
+            "Where the judges differ, how the verdict was reconciled, in our words.",
+          ),
+        ),
+      ),
+      readings: v.optional(
+        v.pipe(
+          v.strictObject({
+            opus: v.pipe(
+              v.array(characterStroke),
+              v.description(
+                "The strokes as the reader run on Opus 5.5 recorded them.",
+              ),
+            ),
+            fable: v.pipe(
+              v.array(characterStroke),
+              v.description(
+                "The strokes as the reader run on Fable 5.2 recorded them.",
+              ),
+            ),
+          }),
+          v.description(
+            "Agrippa's 1533 figures only: each blind reader's record of the strokes, in pixels from the region's top left corner. Regardie's figures are in copyright, and their readings are not published.",
+          ),
+        ),
+      ),
+      ...ids("planetaryNameCharacter", {
+        about: {
+          planetaryNameId: "The name whose character the figure is.",
+        },
+      }),
+    }),
+    v.description(
+      "Agrippa's characters of the planetary names, as he prints them (1533) and as Regardie's vol. 4 redraws them (1940), each with our verdict on whether it is the name traced on its planet's square.",
     ),
   ),
 

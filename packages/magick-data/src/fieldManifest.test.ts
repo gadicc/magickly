@@ -456,9 +456,9 @@ describe("the descriptions", () => {
     );
   });
 
-  it("number 305 field paths, the shared English text described once", () => {
+  it("number 339 field paths, the shared English text described once", () => {
     const paths = NAMES.flatMap((table) => fields.tables[table].fields);
-    expect(paths).toHaveLength(305);
+    expect(paths).toHaveLength(339);
     expect(
       paths.filter((f) => f.description === "The text in English.").length,
     ).toBeGreaterThan(30);

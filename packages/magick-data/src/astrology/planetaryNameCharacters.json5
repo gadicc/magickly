@@ -1,0 +1,1163 @@
+{
+  /*
+    Agrippa's characters of the planetary names, and whether each is the
+    name traced on its planet's square (plan 093, K6). One row a figure:
+    the sixteen names Agrippa draws a character for, as his 1533 printing
+    draws them and as Regardie's of 1940 redraws them, keyed by the name's
+    id and the witness's. The trace is aiqBekar.ts's `traceHebrew`, the
+    Golden Dawn's reduction; the names, their spellings and the witnesses
+    are planetaryNames.json5's, beside this file.
+
+    The figures. `leaf` is the archive.org leaf, `n164`, and `region` the
+    figure's box, { x, y, width, height } in pixels, in archive.org's
+    full-size image of that leaf,
+    https://archive.org/download/<item>/page/<leaf>.jpg:
+      agrippa1533: Agrippa, De occulta philosophia libri tres (Cologne,
+        1533), Book II, chapter 22, item DeOccultaPhilosophiaLoc1533,
+        n164–n168. Public domain.
+      regardie1940: Regardie, The Golden Dawn, vol. 4 (Chicago, 1940),
+        the plates of pp. 81–86, item IsraelRegardie-TheGoldenDawn-Vol4-1940,
+        each name on its planet's leaf, n75–n80, as planetaryNames.json5
+        gives it. In copyright where the site is read (plan 091): the
+        verdicts and the boxes, and our words about the figures, only.
+
+    How they were read, on 20 November 2026:
+      1. Each figure was cropped from its page image and given an opaque
+         id, so that nothing a reader saw named it.
+      2. Two readers, Claude Opus 5.5 (reasoning high) and Claude Fable
+         5.2 (reasoning high), working apart and blind to the names,
+         recorded each figure's strokes, its vertices in order and the
+         marks at its ends.
+      3. Two judges, the same two models, working apart, compared each
+         figure, with both readings, against the trace of every spelling
+         the witnesses give for its name, with the final letters at their
+         ordinary values and at 500 to 900, and gave a verdict, the
+         nearest trace and where the figure departs from it.
+      4. Claude (Opus 5.5) reconciled the two. Where the judges differ,
+         on 7 figures, `note` says how it was settled; both verdicts are
+         kept in `judges`.
+    The working files (the crops, the comparison sheets, the readings of
+    the 1940 figures and the judges' notes) are kept outside the
+    repository, with the owner.
+
+    A row holds:
+      planetaryNameId  the name whose character it is.
+      witness, leaf, region  where the figure is, as above.
+      verdict     match: the spelling's trace, drawn freely. Scale,
+                    rotation and mirroring are free; a return may be a U,
+                    a wedge or two parallel legs; two letters on one cell
+                    may be a notch or a cap.
+                  partial: the trace, with the departures named.
+                  no: not recognisably any spelling's trace.
+      spelling    the Hebrew whose trace it is, or the nearest: a
+                  witness's `he` in planetaryNames.json5, or the name's
+                  `division`.
+      finals      how the trace counts final letters: `ordinary` (and any
+                  spelling with none), `final` (500 to 900), or `mixed`,
+                  some words each way, which `cellsRead` shows.
+      cellsRead   a partial's only: the cells the figure's vertices sit
+                  on, word by word, which are not the trace's.
+      departures  where the figure leaves the trace, in our words; none
+                  for a match.
+      marks       the marks at its ends and turns, in our words.
+      judges      each judge's own verdict, { opus, fable }.
+      note        where the judges differ, how it was reconciled.
+      readings    the 1533 figures only: each reader's record, { opus,
+                  fable }, a list of strokes, each { closed, vertices }.
+                  A vertex is { kind, x, y, mark }, in pixels from the
+                  region's top left corner. `kind`: end; corner; hairpin,
+                  a rounded U, at its far point; cusp, a notch, cap or
+                  kink; curve, an end of an arc. `mark`, at an end only:
+                  circle, dot, bar, hook, none or other. Regardie's
+                  figures are in copyright, and their readings are not
+                  here.
+
+    What the rows show. The 1940 figures keep 1533's paths and their
+    departures, and differ only in the drawing: Kedemel's start is moved,
+    and Iophiel's and Hagiel's capped turn sits on cell 10, where 1533's
+    is nearer 11. The departures recur: ר on cell 2, not 20, in Graphiel,
+    Bartzabel and Sorath; ל on 3, not 30, in Nakhiel and Hagiel; י and א
+    drawn as one capped turn in Iophiel, Hagiel and Tiriel; a letter with
+    no vertex in Chasmodai and Graphiel. So they are the characters' own,
+    not one reader's slips.
+   */
+
+  // SATURN
+  "agiel-agrippa1533": {
+    id: "agiel-agrippa1533",
+    planetaryNameId: "agiel",
+    witness: "agrippa1533",
+    leaf: "n164",
+    region: { x: 660, y: 975, width: 270, height: 195 },
+    verdict: "match",
+    spelling: "אגיאל",
+    finals: "ordinary",
+    departures: [],
+    marks: "A circle at both ends. The two letters on cell 1 (י, א) are one turn with an m-shaped cap.",
+    judges: { opus: "match", fable: "match" },
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 71, y: 53, mark: "circle" },
+            { kind: "cusp", x: 179, y: 137 },
+            { kind: "hairpin", x: 33, y: 87 },
+            { kind: "end", x: 144, y: 168, mark: "circle" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 71, y: 53, mark: "circle" },
+            { kind: "cusp", x: 181, y: 137 },
+            { kind: "hairpin", x: 32, y: 91 },
+            { kind: "end", x: 144, y: 168, mark: "circle" },
+          ],
+        },
+      ],
+    },
+  },
+  "agiel-regardie1940": {
+    id: "agiel-regardie1940",
+    planetaryNameId: "agiel",
+    witness: "regardie1940",
+    leaf: "n75",
+    region: { x: 370, y: 2900, width: 390, height: 400 },
+    verdict: "match",
+    spelling: "אגיאל",
+    finals: "ordinary",
+    departures: [],
+    marks: "A circle at the start, the end plain; the doubled cell 1 is a capped turn.",
+    judges: { opus: "match", fable: "match" },
+  },
+  "zazel-agrippa1533": {
+    id: "zazel-agrippa1533",
+    planetaryNameId: "zazel",
+    witness: "agrippa1533",
+    leaf: "n164",
+    region: { x: 1000, y: 960, width: 400, height: 230 },
+    verdict: "match",
+    spelling: "זאזל",
+    finals: "ordinary",
+    departures: [],
+    marks: "A circle at both ends; the return to 7 is a narrow U.",
+    judges: { opus: "match", fable: "match" },
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 102, y: 61, mark: "circle" },
+            { kind: "corner", x: 256, y: 147 },
+            { kind: "hairpin", x: 145, y: 166 },
+            { kind: "end", x: 251, y: 173, mark: "circle" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 102, y: 61, mark: "circle" },
+            { kind: "corner", x: 258, y: 147 },
+            { kind: "hairpin", x: 144, y: 167 },
+            { kind: "end", x: 251, y: 173, mark: "circle" },
+          ],
+        },
+      ],
+    },
+  },
+  "zazel-regardie1940": {
+    id: "zazel-regardie1940",
+    planetaryNameId: "zazel",
+    witness: "regardie1940",
+    leaf: "n75",
+    region: { x: 300, y: 2075, width: 600, height: 345 },
+    verdict: "match",
+    spelling: "זאזל",
+    finals: "ordinary",
+    departures: [],
+    marks: "A circle at both ends; the return to 7 is a narrow U.",
+    judges: { opus: "match", fable: "match" },
+  },
+
+  // JUPITER
+  "iophiel-agrippa1533": {
+    id: "iophiel-agrippa1533",
+    planetaryNameId: "iophiel",
+    witness: "agrippa1533",
+    leaf: "n164",
+    region: { x: 690, y: 1830, width: 320, height: 270 },
+    verdict: "partial",
+    spelling: "יהפיאל",
+    finals: "ordinary",
+    cellsRead: [[10, 5, 8, 11, 3]],
+    departures: [
+      "The second י and the א are one turn, nearer cell 11 (10 and 1 taken together) than cell 10; the line never goes up to cell 1.",
+      "The return at cell 5 is drawn with a pen lift: two parallel strokes.",
+    ],
+    marks: "A circle at both ends.",
+    judges: { opus: "partial", fable: "partial" },
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 216, y: 98, mark: "circle" },
+            { kind: "end", x: 65, y: 103, mark: "none" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 37, y: 125, mark: "none" },
+            { kind: "hairpin", x: 281, y: 140 },
+            { kind: "corner", x: 114, y: 155 },
+            { kind: "end", x: 216, y: 202, mark: "circle" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 216, y: 98, mark: "circle" },
+            { kind: "end", x: 68, y: 102, mark: "none" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 38, y: 125, mark: "none" },
+            { kind: "hairpin", x: 279, y: 140 },
+            { kind: "corner", x: 114, y: 155 },
+            { kind: "end", x: 217, y: 203, mark: "circle" },
+          ],
+        },
+      ],
+    },
+  },
+  "iophiel-regardie1940": {
+    id: "iophiel-regardie1940",
+    planetaryNameId: "iophiel",
+    witness: "regardie1940",
+    leaf: "n75",
+    region: { x: 1430, y: 3000, width: 650, height: 370 },
+    verdict: "partial",
+    spelling: "יהפיאל",
+    finals: "ordinary",
+    cellsRead: [[10, 5, 8, 10, 3]],
+    departures: [
+      "The א has no vertex: from the second visit to cell 10 the line goes straight to cell 3. The joined turn sits on cell 10, where 1533 has it nearer 11.",
+    ],
+    marks: "A circle at the start, a bar at the end.",
+    judges: { opus: "partial", fable: "partial" },
+  },
+  "hismael-agrippa1533": {
+    id: "hismael-agrippa1533",
+    planetaryNameId: "hismael",
+    witness: "agrippa1533",
+    leaf: "n164",
+    region: { x: 1035, y: 1815, width: 270, height: 270 },
+    verdict: "match",
+    spelling: "הסמאל",
+    finals: "ordinary",
+    departures: [],
+    marks: "A circle at both ends.",
+    judges: { opus: "match", fable: "match" },
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 43, y: 164, mark: "circle" },
+            { kind: "corner", x: 149, y: 152 },
+            { kind: "corner", x: 35, y: 81 },
+            { kind: "corner", x: 236, y: 81 },
+            { kind: "end", x: 127, y: 240, mark: "circle" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 127, y: 241, mark: "circle" },
+            { kind: "corner", x: 240, y: 78 },
+            { kind: "corner", x: 32, y: 80 },
+            { kind: "corner", x: 151, y: 152 },
+            { kind: "end", x: 43, y: 164, mark: "circle" },
+          ],
+        },
+      ],
+    },
+  },
+  "hismael-regardie1940": {
+    id: "hismael-regardie1940",
+    planetaryNameId: "hismael",
+    witness: "regardie1940",
+    leaf: "n75",
+    region: { x: 1380, y: 2100, width: 700, height: 660 },
+    verdict: "match",
+    spelling: "הסמאל",
+    finals: "ordinary",
+    departures: [],
+    marks: "A circle at the start, the end plain.",
+    judges: { opus: "match", fable: "match" },
+  },
+
+  // MARS
+  "graphiel-agrippa1533": {
+    id: "graphiel-agrippa1533",
+    planetaryNameId: "graphiel",
+    witness: "agrippa1533",
+    leaf: "n165",
+    region: { x: 1010, y: 770, width: 360, height: 260 },
+    verdict: "partial",
+    spelling: "גראפיאל",
+    finals: "ordinary",
+    cellsRead: [[3, 2, 1, 8, 10, 3]],
+    departures: [
+      "The ר is near cell 2, not 20, as if 200 were reduced to 2.",
+      "The second א has no vertex: from cell 10 the line goes straight back to cell 3.",
+      "Loosely drawn, and turned about 34° clockwise.",
+    ],
+    marks: "None: the trace ends on the cell it starts from, and the figure is a closed outline.",
+    judges: { opus: "partial", fable: "partial" },
+    readings: {
+      opus: [
+        {
+          closed: true,
+          vertices: [
+            { kind: "corner", x: 56, y: 83 },
+            { kind: "corner", x: 205, y: 140 },
+            { kind: "corner", x: 107, y: 174 },
+            { kind: "corner", x: 175, y: 221 },
+            { kind: "corner", x: 326, y: 70 },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: true,
+          vertices: [
+            { kind: "corner", x: 327, y: 70 },
+            { kind: "corner", x: 55, y: 83 },
+            { kind: "corner", x: 204, y: 140 },
+            { kind: "corner", x: 108, y: 173 },
+            { kind: "corner", x: 176, y: 222 },
+          ],
+        },
+      ],
+    },
+  },
+  "graphiel-regardie1940": {
+    id: "graphiel-regardie1940",
+    planetaryNameId: "graphiel",
+    witness: "regardie1940",
+    leaf: "n76",
+    region: { x: 90, y: 1960, width: 970, height: 970 },
+    verdict: "partial",
+    spelling: "גראפיאל",
+    finals: "ordinary",
+    cellsRead: [[3, 2, 1, 8, 10, 3]],
+    departures: ["The ר is on cell 2, not 20.", "The second א has no vertex."],
+    marks: "A circle and a plain end side by side on cell 3: 1940 opens 1533's closed outline.",
+    judges: { opus: "partial", fable: "partial" },
+  },
+  "bartzabel-agrippa1533": {
+    id: "bartzabel-agrippa1533",
+    planetaryNameId: "bartzabel",
+    witness: "agrippa1533",
+    leaf: "n165",
+    region: { x: 1380, y: 730, width: 240, height: 350 },
+    verdict: "partial",
+    spelling: "ברצבאל",
+    finals: "ordinary",
+    cellsRead: [[2, 9, 2, 1, 3]],
+    departures: [
+      "It follows the six-letter ברצבאל (777's spelling, whose sum is the 325 Agrippa prints), not his seven-letter ברצאבאל: against his Hebrew, the first א has no vertex.",
+      "The ר shares cell 2 with the ב before it (200 reduced to 2), drawn as a curl at the start; the return 9 to 2 is a narrow U.",
+    ],
+    marks: "The circle is at the trace's end (cell 3); the start has a curl.",
+    judges: { opus: "match", fable: "partial" },
+    note: "The judges differ: one reads the narrow U as the climb to 20 and the turn to 9 under Agrippa's seven letters (a match); the other reads it as a return, which is how a U is drawn everywhere else, giving ברצבאל with ר on 2. Recorded as the second, which accounts for every stroke without a U that is not a return.",
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 188, y: 49, mark: "circle" },
+            { kind: "corner", x: 37, y: 223 },
+            { kind: "corner", x: 73, y: 245 },
+            { kind: "hairpin", x: 68, y: 265 },
+            { kind: "hairpin", x: 170, y: 174 },
+            { kind: "hairpin", x: 90, y: 288 },
+            { kind: "end", x: 112, y: 277, mark: "none" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 105, y: 298, mark: "none" },
+            { kind: "end", x: 127, y: 286, mark: "none" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 188, y: 50, mark: "circle" },
+            { kind: "corner", x: 36, y: 224 },
+            { kind: "corner", x: 77, y: 245 },
+            { kind: "hairpin", x: 68, y: 268 },
+            { kind: "hairpin", x: 168, y: 171 },
+            { kind: "end", x: 92, y: 277, mark: "hook" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 104, y: 299, mark: "none" },
+            { kind: "end", x: 130, y: 286, mark: "none" },
+          ],
+        },
+      ],
+    },
+  },
+  "bartzabel-regardie1940": {
+    id: "bartzabel-regardie1940",
+    planetaryNameId: "bartzabel",
+    witness: "regardie1940",
+    leaf: "n76",
+    region: { x: 1500, y: 1980, width: 560, height: 920 },
+    verdict: "partial",
+    spelling: "ברצבאל",
+    finals: "ordinary",
+    cellsRead: [[2, 9, 2, 1, 3]],
+    departures: ["As 1533: ברצבאל, with the ר on cell 2 beside the ב."],
+    marks: "A circle at the start, a bar at the end: 1940 moves the circle to the start.",
+    judges: { opus: "match", fable: "partial" },
+    note: "The judges differ as for 1533; recorded the same way.",
+  },
+
+  // SUN
+  "nakhiel-agrippa1533": {
+    id: "nakhiel-agrippa1533",
+    planetaryNameId: "nakhiel",
+    witness: "agrippa1533",
+    leaf: "n165",
+    region: { x: 1020, y: 1785, width: 255, height: 255 },
+    verdict: "partial",
+    spelling: "נכיאל",
+    finals: "ordinary",
+    cellsRead: [[5, 20, 10, 1, 3]],
+    departures: [
+      "The last leg goes to cell 3, not 30: the ל taken as 3 although the square has 30.",
+    ],
+    marks: "A circle at both ends.",
+    judges: { opus: "partial", fable: "partial" },
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 67, y: 48, mark: "circle" },
+            { kind: "corner", x: 233, y: 46 },
+            { kind: "corner", x: 75, y: 198 },
+            { kind: "corner", x: 37, y: 149 },
+            { kind: "end", x: 38, y: 235, mark: "circle" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 67, y: 48, mark: "circle" },
+            { kind: "corner", x: 232, y: 47 },
+            { kind: "corner", x: 76, y: 199 },
+            { kind: "corner", x: 37, y: 153 },
+            { kind: "end", x: 38, y: 235, mark: "circle" },
+          ],
+        },
+      ],
+    },
+  },
+  "nakhiel-regardie1940": {
+    id: "nakhiel-regardie1940",
+    planetaryNameId: "nakhiel",
+    witness: "regardie1940",
+    leaf: "n77",
+    region: { x: 1330, y: 380, width: 950, height: 1090 },
+    verdict: "partial",
+    spelling: "נכיאל",
+    finals: "ordinary",
+    cellsRead: [[5, 20, 10, 1, 3]],
+    departures: ["As 1533: the ל on cell 3."],
+    marks: "A circle at the start, a bar at the end.",
+    judges: { opus: "partial", fable: "partial" },
+  },
+  "sorath-agrippa1533": {
+    id: "sorath-agrippa1533",
+    planetaryNameId: "sorath",
+    witness: "agrippa1533",
+    leaf: "n165",
+    region: { x: 1305, y: 1785, width: 300, height: 270 },
+    verdict: "partial",
+    spelling: "סורת",
+    finals: "ordinary",
+    cellsRead: [[6, 6, 2, 4]],
+    departures: [
+      "The ר is near cell 2, not 20: one long diagonal and a short step back, where the trace bends at 20.",
+    ],
+    marks: "A double hook at the start, for the two letters on cell 6; the circle is at the trace's end.",
+    judges: { opus: "partial", fable: "partial" },
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 52, y: 44, mark: "other" },
+            { kind: "corner", x: 255, y: 250 },
+            { kind: "end", x: 187, y: 244, mark: "circle" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 51, y: 44, mark: "hook" },
+            { kind: "corner", x: 252, y: 249 },
+            { kind: "end", x: 186, y: 244, mark: "circle" },
+          ],
+        },
+      ],
+    },
+  },
+  "sorath-regardie1940": {
+    id: "sorath-regardie1940",
+    planetaryNameId: "sorath",
+    witness: "regardie1940",
+    leaf: "n77",
+    region: { x: 1330, y: 1870, width: 950, height: 1130 },
+    verdict: "partial",
+    spelling: "סורת",
+    finals: "ordinary",
+    cellsRead: [[6, 6, 2, 4]],
+    departures: ["As 1533: the ר on cell 2."],
+    marks: "A double hook at the start, a bar at the end.",
+    judges: { opus: "partial", fable: "partial" },
+  },
+
+  // VENUS
+  "hagiel-agrippa1533": {
+    id: "hagiel-agrippa1533",
+    planetaryNameId: "hagiel",
+    witness: "agrippa1533",
+    leaf: "n166",
+    region: { x: 900, y: 720, width: 345, height: 285 },
+    verdict: "partial",
+    spelling: "הגיאל",
+    finals: "ordinary",
+    cellsRead: [[5, 3, 11, 3]],
+    departures: [
+      "The י and א are one capped turn nearer cell 11 than 10; the line never reaches cell 1.",
+      "The last leg returns down beside the second to cell 3: the ל taken as 3 although the square has 30.",
+    ],
+    marks: "A circle at both ends.",
+    judges: { opus: "partial", fable: "partial" },
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 41, y: 45, mark: "circle" },
+            { kind: "corner", x: 270, y: 267 },
+            { kind: "cusp", x: 286, y: 44 },
+            { kind: "end", x: 301, y: 259, mark: "circle" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 41, y: 45, mark: "circle" },
+            { kind: "corner", x: 269, y: 265 },
+            { kind: "cusp", x: 287, y: 45 },
+            { kind: "end", x: 300, y: 259, mark: "circle" },
+          ],
+        },
+      ],
+    },
+  },
+  "hagiel-regardie1940": {
+    id: "hagiel-regardie1940",
+    planetaryNameId: "hagiel",
+    witness: "regardie1940",
+    leaf: "n78",
+    region: { x: 1300, y: 200, width: 1100, height: 1140 },
+    verdict: "partial",
+    spelling: "הגיאל",
+    finals: "ordinary",
+    cellsRead: [[5, 3, 10, 3]],
+    departures: [
+      "The א has no vertex; the capped turn sits on cell 10.",
+      "The ל on cell 3, as in 1533.",
+    ],
+    marks: "A circle at the start, a bar at the end.",
+    judges: { opus: "partial", fable: "partial" },
+  },
+  "kedemel-agrippa1533": {
+    id: "kedemel-agrippa1533",
+    planetaryNameId: "kedemel",
+    witness: "agrippa1533",
+    leaf: "n166",
+    region: { x: 900, y: 1080, width: 350, height: 340 },
+    verdict: "match",
+    spelling: "קדמאל",
+    finals: "ordinary",
+    departures: [],
+    marks: "A circle at both ends. Not to scale: the first leg is about twice as long as the trace's.",
+    judges: { opus: "match", fable: "match" },
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 68, y: 114, mark: "circle" },
+            { kind: "corner", x: 132, y: 188 },
+            { kind: "corner", x: 88, y: 287 },
+            { kind: "corner", x: 303, y: 49 },
+            { kind: "end", x: 142, y: 64, mark: "circle" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 142, y: 64, mark: "circle" },
+            { kind: "corner", x: 301, y: 50 },
+            { kind: "corner", x: 89, y: 287 },
+            { kind: "corner", x: 132, y: 189 },
+            { kind: "end", x: 68, y: 114, mark: "circle" },
+          ],
+        },
+      ],
+    },
+  },
+  "kedemel-regardie1940": {
+    id: "kedemel-regardie1940",
+    planetaryNameId: "kedemel",
+    witness: "regardie1940",
+    leaf: "n78",
+    region: { x: 200, y: 2300, width: 1260, height: 1190 },
+    verdict: "partial",
+    spelling: "קדמאל",
+    finals: "ordinary",
+    cellsRead: [[1, 4, 40, 1, 30]],
+    departures: [
+      "The start is beside cell 1, in the middle of the square, not on cell 10: the first leg climbs almost along the long leg after it.",
+    ],
+    marks: "A circle at the start, a bar at the end.",
+    judges: { opus: "match", fable: "partial" },
+    note: "The judges differ: one allows the displaced start as drawing not to scale (a match); the other measures the start beside cell 1 and the first leg's angle at about 10° against the trace's 56°. Recorded as partial on that measurement.",
+  },
+  "bne-seraphim-agrippa1533": {
+    id: "bne-seraphim-agrippa1533",
+    planetaryNameId: "bne-seraphim",
+    witness: "agrippa1533",
+    leaf: "n166",
+    region: { x: 930, y: 1470, width: 315, height: 270 },
+    verdict: "match",
+    spelling: "בני שרפים",
+    finals: "final",
+    departures: [],
+    marks: "One stroke a word, each with a circle at its start and a blunt end. The final ם counts 600, on cell 6; the last leg is short.",
+    judges: { opus: "match", fable: "match" },
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 186, y: 30, mark: "bar" },
+            { kind: "corner", x: 66, y: 68 },
+            { kind: "end", x: 244, y: 248, mark: "circle" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 112, y: 94, mark: "bar" },
+            { kind: "corner", x: 172, y: 46 },
+            { kind: "corner", x: 134, y: 236 },
+            { kind: "corner", x: 293, y: 182 },
+            { kind: "end", x: 39, y: 99, mark: "circle" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 188, y: 29, mark: "none" },
+            { kind: "corner", x: 68, y: 69 },
+            { kind: "end", x: 244, y: 248, mark: "circle" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 112, y: 93, mark: "bar" },
+            { kind: "corner", x: 172, y: 46 },
+            { kind: "corner", x: 136, y: 238 },
+            { kind: "corner", x: 291, y: 182 },
+            { kind: "end", x: 39, y: 99, mark: "circle" },
+          ],
+        },
+      ],
+    },
+  },
+  "bne-seraphim-regardie1940": {
+    id: "bne-seraphim-regardie1940",
+    planetaryNameId: "bne-seraphim",
+    witness: "regardie1940",
+    leaf: "n78",
+    region: { x: 1250, y: 1430, width: 1180, height: 925 },
+    verdict: "match",
+    spelling: "בני שרפים",
+    finals: "final",
+    departures: [],
+    marks: "A circle at each word's start, the ends plain. The final ם on cell 6; the last leg stops well short of it.",
+    judges: { opus: "match", fable: "match" },
+  },
+
+  // MERCURY
+  "tiriel-agrippa1533": {
+    id: "tiriel-agrippa1533",
+    planetaryNameId: "tiriel",
+    witness: "agrippa1533",
+    leaf: "n167",
+    region: { x: 1380, y: 900, width: 285, height: 240 },
+    verdict: "partial",
+    spelling: "טיריאל",
+    finals: "ordinary",
+    cellsRead: [[9, 10, 20, 11, 30]],
+    departures: [
+      "The return to 10 and the step to cell 1 are one capped turn, beside the first visit to 10 and nearer cell 11; the line never reaches cell 1.",
+    ],
+    marks: "A circle at both ends.",
+    judges: { opus: "match", fable: "partial" },
+    note: "The judges differ: one takes the capped turn for the two letters on neighbouring cells 10 and 1 (a match); the other fits it to cell 11. Recorded as partial, since the line does not reach cell 1, which is the departure both describe.",
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 42, y: 224, mark: "circle" },
+            { kind: "corner", x: 256, y: 37 },
+            { kind: "corner", x: 157, y: 186 },
+            { kind: "cusp", x: 210, y: 43 },
+            { kind: "end", x: 228, y: 146, mark: "circle" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 43, y: 224, mark: "circle" },
+            { kind: "corner", x: 258, y: 37 },
+            { kind: "corner", x: 158, y: 189 },
+            { kind: "cusp", x: 211, y: 47 },
+            { kind: "end", x: 229, y: 146, mark: "circle" },
+          ],
+        },
+      ],
+    },
+  },
+  "tiriel-regardie1940": {
+    id: "tiriel-regardie1940",
+    planetaryNameId: "tiriel",
+    witness: "regardie1940",
+    leaf: "n79",
+    region: { x: 100, y: 2340, width: 850, height: 1040 },
+    verdict: "partial",
+    spelling: "טיריאל",
+    finals: "ordinary",
+    cellsRead: [[9, 10, 20, 11, 30]],
+    departures: [
+      "As 1533, the capped turn about two cells from 10. Turned a quarter-turn anticlockwise.",
+    ],
+    marks: "Large circles at both ends.",
+    judges: { opus: "match", fable: "partial" },
+    note: "The judges differ as for 1533; recorded the same way.",
+  },
+  "taphthartharath-agrippa1533": {
+    id: "taphthartharath-agrippa1533",
+    planetaryNameId: "taphthartharath",
+    witness: "agrippa1533",
+    leaf: "n167",
+    region: { x: 1425, y: 1485, width: 180, height: 255 },
+    verdict: "match",
+    spelling: "תפתרתרת",
+    finals: "ordinary",
+    departures: [],
+    marks: "None: the trace ends where it starts and the figure is a closed outline, the returns drawn as parallel prongs.",
+    judges: { opus: "match", fable: "match" },
+    readings: {
+      opus: [
+        {
+          closed: true,
+          vertices: [
+            { kind: "hairpin", x: 56, y: 30 },
+            { kind: "corner", x: 62, y: 146 },
+            { kind: "hairpin", x: 161, y: 175 },
+            { kind: "hairpin", x: 62, y: 162 },
+            { kind: "hairpin", x: 164, y: 204 },
+            { kind: "corner", x: 42, y: 178 },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: true,
+          vertices: [
+            { kind: "hairpin", x: 57, y: 28 },
+            { kind: "corner", x: 62, y: 146 },
+            { kind: "hairpin", x: 165, y: 173 },
+            { kind: "hairpin", x: 60, y: 167 },
+            { kind: "hairpin", x: 167, y: 207 },
+            { kind: "corner", x: 41, y: 179 },
+          ],
+        },
+      ],
+    },
+  },
+  "taphthartharath-regardie1940": {
+    id: "taphthartharath-regardie1940",
+    planetaryNameId: "taphthartharath",
+    witness: "regardie1940",
+    leaf: "n79",
+    region: { x: 1590, y: 2480, width: 550, height: 902 },
+    verdict: "match",
+    spelling: "תפתרתרת",
+    finals: "ordinary",
+    departures: [],
+    marks: "None: a closed outline, as 1533.",
+    judges: { opus: "match", fable: "match" },
+  },
+
+  // MOON
+  "chasmodai-agrippa1533": {
+    id: "chasmodai-agrippa1533",
+    planetaryNameId: "chasmodai",
+    witness: "agrippa1533",
+    leaf: "n168",
+    region: { x: 1020, y: 750, width: 420, height: 400 },
+    verdict: "partial",
+    spelling: "חשמודאי",
+    finals: "ordinary",
+    cellsRead: [[8, 30, 6, 4, 1, 10]],
+    departures: [
+      "The מ has no vertex: from cell 30 the line goes straight to cell 6.",
+    ],
+    marks: "Flared ends, no circle.",
+    judges: { opus: "partial", fable: "partial" },
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 137, y: 151, mark: "bar" },
+            { kind: "corner", x: 176, y: 45 },
+            { kind: "corner", x: 71, y: 127 },
+            { kind: "corner", x: 374, y: 366 },
+            { kind: "corner", x: 248, y: 220 },
+            { kind: "end", x: 207, y: 264, mark: "bar" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 134, y: 151, mark: "bar" },
+            { kind: "corner", x: 177, y: 46 },
+            { kind: "corner", x: 70, y: 127 },
+            { kind: "corner", x: 375, y: 369 },
+            { kind: "corner", x: 245, y: 217 },
+            { kind: "end", x: 206, y: 264, mark: "bar" },
+          ],
+        },
+      ],
+    },
+  },
+  "chasmodai-regardie1940": {
+    id: "chasmodai-regardie1940",
+    planetaryNameId: "chasmodai",
+    witness: "regardie1940",
+    leaf: "n80",
+    region: { x: 1330, y: 300, width: 650, height: 660 },
+    verdict: "partial",
+    spelling: "חשמודאי",
+    finals: "ordinary",
+    cellsRead: [[8, 30, 6, 4, 1, 10]],
+    departures: ["As 1533: no vertex for the מ. Turned about 80° clockwise."],
+    marks: "A bar at the start, the end plain; no circle.",
+    judges: { opus: "partial", fable: "partial" },
+  },
+  "schedbarschemoth-schartathan-agrippa1533": {
+    id: "schedbarschemoth-schartathan-agrippa1533",
+    planetaryNameId: "schedbarschemoth-schartathan",
+    witness: "agrippa1533",
+    leaf: "n168",
+    region: { x: 1035, y: 1215, width: 375, height: 345 },
+    verdict: "no",
+    spelling: "שדברשהמעת שרתתן",
+    finals: "final",
+    departures: [
+      "Only fragments correspond: the oval loop has no place in any spelling's trace, the first word's climb up the column to the corner is not drawn, and the second word has no notch for its doubled ת and no last leg.",
+      "Drawn as three strokes, where the divided spelling has two words.",
+    ],
+    marks: "Circles at most free ends, a ring on the oval, a wedge at one end.",
+    judges: { opus: "no", fable: "partial" },
+    note: "The judges differ: one finds no trace; the other a partial one that needs a joined ש and ה (near cell 35), an extra pen lift and an unexplained loop. Recorded as no: that many unattested steps do not make a recognisable trace.",
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 63, y: 57, mark: "circle" },
+            { kind: "corner", x: 23, y: 165 },
+            { kind: "corner", x: 36, y: 157 },
+            { kind: "hairpin", x: 48, y: 330 },
+            { kind: "end", x: 61, y: 109, mark: "circle" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 143, y: 68, mark: "circle" },
+            { kind: "curve", x: 193, y: 130 },
+            { kind: "corner", x: 184, y: 163 },
+            { kind: "corner", x: 348, y: 245 },
+            { kind: "corner", x: 234, y: 317 },
+            { kind: "end", x: 265, y: 254, mark: "circle" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 143, y: 68, mark: "circle" },
+            { kind: "end", x: 171, y: 150, mark: "other" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 161, y: 93, mark: "circle" },
+            { kind: "end", x: 334, y: 310, mark: "circle" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 63, y: 57, mark: "circle" },
+            { kind: "corner", x: 23, y: 166 },
+            { kind: "corner", x: 40, y: 158 },
+            { kind: "hairpin", x: 48, y: 330 },
+            { kind: "end", x: 61, y: 109, mark: "circle" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 170, y: 151, mark: "other" },
+            { kind: "curve", x: 194, y: 133 },
+            { kind: "corner", x: 183, y: 162 },
+            { kind: "corner", x: 350, y: 245 },
+            { kind: "corner", x: 234, y: 318 },
+            { kind: "end", x: 266, y: 254, mark: "circle" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 161, y: 93, mark: "circle" },
+            { kind: "end", x: 334, y: 310, mark: "circle" },
+          ],
+        },
+      ],
+    },
+  },
+  "schedbarschemoth-schartathan-regardie1940": {
+    id: "schedbarschemoth-schartathan-regardie1940",
+    planetaryNameId: "schedbarschemoth-schartathan",
+    witness: "regardie1940",
+    leaf: "n80",
+    region: { x: 1410, y: 1180, width: 640, height: 880 },
+    verdict: "no",
+    spelling: "שדברשהמעת שרתתן",
+    finals: "final",
+    departures: ["As 1533."],
+    marks: "As 1533, with a fork for the wedge.",
+    judges: { opus: "no", fable: "partial" },
+    note: "The judges differ as for 1533; recorded the same way.",
+  },
+  "malcha-betharsisim-agrippa1533": {
+    id: "malcha-betharsisim-agrippa1533",
+    planetaryNameId: "malcha-betharsisim",
+    witness: "agrippa1533",
+    leaf: "n168",
+    region: { x: 1000, y: 1695, width: 455, height: 415 },
+    verdict: "partial",
+    spelling: "מלכא בתרשיתים עד ברוח שחקים",
+    finals: "mixed",
+    cellsRead: [
+      [40, 30, 21],
+      [2, 40, 20, 30, 10, 40, 10, 40],
+      [70, 4],
+      [2, 20, 6, 8],
+      [30, 8, 10, 10, 60],
+    ],
+    departures: [
+      "First word: the כ and א are one end vertex up and to the right of cell 30 (as if 21); the long descent to 20 and the turn to 1 are not drawn.",
+      "Finals mixed: the second word ends on 40 (ordinary ם), the fifth on 60 (ם as 600).",
+      "Words two to five follow their traces; the second word's run of returns is a serpentine of parallel legs.",
+    ],
+    marks: "Circles at most ends; the fourth word has a hook at its start and a wedge at its end.",
+    judges: { opus: "partial", fable: "partial" },
+    readings: {
+      opus: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 84, y: 138, mark: "circle" },
+            { kind: "end", x: 255, y: 376, mark: "circle" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 136, y: 162, mark: "circle" },
+            { kind: "corner", x: 65, y: 228 },
+            { kind: "hairpin", x: 145, y: 294 },
+            { kind: "corner", x: 114, y: 286 },
+            { kind: "end", x: 130, y: 327, mark: "circle" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 57, y: 216, mark: "other" },
+            { kind: "corner", x: 15, y: 185 },
+            { kind: "corner", x: 135, y: 363 },
+            { kind: "end", x: 171, y: 298, mark: "hook" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 356, y: 64, mark: "circle" },
+            { kind: "corner", x: 277, y: 94 },
+            { kind: "end", x: 281, y: 134, mark: "circle" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 398, y: 296, mark: "circle" },
+            { kind: "corner", x: 273, y: 153 },
+            { kind: "hairpin", x: 290, y: 373 },
+            { kind: "hairpin", x: 302, y: 129 },
+            { kind: "hairpin", x: 322, y: 313 },
+            { kind: "hairpin", x: 337, y: 177 },
+            { kind: "hairpin", x: 359, y: 311 },
+            { kind: "end", x: 365, y: 182, mark: "circle" },
+          ],
+        },
+      ],
+      fable: [
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 84, y: 138, mark: "circle" },
+            { kind: "end", x: 255, y: 376, mark: "circle" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 136, y: 162, mark: "circle" },
+            { kind: "corner", x: 63, y: 228 },
+            { kind: "hairpin", x: 147, y: 293 },
+            { kind: "corner", x: 112, y: 287 },
+            { kind: "end", x: 130, y: 327, mark: "circle" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 57, y: 217, mark: "other" },
+            { kind: "corner", x: 14, y: 184 },
+            { kind: "corner", x: 135, y: 364 },
+            { kind: "end", x: 166, y: 301, mark: "hook" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 355, y: 64, mark: "circle" },
+            { kind: "corner", x: 280, y: 96 },
+            { kind: "end", x: 281, y: 134, mark: "circle" },
+          ],
+        },
+        {
+          closed: false,
+          vertices: [
+            { kind: "end", x: 398, y: 296, mark: "circle" },
+            { kind: "corner", x: 273, y: 151 },
+            { kind: "hairpin", x: 288, y: 372 },
+            { kind: "hairpin", x: 306, y: 129 },
+            { kind: "hairpin", x: 324, y: 314 },
+            { kind: "hairpin", x: 341, y: 177 },
+            { kind: "hairpin", x: 359, y: 311 },
+            { kind: "end", x: 365, y: 182, mark: "circle" },
+          ],
+        },
+      ],
+    },
+  },
+  "malcha-betharsisim-regardie1940": {
+    id: "malcha-betharsisim-regardie1940",
+    planetaryNameId: "malcha-betharsisim",
+    witness: "regardie1940",
+    leaf: "n80",
+    region: { x: 650, y: 2400, width: 1640, height: 810 },
+    verdict: "partial",
+    spelling: "מלכא בתרשיתים עד ברוח שחקים",
+    finals: "mixed",
+    cellsRead: [
+      [40, 30, 21],
+      [2, 40, 20, 30, 10, 40, 10, 40],
+      [70, 4],
+      [2, 20, 6, 8],
+      [30, 8, 10, 10, 60],
+    ],
+    departures: [
+      "As 1533: the first word's כ and א as one vertex; finals mixed. The serpentine is slanted and out of proportion.",
+    ],
+    marks: "Circles at most ends; the fourth word ends in a fork.",
+    judges: { opus: "partial", fable: "partial" },
+  },
+}

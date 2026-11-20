@@ -57,6 +57,7 @@
     "./astrology/aiqBekar": "./src/astrology/aiqBekar.ts",
     "./astrology/planetaryNames": "./src/astrology/PlanetaryNames.ts",
     "./astrology/planetaryNameExceptions": "./src/astrology/PlanetaryNameExceptions.ts",
+    "./astrology/planetaryNameCharacters": "./src/astrology/PlanetaryNameCharacters.ts",
     "./astrology/zodiac": "./src/astrology/Zodiac.ts",
     "./enochian/letters": "./src/enochian/Letters.ts",
     "./enochian/tablets": "./src/enochian/Tablets.ts",
@@ -169,6 +170,10 @@
       "./astrology/planetaryNameExceptions": {
         "types": "./lib/astrology/PlanetaryNameExceptions.d.ts",
         "default": "./lib/astrology/PlanetaryNameExceptions.js"
+      },
+      "./astrology/planetaryNameCharacters": {
+        "types": "./lib/astrology/PlanetaryNameCharacters.d.ts",
+        "default": "./lib/astrology/PlanetaryNameCharacters.js"
       },
       "./astrology/zodiac": {
         "types": "./lib/astrology/Zodiac.d.ts",

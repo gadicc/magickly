@@ -2,7 +2,7 @@
 
 Magickal correspondences and reference data — the sephirot, the planets, the
 zodiac, the Hebrew and Enochian letters, the Golden Dawn grades, the
-geomantic figures and the rest — as 31 tables of plain rows, a graph that
+geomantic figures and the rest — as 32 tables of plain rows, a graph that
 says how they link, and the code that joins them. It is the data layer of
 [magick.ly](https://magick.ly), which consumes it as anyone else would.
 
@@ -78,7 +78,7 @@ different. Two kinds of figure are given, and each says where it came from:
   (`pnpm --filter magick-data smoke`, which prints them): the packed
   tarball, read by a consumer compiled with TypeScript 6.0.3 under
   `bundler`, with `lib: ["es2022"]` and `skipLibCheck`. Each of its reads
-  loads the same 95 files, the lib's included.
+  loads the same 96 files, the lib's included.
 - **Measured on the prototype at `dc6f732`**: the bundle sizes, minified
   and gzipped by esbuild 0.28.2 (webpack 5.111.0 came within a few per
   cent), and the instantiations of a scoped `assemble()`, in a consumer
@@ -93,11 +93,11 @@ import data from "magick-data";
 data.sephirah.tiferet.planet?.symbol; // "☉"
 ```
 
-It holds 28 of the 31 tables: `enochianTablet`, `christianChoir` and
+It holds 29 of the 32 tables: `enochianTablet`, `christianChoir` and
 `seventyTwoAngel` link to nothing and nothing links to them, so they are
-left out and read through their own subpaths. Reading one field costs 8,223
-instantiations, and a four-hop read 18,793 (smoke test); the bundle is
-17,290 bytes gzipped (`dc6f732`). Whatever imports it carries all 28
+left out and read through their own subpaths. Reading one field costs 8,336
+instantiations, and a four-hop read 19,002 (smoke test); the bundle is
+17,290 bytes gzipped (`dc6f732`). Whatever imports it carries all 29
 tables.
 
 **One raw table**, by its subpath:
@@ -150,6 +150,7 @@ is what a link's `to` names.
 | `astrologicalHouse` | 12 | `./astrology/houses` |
 | `planetaryName` | 38 | `./astrology/planetaryNames` |
 | `planetaryNameException` | 19 | `./astrology/planetaryNameExceptions` |
+| `planetaryNameCharacter` | 32 | `./astrology/planetaryNameCharacters` |
 | `hebrewLetter` | 27 | `./hebrewLetters` |
 | `enochianLetter` | 21 | `./enochian/letters` |
 | `enochianTablet` | 5 | `./enochian/tablets` |
@@ -186,7 +187,7 @@ as the row's name with `Id` (`SephirahId`). The exceptions are
 `LetterId` for `enochianLetter`; and `planet`, whose `PlanetKey` is every
 row's id while `PlanetId` names only the twelve whose `kind` is
 `"planet"`. The three array tables' modules export no id type.
-`magick-data/tables` exports all 31 raw, with the `Tables` and `TableName`
+`magick-data/tables` exports all 32 raw, with the `Tables` and `TableName`
 types, and `magick-data/types` and `magick-data/rows` the row types derived
 from the tables and the graph.
 
@@ -205,6 +206,15 @@ witnesses in order, and `tracedSpelling(name)`, the Hebrew a name is traced
 in. The planet's `intelligenceOfIntelligences` is deprecated: it is the
 Moon's `malcha-betharsisim` row, which a test holds it equal to, and it stays
 until a major version.
+
+`planetaryNameCharacter` holds Agrippa's characters of the sixteen names he
+draws one for, a row a figure: as his 1533 printing draws it and as
+Regardie's vol. 4 (1940) redraws it, each with the figure's box on the
+archive.org page image and our `verdict` on whether it is the name traced on
+its planet's square (`traceHebrew`): `match`, `partial`, with the cells the
+figure reads and where it departs, or `no`. Each judge's verdict is kept
+beside ours, and the 1533 figures carry two blind readers' records of their
+strokes. A name's `characters` are its rows.
 
 ## The graph
 
@@ -436,6 +446,7 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `alchemy/symbols.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `alchemy/terms.json5` | [Correspondences](#correspondences); `terms` from [the Second Knowledge Lecture](#the-second-knowledge-lecture), with no rights asserted over them | 2026-11-12 |
 | `astrology/houses.json5` | [Correspondences](#correspondences); `interpretation` is ours, following [Lilly](#lillys-houses); `motto.la` is the mnemonic verse as usually quoted, not from Lilly, and `motto.en` our rendering of it ([Lilly's houses](#lillys-houses)) | 2026-11-12 |
+| `astrology/planetaryNameCharacters.json5` | Ours: verdicts on [Agrippa's characters](#agrippas-characters) of the planetary names, as his 1533 printing and Regardie's vol. 4 (1940) draw them, with each figure's box on archive.org's page image, in our words; the blind readings are of Agrippa's 1533 figures, which are public domain, and none of Regardie's is given | 2026-11-20 |
 | `astrology/planetaryNameExceptions.json5` | Ours: where a witness's printed number departs from the [planetary names](#the-planetary-names)' Hebrew, and whose the difference is, in our words | 2026-11-20 |
 | `astrology/planetaryNames.json5` | [The planetary names](#the-planetary-names): the names, their Hebrew, romanisations, captions and numbers as each witness prints them, with the archive.org leaf; Agrippa's, the 1651 English's and Barrett's are public domain, 777's names and numbers, and Regardie's names, are taken as facts | 2026-11-20 |
 | `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon); `about` and `description` are ours, written from public-domain works the file's header cites; `intelligenceOfIntelligences`, the Moon's, is the name and its Hebrew from [Agrippa](#agrippas-kameas)'s table of the Moon, with 777's and Regardie's spellings of it beside his, names only, as the header cites them | 2026-11-14 |
@@ -578,6 +589,23 @@ text. The readings are one pass by eye on the scans, made on 19 November
 prints that its Hebrew does not add up to, what differs and whose it is.
 See
 [plan 093](https://github.com/gadicc/magickly/blob/main/plans/093-kameas-and-their-sigils.md).
+
+### Agrippa's characters
+
+**`astrology/planetaryNameCharacters.json5`** is ours: whether each of the
+characters Agrippa prints with the planetary names (1533, archive.org
+`DeOccultaPhilosophiaLoc1533`, n164–n168), and each of Regardie's
+redrawings of them (vol. 4, 1940, `IsraelRegardie-TheGoldenDawn-Vol4-1940`,
+n75–n80), is the name traced on its planet's square. On 20 November 2026
+two readers, Claude Opus 5.5 and Claude Fable 5.2, recorded each figure
+apart and blind to the names, from crops given opaque ids; two judges, the
+same two models, compared each figure with the trace of every spelling the
+witnesses give, with and without final values; and Claude reconciled their
+verdicts, keeping both. The file's header gives the method and the verdicts'
+meanings. Agrippa's figures are public domain, and the readers' records of
+them are given; Regardie's are in copyright (plan 091), so for his only the
+boxes, the verdicts and our words about the figures are given, and nothing
+traced from them.
 
 ### The Enochian letters
 

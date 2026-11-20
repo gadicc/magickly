@@ -34,6 +34,7 @@
     "src/astrology/aiqBekar.ts",
     "src/astrology/PlanetaryNames.ts",
     "src/astrology/PlanetaryNameExceptions.ts",
+    "src/astrology/PlanetaryNameCharacters.ts",
     "src/astrology/Zodiac.ts",
     "src/enochian/Letters.ts",
     "src/enochian/Tablets.ts",

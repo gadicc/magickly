@@ -27,6 +27,8 @@ export interface AstrologicalHouseRow extends Row<"*", "astrologicalHouse"> {}
 export interface PlanetaryNameRow extends Row<"*", "planetaryName"> {}
 export interface PlanetaryNameExceptionRow
   extends Row<"*", "planetaryNameException"> {}
+export interface PlanetaryNameCharacterRow
+  extends Row<"*", "planetaryNameCharacter"> {}
 
 export interface HebrewLetterRow extends Row<"*", "hebrewLetter"> {}
 
@@ -81,6 +83,7 @@ export interface NamedRows {
   astrologicalHouse: AstrologicalHouseRow;
   planetaryName: PlanetaryNameRow;
   planetaryNameException: PlanetaryNameExceptionRow;
+  planetaryNameCharacter: PlanetaryNameCharacterRow;
 
   hebrewLetter: HebrewLetterRow;
 

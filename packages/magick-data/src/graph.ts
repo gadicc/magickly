@@ -61,6 +61,15 @@ export const graph = {
       },
     },
   },
+  planetaryNameCharacter: {
+    links: {
+      planetaryNameId: {
+        to: "planetaryName",
+        inverse: "characters",
+        inverseMany: true,
+      },
+    },
+  },
 
   hebrewLetter: {},
 

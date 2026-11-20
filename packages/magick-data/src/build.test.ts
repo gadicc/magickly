@@ -64,6 +64,17 @@ describe("the picklists a declaration states as literals", () => {
       zodiac: ["quadruplicity"],
       planetaryName: ["role"],
       planetaryNameException: ["from", "whose", "witness"],
+      planetaryNameCharacter: [
+        "finals",
+        "judges.fable",
+        "judges.opus",
+        "readings.fable[].vertices[].kind",
+        "readings.fable[].vertices[].mark",
+        "readings.opus[].vertices[].kind",
+        "readings.opus[].vertices[].mark",
+        "verdict",
+        "witness",
+      ],
       enochianTablet: ["choices.gd[].from", "kind"],
       tetragram: ["rows[]"],
       gdGrade: ["orderId"],
@@ -424,7 +435,7 @@ describe("the generated declarations' picklist literals", () => {
       .map((name) => [name, picklistPaths(schemas[name])] as const)
       .filter(([, paths]) => paths.length);
     // Every picklist the first test above lists, so none is skipped here.
-    expect(picked.flatMap(([, paths]) => paths)).toHaveLength(12);
+    expect(picked.flatMap(([, paths]) => paths)).toHaveLength(21);
 
     const program = compile(
       picked.map(

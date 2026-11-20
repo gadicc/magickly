@@ -16,6 +16,7 @@ import zodiac from "../dist/astrology/zodiac.js";
 import astrologicalHouse from "../dist/astrology/houses.js";
 import planetaryName from "../dist/astrology/planetaryNames.js";
 import planetaryNameException from "../dist/astrology/planetaryNameExceptions.js";
+import planetaryNameCharacter from "../dist/astrology/planetaryNameCharacters.js";
 
 import hebrewLetter from "../dist/hebrewLetters.js";
 
@@ -66,6 +67,7 @@ export type Tables = {
   astrologicalHouse: typeof astrologicalHouse;
   planetaryName: typeof planetaryName;
   planetaryNameException: typeof planetaryNameException;
+  planetaryNameCharacter: typeof planetaryNameCharacter;
   hebrewLetter: typeof hebrewLetter;
   enochianLetter: typeof enochianLetter;
   enochianTablet: typeof enochianTablet;
@@ -101,6 +103,7 @@ export const tables: Tables = {
   astrologicalHouse,
   planetaryName,
   planetaryNameException,
+  planetaryNameCharacter,
 
   hebrewLetter,
 

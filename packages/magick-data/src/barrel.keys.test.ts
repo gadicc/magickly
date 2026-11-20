@@ -8,7 +8,7 @@ import data from "./data.ts";
  * mutation, and this is the delta, table by table.
  *
  * Two tables are new, `gdDegree` and `tribeOfIsrael`, both of them link
- * targets the barrel never held. The barrel is 28 of the 31 tables:
+ * targets the barrel never held. The barrel is 29 of the 32 tables:
  * `seventyTwoAngel`, `enochianTablet` and `christianChoir` declare no link in
  * either direction, so assembling them would add nothing to any row and only
  * put their JSON in every barrel route's chunk ([data.ts](./data.ts)).
@@ -64,7 +64,9 @@ import data from "./data.ts";
  * their own, `planetaryName`, with the exceptions to its printed numbers in
  * `planetaryNameException`: a planet's `intelligenceId` and `spiritId`, and
  * a figure's `rulerIds`, give `intelligence`, `spirit` and `rulers`, and the
- * planet derives `planetaryNames`, every name of its square.
+ * planet derives `planetaryNames`, every name of its square. Its K6 added
+ * `planetaryNameCharacter`, Agrippa's characters with our verdicts, which
+ * gives a name the back-link `characters`.
  *
  * The sampled row is each table's first, named so the sample is reproducible;
  * for the one array table left in the barrel that is index `0`.
@@ -125,6 +127,7 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "witnesses",
       "planet",
       "godName",
+      "characters",
       "exceptions",
       "tetragrams",
     ],
@@ -140,6 +143,24 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "whose",
       "leaf",
       "note",
+      "planetaryName",
+    ],
+  },
+  planetaryNameCharacter: {
+    row: "agiel-agrippa1533",
+    keys: [
+      "id",
+      "planetaryNameId",
+      "witness",
+      "leaf",
+      "region",
+      "verdict",
+      "spelling",
+      "finals",
+      "departures",
+      "marks",
+      "judges",
+      "readings",
       "planetaryName",
     ],
   },
