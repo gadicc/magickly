@@ -1,7 +1,8 @@
 # Kameas and their sigils — 19 November 2026
 
 Status: accepted 20 November 2026; the twelve decisions stand as
-recommended. K1 built on `gate/kameas` (see Stages); K6 next. The draft was
+recommended. K1 and K6 built on `gate/kameas` (see Stages); K6's sheet
+waits for Gadi, then K2. The draft was
 reviewed adversarially (Fable 5.2, high, 19 November); its three
 blockers and eight majors are answered below
 ([Review](#review-19-november-2026)).
@@ -69,6 +70,10 @@ them into data.
   its square.
 
 ### What the characters show (one pass, to be redone in K6)
+
+K6 redid this blind; its findings, in Stages, replace the list below
+where they differ (Tiriel and Graphiel are traces with departures;
+Iophiel's geometry is its trace with י and א as one turn).
 
 - **The two printings differ.** Agrippa 1533 (n164) draws a circle at
   both ends of Agiel, Zazel, Iophiel and Hismael, and 1651 (n257) and
@@ -424,6 +429,66 @@ Barrett's Malcha note, and the README's Regardie wording. The gate
 (check, typecheck, i18n:check, test:coverage, build with ci.yml's
 placeholder env) passed on the committed tree. Left for Gadi: the
 README's sign-off date 2026-11-20 on the two new Sources rows.
+
+**K6 built 20 November 2026** (`bac85c0b`). `planetaryNameCharacter`
+(32 rows) holds a verdict on each of the sixteen characters in Agrippa
+1533 (n164–n168) and Regardie 1940 (n75–n80): 11 match, 19 partial, 2
+no. How it was made:
+
+- Each figure was cropped from archive.org's full-size page image and
+  given an opaque id. Four 1940 crops cut a vertex off; they were
+  widened and both readers re-read those four.
+- Two readers, Opus 5.5 (high) and Fable 5.2 (high), apart and blind to
+  the names, recorded strokes, vertices and end marks. They agree on
+  the vertex count of 25 of 32 figures; the rest differ in small
+  details (a cap read as one vertex or several, a tail, an end mark).
+- A comparison script fitted each reading to every spelling's trace by
+  similarity. Its thresholds were fixed before it ran, it matched every
+  synthetic figure made from the traces, and no wrong name ever
+  matched (4 or 5 of 32 came out close). It could not judge figures
+  that draw returns as parallel lines or lift the pen, so it is
+  support, not the verdict.
+- Two judges, the same two models apart, compared each figure and both
+  readings with every spelling's trace, with and without finals. They
+  agree on 25 verdicts; the orchestrator settled the 7 others (both
+  Bartzabels, both Tiriels, Regardie's Kedemel, both spirits of
+  spirits), each with a `note`.
+
+Findings:
+
+- **Matches**: Agiel, Zazel, Hismael, Taphthartharath and the Bne
+  Seraphim in both printings (the Bne Seraphim with final ם as 600, on
+  cell 6), and Agrippa's Kedemel.
+- **Departures recur, in both printings**: ר on cell 2, not 20
+  (Graphiel, Bartzabel, Sorath); ל on 3, not 30 (Nakhiel, Hagiel);
+  י and א as one capped turn, nearer cell 11 (Iophiel, Hagiel,
+  Tiriel); a letter with no vertex (Chasmodai's מ, Graphiel's second
+  א). They are not uniform: ל stays on 30 in Kedemel and Tiriel, ר on
+  20 in Taphthartharath. So Agrippa's characters are traces on his
+  squares, but not under one reduction rule.
+- **Bartzabel** follows the six-letter ברצבאל, whose sum is the 325
+  Agrippa prints beside his seven-letter Hebrew (discrepancy 1).
+- **Malcha** follows four of its five words, and counts ם as 40 in one
+  word and 600 in another. **Schedbarschemoth Schartathan** is not
+  recognisably any trace.
+- **1940 keeps 1533's paths and departures.** It lays the small squares'
+  figures on the cells more exactly, moves Kedemel's start and the
+  joined turn of Iophiel and Hagiel to cell 10, and copies Mercury's
+  and the Moon's as shapes, turned.
+- **Marks**: 1533 puts a circle at both ends of most figures, a hook
+  or curl where the first cell is doubled, and no mark on a closed
+  outline. 1940 mostly has a circle at the start and a bar or nothing
+  at the end, which is the rose's marks.
+
+Decision 4 stands: the departures are in the reduction, not the marks,
+and 1940's habit is the rose's start circle and end bar. Decision 3
+stands for the generator (vol. 4's rule), and the name pages show where
+each character departs from it. The table carries Agrippa's two readings
+so that K4 can draw his characters; the crops, sheets, 1940 readings and
+judges' notes are in `~/Documents/Magick/Kameas/k6-2026-11-20/`, with
+the side-by-side sheet for Gadi (`side-by-side.html`). The gate
+(check, typecheck, i18n:check, test:coverage, build) passed on the
+committed tree.
 
 K1 first; K6 needs K1; K2 needs K6 (decision 4 may move); K5 runs
 alongside; K3 needs K2; K4 needs K3 and K5.
