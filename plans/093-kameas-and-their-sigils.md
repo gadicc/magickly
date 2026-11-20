@@ -1,7 +1,7 @@
 # Kameas and their sigils — 19 November 2026
 
 Status: accepted 20 November 2026; the twelve decisions stand as
-recommended. Nothing built; K1 starts when Gadi says so. The draft was
+recommended. K1 built on `gate/kameas` (see Stages); K6 next. The draft was
 reviewed adversarially (Fable 5.2, high, 19 November); its three
 blockers and eight majors are answered below
 ([Review](#review-19-november-2026)).
@@ -103,6 +103,10 @@ paper over.
    692, or 1252 with final Mem as 600, which is what 1651 prints.
 4. **1651's compositor**, copied by Barrett: Sorath סורה (271), Hasmodai
    השמודאי (366), the Moon's two long names; Eloh 56 for 36 (1651 only).
+   Not settled: 1651's Taphthartharath, whose sixth letter is a dalet in
+   the EEBO copy (n271, תפתרתדת, 1884) and unclear in b30335231 (n256);
+   Barrett has the resh. Reading that letter in another copy settles
+   whether the edition or one copy has it (found in K1's review).
 5. **The Moon's long names** reach 3321 in 1533 only with final Mem as
    600 and final Nun as 700.
 6. **777's e-text** reads Tiriel with Tav (651 against its printed 260)
@@ -377,6 +381,49 @@ in each). Alternatives are kept for the record.
 | K5 | The five seals, as a public component | Gadi reviews side-by-side renders |
 | K3 | `KameaSigil` (mock-up of stroke weights first), the `kamea` and `kamea-sigil` contracts, the generator route, README and explorer entries; magick-components 0.5.0 with magick-data 0.3.0 | Contract tests; browser check |
 | K4 | Hub, seven kamea pages, name pages; images, JSON-LD, sitemap, route registries; planet-page row, hall links; Lingui and Hebrew | Gate; Gadi's `search:publish` |
+
+**K1 built 20 November 2026** (`4c07ad84`). magick-data 0.3.0 adds
+`planetaryName` (38 rows), `planetaryNameException` (19 rows) and
+`astrology/aiqBekar` (`AIQ_BEKAR`, `hebrewValue`, `aiqBekar`,
+`traceHebrew`); the planets' `intelligenceId` and `spiritId` and the
+tetragrams' `rulerIds` are links, checked by a new `role` integrity
+check; `intelligenceOfIntelligences` is deprecated and held equal to its
+row. Where it departs from or adds to the design above:
+
+- Ids: the fourteen in use; divine names `<planet>-<slug>`
+  (`saturn-hod-9`, `mercury-asboga`); `bne-seraphim`,
+  `malcha-betharsisim`, `schedbarschemoth-schartathan`. Exception rows
+  are keyed `<name>-<witness>`, and link by `planetaryNameId`.
+- A reading has `he`, `roman`, `caption` (public-domain witnesses only),
+  `number`, `count`, `item`, `leaf` and `note`. `count` is `finals` only
+  where final values make the printed number (1533's two Moon names,
+  1651's Bne Seraphim), and `pairs` for Asboga, the eight extended,
+  tested pair by pair. `item` names another copy where a reading was
+  made in it (1651's EEBO copy for Taphthartharath and the Moon's
+  intelligence of intelligences), so a leaf links the page that shows
+  the reading.
+- Decision 10's division of the spirit of spirits is a row field,
+  `division`, held equal to 1533's word; `tracedSpelling` returns it.
+- Display names: `name.roman`, today's text for the fourteen
+  (Iophiel, Bartzabel), so no visible text changed and search needs no
+  republish; Agrippa's forms beside them wait for K4. Three divine names
+  no witness romanises are our consonant transcriptions (HVH, AHY, YHY),
+  said so in their notes.
+- `graph.planet.pending` and `graph.tetragram.pending` are gone, a
+  type-level change a 0.x minor allows.
+- `/open-source/data` now counts 31 tables and lists the two new ones
+  (noindex, not in search).
+
+Verification: every printed number is its sum or an exception row, and
+a stale row fails; every hand trace in the appendix matches in both
+finals modes. A fresh Opus review (high) found no critical or high
+issue; fixed before the gate: two 1651 readings that linked a leaf
+where the reading cannot be seen (now `item`), 1651's Taphthartharath
+recorded in 1533's spelling (now as read, with an `unsettled` row),
+Barrett's Malcha note, and the README's Regardie wording. The gate
+(check, typecheck, i18n:check, test:coverage, build with ci.yml's
+placeholder env) passed on the committed tree. Left for Gadi: the
+README's sign-off date 2026-11-20 on the two new Sources rows.
 
 K1 first; K6 needs K1; K2 needs K6 (decision 4 may move); K5 runs
 alongside; K3 needs K2; K4 needs K3 and K5.
