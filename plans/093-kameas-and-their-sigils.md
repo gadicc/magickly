@@ -1,8 +1,8 @@
 # Kameas and their sigils — 19 November 2026
 
 Status: accepted 20 November 2026; the twelve decisions stand as
-recommended. K1 and K6 built on `gate/kameas` (see Stages); K6's sheet
-waits for Gadi, then K2. The draft was
+recommended. K1, K6 and K2 built on `gate/kameas` (see Stages); K5 and
+K3 next. The draft was
 reviewed adversarially (Fable 5.2, high, 19 November); its three
 blockers and eight majors are answered below
 ([Review](#review-19-november-2026)).
@@ -182,6 +182,9 @@ for the table's (decision 3).
 magick-data 0.2.1 → 0.3.0 (additive).
 
 ### Engine: a kamea layout under the rose's rules
+
+As built (K2, in Stages), the scale is 28 units a cell, not 10, and some
+names do make an exact straight pass (item 4).
 
 The kamea uses the rose's marks: a start circle (R1), straight strokes
 (R2), a crook for a repeat in one cell (R3, which Agrippa's Agiel shows),
@@ -489,6 +492,50 @@ judges' notes are in `~/Documents/Magick/Kameas/k6-2026-11-20/`, with
 the side-by-side sheet for Gadi (`side-by-side.html`). The gate
 (check, typecheck, i18n:check, test:coverage, build) passed on the
 committed tree.
+
+**K2 built 20 November 2026** (`bdf56729`). magick-components gains
+`kameaLayout(planet, { finals })` (exported, React-free, reducing in
+`place` with `aiqBekar`), a layout's own frame (a square bound, radius
+48, pitch 100, `Kamea`'s viewBox; the rose's disc unchanged), a
+`strokeWidth` on `SigilImage` and the profile, and `laneStarts`, an
+opt-in placement setting the rose never sets. Where it departs from the
+design above:
+
+- **Scale and slack.** 28 units a cell and slack 0.46, not the stub's
+  10 and 0.46: at 10 units 3,000 random starts found no figure for some
+  Moon names, so a larger budget alone could not clear them. A sweep of
+  20, 22, 24 and 28 units by slack 0.44, 0.46 and 0.48 (with lane
+  starts and 8 budgets) found 28/0.46 the only setting with no name
+  failing at the rose's slack; the 0.48 settings place every name too
+  but halve the clearance from the grid lines. The cost: the Moon's unit
+  is 0.381 of the square's 96, so a Moon sigil meets the grammar's
+  1.25 px a unit only from about 328 px across (22/0.48: 258 px).
+- **Grid lines.** A vertex may sit 0.042 cell from a cell line, 0.445
+  units on the Moon's square, where half the stroke and half a 0.6 rule
+  make 0.49: the inks can just touch, though read-back is exact. Only
+  slack 0.44 clears it, and no 0.44 setting places every name. K3's
+  mock-up judges it at real size.
+- **Straight passes** do occur: through the Moon's 10 in 1651's and
+  Barrett's Malcha, and in 1533's Malcha and Elim with finals. R4's
+  0.05 cell holds (a near miss is at least 0.094 cell off).
+- **Stroke width** is one unit of the Moon's square, 0.381, provisional
+  for K3.
+
+Oracle: O1–O3 over every letter-reachable triple (15,273), the 60 name
+cases (every witness's spelling, the divided and undivided spirit of
+spirits, the divine names, both finals modes; pinned), 1,260 seeded
+random words, 10 grid templates and vol. 4's Zazel and Taphthartharath
+traced from letters; 26 s in CI. No name fails. 70 known failures (46
+triples, 24 random words; 35 on Mercury's square, 35 on the Moon's): 69
+are returns of 7.6 to 9.9 cells or turns between neighbouring cells,
+where F1's wedge opens at most 0.92 cell, and one is a clearance
+failure. The rose: `scripts/sigil-oracle/roseDigest.mts` hashes the SVG
+of 31,074 rose figures (the report corpus and collinear runs on both
+roses) and gives `d122e18e…c256` before and after; the registry digest
+is unchanged. A fresh Opus review (high) checked the digest on a clean
+worktree of the base and found the one exception the first build listed
+(777's Malcha with finals) to be a setting, not a limit, which the sweep
+then removed. The gate passed on the committed tree.
 
 K1 first; K6 needs K1; K2 needs K6 (decision 4 may move); K5 runs
 alongside; K3 needs K2; K4 needs K3 and K5.
