@@ -210,7 +210,7 @@ export function wordInk(
   word: PlacedWord,
   unit: number,
   profile: SigilProfile,
-  bound?: { center: Point; radius: number },
+  bound?: Pick<SigilFrame, "center" | "radius" | "shape">,
 ): WordInk {
   const m = marksOf(profile);
   const rs = m.startRadius * unit;
@@ -250,13 +250,16 @@ export function wordInk(
   const loneChord = () => {
     const count = 2 * word[0].crooks;
     if (!bound) return m.cupChord * unit;
-    // How far +x from the rim the bound is: |rim + λx − centre| = radius.
+    // How far +x from the rim the bound is: on a disc, where
+    // |rim + λx − centre| = radius; on a square, its right-hand side.
     const w = sub(rim, bound.center);
     const room =
-      -w.x +
-      Math.sqrt(
-        Math.max(0, w.x * w.x - (dot(w, w) - bound.radius * bound.radius)),
-      );
+      bound.shape === "square"
+        ? bound.radius - w.x
+        : -w.x +
+          Math.sqrt(
+            Math.max(0, w.x * w.x - (dot(w, w) - bound.radius * bound.radius)),
+          );
     const chord = Math.min(m.cupChord * unit, (room - 0.02 * unit) / count);
     if (chord < m.cupMinChord * unit) cramped.push(0);
     return Math.max(chord, m.cupMinChord * unit);
@@ -331,20 +334,55 @@ export function wordInk(
 
 /** Where a figure's words sit (the figure grammar's frame). */
 export interface SigilFrame {
-  /** The centre of the layout's places' bounding box, quantised. */
+  /**
+   * The bound's centre: the centre of the layout's places' bounding box,
+   * or the layout's own frame's, quantised.
+   */
   center: Point;
-  /** The disc about `center` every mark stays within. */
+  /** How far from `center` every mark stays: the disc's radius, or half the square's side. */
   radius: number;
-  /** Each word's square region's side: the disc and 10 units each side. */
+  /** Each word's square region's side: the disc and 10 units each side, unless the layout says. */
   pitch: number;
+  /**
+   * `square` when the bound is a square (a layout's own frame, as a
+   * kamea's); absent for a disc, as on the rose.
+   */
+  shape?: "square";
 }
 
 /**
- * The frame of `layout`: a disc about the centre of the anchors' bounding
- * box reaching every place's slack, rounded up to a whole unit, and words
- * `pitch` apart. On the rose: radius 40 and pitch 100, today's viewBox.
+ * How far `p` lies from `frame`'s centre as its bound measures it: the
+ * distance on a disc, the larger offset along an axis on a square. A mark
+ * is inside the bound while this is at most `frame.radius`.
+ */
+export function frameReach(
+  frame: Pick<SigilFrame, "center" | "shape">,
+  p: Point,
+): number {
+  if (frame.shape === "square")
+    return Math.max(
+      Math.abs(p.x - frame.center.x),
+      Math.abs(p.y - frame.center.y),
+    );
+  return dist(p, frame.center);
+}
+
+/**
+ * The frame of `layout`: its own (`SigilLayout.frame`) if it gives one,
+ * otherwise a disc about the centre of the anchors' bounding box reaching
+ * every place's slack, rounded up to a whole unit, and words `pitch`
+ * apart. On the rose: radius 40 and pitch 100, today's viewBox.
  */
 export function sigilFrame(layout: SigilGeometry): SigilFrame {
+  if (layout.frame) {
+    const { center, shape, radius, pitch } = layout.frame;
+    return {
+      center: { x: quantise(center.x), y: quantise(center.y) },
+      radius,
+      pitch,
+      ...(shape === "square" ? { shape } : {}),
+    };
+  }
   const unit = layout.unit;
   const anchors = layout.places.map((place) => layout.anchor(place));
   const xs = anchors.map((p) => p.x);

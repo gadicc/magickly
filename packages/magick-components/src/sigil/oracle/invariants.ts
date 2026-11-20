@@ -138,15 +138,24 @@ function checkWord(
       );
   }
 
-  // Every mark inside the outer ring.
+  // Every mark inside the outer ring (or square).
+  const square = frame.shape === "square";
   let reach = 0;
   for (const piece of pieces)
     for (const p of piece.points)
-      reach = Math.max(reach, dist(p, frame.center));
+      reach = Math.max(
+        reach,
+        square
+          ? Math.max(
+              Math.abs(p.x - frame.center.x),
+              Math.abs(p.y - frame.center.y),
+            )
+          : dist(p, frame.center),
+      );
   if (reach > frame.radius + SIZE_TOLERANCE * unit)
     fail(
       "outer-ring",
-      `ink reaches ${reach.toFixed(2)} from the centre; the bound is ${frame.radius}`,
+      `ink reaches ${reach.toFixed(2)} from the centre${square ? " along an axis" : ""}; the bound is ${frame.radius}`,
     );
 
   const merged = inkShapes(pieces, unit, true);

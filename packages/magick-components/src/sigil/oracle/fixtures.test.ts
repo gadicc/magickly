@@ -1,12 +1,13 @@
+import kameas from "magick-data/astrology/kameas";
 import { describe, expect, it } from "vitest";
 import {
   ROSE_SIGIL_PROFILE,
   roseSigilLayout,
 } from "../../gd/roseSigilLayout.ts";
+import { KAMEA_SIGIL_PROFILE, kameaLayout } from "../kameaLayout.ts";
 import type { PlaceId, Point, SigilLayout } from "../types.ts";
 import { HAND_FIXTURES, KAMEA_FIXTURES } from "./fixtures.ts";
 import { figureFactFailures } from "./fixturesFacts.ts";
-import { KAMEA_STUB_PROFILE, planetKameaLayout } from "./kameaLayout.ts";
 import { referencePlan, referenceWords } from "./referencePlan.ts";
 
 const gd = roseSigilLayout("gd");
@@ -110,37 +111,47 @@ describe("hand fixtures", () => {
 
 describe("kamea fixtures", () => {
   it.each(KAMEA_FIXTURES.map((fixture) => [fixture.id, fixture] as const))(
-    "%s: the reference plans it as encoded",
+    "%s: the reference plans it as encoded, its letters on the text's cells",
     (_, fixture) => {
+      const layout = kameaLayout(fixture.planet);
       expect(
         referencePlan(
-          [fixture.numbers],
-          planetKameaLayout(fixture.planet),
-          KAMEA_STUB_PROFILE,
+          referenceWords(fixture.text),
+          layout,
+          KAMEA_SIGIL_PROFILE,
         ),
       ).toEqual(fixture.plan);
+      // The letters reduce to the numbers the text gives.
+      const cellOf = (n: number) => {
+        const square = kameas[fixture.planet];
+        const row = square.findIndex((cells) => cells.includes(n));
+        return `${row},${square[row].indexOf(n)}`;
+      };
+      expect([...fixture.text].map((c) => layout.place(c))).toEqual(
+        fixture.numbers.map(cellOf),
+      );
     },
   );
 
   it.each(KAMEA_FIXTURES.map((fixture) => [fixture.id, fixture] as const))(
     "%s: the square's cells turn and head as the figure does",
     (_, fixture) => {
-      const layout = planetKameaLayout(fixture.planet);
+      const layout = kameaLayout(fixture.planet);
       expect(
-        figureFactFailures(fixture, layout, KAMEA_STUB_PROFILE.nooseTolerance),
+        figureFactFailures(fixture, layout, KAMEA_SIGIL_PROFILE.nooseTolerance),
       ).toEqual([]);
     },
   );
 
   it("fail on a mirrored square", () => {
     for (const fixture of KAMEA_FIXTURES) {
-      const layout = planetKameaLayout(fixture.planet);
+      const layout = kameaLayout(fixture.planet);
       const mirrored = moved(layout, ({ x, y }) => ({ x: -x, y }));
       expect(
         figureFactFailures(
           fixture,
           mirrored,
-          KAMEA_STUB_PROFILE.nooseTolerance,
+          KAMEA_SIGIL_PROFILE.nooseTolerance,
         ),
       ).not.toEqual([]);
     }

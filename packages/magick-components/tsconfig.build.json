@@ -40,6 +40,7 @@
     "src/kabbalah/fieldPath.ts",
     "src/kabbalah/TreeOfLife.tsx",
     "src/sigil/ink.ts",
+    "src/sigil/kameaLayout.ts",
     "src/sigil/placeSigil.ts",
     "src/sigil/planSigil.ts",
     "src/sigil/SigilImage.tsx",

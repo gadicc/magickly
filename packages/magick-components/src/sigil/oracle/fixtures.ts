@@ -98,13 +98,16 @@ export interface HandFixture {
   notes: readonly string[];
 }
 
-/** A hand fixture on a planet's kamea; tokens are numbers. */
+/** A hand fixture on a planet's kamea, traced from its letters. */
 export interface KameaFixture {
   id: string;
   planet: KameaPlanetId;
+  /** The name in Hebrew, as the text spells it. */
+  text: string;
   /** The numbers, after Aiq Bekar's reduction, as the text gives them. */
   numbers: readonly number[];
   sources: readonly FigureSource[];
+  /** The plan under plan 088's rules on the square, with `KAMEA_SIGIL_PROFILE`. */
   plan: SigilPlan;
   figure: readonly FigureWord[];
   notes: readonly string[];
@@ -420,13 +423,16 @@ export const HAND_FIXTURES: readonly HandFixture[] = [
 
 /**
  * The two kamea sigils the text works through (vol. 4, pp. 79–80,
- * leaves n73–n74), on the squares of pp. 81 and 85. The text's numbers
- * are already reduced by Aiq Bekar; the layout knows only numbers.
+ * leaves n73–n74), on the squares of pp. 81 and 85, as plans: traced from
+ * the letters on `kameaLayout`, which reduces them by Aiq Bekar to the
+ * numbers the text gives. Their returns are F1's wedges (decision 4), the
+ * revisits counted in `visit`.
  */
 export const KAMEA_FIXTURES: readonly KameaFixture[] = [
   {
     id: "zazel-kamea",
     planet: "saturn",
+    text: "זאזל",
     numbers: [7, 1, 7, 3],
     sources: [
       { page: 79, leaf: 73 },
@@ -455,12 +461,14 @@ export const KAMEA_FIXTURES: readonly KameaFixture[] = [
       "p. 81 (Spirit: Zazel, on Saturn's square 4 9 2 / 3 5 7 / 8 1 6, " +
         "as magick-data's): the return to 7 is a narrow U beside the " +
         "first stroke, and both ends carry a circle, not a bar. The plan " +
-        "follows the rose's rules; the kamea profile is S5's.",
+        "follows the rose's rules (plan 093, decision 4): the return is " +
+        "F1's wedge, the start a circle and the end a bar.",
     ],
   },
   {
     id: "taphthartharath-kamea",
     planet: "mercury",
+    text: "תפתרתרת",
     numbers: [40, 8, 40, 20, 40, 20, 40],
     sources: [
       { page: 80, leaf: 74 },

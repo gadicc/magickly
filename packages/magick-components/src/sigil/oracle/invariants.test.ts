@@ -3,6 +3,7 @@ import {
   ROSE_SIGIL_PROFILE,
   roseSigilLayout,
 } from "../../gd/roseSigilLayout.ts";
+import { KAMEA_SIGIL_PROFILE, kameaLayout } from "../kameaLayout.ts";
 import type { SigilLayout, SigilPlan } from "../types.ts";
 import { drawPlaced, placeSimply } from "./figureDrawer.ts";
 import { HAND_FIXTURES } from "./fixtures.ts";
@@ -12,8 +13,7 @@ import {
   type InvariantCheck,
   nextDouble,
 } from "./invariants.ts";
-import { KAMEA_STUB_PROFILE, planetKameaLayout } from "./kameaLayout.ts";
-import { scrambleSvg } from "./mutants.ts";
+import { scrambleSvg, zazelOnSaturn } from "./mutants.ts";
 import { checkReadBack } from "./readBack.ts";
 import { referencePlan, referenceWords } from "./referencePlan.ts";
 import { PLAN_TEMPLATES } from "./templates.ts";
@@ -138,11 +138,22 @@ describe("checkInvariants", () => {
   });
 
   it("passes Zazel on Saturn's kamea", () => {
-    const layout = planetKameaLayout("saturn");
-    const p = referencePlan([[7, 1, 7, 3]], layout, KAMEA_STUB_PROFILE);
-    expect(
-      checkInvariants(drawPlaced(placeSimply(p, layout), layout), p, layout),
-    ).toEqual([]);
+    const { svg, plan: p, layout } = zazelOnSaturn();
+    expect(checkInvariants(svg, p, layout)).toEqual([]);
+  });
+
+  it("bounds a kamea's ink by its square, not the disc round it", () => {
+    // Zayin 7 to Daleth 4, Saturn's top left corner, drawn 2 units past
+    // the square's side: inside the disc that would reach the corners.
+    const layout = kameaLayout("saturn");
+    const p = referencePlan(referenceWords("זד"), layout, KAMEA_SIGIL_PROFILE);
+    const corner = layout.anchor("0,0");
+    const out = { x: -48 - 2 * layout.unit, y: corner.y };
+    expect(Math.hypot(out.x, out.y)).toBeLessThan(48 * Math.SQRT2);
+    const svg = drawPlaced(placeSimply(p, layout, [[undefined, out]]), layout);
+    expect(checkInvariants(svg, p, layout).map((f) => f.check)).toContain(
+      "outer-ring",
+    );
   });
 
   it("holds marks to the grammar's sizes", () => {

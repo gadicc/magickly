@@ -12,6 +12,11 @@ import {
   roseSigilLayout,
 } from "../../gd/roseSigilLayout.ts";
 import { svgCoordinate } from "../../svgCoordinate.ts";
+import {
+  KAMEA_CELL_UNITS,
+  KAMEA_SIGIL_PROFILE,
+  kameaLayout,
+} from "../kameaLayout.ts";
 import type { Point, SigilLayout, SigilPlan } from "../types.ts";
 import {
   arcCentre,
@@ -29,7 +34,6 @@ import {
 } from "./figureDrawer.ts";
 import { norm, sub } from "./figureShapes.ts";
 import type { InvariantCheck } from "./invariants.ts";
-import { KAMEA_STUB_PROFILE, planetKameaLayout } from "./kameaLayout.ts";
 import { referencePlan, referenceWords } from "./referencePlan.ts";
 
 function segmentText(seg: PathSegment): string {
@@ -222,17 +226,48 @@ export const KNOWN_GOOD: readonly { id: string; figure: () => JudgedFigure }[] =
     },
     {
       id: "zazel-kamea",
-      figure: () => {
-        const layout = planetKameaLayout("saturn");
-        const plan = referencePlan([[7, 1, 7, 3]], layout, KAMEA_STUB_PROFILE);
-        return {
-          svg: drawPlaced(placeSimply(plan, layout), layout),
-          plan,
-          layout,
-        };
-      },
+      figure: zazelOnSaturn,
     },
   ];
+
+/**
+ * Zazel on Saturn's square drawn the simple way, its return to Zayin (7,
+ * at 1,2) set 0.4 of a cell beside the first visit, square to the stroke
+ * from Aleph (2,1), towards the centre. The simple drawer's revisit offset
+ * is in units, and at 28 units a cell its wedge opens too little to keep
+ * within the grammar's 8 units of touching ink over a stroke 40 units long.
+ */
+export function zazelOnSaturn(): {
+  svg: string;
+  plan: SigilPlan;
+  layout: SigilLayout<string>;
+} {
+  const layout = kameaLayout("saturn");
+  const plan = referencePlan(
+    referenceWords("זאזל"),
+    layout,
+    KAMEA_SIGIL_PROFILE,
+  );
+  const zayin = layout.anchor("1,2");
+  const aleph = layout.anchor("2,1");
+  const cell = KAMEA_CELL_UNITS * layout.unit;
+  const dx = zayin.x - aleph.x;
+  const dy = zayin.y - aleph.y;
+  const l = Math.sqrt(dx * dx + dy * dy);
+  // Left of the stroke in SVG's y-down coordinates: towards the centre.
+  const back = {
+    x: svgCoordinate(zayin.x + (dy / l) * 0.4 * cell),
+    y: svgCoordinate(zayin.y - (dx / l) * 0.4 * cell),
+  };
+  return {
+    svg: drawPlaced(
+      placeSimply(plan, layout, [[undefined, undefined, back]]),
+      layout,
+    ),
+    plan,
+    layout,
+  };
+}
 
 /** A broken figure, and which checks must catch it. */
 export interface Mutant {

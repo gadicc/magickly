@@ -47,6 +47,32 @@ export interface SigilLayout<Token = string> {
   unit: number;
   /** Every place, in a stable order. */
   places: readonly PlaceId[];
+  /**
+   * The bound a word's ink keeps within and the pitch words are set at,
+   * when the layout has its own (a kamea's square). Without one, the
+   * frame is the disc about the anchors that reaches every place's slack
+   * (`sigilFrame`), as on the rose.
+   */
+  frame?: SigilLayoutFrame;
+}
+
+/**
+ * A layout's own frame (plan 093, "Engine"), in layout coordinates: every
+ * mark of a word stays within `radius` of `center`, measured as `shape`
+ * says, and word `i` is drawn `i × pitch` to the left of the first.
+ */
+export interface SigilLayoutFrame {
+  /** The bound's centre. */
+  center: Point;
+  /**
+   * `disc`: within `radius` of `center`. `square`: within `radius` of it
+   * along each axis, a square `2 × radius` across, as a kamea's is.
+   */
+  shape: "disc" | "square";
+  /** The disc's radius, or half the square's side. */
+  radius: number;
+  /** Each word's square region's side; at least the bound's width. */
+  pitch: number;
 }
 
 /**
@@ -117,6 +143,14 @@ export interface SigilProfile {
   marks?: SigilMarkSizes;
   /** Rule placement's settings; `DEFAULT_SIGIL_PLACEMENT` when not given. */
   placement?: SigilPlacementSettings;
+  /**
+   * The ink's width in layout coordinates, not sigil units: a weight
+   * fixed against the layout rather than scaled with its unit, as a
+   * kamea's is against its square. `SigilImage` draws with it unless told
+   * otherwise; without it, the stroke is `layout.unit` wide, the figure
+   * grammar's one unit.
+   */
+  strokeWidth?: number;
 }
 
 /**
@@ -166,4 +200,13 @@ export interface SigilPlacementSettings {
    * elements checked. It bounds the time a long word takes.
    */
   budget: number;
+  /**
+   * Also search from starts that set every first visit at its slack's
+   * edge, square to the stroke into it, on sides that alternate in pairs
+   * along the word (+ + − −, and its shifts and mirror), so that where the
+   * line turns back along itself the visits either side of the turn stand
+   * apart and its wedge opens (plan 093: a kamea folds runs of letters
+   * onto one line). Tried after the first rule start. Off unless set.
+   */
+  laneStarts?: boolean;
 }

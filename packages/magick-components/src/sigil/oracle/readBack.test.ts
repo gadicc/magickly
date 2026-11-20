@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { roseSigilLayout } from "../../gd/roseSigilLayout.ts";
+import { KAMEA_SIGIL_PROFILE, kameaLayout } from "../kameaLayout.ts";
 import type { SigilPlan } from "../types.ts";
 import { drawPlaced, placeSimply } from "./figureDrawer.ts";
 import { HAND_FIXTURES } from "./fixtures.ts";
-import { KAMEA_STUB_PROFILE, planetKameaLayout } from "./kameaLayout.ts";
 import { mirroredLayout, scrambleSvg } from "./mutants.ts";
 import { checkReadBack, readBack } from "./readBack.ts";
-import { referencePlan } from "./referencePlan.ts";
+import { referencePlan, referenceWords } from "./referencePlan.ts";
 import { PLAN_TEMPLATES } from "./templates.ts";
 
 const cases: { id: string; plan: SigilPlan; version: string }[] = [
@@ -65,8 +65,12 @@ describe("readBack", () => {
   }
 
   it("reads Zazel on Saturn's kamea", () => {
-    const layout = planetKameaLayout("saturn");
-    const plan = referencePlan([[7, 1, 7, 3]], layout, KAMEA_STUB_PROFILE);
+    const layout = kameaLayout("saturn");
+    const plan = referencePlan(
+      referenceWords("זאזל"),
+      layout,
+      KAMEA_SIGIL_PROFILE,
+    );
     const svg = drawPlaced(placeSimply(plan, layout), layout);
     expect(checkReadBack(svg, plan, layout).failures).toEqual([]);
   });

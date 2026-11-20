@@ -26,9 +26,12 @@
  * the layout's centre, at `revisitOffset` and at the slack's edge; then,
  * at the edge, either side, with the first letter of a revisited place
  * (or a first letter with crooks) drawn ahead along its first stroke, and
- * then drawn back. A start that repeats an earlier one's positions is
- * skipped, and the best figure of all is kept. Everything stops when
- * `budget` units of checking work are spent.
+ * then drawn back. With `laneStarts` (a kamea's profile), eight more
+ * starts follow the first, every first visit at its slack's edge, square
+ * to the stroke into it, on sides that alternate in pairs. A start that
+ * repeats an earlier one's positions is skipped, and the best figure of
+ * all is kept. Everything stops when `budget` units of checking work are
+ * spent.
  *
  * A run of nooses in a row is settled together, onto the chord between
  * the run's outer neighbours, so the line through them stays unbent;
@@ -65,6 +68,7 @@ import {
 import {
   CUP_SAMPLES as CUP_POINTS,
   defaultSide,
+  frameReach,
   type InkLoop,
   type InkWave,
   marksOf,
@@ -398,22 +402,21 @@ function single(e: Element, ctx: Context): PlacementFailure[] {
       break;
     }
     case "loop":
-      outer(dist(e.loop.center, frame.center) + e.loop.radius, [e.loop.vertex]);
+      outer(frameReach(frame, e.loop.center) + e.loop.radius, [e.loop.vertex]);
       break;
     case "wave": {
       const vs = verticesOf(e, n);
       let far = 0;
-      for (const p of e.wave.points) far = Math.max(far, dist(p, frame.center));
+      for (const p of e.wave.points) far = Math.max(far, frameReach(frame, p));
       outer(far, vs);
       if (e.cramped)
         out.push({ check: "crook", vertices: involve(word, vs), excess: 1 });
       break;
     }
     case "bar":
-      outer(
-        Math.max(dist(e.seg.a, frame.center), dist(e.seg.b, frame.center)),
-        [n - 1],
-      );
+      outer(Math.max(frameReach(frame, e.seg.a), frameReach(frame, e.seg.b)), [
+        n - 1,
+      ]);
       break;
   }
   return out;
@@ -792,6 +795,27 @@ function roomier(
  */
 type RevisitWay = "beside" | "other" | "inward";
 
+/**
+ * A lane start's first visits: each `width` beside its anchor, square to
+ * the stroke into it, on side `sides[i mod length]` (`laneStarts`).
+ */
+interface Lanes {
+  sides: readonly (1 | -1)[];
+  width: number;
+}
+
+/**
+ * The lane starts' sides: in pairs, so the visits either side of any
+ * vertex lie on opposite sides, which a turn back along one line needs to
+ * open its wedge; shifted, and mirrored.
+ */
+const LANE_SIDES: readonly (readonly (1 | -1)[])[] = [
+  [1, 1, -1, -1],
+  [-1, -1, 1, 1],
+  [1, -1, -1, 1],
+  [-1, 1, 1, -1],
+];
+
 /** One word's vertices at their rule positions, nooses still on their anchors. */
 function rulePositions(
   word: SigilWord,
@@ -800,6 +824,7 @@ function rulePositions(
   way: RevisitWay,
   center: Point,
   lead: number,
+  lanes?: Lanes,
 ): Point[] {
   const points: Point[] = [];
   const revisited = new Set(
@@ -812,6 +837,17 @@ function rulePositions(
       // first letter with crooks, whose cups then start further along.
       const next = word[i + 1] ? anchors[i + 1] : anchors[i];
       const ahead = revisited.has(v.place) || (i === 0 && v.crooks > 0);
+      if (lanes) {
+        const d =
+          i > 0
+            ? direction(anchors[i - 1], anchors[i])
+            : direction(anchors[i], next);
+        const side = lanes.sides[i % lanes.sides.length];
+        points.push(
+          quantised(along(anchors[i], normal(d), side * lanes.width)),
+        );
+        return;
+      }
       points.push(
         lead !== 0 && ahead && word[i + 1]
           ? quantised(along(anchors[i], direction(anchors[i], next), lead))
@@ -1101,7 +1137,7 @@ function placeWord(
     Math.min(...word.map((v) => layout.slack(v.place))) -
     settings.slackMargin * unit;
   const offset = settings.revisitOffset * unit;
-  const starts: [number, RevisitWay, number][] = [
+  const starts: [number, RevisitWay, number, Lanes?][] = [
     [offset, "beside", 0],
     [offset, "other", 0],
     [offset, "inward", 0],
@@ -1113,11 +1149,32 @@ function placeWord(
     [edge, "beside", -offset],
     [edge, "other", -offset],
   ];
+  if (settings.laneStarts)
+    starts.splice(
+      1,
+      0,
+      ...LANE_SIDES.flatMap((sides) =>
+        [offset, edge].map((by): [number, RevisitWay, number, Lanes] => [
+          by,
+          "beside",
+          0,
+          { sides, width: edge },
+        ]),
+      ),
+    );
   const tried = new Set<string>();
   let best: ReturnType<typeof search> | undefined;
-  for (const [by, way, lead] of starts) {
+  for (const [by, way, lead, lanes] of starts) {
     if (best && (best.score === 0 || spent())) break;
-    const points = rulePositions(word, anchors, by, way, frame.center, lead);
+    const points = rulePositions(
+      word,
+      anchors,
+      by,
+      way,
+      frame.center,
+      lead,
+      lanes,
+    );
     const key = JSON.stringify(points);
     if (tried.has(key)) continue;
     tried.add(key);

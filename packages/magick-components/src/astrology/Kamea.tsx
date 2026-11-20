@@ -2,6 +2,13 @@ import kameas, { type KameaPlanetId } from "magick-data/astrology/kameas";
 import planets from "magick-data/astrology/planets";
 import type { CSSProperties, ReactNode } from "react";
 import { svgCoordinate } from "../svgCoordinate.ts";
+import { KAMEA_SIDE, kameaGeometry } from "./kameaGeometry.ts";
+
+export {
+  KAMEA_SIDE,
+  type KameaGeometry,
+  kameaGeometry,
+} from "./kameaGeometry.ts";
 
 /*
  * A planet's kamea (magic square) drawn from its numbers, which magick-data
@@ -11,40 +18,10 @@ import { svgCoordinate } from "../svgCoordinate.ts";
  * after stage F"): the temple hall's `kamea` art wraps `KameaFigure`.
  */
 
-/** The square's side, in the figure's units; the figure is centred on 0,0. */
-export const KAMEA_SIDE = 96;
 const FRAME = 2;
 const RULE = 0.6;
 /** The numbers' size, as a share of a cell. */
 const NUMBER_SIZE = 0.48;
-
-/**
- * Where a square's cells lie in the figure: what a drawing laid over the
- * numbers (a planet's seal, or a sigil traced from cell to cell) needs to
- * line up with them.
- */
-export interface KameaGeometry {
-  /** Cells along a side: Saturn 3 … the Moon 9. */
-  order: number;
-  /** A cell's side, in the figure's units. */
-  cell: number;
-  /** A cell's centre, by its row from the top and its column from the left. */
-  center(row: number, column: number): [x: number, y: number];
-}
-
-/** The geometry of a square of `order` cells a side, in `KameaFigure`. */
-export function kameaGeometry(order: number): KameaGeometry {
-  const half = KAMEA_SIDE / 2;
-  const cell = KAMEA_SIDE / order;
-  return {
-    order,
-    cell,
-    center: (row, column) => [
-      -half + (column + 0.5) * cell,
-      -half + (row + 0.5) * cell,
-    ],
-  };
-}
 
 export interface KameaFigureProps {
   /**

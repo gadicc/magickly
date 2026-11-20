@@ -1,6 +1,7 @@
 /**
  * O1, expected plans (plan 088): a planner against the plans written by
- * hand (the primary fixtures, the templates and the kamea stubs), and
+ * hand (the primary fixtures, the templates, and vol. 4's two kamea
+ * examples and the grid's templates, plan 093), and
  * against the reference planner over the 72 names and, when asked, every
  * two- and three-letter text on both roses. The hand plans catch a rule
  * misread in the list itself, which the reference, written from the same
@@ -13,6 +14,7 @@ import {
   ROSE_SIGIL_PROFILE,
   roseSigilLayout,
 } from "../../gd/roseSigilLayout.ts";
+import { KAMEA_SIGIL_PROFILE, kameaLayout } from "../kameaLayout.ts";
 import type { SigilLayout, SigilPlan, SigilProfile } from "../types.ts";
 import {
   CORPUS_ROSE_VERSIONS,
@@ -20,7 +22,7 @@ import {
   SEVENTY_TWO_NAMES,
 } from "./corpus.ts";
 import { HAND_FIXTURES, KAMEA_FIXTURES } from "./fixtures.ts";
-import { KAMEA_STUB_PROFILE, planetKameaLayout } from "./kameaLayout.ts";
+import { KAMEA_TEMPLATES } from "./kameaTemplates.ts";
 import { referencePlan, referenceWords } from "./referencePlan.ts";
 import { PLAN_TEMPLATES } from "./templates.ts";
 
@@ -36,6 +38,7 @@ export type O1Source =
   | "fixture"
   | "template"
   | "kamea"
+  | "kamea-template"
   | "names"
   | "pairs"
   | "triples";
@@ -46,7 +49,7 @@ export interface O1Mismatch {
   id: string;
   /** The rose's version, for rose cases. */
   version?: RoseVersionId;
-  /** The text, or the numbers for a kamea stub. */
+  /** The text. */
   input: string;
   /** The first difference, in words: "word 0, vertex 1: crooks 0, expected 1". */
   difference: string;
@@ -173,11 +176,22 @@ export function checkPlanner(
     compare(
       "kamea",
       fixture.id,
-      fixture.numbers.join(", "),
-      [[...fixture.numbers]],
-      planetKameaLayout(fixture.planet),
-      KAMEA_STUB_PROFILE,
+      fixture.text,
+      split(fixture.text),
+      kameaLayout(fixture.planet),
+      KAMEA_SIGIL_PROFILE,
       fixture.plan,
+    );
+
+  for (const template of KAMEA_TEMPLATES)
+    compare(
+      "kamea-template",
+      template.id,
+      template.text,
+      split(template.text),
+      kameaLayout(template.planet),
+      KAMEA_SIGIL_PROFILE,
+      template.plan,
     );
 
   const againstReference = (

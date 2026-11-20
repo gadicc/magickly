@@ -4,7 +4,6 @@ import {
   CORPUS_ROSE_VERSIONS,
   DOMAIN_EDGE_TEXTS,
   inGrammarDomain,
-  KAMEA_STUBS,
   RANDOM_CORPUS,
   randomRoseTexts,
   roseTexts,
@@ -50,17 +49,6 @@ describe("oracle corpus", () => {
 
   it("gives nothing for no letters", () => {
     expect([...roseTexts(0, "gd")]).toEqual([]);
-  });
-
-  it("has the kamea stubs", () => {
-    expect(KAMEA_STUBS).toEqual([
-      { id: "zazel-kamea", planet: "saturn", numbers: [7, 1, 7, 3] },
-      {
-        id: "taphthartharath-kamea",
-        planet: "mercury",
-        numbers: [40, 8, 40, 20, 40, 20, 40],
-      },
-    ]);
   });
 });
 

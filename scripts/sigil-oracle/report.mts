@@ -11,7 +11,9 @@
  *   regression, with the known failures that now pass;
  * - the corpus is the engine suite's: hand fixtures, templates, the 72
  *   names, every pair and triple, the seeded random corpus and the
- *   domain's edge words, every A-B-A-B-A word, the kamea stubs; and,
+ *   domain's edge words, every A-B-A-B-A word; on the kameas (plan 093),
+ *   vol. 4's two examples, the grid's templates, every name the pages
+ *   trace, every letter-reachable triple and the random words; and,
  *   apart from it, a seeded random set of 13- to 32-letter words beyond
  *   the tested domain, reported on its own;
  * - contact sheets, each as SVG and PNG (`@resvg/resvg-wasm`, with the
@@ -49,10 +51,9 @@ import {
   roseSigilLayout,
 } from "../../packages/magick-components/src/gd/roseSigilLayout.ts";
 import {
-  sigilFrame,
-  sigilPathData,
-  sigilViewBox,
-} from "../../packages/magick-components/src/sigil/ink.ts";
+  KAMEA_SIGIL_PROFILE,
+  kameaLayout,
+} from "../../packages/magick-components/src/sigil/kameaLayout.ts";
 import {
   kameaUnroundedAnchor,
   roseUnroundedAnchor,
@@ -65,7 +66,11 @@ import {
   roseTexts,
   SEVENTY_TWO_NAMES,
 } from "../../packages/magick-components/src/sigil/oracle/corpus.ts";
-import { ENGINE_KNOWN_FAILURES } from "../../packages/magick-components/src/sigil/oracle/engineKnownFailures.ts";
+import {
+  ENGINE_KNOWN_FAILURES,
+  KAMEA_KNOWN_FAILURES,
+  KAMEA_NAME_KNOWN_FAILURES,
+} from "../../packages/magick-components/src/sigil/oracle/engineKnownFailures.ts";
 import {
   HAND_FIXTURES,
   KAMEA_FIXTURES,
@@ -77,9 +82,12 @@ import {
   type InvariantFailure,
 } from "../../packages/magick-components/src/sigil/oracle/invariants.ts";
 import {
-  KAMEA_STUB_PROFILE,
-  planetKameaLayout,
-} from "../../packages/magick-components/src/sigil/oracle/kameaLayout.ts";
+  CORPUS_KAMEA_PLANETS,
+  kameaNameCases,
+  kameaTriples,
+  randomKameaTexts,
+} from "../../packages/magick-components/src/sigil/oracle/kameaCorpus.ts";
+import { KAMEA_TEMPLATES } from "../../packages/magick-components/src/sigil/oracle/kameaTemplates.ts";
 import { firstDifference } from "../../packages/magick-components/src/sigil/oracle/o1.ts";
 import {
   checkReadBack,
@@ -90,7 +98,6 @@ import {
   referenceWords,
 } from "../../packages/magick-components/src/sigil/oracle/referencePlan.ts";
 import { PLAN_TEMPLATES } from "../../packages/magick-components/src/sigil/oracle/templates.ts";
-import { placeSigil } from "../../packages/magick-components/src/sigil/placeSigil.ts";
 import {
   planSigil,
   sigilWords,
@@ -121,6 +128,10 @@ type Corpus =
   | "domain-edge"
   | "ababa"
   | "kamea"
+  | "kamea-templates"
+  | "kamea-names"
+  | "kamea-triples"
+  | "kamea-random"
   | "beyond";
 
 /** One text to judge, with the plan it must have. */
@@ -130,8 +141,8 @@ interface Case {
   text: string;
   version: RoseVersionId;
   expected: SigilPlan;
-  /** A kamea stub's square and numbers; `version` is then unused. */
-  kamea?: { planet: KameaPlanetId; numbers: readonly number[] };
+  /** A kamea case's square and finals mode; `version` is then unused. */
+  kamea?: { planet: KameaPlanetId; finals: boolean };
 }
 
 /** What the oracle says of a case. */
@@ -250,11 +261,46 @@ function corpus(tiny: boolean): Case[] {
     cases.push({
       corpus: "kamea",
       id: f.id,
-      text: f.numbers.join(","),
+      text: f.text,
       version: "gd",
       expected: f.plan,
-      kamea: { planet: f.planet, numbers: f.numbers },
+      kamea: { planet: f.planet, finals: false },
     });
+  for (const t of take(KAMEA_TEMPLATES, 2))
+    cases.push({
+      corpus: "kamea-templates",
+      id: t.id,
+      text: t.text,
+      version: "gd",
+      expected: t.plan,
+      kamea: { planet: t.planet, finals: false },
+    });
+  const kameaCase = (
+    corpusName: Corpus,
+    id: string,
+    text: string,
+    planet: KameaPlanetId,
+    finals = false,
+  ): Case => ({
+    corpus: corpusName,
+    id,
+    text,
+    version: "gd",
+    expected: referencePlan(
+      referenceWords(text),
+      kameaLayout(planet, { finals }),
+      KAMEA_SIGIL_PROFILE,
+    ),
+    kamea: { planet, finals },
+  });
+  for (const n of take(kameaNameCases(), 2))
+    cases.push(kameaCase("kamea-names", n.id, n.text, n.planet, n.finals));
+  for (const planet of take(CORPUS_KAMEA_PLANETS, 1)) {
+    for (const text of take(kameaTriples(planet), 3))
+      cases.push(kameaCase("kamea-triples", `${planet} ${text}`, text, planet));
+    for (const text of take(randomKameaTexts(planet), 2))
+      cases.push(kameaCase("kamea-random", `${planet} ${text}`, text, planet));
+  }
   const random = randomRoseTexts();
   for (const version of VERSIONS) {
     for (const [corpusName, texts] of [
@@ -312,36 +358,30 @@ function beyondCorpus(tiny: boolean): Case[] {
   );
 }
 
-/** A kamea stub drawn by the engine, as the engine suite draws it. */
+/** A kamea case drawn by the engine, as the kamea suite draws it. */
 async function judgeKamea(c: Case, stability: boolean): Promise<Verdict> {
-  const { planet, numbers } = c.kamea ?? { planet: "saturn", numbers: [] };
-  const layout = planetKameaLayout(planet);
-  const drawNumbers = (text: string, l: SigilLayout<number>) => {
-    const plan = planSigil(
-      [text.split(",").map(Number)],
-      l,
-      KAMEA_STUB_PROFILE,
+  const { planet, finals } = c.kamea ?? { planet: "saturn", finals: false };
+  const layout = kameaLayout(planet, { finals });
+  const drawKamea = (text: string, l: SigilLayout<string>) =>
+    renderToStaticMarkup(
+      createElement(SigilImage, {
+        text,
+        layout: l,
+        profile: KAMEA_SIGIL_PROFILE,
+      }),
     );
-    const d = sigilPathData(
-      placeSigil(plan, l, KAMEA_STUB_PROFILE),
-      l,
-      KAMEA_STUB_PROFILE,
-    );
-    const viewBox = sigilViewBox(sigilFrame(l), plan.length).join(" ");
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}"><path stroke="red" stroke-width="${l.unit}" fill="none" d="${d}"/></svg>`;
-  };
-  const plan = planSigil([[...numbers]], layout, KAMEA_STUB_PROFILE);
-  const svg = drawNumbers(c.text, layout);
+  const plan = planSigil(sigilWords(c.text), layout, KAMEA_SIGIL_PROFILE);
+  const svg = drawKamea(c.text, layout);
   const verdict: Verdict = {
     case: c,
     o1: firstDifference(c.expected, plan),
     o2: checkInvariants(svg, c.expected, layout),
     o3: checkReadBack(svg, c.expected, layout).failures,
-    placed: placeSigil(plan, layout, KAMEA_STUB_PROFILE),
+    placed: sigilFigure(c.text, layout, KAMEA_SIGIL_PROFILE).placed,
   };
   if (stability)
     verdict.stable = (
-      await checkStability(drawNumbers, c.text, layout, {
+      await checkStability(drawKamea, c.text, layout, {
         unrounded: kameaUnroundedAnchor(Math.sqrt(layout.places.length)),
         quantise: svgCoordinate,
       })
@@ -374,7 +414,7 @@ async function judge(c: Case, stability: boolean): Promise<Verdict> {
 
 /** The key `engineKnownFailures.ts` gives a case. */
 const knownKey = (c: Case) =>
-  c.kamea ? `kamea ${c.id}` : `${c.version} ${c.text}`;
+  c.kamea ? `${c.kamea.planet} ${c.text}` : `${c.version} ${c.text}`;
 
 /**
  * The checks a case is known to fail, if any. Regardie's rose moves only
@@ -382,6 +422,10 @@ const knownKey = (c: Case) =>
  * engine suite draws once.
  */
 function knownFailure(c: Case): string | undefined {
+  if (c.kamea)
+    return c.corpus === "kamea-names"
+      ? KAMEA_NAME_KNOWN_FAILURES[c.id]
+      : KAMEA_KNOWN_FAILURES[knownKey(c)];
   return (
     ENGINE_KNOWN_FAILURES[knownKey(c)] ??
     (!c.kamea && c.version !== "gd" && !/[כת]/u.test(c.text)
@@ -935,7 +979,10 @@ export async function sigilOracleReport(options: SigilOracleReportOptions) {
     verdicts.push(
       await judge(
         c,
-        c.corpus === "names" || c.corpus === "fixtures" || c.corpus === "kamea",
+        c.corpus === "names" ||
+          c.corpus === "fixtures" ||
+          c.corpus === "kamea" ||
+          c.corpus === "kamea-names",
       ),
     );
   log(
@@ -1128,7 +1175,7 @@ export async function sigilOracleReport(options: SigilOracleReportOptions) {
     [
       "# Sigil oracle report (plan 088)",
       "",
-      `${verdicts.length} figures${tiny ? " (the tiny corpus)" : ""}, the engine against O1–O3; the 1-ulp check on the names, fixtures and kamea stubs, nudged before rounding.`,
+      `${verdicts.length} figures${tiny ? " (the tiny corpus)" : ""}, the engine against O1–O3; the 1-ulp check on the names, fixtures, vol. 4's kamea examples and the names traced on the kameas, nudged before rounding.`,
       "",
       `${oracle.All.passes} pass. ${known.expected} fail as known (expected: \`engineKnownFailures.ts\`${known.changed ? `, ${known.changed} with other checks than listed` : ""}); ${known.regressions} regression${known.regressions === 1 ? "" : "s"}; ${known.fixed} known failure${known.fixed === 1 ? "" : "s"} now pass${known.fixed === 1 ? "es" : ""}.`,
       "",

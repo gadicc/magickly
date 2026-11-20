@@ -1,4 +1,5 @@
 import type React from "react";
+import { svgCoordinate } from "../svgCoordinate.ts";
 import {
   type SigilFrame,
   sigilFrame,
@@ -68,6 +69,12 @@ export interface SigilImageProps {
   /** The ink's colour (default red, as the rose sigil has always been drawn). */
   stroke?: string;
   /**
+   * The ink's width, in layout coordinates: the profile's `strokeWidth`
+   * unless given, and `layout.unit` (the figure grammar's one unit) when
+   * the profile has none; written to 0.001, as the coordinates are.
+   */
+  strokeWidth?: number;
+  /**
    * Drawn under the sigil, once per word region, given that word's offset
    * (the rose behind each word, say).
    */
@@ -92,14 +99,16 @@ export interface SigilImageProps {
 /**
  * A sigil drawn by rule on any layout, with no hooks, so a server renderer
  * draws it with React's server build. Its only ink is stroked paths in
- * one group, a path per subpath in drawing order, the stroke
- * `layout.unit` wide, so the figure grammar's sizes hold.
+ * one group, a path per subpath in drawing order, the stroke `strokeWidth`
+ * wide: by default the profile's, or `layout.unit`, so the figure
+ * grammar's sizes hold.
  */
 export function SigilImage({
   text,
   layout,
   profile,
   stroke = "red",
+  strokeWidth = profile.strokeWidth ?? layout.unit,
   backdrop,
   children,
   ref,
@@ -119,7 +128,12 @@ export function SigilImage({
         Array.from({ length: regions }, (_, i) =>
           backdrop({ x: -i * figure.frame.pitch, y: 0 }, i),
         )}
-      <g stroke={stroke} strokeWidth={layout.unit} fill="none" ref={inkRef}>
+      <g
+        stroke={stroke}
+        strokeWidth={svgCoordinate(strokeWidth)}
+        fill="none"
+        ref={inkRef}
+      >
         {figure.paths.map((d, i) => (
           // Paths in drawing order, which a figure's text fixes.
           // biome-ignore lint/suspicious/noArrayIndexKey: the order is the identity.

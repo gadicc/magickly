@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Point, SigilPlan, SigilVertex } from "../types.ts";
 import { HAND_FIXTURES, KAMEA_FIXTURES } from "./fixtures.ts";
+import { KAMEA_TEMPLATES } from "./kameaTemplates.ts";
 import { checkPlanner, firstDifference, type Planner } from "./o1.ts";
 import { referencePlan } from "./referencePlan.ts";
 import { PLAN_TEMPLATES } from "./templates.ts";
@@ -123,7 +124,10 @@ describe("O1: expected plans", () => {
     // About 0.1 s here; the bound only stops it creeping out of CI.
     expect(performance.now() - started).toBeLessThan(5000);
     const hand =
-      HAND_FIXTURES.length + PLAN_TEMPLATES.length + KAMEA_FIXTURES.length;
+      HAND_FIXTURES.length +
+      PLAN_TEMPLATES.length +
+      KAMEA_FIXTURES.length +
+      KAMEA_TEMPLATES.length;
     expect(calls).toBe(hand + 2 * 72 + 2 * (22 ** 2 + 22 ** 3));
   });
 
@@ -144,7 +148,7 @@ describe("O1: expected plans", () => {
       expect(mismatches.length).toBeGreaterThan(0);
       expect(
         mismatches.every((m) =>
-          ["fixture", "template", "kamea"].includes(m.source),
+          ["fixture", "template", "kamea", "kamea-template"].includes(m.source),
         ),
       ).toBe(true);
     },

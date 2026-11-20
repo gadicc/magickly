@@ -3,6 +3,7 @@ import {
   ROSE_SIGIL_PROFILE,
   roseSigilLayout,
 } from "../../gd/roseSigilLayout.ts";
+import { kameaLayout } from "../kameaLayout.ts";
 import {
   FIGURE_GRAMMAR,
   figureWords,
@@ -12,7 +13,6 @@ import {
 } from "./figure.ts";
 import { drawPlaced, placeSimply } from "./figureDrawer.ts";
 import { inkShapes } from "./figureShapes.ts";
-import { planetKameaLayout } from "./kameaLayout.ts";
 import { referencePlan, referenceWords } from "./referencePlan.ts";
 
 const rose = roseSigilLayout();
@@ -29,13 +29,24 @@ describe("the figure frame", () => {
     });
   });
 
-  it("scales with a kamea's cells", () => {
-    const saturn = planetKameaLayout("saturn");
+  it("scales with a layout's unit", () => {
+    const { frame: _own, ...saturn } = kameaLayout("saturn");
     const frame = sigilFrame(saturn);
     expect(frame.unit).toBe(saturn.unit);
     expect(frame.pitch).toBeCloseTo(
       2 * frame.radius + 2 * FIGURE_GRAMMAR.wordMargin * saturn.unit,
     );
+  });
+
+  it("takes a layout's own frame, a kamea's square", () => {
+    const saturn = kameaLayout("saturn");
+    expect(sigilFrame(saturn)).toEqual({
+      center: { x: 0, y: 0 },
+      radius: 48,
+      pitch: 100,
+      unit: saturn.unit,
+      shape: "square",
+    });
   });
 });
 

@@ -118,9 +118,11 @@
  *   it passes straight back through its first letter (V‑P‑V‑N, V‑X‑P‑V‑N).
  * - **Outer bound.** Every mark of a word lies within its layout's outer
  *   bound: for the rose the disc of radius 40, its outer ring (letters at 35,
- *   slack 4.6). For any layout, unless one is supplied, the disc about the
- *   centre of the anchors' bounding box that reaches every place's slack,
- *   rounded up to a whole unit (which gives 40 on the rose).
+ *   slack 4.6). A layout may give its own (`SigilLayout.frame`), a disc or a
+ *   square, as a kamea's square is (plan 093); otherwise, unless one is
+ *   supplied, the disc about the centre of the anchors' bounding box that
+ *   reaches every place's slack, rounded up to a whole unit (which gives 40
+ *   on the rose).
  * - **Words (R2, decision 5).** One SVG; word `i` (reading order) is drawn in
  *   the layout's coordinates translated by `(−i × pitch, 0)`, so words run
  *   right to left; `pitch` is the bound's diameter plus 10 units each side
@@ -256,21 +258,25 @@ export type SigilGeometry = Omit<SigilLayout<never>, "place">;
  * Where a figure's words sit: each word is drawn in the layout's own
  * coordinates, translated by `(-index × pitch, 0)`, so words run right to
  * left (R2, decision 5). Every mark stays within `radius` of `center`
- * (layout coordinates); a word's region is the square of side `pitch`
- * around its translated centre.
+ * (layout coordinates), along each axis when `shape` is `square`; a
+ * word's region is the square of side `pitch` around its translated
+ * centre.
  */
 export interface SigilFrame {
   center: Point;
   radius: number;
   pitch: number;
   unit: number;
+  /** A square bound, `2 × radius` across; absent for a disc. */
+  shape?: "square";
 }
 
 /**
- * The frame of `layout`: unless `bound` is given, a disc about the centre
- * of the anchors' bounding box reaching every place's slack, rounded up to
- * a whole unit. On the rose that is radius 40, the rose's outer ring
- * (letters at 35, slack 4.6), and a pitch of 100, today's viewBox.
+ * The frame of `layout`: `bound` if given; else the layout's own
+ * (`SigilLayout.frame`); else a disc about the centre of the anchors'
+ * bounding box reaching every place's slack, rounded up to a whole unit.
+ * On the rose that is radius 40, the rose's outer ring (letters at 35,
+ * slack 4.6), and a pitch of 100, today's viewBox.
  */
 export function sigilFrame(
   layout: SigilGeometry,
@@ -278,13 +284,23 @@ export function sigilFrame(
 ): SigilFrame {
   const unit = layout.unit;
   const margin = FIGURE_GRAMMAR.wordMargin * unit;
-  if (bound) return { ...bound, pitch: 2 * (bound.radius + margin), unit };
-  const anchors = layout.places.map((place) => layout.anchor(place));
-  const xs = anchors.map((p) => p.x);
-  const ys = anchors.map((p) => p.y);
   // Quantised as SVG coordinates are, so a 1-ulp nudge of the anchors
   // cannot move the frame.
   const q = (v: number) => Math.round(v * 1000) / 1000 + 0;
+  if (bound) return { ...bound, pitch: 2 * (bound.radius + margin), unit };
+  if (layout.frame) {
+    const { center, radius, pitch, shape } = layout.frame;
+    return {
+      center: { x: q(center.x), y: q(center.y) },
+      radius,
+      pitch,
+      unit,
+      ...(shape === "square" ? { shape } : {}),
+    };
+  }
+  const anchors = layout.places.map((place) => layout.anchor(place));
+  const xs = anchors.map((p) => p.x);
+  const ys = anchors.map((p) => p.y);
   const center = {
     x: q((Math.min(...xs) + Math.max(...xs)) / 2),
     y: q((Math.min(...ys) + Math.max(...ys)) / 2),

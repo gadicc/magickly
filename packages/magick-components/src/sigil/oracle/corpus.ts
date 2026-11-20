@@ -1,9 +1,9 @@
 /**
  * The oracle's corpus beyond the hand-written cases (plan 088, "The
  * corpus"): the 72 names as magick-data gives them, every two- and
- * three-letter text on each rose, a seeded random corpus of longer words,
- * and the kamea stubs. The hand fixtures and templates are in
- * `fixtures.ts` and `templates.ts`.
+ * three-letter text on each rose, and a seeded random corpus of longer
+ * words. The hand fixtures and templates are in `fixtures.ts` and
+ * `templates.ts`; the kameas' corpus is `kameaCorpus.ts`.
  */
 
 import angels from "magick-data/kabbalah/seventyTwoAngels";
@@ -13,7 +13,6 @@ import {
   roseRings,
 } from "../../gd/roseSigilInternals.ts";
 import { FIGURE_GRAMMAR } from "./figure.ts";
-import { KAMEA_FIXTURES } from "./fixtures.ts";
 
 /** One of the 72 names, by its number in Lenain's order. */
 export interface NameCase {
@@ -54,13 +53,6 @@ export function* roseTexts(
     indices[k] += 1;
   }
 }
-
-/** The kamea stubs: Zazel on Saturn's square, Taphthartharath on Mercury's. */
-export const KAMEA_STUBS = KAMEA_FIXTURES.map(({ id, planet, numbers }) => ({
-  id,
-  planet,
-  numbers,
-}));
 
 /**
  * A small seeded generator (xorshift32), so the random corpus is the same

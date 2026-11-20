@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { roseSigilLayout } from "../../gd/roseSigilLayout.ts";
 import { svgCoordinate } from "../../svgCoordinate.ts";
+import { kameaLayout } from "../kameaLayout.ts";
 import type { SigilLayout } from "../types.ts";
 import {
   kameaUnroundedAnchor,
@@ -9,9 +10,9 @@ import {
   roseUnroundedAnchor,
   roundingMargin,
 } from "./anchors.ts";
-import { CORPUS_ROSE_VERSIONS, KAMEA_STUBS } from "./corpus.ts";
+import { CORPUS_ROSE_VERSIONS } from "./corpus.ts";
 import { checkStability } from "./invariants.ts";
-import { planetKameaLayout } from "./kameaLayout.ts";
+import { CORPUS_KAMEA_PLANETS } from "./kameaCorpus.ts";
 
 const roundsTo = (
   layout: SigilLayout<never> | SigilLayout<string> | SigilLayout<number>,
@@ -40,9 +41,9 @@ describe("anchors before rounding", () => {
       expect(nearest.margin).toBeGreaterThan(ROUNDING_MARGIN);
     });
 
-  for (const stub of KAMEA_STUBS)
-    it(`keeps every cell of ${stub.id}'s square clear of a boundary`, () => {
-      const layout = planetKameaLayout(stub.planet);
+  for (const planet of CORPUS_KAMEA_PLANETS)
+    it(`keeps every cell of ${planet}'s square clear of a boundary`, () => {
+      const layout = kameaLayout(planet);
       const unrounded = kameaUnroundedAnchor(Math.sqrt(layout.places.length));
       expect(roundsTo(layout, unrounded)).toBe(true);
       expect(

@@ -8,7 +8,7 @@
  * the unrounded anchors and measures how far each lies from a boundary.
  */
 
-import { kameaGeometry } from "../../astrology/Kamea.tsx";
+import { kameaGeometry } from "../../astrology/kameaGeometry.ts";
 import { letterPoint } from "../../gd/roseSigilInternals.ts";
 import { SVG_COORDINATE_DECIMALS } from "../../svgCoordinate.ts";
 import type { PlaceId, Point } from "../types.ts";
@@ -30,7 +30,7 @@ export function roseUnroundedAnchor(version?: string): UnroundedAnchor {
 }
 
 /**
- * A kamea stub's anchors before rounding: cell centres as `kameaGeometry`
+ * A kamea's anchors before rounding: cell centres as `kameaGeometry`
  * computes them, for places `"row,column"`.
  */
 export function kameaUnroundedAnchor(order: number): UnroundedAnchor {
