@@ -625,6 +625,37 @@ stage 2 commits the name lists as its test fixture.
    highlights, its names, the Kerubic archangels and the servient names
    with their Union letter (decision 8), with ids of their own; NROAM,
    NAAOM and AISMT move to the archangels' ids then.
+   **Built 20 November 2026** (`8767fa20`). `tabletNames(view)` keeps its
+   one parameter: a view carries its version, and a version has one
+   Tablet of Union, so the function reads the Union of the same version
+   from the package's own data; a second parameter could only be passed
+   the wrong Union or left out. New kinds `kerubicArchangel`,
+   `servientArchangel`, `union` and `unionColumn` (the fixture's own
+   words), ids `<quarter>-kerubic-archangel`,
+   `<quarter>-servient-1-archangel` to `-4-archangel`, `union-row-1` to
+   `-4` and `union-column-1`, and a `unionLetter` on each archangel, whose
+   `squares` are the Watchtower's alone. `TABLET_NAME_IDS` has 63 ids, the
+   old 38 first; a Golden Dawn Watchtower gives 58 names, Dee's and
+   Raphael's 38, the Union 5 (none in their versions). Dictionary pins of
+   the 38 are unchanged; the Kerubic archangels match 14, 14 and 12 by
+   their own spelling (gd, regardie, equinox), the Union's lines 4 of 5,
+   the servient archangels none. The dictionary's `WE` second prefixes are
+   `names.dictionary`, shown as the dictionary's, and their source is a
+   question in plan 082. `UnionGrid` takes the same highlights;
+   `regions` are the Watchtowers' only. On the page the choice reads
+   "Tablet of Union"; tapping a quarter square pins its base name, whose
+   detail offers its archangel first. The image contract is per id
+   (`TABLET_VIEWBOXES`, the Union's 496 × 416 default, `union` refused
+   with `dee` and `raphael`); the 80 Watchtower images' bytes were
+   compared before and after and did not move, but their identity moved
+   (`1212086a…` to `d7fd15d8…`) because the spec's one input now holds the
+   Union's line. A per-id input would have kept it, but needs the
+   registry's identity design (plan 032) changed for every component, so
+   it is a follow-up. Checked in a browser at 1440 × 900 and 390 × 844. A
+   fresh Opus review found a square chosen on one tablet carried to the
+   other (drawn off the Union's page) and states that draw nothing on the
+   Union still withholding the image link; both were fixed and checked
+   before the gate. `search:publish` embedded 14 passages.
 5. **Release.** magick-data 0.3.0 and the magick-components minor
    (decision 10); plan 000's status and follow-ups.
 
@@ -703,5 +734,8 @@ To be copied to plan 000's list when the plan is accepted:
   page, if the phone mock-up does not already choose it.
 - Link back from a dictionary entry to its place on a tablet
   (`/enochian/tablets?tablet=earth&name=…`).
+- Hash each tablet image's own readings only (a per-id input in the
+  render registry, plan 032), so a change to one tablet's data stops
+  re-identifying the others (stage 4).
 - The dictionary's four Kerubic archangel entries that lack their tablet's
   element (already in plan 000).
