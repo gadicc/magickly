@@ -246,12 +246,24 @@ Follow-ups are separate from the completed migration work:
   Agrippa's reductions (ר on 2, ל on 3, י and א as one turn) beside the
   Golden Dawn's; Vaughan's two beads for a doubled letter on a straight
   pass.
+- Kameas and their sigils ([plan 093](093-kameas-and-their-sigils.md)):
+  stages K1, K6, K2, K5 and K3 built on `gate/kameas` (the planetary
+  names and their characters in magick-data, the kamea sigil engine,
+  the seven seals, `KameaSigil`, the generator at
+  `/astrology/kamea/sigils`), released as magick-data 0.4.0 and
+  magick-components 0.6.0. TODO: K4, the hub, seven kamea pages and a
+  page per name; Gadi's sign-off on the README rows dated 20 and 21
+  November.
 - TODO: rate limiting for the public component image routes
   (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through
   WASM on request, and `/api/render/rose-sigil` takes up to about 160 ms
   of CPU for a 32-letter text chosen to stress its placement by rule
   (18 November, plan 088), so the edge cache offers no protection against
-  varied requests. Nothing in the app rate-limits today; see
+  varied requests. `/api/render/kamea-sigil` (plan 093, 21 November) is
+  far costlier: a word placement cannot clear takes about 4 s of CPU
+  (main search and fallback) for each distinct canonical URL on each
+  instance, 33 ms once that instance has placed it; a non-canonical query
+  redirects to the canonical one, so the CDN keeps one key a figure. Nothing in the app rate-limits today; see
   [plan 027](027-component-exports.md#adversarial-review).
 - 10 November 2026: Bing Webmaster Tools has magick.ly (and the old
   magick.li); each production release tells IndexNow (Bing, Yandex and

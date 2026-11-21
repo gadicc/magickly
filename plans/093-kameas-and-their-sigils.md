@@ -1,9 +1,9 @@
 # Kameas and their sigils — 19 November 2026
 
 Status: accepted 20 November 2026; the twelve decisions stand as
-recommended. K1, K6, K2, K5 and K3's package half built on
-`gate/kameas` (see Stages); K3's contracts, generator route and release
-next. The draft was
+recommended. K1, K6, K2, K5 and K3 built on `gate/kameas` (see
+Stages), released as magick-data 0.4.0 and magick-components 0.6.0; K4,
+the reference pages, next. The draft was
 reviewed adversarially (Fable 5.2, high, 19 November); its three
 blockers and eight majors are answered below
 ([Review](#review-19-november-2026)).
@@ -376,6 +376,8 @@ in each). Alternatives are kept for the record.
     letters in 1533, is divided as its romanisation divides it
     (Schedbarschemoth | Schartathan), and the page says the division is
     ours; undivided it is beyond the tested domain and fails placement.
+    (K2 and K3 changed this: undivided, it now places; the division
+    stands as decided, and the pages still say it is ours.)
 11. **Seals on the reference pages** only once drawn (K5); no
     placeholder on a reference page.
 12. **Search**: the commits that change indexed text wait for Gadi's
@@ -593,6 +595,53 @@ README, package.json and smoke-script conflicts kept both sides). The
 commit hashes above are the rebased ones. K1's version line is dropped:
 these tables ship in K3's release, magick-data 0.4.0 with
 magick-components 0.6.0.
+
+**K3's app half built 21 November 2026** (`9a5e3ec3`).
+
+- **Image contracts.** `kamea` draws the bare square by planet (profile
+  `magickli-kamea-image-v1`). `kamea-sigil` draws a name's one-row sigil
+  (`magickli-kamea-sigil-image-v1`): personal, not indexed, with its own
+  `finals` parameter, final forms kept as written rather than respelled
+  as the rose's are, and 1 to 32 letters. A non-canonical
+  `kamea-sigil` query redirects (308) to the canonical one, so the cache
+  keeps one key a figure. A word drawn best effort is reported in
+  `X-Sigil-Placement: failed`, read from the drawing; a registration's
+  extra headers are `X-` names only and cannot override the route's.
+  Byte pins, and a drawing digest over 42 texts in both finals modes.
+- **The generator** at `/astrology/kamea/sigils` offers:
+  - a planet, the planet's names in every witness's spelling, or any
+    Hebrew text;
+  - final letters at 500–900;
+  - the sigil over the square, a table of each letter, its number and
+    its cell, and downloads.
+
+  Placement runs in a Web Worker, debounced 250 ms, and a busy worker is
+  replaced on new input; if the worker fails, placement falls back to the
+  main thread. The default and every listed name that places without the
+  fallback are drawn on the server; other shared texts show the bare
+  square until the client places them. The page says the spirit of
+  spirits' division is ours. There are no breadcrumbs through
+  `/astrology/kamea` until K4 gives that path a page.
+- **Elsewhere.** `/gd/sigils` and `/astrology` link the generator. The
+  components explorer has `KameaSigil`, whose live example places off the
+  main thread after its first draw, and `PlanetarySeal`; its `Kamea` tile
+  is now the `kamea` image.
+- **Lingui and search.** 61 strings are translated into Hebrew. The
+  search publish (14 rows written, 4 pruned) was Gadi's, and the gate
+  then passed.
+
+A fresh Opus review (high) found no correctness bug. Fixed before the
+commit:
+
+- the worker's missing failure path;
+- an indexed page that shipped "Placing the sigil…" with no figure;
+- a failure header computed by placing the text a second time;
+- non-canonical image URLs multiplying cache keys.
+
+Left open: a failing word costs about 4 s of server CPU per distinct
+canonical URL per instance (plan 000's rate-limit TODO). For K4: the
+`kamea` contract becomes `indexed: false` once the pages publish the
+squares' static files, as the rose's did in plan 088 S4.
 
 K1 first; K6 needs K1; K2 needs K6 (decision 4 may move); K5 runs
 alongside; K3 needs K2; K4 needs K3 and K5.

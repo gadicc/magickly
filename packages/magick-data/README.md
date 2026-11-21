@@ -418,6 +418,20 @@ built from. CI publishes a pre-release under the `next` tag and a release
 under `latest`. The first version, the release candidate 0.1.0-rc.0, was
 published by hand.
 
+0.4.0 adds the names that go with the planetary squares (plan 093 in the
+repository): the tables `planetaryName`, `planetaryNameException` and
+`planetaryNameCharacter` (see [The planetary names](#the-planetary-names)
+and [Agrippa's characters](#agrippas-characters)), and
+`astrology/aiqBekar`. A planet's `intelligenceId` and `spiritId`, and a
+geomantic figure's `rulerIds`, keep their ids and are now links to
+`planetaryName` rows, which the graph follows; a planet lists its
+`planetaryNames`. `magick-data/graph`'s `graph.planet.pending` and
+`graph.tetragram.pending`, which listed them as links still to come, are
+gone, which only code that reads those keys notices.
+`intelligenceOfIntelligences` is deprecated for the Moon's
+`malcha-betharsisim` row, and stays until a major version. No existing
+value changed.
+
 ## Romanised Hebrew
 
 A romanised Hebrew name writes its prefixes as Israel's official

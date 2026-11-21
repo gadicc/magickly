@@ -703,6 +703,24 @@ Watchtowers only) and `anySquare` (`onSelect` for a click on any
 square). The Tablet of Union takes them too. With none of them set a
 tablet draws exactly as before. It depends on magick-data 0.3.0.
 
+0.6.0 adds the kameas' sigils and the planetary seals (plan 093 in the
+repository). `astrology/KameaSigil` traces a name on its planet's
+square (see [A sigil on a kamea](#a-sigil-on-a-kamea)), on
+`sigil/kameaLayout`: the square as a sigil layout, its letters reduced
+by Aiq Bekar, `KAMEA_SIGIL_PROFILE` with its rule against a stroke
+running along a cell's rule and its seeded fallback, and
+`kameaSigilMinSize()`. `astrology/PlanetarySeal` draws the seven seals
+after Agrippa (1533), on the page or on a silver plate; the halls' seal
+art now draws it, and Venus' and the Moon's plates are as they were.
+`astrology/Kamea` also exports its rules' and frame's widths
+(`KAMEA_RULE_WIDTH`, `KAMEA_FRAME_WIDTH`). For layouts of your own, the
+engine takes new settings, each off unless set: a layout's `frame` and
+`lines`, a profile's `strokeWidth`, and placement's `laneStarts`,
+`lineRun` and `fallback`; `SigilImage` takes `strokeWidth`, `width`,
+`height`, `className`, `style`, `role`, `aria-label`, `aria-hidden` and
+`data-placement`. The rose sigil draws exactly as before. It depends on
+magick-data 0.4.0.
+
 ## Requirements
 
 React 19 and an ES module environment: Node 22 or later (`engines`
@@ -729,7 +747,7 @@ package's entries.
 | A sigil traced on a kamea (`sigil/kameaLayout`) | Drawn in code. The rose-cross sigil's engine (its row below), over the cells of magick-data's squares (Agrippa's, as the row above says); each letter is reduced to a cell by Aiq Bekar, the Qabalah of Nine Chambers (`magick-data/astrology/aiqBekar`), by the rule and the two worked examples in Regardie, *The Golden Dawn*, vol. 4 (Aries Press, Chicago, 1940), pp. 78–80 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaves n72–n74), from which only the method is taken | 2026-11-20 |
 | A name's sigil on its kamea (`astrology/KameaSigil`) | Drawn in code: the sigil traced on a kamea (`sigil/kameaLayout`, the row above) over the square `astrology/Kamea` draws (two rows above), a figure per word on its own square | 2026-11-21 |
 | The rose-cross sigil (`gd/RoseSigil`, `gd/RoseSigilImage`, `gd/roseSigilGeometry`, `gd/roseSigilLayout`, `sigil/types`, `sigil/planSigil`, `sigil/placeSigil`, `sigil/ink`, `sigil/SigilImage`) | Drawn in code. The rose's construction, three rings of letters at equal angles, is Gadi Cohen's original geometry, written out in `gd/roseSigilGeometry`, and the sigil is planned and placed over it by rule, our code, after the rules Regardie gives in *The Golden Dawn*, vol. 4 (Aries Press, Chicago, 1940), p. 57 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaf n51), from which only the rules are taken. The order of the letters is in two versions. The Golden Dawn's (`gd`, the default) is the figure Crowley printed in *The Equinox* I(3) (1910), Diagram 63, plate facing p. 210 (archive.org `crowley-equinox_202110`, "The Equinox Vol. 1, No. 3", leaf n220), and the colour key to the rose in "The Complete Symbol of the Tarot", *The Equinox* I(8) (1912), plate facing p. 145 (the same item, "The Equinox Vol. 1, No. 8", leaf n174). Regardie's (`regardie1939`), which exchanges Kaph and Tau, is *The Golden Dawn*, vol. 3 (Aries Press, Chicago, 1939), p. 53 and Diagram 20, p. 56 (archive.org `IsraelRegardie-TheGoldenDawn-Vol3-1939`, leaves n46 and n49) | 2026-11-19 |
-| The temple halls' art (`gd/hall`, `gd/hall/presets`, `gd/hall/tags`, `gd/hall/editor`) | Our own art, in code. The halls' layouts are facts from Regardie, *The Golden Dawn*, vol. 2 (Aries Press, Chicago, 1938), cited for each hall by page and archive.org leaf (`IsraelRegardie-TheGoldenDawn-Vol2-1938`); no drawing of his is copied. The planets' seals are `astrology/PlanetarySeal`'s, after Agrippa's woodcuts (1533; its row above), on a silver plate. Each art records its source in its `provenance` | 2026-11-17 |
+| The temple halls' art (`gd/hall`, `gd/hall/presets`, `gd/hall/tags`, `gd/hall/editor`) | Our own art, in code. The halls' layouts are facts from Regardie, *The Golden Dawn*, vol. 2 (Aries Press, Chicago, 1938), cited for each hall by page and archive.org leaf (`IsraelRegardie-TheGoldenDawn-Vol2-1938`); no drawing of his is copied. The planets' seals are `astrology/PlanetarySeal`'s, after Agrippa's woodcuts (1533; its row above), on a silver plate. Each art records its source in its `provenance` | 2026-11-21 |
 | The halls' fonts (`fonts/*`) | Subsets of Noto Serif and Frank Ruhl Libre under the SIL Open Font License 1.1, made from google/fonts at a pinned commit; [fonts/SOURCES.md](./fonts/SOURCES.md) gives the files, their hashes and how they are made | 2026-11-14 |
 | The Moon (`astrology/Moon`, `astrology/MoonWidget`) | The paths of the lit part and the disc adapt `phase_junk()` from moon-phase, Copyright © 2012 Regents of the University of California, under the BSD 3-Clause License, at a pinned commit (see [Licences](#licences)); the phase comes from lune (Apache-2.0, a dependency). The tile draws no picture of its own | 2026-11-14 |
 | Mercury's retrogrades (`astrology/MercuryWidget`, `astrology/mercuryRetrograde`) | Our code, MIT, computing the stations with astronomy-engine (MIT, a dependency). The tile draws no picture of its own: the planet's is the page's | 2026-11-14 |
