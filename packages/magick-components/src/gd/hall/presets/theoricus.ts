@@ -88,8 +88,8 @@ export const theoricus1: HallPreset = {
 /**
  * The Theoricus 2=9 hall, after Regardie 1938, vol. 2, p.82: Resh,
  * Samekh and Tzaddi above the East and Tau beyond the West. The kamea of
- * Luna is drawn from its numbers; the seals of Luna are a placeholder and
- * the serpent on the Tree a marker until their art is drawn (stage H).
+ * Luna is drawn from its numbers and its seal after Agrippa; the serpent
+ * on the Tree is a marker until its art is drawn (stage H).
  */
 export const theoricus2: HallPreset = {
   id: "theoricus2",

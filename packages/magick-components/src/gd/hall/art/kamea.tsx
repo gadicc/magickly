@@ -1,11 +1,13 @@
 import { KameaFigure } from "../../../astrology/Kamea.tsx";
-import { svgCoordinate } from "../../../svgCoordinate.ts";
+import {
+  PLANETARY_SEAL_BASIS,
+  PLANETARY_SEAL_SOURCE,
+  PlanetarySealFigure,
+} from "../../../astrology/PlanetarySeal.tsx";
 import { enumAttr } from "../attributes.ts";
 import { GD_HALL_FONT_STACKS } from "../fonts.ts";
-import { wrapText } from "../labels.ts";
 import {
   HALL_KAMEA_PLANET_IDS,
-  HALL_PLANET_NAMES,
   HALL_PLANETS,
   type HallPlanet,
 } from "../planets.ts";
@@ -15,15 +17,27 @@ import type {
   HallAttrSpec,
   HallNode,
 } from "../types.ts";
-import { SEALS, sealProvenance } from "./seals.tsx";
-import { original, PALETTE, variantOf } from "./shared.ts";
+import { original, PALETTE, publicDomain, variantOf } from "./shared.ts";
 
 export const kameaProvenance = original(
   "A planet's magic square drawn from its numbers, which magick-data " +
     "computes (astrology/kameas): the shared Kamea component's figure, a " +
     "grid with each number in its cell.",
 );
-export { sealProvenance };
+
+/**
+ * The `seal` art's provenance: the shared PlanetarySeal component's
+ * seals, drawn after Agrippa's woodcuts (1533), on the silver plate. The
+ * plate is our reading of the chapter's text (leaf n162), which says each
+ * planet's table, with its characters, is engraved on silver; the
+ * woodcuts themselves draw the seals on the bare page.
+ */
+export const sealProvenance = publicDomain(
+  "A planet's seal drawn from geometry after Agrippa's woodcut, the " +
+    "shared PlanetarySeal component's figure, on a silver plate (plan 061, " +
+    "stage H, part 2; plan 093, stage K5).",
+  { source: PLANETARY_SEAL_SOURCE, basis: PLANETARY_SEAL_BASIS },
+);
 
 /** Every art module exports its provenance; these two share a module. */
 export const provenance = [kameaProvenance, sealProvenance];
@@ -64,17 +78,22 @@ export const kameaArt: HallArt = {
   provenance: kameaProvenance,
 };
 
-const SEAL_SIZE = 13;
-const SEAL_WIDTH = 64;
-
+/**
+ * The shared `PlanetarySealFigure` on the hall's silver plate, in its
+ * palette. Without a planet, a dashed ring, as the kamea draws an empty
+ * frame.
+ */
 function Seal({ node }: HallArtProps) {
   const planet = planetOf(node);
-  const Drawn = planet && SEALS.get(planet);
-  if (Drawn) return <Drawn />;
-  const name = planet && HALL_PLANET_NAMES.get(planet);
-  const lines = name ? wrapText(`Seals of ${name}`, SEAL_WIDTH, SEAL_SIZE) : [];
-  const advance = SEAL_SIZE * 1.2;
-  const first = SEAL_SIZE * 0.36 - ((lines.length - 1) * advance) / 2;
+  if (planet)
+    return (
+      <PlanetarySealFigure
+        planet={HALL_KAMEA_PLANET_IDS.get(planet)}
+        look="plate"
+        plate={PALETTE.silver}
+        ink={PALETTE.ink}
+      />
+    );
   return (
     <>
       <circle
@@ -85,32 +104,14 @@ function Seal({ node }: HallArtProps) {
         strokeDasharray="7 5"
       />
       <circle r={39} fill="none" stroke={PALETTE.placeholder} strokeWidth={1} />
-      <g
-        fill={PALETTE.placeholder}
-        fontFamily={GD_HALL_FONT_STACKS.serif}
-        fontStyle="italic"
-        fontSize={SEAL_SIZE}
-        textAnchor="middle"
-        style={{ fontVariantLigatures: "none", fontKerning: "normal" }}
-      >
-        {lines.map((line, index) => (
-          <text
-            // biome-ignore lint/suspicious/noArrayIndexKey: lines keep their order
-            key={index}
-            y={svgCoordinate(first + index * advance)}
-          >
-            {line.text}
-          </text>
-        ))}
-      </g>
     </>
   );
 }
 
 /**
- * A planet's seals (`seal(planet="moon")`), 100 × 100: the Moon's and
- * Venus' seals after Agrippa (`seals.tsx`); for the other planets, until
- * theirs are drawn, a dashed ring with "Seals of Sol" in it.
+ * A planet's seals (`seal(planet="moon")`), 100 × 100: its seal after
+ * Agrippa on a silver plate (`astrology/PlanetarySeal`). Without a planet,
+ * a dashed ring.
  */
 export const sealArt: HallArt = {
   Component: Seal,

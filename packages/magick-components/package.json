@@ -1,7 +1,7 @@
 {
   "name": "magick-components",
   "version": "0.5.0",
-  "description": "React components that draw magickal figures from magick-data: the Tree of Life, the Golden Dawn's temple halls, lamens and symbols, the rose-cross sigil, the Enochian tablets, the kameas, the planetary spirits' geomantic sigils and the Moon",
+  "description": "React components that draw magickal figures from magick-data: the Tree of Life, the Golden Dawn's temple halls, lamens and symbols, the rose-cross sigil, the Enochian tablets, the kameas, the planetary seals, the planetary spirits' geomantic sigils and the Moon",
   "keywords": [
     "magick",
     "react",
@@ -45,6 +45,7 @@
     "./astrology/MercuryWidget": "./src/astrology/MercuryWidget.tsx",
     "./astrology/Moon": "./src/astrology/Moon.tsx",
     "./astrology/MoonWidget": "./src/astrology/MoonWidget.tsx",
+    "./astrology/PlanetarySeal": "./src/astrology/PlanetarySeal.tsx",
     "./astrology/PlanetarySpirit": "./src/astrology/PlanetarySpirit.tsx",
     "./chakras/Chakras": "./src/chakras/Chakras.tsx",
     "./enochian/Tablet": "./src/enochian/Tablet.tsx",
@@ -97,6 +98,10 @@
       "./astrology/MoonWidget": {
         "types": "./lib/astrology/MoonWidget.d.ts",
         "default": "./lib/astrology/MoonWidget.js"
+      },
+      "./astrology/PlanetarySeal": {
+        "types": "./lib/astrology/PlanetarySeal.d.ts",
+        "default": "./lib/astrology/PlanetarySeal.js"
       },
       "./astrology/PlanetarySpirit": {
         "types": "./lib/astrology/PlanetarySpirit.d.ts",

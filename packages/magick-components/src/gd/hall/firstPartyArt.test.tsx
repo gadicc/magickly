@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { KameaFigure } from "../../astrology/Kamea.tsx";
+import { PlanetarySealFigure } from "../../astrology/PlanetarySeal.tsx";
 import { DEFAULT_HALL_ART } from "./art/index.ts";
 import { PALETTE } from "./art/shared.ts";
 import { TABLET_ELEMENTS, tabletArt } from "./art/symbols.tsx";
@@ -547,15 +548,34 @@ describe("the kameas and seals", () => {
     expect(provenance.notes).toContain("Public domain:");
   });
 
-  it("marks the other planets' seals as a placeholder naming the planet", () => {
-    const seal = draw(art("seal"), { type: "seal", planet: "sun" });
-    expect(seal).toContain("stroke-dasharray");
-    expect(seal).toMatch(/>Seals of<\/text><text [^>]*>Sol<\/text>/);
-    for (const planet of ["saturn", "jupiter", "mars", "mercury"])
-      expect(draw(art("seal"), { type: "seal", planet }), planet).toContain(
-        "stroke-dasharray",
+  it("draws every planet's seal, the shared figure on silver", () => {
+    const figure = (planet: (typeof HALL_PLANETS)[number]) =>
+      renderToStaticMarkup(
+        <svg aria-hidden="true">
+          <PlanetarySealFigure
+            planet={HALL_KAMEA_PLANET_IDS.get(planet)}
+            look="plate"
+            plate={PALETTE.silver}
+            ink={PALETTE.ink}
+          />
+        </svg>,
       );
-    expect(draw(art("seal"), { type: "seal" })).not.toContain("<text");
+    const seals = HALL_PLANETS.map((planet) => {
+      const seal = draw(art("seal"), { type: "seal", planet });
+      expect(seal, planet).toBe(figure(planet));
+      expect(seal, planet).toContain(`fill="${PALETTE.silver}"`);
+      expect(seal, planet).not.toContain("stroke-dasharray");
+      expect(seal, planet).not.toMatch(/<text|\sid=|href|url\(/);
+      return seal;
+    });
+    expect(new Set(seals).size).toBe(HALL_PLANETS.length);
+  });
+
+  it("draws a dashed ring for a seal without a planet", () => {
+    const empty = draw(art("seal"), { type: "seal" });
+    expect(empty).toContain("stroke-dasharray");
+    expect(empty).not.toContain("<text");
+    expect(draw(art("seal"), { type: "seal", planet: "pluto" })).toBe(empty);
   });
 
   it("validates a planet and warns of a missing one", () => {

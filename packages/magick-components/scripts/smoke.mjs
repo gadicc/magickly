@@ -211,6 +211,11 @@ const SERVER_DRAWINGS = [
     `<KameaSigil planet="saturn" text="זאזל" />`,
   ],
   [
+    "seal",
+    `import PlanetarySeal from "magick-components/astrology/PlanetarySeal";`,
+    `<PlanetarySeal planet="mars" />`,
+  ],
+  [
     "spirit",
     `import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";`,
     `<PlanetarySpirit spirit="zazel" style={{ height: "2em" }} />`,
@@ -742,6 +747,7 @@ import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";
 import { Kamea } from "magick-components/astrology/Kamea";
 import { KameaSigil, KameaSigilImage, kameaSigil, type KameaSigilFigure } from "magick-components/astrology/KameaSigil";
 import { kameaSigilMinSize } from "magick-components/sigil/kameaLayout";
+import { PlanetarySeal, PlanetarySealFigure } from "magick-components/astrology/PlanetarySeal";
 import Lamen from "magick-components/gd/Lamen";
 import FylfotCross, { FYLFOT_CELLS, type FylfotCellClick } from "magick-components/gd/FylfotCross";
 import { GradeTree } from "magick-components/gd/GradeTree";
@@ -824,6 +830,10 @@ export const page = (
     <KameaSigilImage planet="luna" text="מלכא בתרשיתים" finals label={false} />
     {/* @ts-expect-error: the planet is one with a kamea */}
     <KameaSigil planet="earth" text="א" />
+    <PlanetarySeal planet="sol" ink="var(--ink, black)" width={64} />
+    <svg viewBox="-50 -50 100 100"><PlanetarySealFigure planet="luna" look="plate" plate="#ccc" /></svg>
+    {/* @ts-expect-error: the hall's "moon" is magick-data's "luna" */}
+    <PlanetarySeal planet="moon" />
     <Lamen officer="hierophant" ringStyle={{ fill: "gold" }} discStyle={{ stroke: "red" }} />
     <FylfotCross cells={[["fire", "", "cursor", null, "water"]]} onCellClick={onCellClick} />
     {tagged}
