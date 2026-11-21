@@ -1,8 +1,9 @@
 # Kameas and their sigils — 19 November 2026
 
 Status: accepted 20 November 2026; the twelve decisions stand as
-recommended. K1, K6 and K2 built on `gate/kameas` (see Stages); K5 and
-K3 next. The draft was
+recommended. K1, K6, K2, K5 and K3's package half built on
+`gate/kameas` (see Stages); K3's contracts, generator route and release
+next. The draft was
 reviewed adversarially (Fable 5.2, high, 19 November); its three
 blockers and eight majors are answered below
 ([Review](#review-19-november-2026)).
@@ -179,7 +180,9 @@ cells)`: a value kept if the square has it, otherwise divided by 10
 until it fits. Final forms count at their ordinary values unless asked
 for the table's (decision 3).
 
-magick-data 0.2.1 → 0.3.0 (additive).
+magick-data 0.3.0 → 0.4.0 (additive). Main released 0.3.0 on 20
+November (`9ae9b486`) from other work while this plan was being built,
+so its release is the next minor, with magick-components 0.6.0.
 
 ### Engine: a kamea layout under the rose's rules
 
@@ -383,14 +386,14 @@ in each). Alternatives are kept for the record.
 | Stage | What | Gate |
 | --- | --- | --- |
 | K0 | Sources (this plan's Sources and appendix) | Gadi; the figure readings are K6's |
-| K1 | magick-data: `planetaryNames` with exceptions as rows, `aiqBekar`, graph edges (planets and tetragrams), display names; 0.3.0 | Every printed number explained by a sum or a row; integrity tests |
+| K1 | magick-data: `planetaryNames` with exceptions as rows, `aiqBekar`, graph edges (planets and tetragrams), display names; released with K3 | Every printed number explained by a sum or a row; integrity tests |
 | K6 | Agrippa's characters read blind by two readers, reconciled, compared with every spelling's trace; verdicts in data | Gadi reviews a side-by-side sheet; decision 4 confirmed or revisited |
 | K2 | Engine: the letter layout, layout frames, stroke width, R4's tolerance, the Moon's column; corpus from letters, grid templates, vol. 4's fixtures | O1–O3 green on the kamea corpus; every traced name places without failure; the rose's path digest over the whole report corpus unchanged |
 | K5 | The five seals, as a public component | Gadi reviews side-by-side renders |
-| K3 | `KameaSigil` (mock-up of stroke weights first), the `kamea` and `kamea-sigil` contracts, the generator route, README and explorer entries; magick-components 0.5.0 with magick-data 0.3.0 | Contract tests; browser check |
+| K3 | `KameaSigil` (mock-up of stroke weights first), the `kamea` and `kamea-sigil` contracts, the generator route, README and explorer entries; magick-components 0.6.0 with magick-data 0.4.0 | Contract tests; browser check |
 | K4 | Hub, seven kamea pages, name pages; images, JSON-LD, sitemap, route registries; planet-page row, hall links; Lingui and Hebrew | Gate; Gadi's `search:publish` |
 
-**K1 built 20 November 2026** (`4c07ad84`). magick-data 0.3.0 adds
+**K1 built 20 November 2026** (`794e407b`). magick-data's next release adds
 `planetaryName` (38 rows), `planetaryNameException` (19 rows) and
 `astrology/aiqBekar` (`AIQ_BEKAR`, `hebrewValue`, `aiqBekar`,
 `traceHebrew`); the planets' `intelligenceId` and `spiritId` and the
@@ -433,7 +436,7 @@ Barrett's Malcha note, and the README's Regardie wording. The gate
 placeholder env) passed on the committed tree. Left for Gadi: the
 README's sign-off date 2026-11-20 on the two new Sources rows.
 
-**K6 built 20 November 2026** (`bac85c0b`). `planetaryNameCharacter`
+**K6 built 20 November 2026** (`0f008ef2`). `planetaryNameCharacter`
 (32 rows) holds a verdict on each of the sixteen characters in Agrippa
 1533 (n164–n168) and Regardie 1940 (n75–n80): 11 match, 19 partial, 2
 no. How it was made:
@@ -493,7 +496,7 @@ the side-by-side sheet for Gadi (`side-by-side.html`). The gate
 (check, typecheck, i18n:check, test:coverage, build) passed on the
 committed tree.
 
-**K2 built 20 November 2026** (`bdf56729`). magick-components gains
+**K2 built 20 November 2026** (`f75b0d23`). magick-components gains
 `kameaLayout(planet, { finals })` (exported, React-free, reducing in
 `place` with `aiqBekar`), a layout's own frame (a square bound, radius
 48, pitch 100, `Kamea`'s viewBox; the rose's disc unchanged), a
@@ -536,6 +539,60 @@ is unchanged. A fresh Opus review (high) checked the digest on a clean
 worktree of the base and found the one exception the first build listed
 (777's Malcha with finals) to be a setting, not a limit, which the sweep
 then removed. The gate passed on the committed tree.
+
+**K5 built 21 November 2026** (`cd487445`). `PlanetarySeal` draws the
+seven seals after Agrippa's 1533 woodcuts (n164–n168), keyed by
+magick-data's planet ids: a page look in currentColor and the halls'
+silver plate. Saturn, Jupiter, Mars, the Sun and Mercury are new, read
+from the leaves and regularised where the woodcut is a hand's wobble.
+Two judgement calls, accepted by Gadi from the side-by-side renders:
+Mercury is drawn square where the woodcut is about 6% wide, and Mars'
+great arc ends in a serif where the woodcut has a wedge. The Moon's and
+Venus' plates are byte-identical, so no hall pin moved. Built on its own
+branch alongside K3 and brought onto `gate/kameas` in the rebase below.
+
+**K3's package half built 21 November 2026** (`f48c8693`). A mock-up at
+real size (Chromium, both themes; kept outside the repository) settled
+three things with Gadi:
+
+- **Stroke 0.6** square units, the grid rule's width, on every square:
+  0.381 left the Moon's marks faint at 240 px and lost in dark theme;
+  0.9 and up filled them in. No casing: a paper-coloured halo did not
+  move a stroke off a rule and cut the numbers it crossed.
+- **A line-run rule** (kamea only): a stroke may lie within touching
+  distance of a cell rule or of the frame (half the stroke plus half the
+  line) for at most one cell. Before it, 1651's בתרשיסים ran along a
+  Moon column rule for 7 cells; after, no name exceeds 0.99 cell. O2
+  checks it independently.
+- **A minimum size per square** keeping the grammar's 1.25 px a unit:
+  Saturn to the Sun 240 px, Venus 256, Mercury 292, the Moon 329.
+
+The review then found that the grammar's distance limits assumed a
+one-unit stroke, while 0.6 is 1.58 units on the Moon: separate strokes'
+inks touched while the checks passed (8 names). Gadi chose to count the
+kamea's limits in stroke widths. Counting only the gaps broke 14 Moon
+names (their column returns' wedges no longer fit), so overlap length
+counts in stroke widths too, keeping the wedge's 7°. A seeded random-start
+fallback (kamea only, deterministic, one shared budget a text) places
+Barrett's Malcha. Result: 59 of the 60 traced names place; 777's Malcha
+with finals, a generator-only spelling, is a listed failure, drawn best
+effort and flagged. Known corpus failures: 87 (69 long returns or tight
+turns, one clearance, and 17 one-letter triples on the Moon, אאא and the
+like, whose marks cannot stand apart at this stroke). `KameaSigil` draws
+the square under the sigil, a figure per word that wraps right to left,
+with `KameaSigilImage` for the one-row download and `kameaSigil()` for
+pages. The rose digest is unchanged (`d122e18e…c256`). For K4: a word
+that fails costs about 4 s of synchronous placement, so the pages draw
+their figures on the server and the generator debounces or places off
+the main thread.
+
+**Rebased onto main 21 November 2026.** Main had released magick-data
+0.3.0 and magick-components 0.5.0 (`9ae9b486`) and moved on; the branch
+was replayed onto `a1d3f22b` without conflict and K5 added on top (its
+README, package.json and smoke-script conflicts kept both sides). The
+commit hashes above are the rebased ones. K1's version line is dropped:
+these tables ship in K3's release, magick-data 0.4.0 with
+magick-components 0.6.0.
 
 K1 first; K6 needs K1; K2 needs K6 (decision 4 may move); K5 runs
 alongside; K3 needs K2; K4 needs K3 and K5.
