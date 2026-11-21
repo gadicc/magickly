@@ -7,7 +7,7 @@ import styles from "./intelligence.module.css";
 /** What the two components read of a planet's row. */
 type WithIntelligence = Pick<
   PlanetRow,
-  "intelligenceId" | "intelligenceOfIntelligences"
+  "intelligence" | "intelligenceOfIntelligences"
 >;
 
 /**
@@ -20,11 +20,6 @@ export const NOTE_IDS = {
   note: (n: 1 | 2) => `intelligence-note-${n}`,
   ref: (n: 1 | 2) => `intelligence-ref-${n}`,
 } as const;
-
-/** The ids are lower case, with no table yet. */
-function capitalize(text: string) {
-  return text[0].toUpperCase() + text.slice(1);
-}
 
 /**
  * A superscript link to note `n`, and the place its "back" link returns to.
@@ -45,8 +40,8 @@ function NoteRef({ n }: { n: 1 | 2 }) {
 }
 
 /**
- * A planet's intelligence, capitalised from its id. The Moon has two
- * names, and both are given: Agrippa's intelligence of intelligences and
+ * A planet's intelligence, by the name `planetaryName` shows. The Moon has
+ * two names, and both are given: Agrippa's intelligence of intelligences and
  * Shelachel, each with a note that `IntelligenceNotes` holds. `hebrew`
  * puts Agrippa's Hebrew before his name, as the planet page sets names.
  */
@@ -57,10 +52,10 @@ export function Intelligence({
   planet: WithIntelligence;
   hebrew?: boolean;
 }) {
-  const id = planet.intelligenceId;
+  const name = planet.intelligence?.name.roman;
   const classical = planet.intelligenceOfIntelligences;
-  if (!id) return null;
-  if (!classical) return <>{capitalize(id)}</>;
+  if (!name) return null;
+  if (!classical) return <>{name}</>;
   return (
     <>
       {hebrew ? (
@@ -69,7 +64,7 @@ export function Intelligence({
         </>
       ) : null}
       <span lang="he-Latn">{classical.roman.agrippa1533}</span>
-      <NoteRef n={1} /> / {capitalize(id)}
+      <NoteRef n={1} /> / {name}
       <NoteRef n={2} />
     </>
   );
@@ -88,9 +83,9 @@ export function IntelligenceNotes({
   level?: 2 | 3;
 }) {
   const classical = planet.intelligenceOfIntelligences;
-  if (!planet.intelligenceId || !classical) return null;
+  const shelachel = planet.intelligence?.name.roman;
+  if (!shelachel || !classical) return null;
   const Heading = level === 2 ? "h2" : "h3";
-  const shelachel = capitalize(planet.intelligenceId);
   return (
     <section
       id={NOTE_IDS.notes}

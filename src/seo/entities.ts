@@ -63,9 +63,8 @@ export function planetPage(id: string): EntityPage | null {
         planet.hebrewLetter && `letter ${planet.hebrewLetter.letter.name}`,
         planet.godName?.name.roman && `god name ${planet.godName.name.roman}`,
         planet.archangel && `archangel ${planet.archangel.name.roman}`,
-        planet.intelligenceId &&
-          `intelligence ${capitalize(planet.intelligenceId)}`,
-        planet.spiritId && `spirit ${capitalize(planet.spiritId)}`,
+        planet.intelligence && `intelligence ${planet.intelligence.name.roman}`,
+        planet.spirit && `spirit ${planet.spirit.name.roman}`,
       ]),
   };
 }
@@ -201,10 +200,6 @@ export function pathPage(id: string): EntityPage | null {
     title: `Tree of Life Path ${pathNo}: ${joins}`,
     description,
   };
-}
-
-function capitalize(text: string) {
-  return text[0].toUpperCase() + text.slice(1);
 }
 
 /** Every entity page, in data order, for the sitemap. */

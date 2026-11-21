@@ -268,6 +268,37 @@ describe("the data against the graph", () => {
     ]);
   });
 
+  it("counts a planetary name its field's role or planet does not answer", () => {
+    // The graph can say only that an `intelligenceId` names a row of
+    // `planetaryName`; that the row is an intelligence, and the planet's
+    // own, is this check's. A figure's rulers go with its planets place by
+    // place. A name that resolves to nothing is the link check's.
+    const planets = broken("planet", {
+      ...tables.planet,
+      saturn: { ...tables.planet.saturn, intelligenceId: "zazel" },
+      jupiter: { ...tables.planet.jupiter, spiritId: "zazel" },
+      mars: { ...tables.planet.mars, intelligenceId: "nowhere" },
+    });
+    expect(of("role", planets)).toEqual([
+      "planet.jupiter.spiritId: names zazel, saturn's spirit, not jupiter's spirit",
+      "planet.saturn.intelligenceId: names zazel, saturn's spirit, not saturn's intelligence",
+    ]);
+    expect(of("link", planets)).toEqual([
+      'planet.mars.intelligenceId: dangling: no planetaryName is keyed "nowhere"',
+    ]);
+    const figures = broken("tetragram", {
+      ...tables.tetragram,
+      caput_draconis: {
+        ...tables.tetragram.caput_draconis,
+        rulerIds: ["hismael", "kedemel"],
+      },
+    });
+    expect(of("role", figures)).toEqual([
+      "tetragram.caput_draconis.rulerIds.0: names hismael, jupiter's spirit, not venus's spirit",
+      "tetragram.caput_draconis.rulerIds.1: names kedemel, venus's spirit, not jupiter's spirit",
+    ]);
+  });
+
   it("counts a row its schema rejects", () => {
     const failures = broken("soul", {
       guph: {

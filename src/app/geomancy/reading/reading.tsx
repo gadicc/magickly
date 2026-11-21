@@ -25,7 +25,7 @@ import ExportControls from "@/export/ExportControls";
 import PlaceChooser from "@/geo/PlaceChooser";
 import { UNNAMED_PLACE } from "@/geo/place";
 import usePlace, { type SourcedPlace } from "@/geo/usePlace";
-import { capitalizeFirstLetter, ordinal } from "@/lib/utils";
+import { ordinal } from "@/lib/utils";
 import { mothersToString } from "@/render/contracts/astroGeomancyChart";
 import Tetragram from "../Tetragram";
 import { compute, tetragramFromRows } from "../tetragrams";
@@ -262,12 +262,8 @@ function PlanetRow({
         {planet.symbol}
       </span>
       <span style={{ width: 75 }}>{planet.name.en.en}</span>
-      <span style={{ width: 90 }}>
-        {capitalizeFirstLetter(planet.intelligenceId as string)}
-      </span>
-      <span style={{ width: 120 }}>
-        {capitalizeFirstLetter(planet.spiritId as string)}
-      </span>
+      <span style={{ width: 90 }}>{planet.intelligence?.name.roman}</span>
+      <span style={{ width: 120 }}>{planet.spirit?.name.roman}</span>
       {children}
     </div>
   );
@@ -569,9 +565,9 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
           and guide the hand that marks the points. I call upon{" "}
           <u>{archangel?.name.roman.toUpperCase()}</u>, archangel ruling the day
           and hour of <u>{planet.name.en.en}</u>, and upon{" "}
-          <u>{planet.intelligenceId?.toLocaleUpperCase()}</u>, the Intelligence
-          of <u>{planet.name.en.en}</u>, that the spirit{" "}
-          <u>{planet.spiritId?.toLocaleUpperCase()}</u> may serve this
+          <u>{planet.intelligence?.name.roman.toLocaleUpperCase()}</u>, the
+          Intelligence of <u>{planet.name.en.en}</u>, that the spirit{" "}
+          <u>{planet.spirit?.name.roman.toLocaleUpperCase()}</u> may serve this
           divination under their rule. Let the figure show what is true, and
           nothing else.
         </div>

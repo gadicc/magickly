@@ -19,14 +19,17 @@ export const fields: EntityFields = {
     "sephirot",
     "godName",
     "archangel",
-    // Pending links with no table yet, so rendered as text, capitalised.
-    "intelligenceId",
+    // The intelligence's name, from `planetaryName`.
+    "intelligence",
     // The Moon's other intelligence, beside Shelachel in the Intelligence
     // row, with a note on each (../Intelligence.tsx). The Hebrew is
     // Agrippa's; of the romanisations, his is in the row and 777's and the
     // Golden Dawn's in the note.
     "intelligenceOfIntelligences.he",
     "intelligenceOfIntelligences.roman",
+    // The spirit's name, from `planetaryName`; its id draws its sigil and
+    // names the sigil's source.
+    "spirit",
     "spiritId",
     "zodiacs",
     "tetragrams",
@@ -41,9 +44,14 @@ export const fields: EntityFields = {
     "kind",
     // The meta description, which `planetPage` gives the route.
     "description.en",
-    // Shown through their accessors, `hebrewLetter`, `godName`, `archangel`.
+    // Shown through their accessors, `hebrewLetter`, `godName`, `archangel`
+    // and `intelligence`.
     "hebrewLetterId",
     "godNameId",
     "archangelId",
+    "intelligenceId",
+    // Every name of the planet's square, with each witness's reading: the
+    // kamea pages' (plan 093, K4), not yet this page's.
+    "planetaryNames",
   ],
 };

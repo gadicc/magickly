@@ -2,7 +2,7 @@
 
 Magickal correspondences and reference data — the sephirot, the planets, the
 zodiac, the Hebrew and Enochian letters, the Golden Dawn grades, the
-geomantic figures and the rest — as 29 tables of plain rows, a graph that
+geomantic figures and the rest — as 31 tables of plain rows, a graph that
 says how they link, and the code that joins them. It is the data layer of
 [magick.ly](https://magick.ly), which consumes it as anyone else would.
 
@@ -78,7 +78,7 @@ different. Two kinds of figure are given, and each says where it came from:
   (`pnpm --filter magick-data smoke`, which prints them): the packed
   tarball, read by a consumer compiled with TypeScript 6.0.3 under
   `bundler`, with `lib: ["es2022"]` and `skipLibCheck`. Each of its reads
-  loads the same 93 files, the lib's included.
+  loads the same 95 files, the lib's included.
 - **Measured on the prototype at `dc6f732`**: the bundle sizes, minified
   and gzipped by esbuild 0.28.2 (webpack 5.111.0 came within a few per
   cent), and the instantiations of a scoped `assemble()`, in a consumer
@@ -93,11 +93,11 @@ import data from "magick-data";
 data.sephirah.tiferet.planet?.symbol; // "☉"
 ```
 
-It holds 26 of the 29 tables: `enochianTablet`, `christianChoir` and
+It holds 28 of the 31 tables: `enochianTablet`, `christianChoir` and
 `seventyTwoAngel` link to nothing and nothing links to them, so they are
-left out and read through their own subpaths. Reading one field costs 7,824
-instantiations, and a four-hop read 17,621 (smoke test); the bundle is
-17,290 bytes gzipped (`dc6f732`). Whatever imports it carries all 26
+left out and read through their own subpaths. Reading one field costs 8,223
+instantiations, and a four-hop read 18,793 (smoke test); the bundle is
+17,290 bytes gzipped (`dc6f732`). Whatever imports it carries all 28
 tables.
 
 **One raw table**, by its subpath:
@@ -148,6 +148,8 @@ is what a link's `to` names.
 | `planet` | 15 | `./astrology/planets` |
 | `zodiac` | 12 | `./astrology/zodiac` |
 | `astrologicalHouse` | 12 | `./astrology/houses` |
+| `planetaryName` | 38 | `./astrology/planetaryNames` |
+| `planetaryNameException` | 19 | `./astrology/planetaryNameExceptions` |
 | `hebrewLetter` | 27 | `./hebrewLetters` |
 | `enochianLetter` | 21 | `./enochian/letters` |
 | `enochianTablet` | 5 | `./enochian/tablets` |
@@ -184,9 +186,25 @@ as the row's name with `Id` (`SephirahId`). The exceptions are
 `LetterId` for `enochianLetter`; and `planet`, whose `PlanetKey` is every
 row's id while `PlanetId` names only the twelve whose `kind` is
 `"planet"`. The three array tables' modules export no id type.
-`magick-data/tables` exports all 29 raw, with the `Tables` and `TableName`
+`magick-data/tables` exports all 31 raw, with the `Tables` and `TableName`
 types, and `magick-data/types` and `magick-data/rows` the row types derived
 from the tables and the graph.
+
+`planetaryName` holds the names that go with the planetary squares: each
+square's divine names, the planets' intelligences and spirits (which a
+planet's `intelligenceId` and `spiritId`, and a geomantic figure's
+`rulerIds`, name), Venus' Bne Seraphim and the Moon's intelligence of
+intelligences and spirit of spirits. A row has the name the site shows
+(`name.roman`), its `role` and each witness's reading (`witnesses`: the
+Hebrew, the romanisation, the number printed beside it and the archive.org
+leaf), from Agrippa's 1533 printing to Regardie's of 1940. Where a printed
+number is not the sum of the printed Hebrew, `planetaryNameException` has a
+row saying so and whose the difference is, and a test holds every number to
+one or the other. Its module also exports `PLANETARY_NAME_WITNESSES`, the
+witnesses in order, and `tracedSpelling(name)`, the Hebrew a name is traced
+in. The planet's `intelligenceOfIntelligences` is deprecated: it is the
+Moon's `malcha-betharsisim` row, which a test holds it equal to, and it stays
+until a major version.
 
 ## The graph
 
@@ -202,7 +220,7 @@ field is one of:
   makes it a list. `as` names the accessor where the field's name would give
   the wrong one.
 - **`pending`**: it names a table that does not exist yet, such as a
-  planet's `spiritId`.
+  Golden Dawn degree's `pillarId`.
 - **`external`**: it names something outside the package, such as a tarot
   trump.
 - **`enum`**: its value is one of a fixed set, not a reference.
@@ -272,6 +290,17 @@ or `null`.
   is no JSON for them; `oddKamea(n)` and `doublyEvenKamea(n)` are the
   constructions, for an odd order from 3 or a multiple of 4, up to
   `MAX_KAMEA_ORDER` (100). Any other order is a `RangeError`.
+- `magick-data/astrology/aiqBekar`: Aiq Bekar, the nine chambers of the
+  Hebrew letters (`AIQ_BEKAR`), and the Golden Dawn's reduction of a
+  letter to a cell of a kamea (Regardie, *The Golden Dawn*, vol. 4, 1940,
+  pp. 78–80). `aiqBekar(value, cells)` keeps a letter's value if the square
+  has a cell of that number, and otherwise divides it by ten until it has;
+  `traceHebrew(hebrew, planet)` gives the cells a name's letters fall on,
+  word by word, on that planet's square. `letterValue` and `hebrewValue`
+  count a letter and a name, the final forms at their ordinary letters'
+  values unless `{ finals: true }` asks for the table's 500 to 900. A value
+  that is not a letter's, or that no division brings within the square, is
+  a `RangeError`.
 - `magick-data/enochian/tablets`: besides its rows, the tablets'
   versions. A row holds each source's reading of the tablet, square by
   square (`readings`: Regardie 1940, the Equinox 1912, Greer's edition,
@@ -407,6 +436,8 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `alchemy/symbols.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `alchemy/terms.json5` | [Correspondences](#correspondences); `terms` from [the Second Knowledge Lecture](#the-second-knowledge-lecture), with no rights asserted over them | 2026-11-12 |
 | `astrology/houses.json5` | [Correspondences](#correspondences); `interpretation` is ours, following [Lilly](#lillys-houses); `motto.la` is the mnemonic verse as usually quoted, not from Lilly, and `motto.en` our rendering of it ([Lilly's houses](#lillys-houses)) | 2026-11-12 |
+| `astrology/planetaryNameExceptions.json5` | Ours: where a witness's printed number departs from the [planetary names](#the-planetary-names)' Hebrew, and whose the difference is, in our words | 2026-11-20 |
+| `astrology/planetaryNames.json5` | [The planetary names](#the-planetary-names): the names, their Hebrew, romanisations, captions and numbers as each witness prints them, with the archive.org leaf; Agrippa's, the 1651 English's and Barrett's are public domain, 777's names and numbers, and Regardie's names, are taken as facts | 2026-11-20 |
 | `astrology/planets.json5` | [Correspondences](#correspondences); `keyOfSolomon` from [the Key of Solomon](#the-key-of-solomon); `about` and `description` are ours, written from public-domain works the file's header cites; `intelligenceOfIntelligences`, the Moon's, is the name and its Hebrew from [Agrippa](#agrippas-kameas)'s table of the Moon, with 777's and Regardie's spellings of it beside his, names only, as the header cites them | 2026-11-14 |
 | `astrology/zodiac.json5` | [Correspondences](#correspondences); `tetragrammatonPermutation` is the Twelve Banners of the Name, Crowley's *777* (1909), col. CXL, as the file's header cites it: the twelve orders of YHVH's letters, one to a sign | 2026-11-14 |
 | `body/parts.json5` | [Correspondences](#correspondences) | 2026-11-12 |
@@ -525,6 +556,28 @@ leaves n166 and n168). The tests check that every square is magic,
 that each starts with his first row (the Moon's as corrected), and that
 Saturn's and Jupiter's are his row by row. See
 [plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md).
+
+### The planetary names
+
+**`astrology/planetaryNames.json5`** gives the names Agrippa sets with
+the planetary squares, *De occulta philosophia libri tres* (Cologne,
+1533), book II, chapter 22, as he prints them and as four later works do:
+*Three Books of Occult Philosophy* (London, 1651), the English
+translation; Francis Barrett, *The Magus* (London, 1801); Aleister
+Crowley, *777 Revised* (London, 1955), Table III, read in Celephaïs
+Press's electronic edition; and the Golden Dawn's papers in Israel
+Regardie, *The Golden Dawn*, vol. 4 (Chicago, 1940), which prints the names
+in capitals and no Hebrew. The file's header names the archive.org copy of
+each, and every reading carries its leaf. Agrippa's, the 1651 English's and
+Barrett's are in the public domain, and **no rights are asserted over the
+names or their captions**. 777 and Regardie's volumes are in copyright, so
+only their spellings and numbers are taken, as facts, and nothing of their
+text. The readings are one pass by eye on the scans, made on 19 November
+2026 by Claude knowing the values to expect, and the sums are computed.
+`astrology/planetaryNameExceptions.json5` is ours: each number a witness
+prints that its Hebrew does not add up to, what differs and whose it is.
+See
+[plan 093](https://github.com/gadicc/magickly/blob/main/plans/093-kameas-and-their-sigils.md).
 
 ### The Enochian letters
 

@@ -24,6 +24,9 @@ import type { Row } from "./types.ts";
 export interface PlanetRow extends Row<"*", "planet"> {}
 export interface ZodiacRow extends Row<"*", "zodiac"> {}
 export interface AstrologicalHouseRow extends Row<"*", "astrologicalHouse"> {}
+export interface PlanetaryNameRow extends Row<"*", "planetaryName"> {}
+export interface PlanetaryNameExceptionRow
+  extends Row<"*", "planetaryNameException"> {}
 
 export interface HebrewLetterRow extends Row<"*", "hebrewLetter"> {}
 
@@ -76,6 +79,8 @@ export interface NamedRows {
   planet: PlanetRow;
   zodiac: ZodiacRow;
   astrologicalHouse: AstrologicalHouseRow;
+  planetaryName: PlanetaryNameRow;
+  planetaryNameException: PlanetaryNameExceptionRow;
 
   hebrewLetter: HebrewLetterRow;
 

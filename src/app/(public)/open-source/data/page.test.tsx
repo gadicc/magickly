@@ -95,7 +95,7 @@ describe("/open-source/data", () => {
   });
 
   it("says the barrel leaves out the tables that link to nothing", () => {
-    expect(html).toContain("holds 26 of the 29 tables");
+    expect(html).toContain("holds 28 of the 31 tables");
     for (const name of ["enochianTablet", "christianChoir", "seventyTwoAngel"])
       expect(html).toContain(`<code>${name}</code>`);
   });

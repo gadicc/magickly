@@ -161,11 +161,8 @@ describe("/open-source/data/[table]", () => {
 
 describe("a table's field list", () => {
   it("says what an id that is not a link names, with the right article", () => {
-    const planet = render("planet").replace(/<!-- -->/g, "");
-    expect(planet).toContain(
-      "an id of an intelligence, which has no table yet",
-    );
-    expect(planet).toContain("an id of a spirit, which has no table yet");
+    const degree = render("gdDegree").replace(/<!-- -->/g, "");
+    expect(degree).toContain("an id of a pillar, which has no table yet");
     const paths = render("treeOfLifePath").replace(/<!-- -->/g, "");
     expect(paths).toContain(
       "an id from <code>tarot-deck</code>, outside the package",

@@ -302,6 +302,7 @@ export default defineConfig({
         "packages/magick-data/src/schemas.ts",
         "packages/magick-data/src/kabbalah/seventyTwoAngelsDerived.ts",
         "packages/magick-data/src/astrology/kameas.ts",
+        "packages/magick-data/src/astrology/aiqBekar.ts",
         "packages/magick-data/src/enochian/TabletNotes.ts",
         "packages/magick-data/src/enochian/TabletNames.ts",
         "packages/magick-data/src/enochian/Keys.ts",

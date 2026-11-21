@@ -5,7 +5,8 @@
  * every id-shaped field declared, and is everything declared there; is every
  * `mirrors` declared from both ends; do the links resolve; does the arity
  * match; are the chains whole; does each path's id spell the two spheres it
- * joins; does every row pass its [schema](./schemas.ts); does any source
+ * joins; does each planetary name a planet or a geomantic figure names
+ * answer to its role; does every row pass its [schema](./schemas.ts); does any source
  * [write a key twice](./duplicateKeys.ts); and does the Enochian
  * dictionary, which is no table, hold an entry its type does not admit, or
  * list a meaning or pronunciation twice? Nothing throws and nothing is fatal
@@ -38,6 +39,12 @@ export interface Failure {
     | "chain"
     /** A path whose id does not spell the indices of the spheres it names. */
     | "ends"
+    /**
+     * A planetary name reached through a field its role does not answer:
+     * a planet's `intelligenceId` that is no intelligence, a `spiritId` or
+     * a figure's ruler that is no spirit, or a name of another planet.
+     */
+    | "role"
     | "schema"
     /** A `mirrors` the graph declares from one end only. */
     | "mirror"
@@ -185,6 +192,58 @@ function checkPathEnds(paths: unknown, sephirot: unknown): Failure[] {
         where: `treeOfLifePath.${id}`,
         detail: `names ${row.fromId} and ${row.toId}, which spell ${spelled}`,
       });
+  }
+  return failures;
+}
+
+/**
+ * The fields that name a planetary name against what the name says it is:
+ * a planet's `intelligenceId` must reach an intelligence, and its `spiritId`
+ * a spirit, of that planet; a geomantic figure's `rulerIds` must reach
+ * spirits, each of the planet at the same place in its `planetIds`. The
+ * graph can say only that the id names a row; which kind of row, and whose,
+ * is said here. A name that does not resolve is the link check's.
+ */
+function checkNameRoles(
+  planets: unknown,
+  tetragrams: unknown,
+  names: unknown,
+): Failure[] {
+  const failures: Failure[] = [];
+  const byId = new Map(rowsOf(names));
+  const expect = (
+    where: string,
+    nameId: unknown,
+    role: string,
+    planetId: unknown,
+  ) => {
+    const name = byId.get(String(nameId));
+    if (!name) return;
+    if (name.role !== role || name.planetId !== planetId)
+      failures.push({
+        check: "role",
+        where,
+        detail: `names ${String(nameId)}, ${String(name.planetId)}'s ${String(name.role)}, not ${String(planetId)}'s ${role}`,
+      });
+  };
+
+  for (const [id, planet] of rowsOf(planets)) {
+    if (planet.intelligenceId !== undefined)
+      expect(
+        `planet.${id}.intelligenceId`,
+        planet.intelligenceId,
+        "intelligence",
+        id,
+      );
+    if (planet.spiritId !== undefined)
+      expect(`planet.${id}.spiritId`, planet.spiritId, "spirit", id);
+  }
+  for (const [id, figure] of rowsOf(tetragrams)) {
+    const rulers = Array.isArray(figure.rulerIds) ? figure.rulerIds : [];
+    const planetIds = Array.isArray(figure.planetIds) ? figure.planetIds : [];
+    rulers.forEach((ruler, i) =>
+      expect(`tetragram.${id}.rulerIds.${i}`, ruler, "spirit", planetIds[i]),
+    );
   }
   return failures;
 }
@@ -360,6 +419,9 @@ export function checkIntegrity(
   }
 
   failures.push(...checkPathEnds(input.treeOfLifePath, input.sephirah));
+  failures.push(
+    ...checkNameRoles(input.planet, input.tetragram, input.planetaryName),
+  );
 
   // The sources as text, which is the only place a repeated key is visible:
   // JSON5 keeps the last of them, so everything downstream sees one.

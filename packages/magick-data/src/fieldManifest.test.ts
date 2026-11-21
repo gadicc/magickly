@@ -176,7 +176,11 @@ describe("the field manifest", () => {
         .filter((f) => f.type.kind === "map")
         .map((f) => `${table}.${f.path}`),
     );
-    expect(maps).toEqual(["enochianTablet.readings", "tetragram.meanings"]);
+    expect(maps).toEqual([
+      "planetaryName.witnesses",
+      "enochianTablet.readings",
+      "tetragram.meanings",
+    ]);
     const readings = field("enochianTablet", "readings").type;
     expect(readings).toMatchObject({
       kind: "map",
@@ -452,9 +456,9 @@ describe("the descriptions", () => {
     );
   });
 
-  it("number 278 field paths, the shared English text described once", () => {
+  it("number 305 field paths, the shared English text described once", () => {
     const paths = NAMES.flatMap((table) => fields.tables[table].fields);
-    expect(paths).toHaveLength(278);
+    expect(paths).toHaveLength(305);
     expect(
       paths.filter((f) => f.description === "The text in English.").length,
     ).toBeGreaterThan(30);

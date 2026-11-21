@@ -30,10 +30,11 @@ export const graph = {
       hebrewLetterId: { to: "hebrewLetter", inverse: "planet" },
       godNameId: { to: "godName" },
       archangelId: { to: "archangel", mirrors: "planetId" },
+      // No inverse: the name's own `planetId` names the planet back, and the
+      // integrity test holds the two to each other and to the name's role.
+      intelligenceId: { to: "planetaryName" },
+      spiritId: { to: "planetaryName" },
     },
-    // The planetary spirits and intelligences have no table of their own; a
-    // tetragram's rulers are the same namespace as `spiritId` (deferred).
-    pending: { intelligenceId: "intelligence", spiritId: "spirit" },
   },
   zodiac: {
     links: {
@@ -44,6 +45,21 @@ export const graph = {
   },
   astrologicalHouse: {
     links: { zodiacId: { to: "zodiac" } },
+  },
+  planetaryName: {
+    links: {
+      planetId: { to: "planet", inverse: "planetaryNames", inverseMany: true },
+      godNameId: { to: "godName" },
+    },
+  },
+  planetaryNameException: {
+    links: {
+      planetaryNameId: {
+        to: "planetaryName",
+        inverse: "exceptions",
+        inverseMany: true,
+      },
+    },
   },
 
   hebrewLetter: {},
@@ -69,8 +85,14 @@ export const graph = {
         inverse: "tetragrams",
         inverseMany: true,
       },
+      // The planets' spirits, which a planet's `spiritId` names too.
+      rulerIds: {
+        to: "planetaryName",
+        many: true,
+        inverse: "tetragrams",
+        inverseMany: true,
+      },
     },
-    pending: { rulerIds: "spirit" },
   },
   geomanticHouse: {},
 

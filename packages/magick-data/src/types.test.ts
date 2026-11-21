@@ -232,7 +232,7 @@ describe("the row types", () => {
 
   it("has no accessor for anything the graph does not link", () => {
     // @ts-expect-error a pending target is not a link
-    expect(data.planet.saturn.spirit).toBeUndefined();
+    expect(data.gdDegree["1st"].pillar).toBeUndefined();
     // @ts-expect-error nor is an enum
     expect(data.gdGrade["0=0"].order).toBeUndefined();
     // @ts-expect-error nor is something external

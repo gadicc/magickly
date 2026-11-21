@@ -8,7 +8,7 @@ import data from "./data.ts";
  * mutation, and this is the delta, table by table.
  *
  * Two tables are new, `gdDegree` and `tribeOfIsrael`, both of them link
- * targets the barrel never held. The barrel is 26 of the 29 tables:
+ * targets the barrel never held. The barrel is 28 of the 31 tables:
  * `seventyTwoAngel`, `enochianTablet` and `christianChoir` declare no link in
  * either direction, so assembling them would add nothing to any row and only
  * put their JSON in every barrel route's chunk ([data.ts](./data.ts)).
@@ -60,6 +60,12 @@ import data from "./data.ts";
  * `tetragramId`, the Golden Dawn's geomantic figure, which gives the letter
  * `tetragram` and the figure the back-link `enochianLetter`.
  *
+ * Plan 093 made the planets' intelligences and spirits rows of a table of
+ * their own, `planetaryName`, with the exceptions to its printed numbers in
+ * `planetaryNameException`: a planet's `intelligenceId` and `spiritId`, and
+ * a figure's `rulerIds`, give `intelligence`, `spirit` and `rulers`, and the
+ * planet derives `planetaryNames`, every name of its square.
+ *
  * The sampled row is each table's first, named so the sample is reproducible;
  * for the one array table left in the barrel that is index `0`.
  */
@@ -75,8 +81,11 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "hebrewLetter",
       "godName",
       "archangel",
+      "intelligence",
+      "spirit",
       "alchemySymbol",
       "gdGrade",
+      "planetaryNames",
       "sephirot",
       "tetragrams",
       "zodiacs",
@@ -105,6 +114,34 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
   astrologicalHouse: {
     row: "0",
     keys: ["index", "zodiacId", "motto", "interpretation", "zodiac"],
+  },
+  planetaryName: {
+    row: "saturn-ab",
+    keys: [
+      "id",
+      "planetId",
+      "role",
+      "name",
+      "witnesses",
+      "planet",
+      "godName",
+      "exceptions",
+      "tetragrams",
+    ],
+  },
+  planetaryNameException: {
+    row: "bartzabel-agrippa1533",
+    keys: [
+      "id",
+      "planetaryNameId",
+      "witness",
+      "printed",
+      "expected",
+      "whose",
+      "leaf",
+      "note",
+      "planetaryName",
+    ],
   },
   hebrewLetter: {
     row: "alef",
@@ -147,6 +184,7 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "zodiac",
       "element",
       "planets",
+      "rulers",
       "enochianLetter",
     ],
   },

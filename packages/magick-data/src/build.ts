@@ -92,6 +92,8 @@ export const TABLE_FILES = {
   planet: "astrology/planets",
   zodiac: "astrology/zodiac",
   astrologicalHouse: "astrology/houses",
+  planetaryName: "astrology/planetaryNames",
+  planetaryNameException: "astrology/planetaryNameExceptions",
   hebrewLetter: "hebrewLetters",
   enochianLetter: "enochian/letters",
   enochianTablet: "enochian/tablets",

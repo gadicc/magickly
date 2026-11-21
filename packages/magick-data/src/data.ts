@@ -8,7 +8,7 @@
  * `window.magickData`. It is now [assemble()](./assemble.ts) over the tables
  * below, with [the graph](./graph.ts) saying what links to what.
  *
- * Three of the 29 in [the registry](./tables.ts) are missing, which is why
+ * Three of the 31 in [the registry](./tables.ts) are missing, which is why
  * the imports are repeated here rather than taken from it. `seventyTwoAngel`,
  * `enochianTablet` and `christianChoir` are named nowhere in the graph, in
  * either direction, so assembling them adds no accessor to any row, and the
@@ -31,6 +31,8 @@ import type { Assembled } from "./types.ts";
 import planet from "../dist/astrology/planets.js";
 import zodiac from "../dist/astrology/zodiac.js";
 import astrologicalHouse from "../dist/astrology/houses.js";
+import planetaryName from "../dist/astrology/planetaryNames.js";
+import planetaryNameException from "../dist/astrology/planetaryNameExceptions.js";
 
 import hebrewLetter from "../dist/hebrewLetters.js";
 
@@ -75,6 +77,8 @@ const barrel = {
   planet,
   zodiac,
   astrologicalHouse,
+  planetaryName,
+  planetaryNameException,
 
   hebrewLetter,
 

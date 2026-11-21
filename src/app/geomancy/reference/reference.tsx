@@ -31,7 +31,6 @@ import {
   HeydonCitation,
   heydonLabel,
 } from "@/drawings/sigilSources";
-import { capitalizeFirstLetter } from "@/lib/utils";
 import SourceLink from "@/sources/SourceLink";
 import Tetragram from "../Tetragram";
 import { figuresByPairs } from "./pairs";
@@ -202,7 +201,7 @@ export default function Geomancy() {
                       <Intelligence planet={planet} />
                     </TableCell>
                     <TableCell align="center">
-                      {capitalizeFirstLetter(planet.spiritId || "")} &nbsp;
+                      {planet.spirit?.name.roman} &nbsp;
                       <Ink drawing="spirit">
                         <PlanetarySpirit
                           spirit={planet.spiritId}

@@ -29,11 +29,6 @@ import Link from "@/ui/Link";
 import { Intelligence, IntelligenceNotes } from "../Intelligence";
 import styles from "./planet.module.css";
 
-/** The spirits are ids, in lower case, with no table yet. */
-function capitalize(text: string) {
-  return text[0].toUpperCase() + text.slice(1);
-}
-
 /** Where the spirit's sigil is drawn from: Heydon's page, linked to its scan. */
 function SigilSource({ spiritId }: { spiritId: string }) {
   const page = rulerSigilPage(spiritId);
@@ -288,14 +283,14 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
             ) : null}
           </Row>
           <Row label="Intelligence">
-            {planet.intelligenceId ? (
+            {planet.intelligence ? (
               <Intelligence planet={planet} hebrew />
             ) : null}
           </Row>
           <Row label="Spirit">
             {planet.spiritId ? (
               <>
-                {capitalize(planet.spiritId)}{" "}
+                {planet.spirit?.name.roman}{" "}
                 {/* The component spreads its other props into its style. The
                     sigil is decoration beside the name it draws. */}
                 <Ink drawing="spirit">

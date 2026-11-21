@@ -410,6 +410,12 @@ export const TEXTS: Readonly<Record<string, TextSpec>> = {
       "The planetary kameas, the magic squares from Saturn's 3 × 3 to the Moon's 9 × 9, computed rather than written out, and the constructions that make them.",
     page: null,
   },
+  "./astrology/aiqBekar": {
+    sources: [],
+    description:
+      "Aiq Bekar, the nine chambers of the Hebrew letters, with the letters' values and the Golden Dawn's reduction that traces a name on a planet's kamea.",
+    page: null,
+  },
 };
 
 /** What the manifest is made from. */

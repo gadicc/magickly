@@ -54,6 +54,9 @@
     "./astrology/houses": "./src/astrology/Houses.ts",
     "./astrology/planets": "./src/astrology/Planets.ts",
     "./astrology/kameas": "./src/astrology/kameas.ts",
+    "./astrology/aiqBekar": "./src/astrology/aiqBekar.ts",
+    "./astrology/planetaryNames": "./src/astrology/PlanetaryNames.ts",
+    "./astrology/planetaryNameExceptions": "./src/astrology/PlanetaryNameExceptions.ts",
     "./astrology/zodiac": "./src/astrology/Zodiac.ts",
     "./enochian/letters": "./src/enochian/Letters.ts",
     "./enochian/tablets": "./src/enochian/Tablets.ts",
@@ -154,6 +157,18 @@
       "./astrology/kameas": {
         "types": "./lib/astrology/kameas.d.ts",
         "default": "./lib/astrology/kameas.js"
+      },
+      "./astrology/aiqBekar": {
+        "types": "./lib/astrology/aiqBekar.d.ts",
+        "default": "./lib/astrology/aiqBekar.js"
+      },
+      "./astrology/planetaryNames": {
+        "types": "./lib/astrology/PlanetaryNames.d.ts",
+        "default": "./lib/astrology/PlanetaryNames.js"
+      },
+      "./astrology/planetaryNameExceptions": {
+        "types": "./lib/astrology/PlanetaryNameExceptions.d.ts",
+        "default": "./lib/astrology/PlanetaryNameExceptions.js"
       },
       "./astrology/zodiac": {
         "types": "./lib/astrology/Zodiac.d.ts",

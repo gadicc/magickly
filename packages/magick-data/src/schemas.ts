@@ -163,6 +163,109 @@ const tabletReading = v.pipe(
   v.description("One source's reading of the tablet."),
 );
 
+/**
+ * The witnesses to the planetary names, as `witnesses` keys them, earliest
+ * first: Agrippa 1533, the English of 1651, Barrett 1801, 777 and Regardie
+ * 1940 (planetaryNames.json5's header cites each). `PlanetaryNames.ts` lists
+ * them too, with where each is read, and its test holds the two equal.
+ */
+const PLANETARY_NAME_WITNESSES = [
+  "agrippa1533",
+  "agrippa1651",
+  "barrett1801",
+  "crowley777",
+  "regardie1940",
+] as const;
+
+/** A planetary name in Hebrew: letters, finals as printed, words spaced. */
+const planetaryHebrew = v.pipe(
+  v.string(),
+  v.regex(/^[\u05D0-\u05EA]+( [\u05D0-\u05EA]+)*$/),
+);
+
+/** An archive.org leaf, `n163`, or a run of them, `n181–n182`. */
+const archiveLeaf = v.pipe(v.string(), v.regex(/^n\d+(–n\d+)?$/));
+
+/** One witness's reading of a planetary name: see the data file's header. */
+const planetaryNameReading = v.pipe(
+  v.strictObject({
+    he: v.optional(
+      v.pipe(
+        planetaryHebrew,
+        v.description(
+          "The name in Hebrew as the witness prints it, final letters included, with its spaces: a name printed run together is one word. Regardie prints no Hebrew.",
+        ),
+      ),
+    ),
+    roman: v.optional(
+      v.pipe(
+        v.string(),
+        v.description(
+          "The name in roman type as the witness prints it, in its capitals and spelling: Iohphiel, BARTZABEL.",
+        ),
+      ),
+    ),
+    caption: v.optional(
+      v.pipe(
+        v.string(),
+        v.description(
+          "The words the witness prints with the name to say what it is, as 1533's Daemonium for Zazel; from the public-domain witnesses only.",
+        ),
+      ),
+    ),
+    number: v.optional(
+      v.pipe(
+        v.number(),
+        v.integer(),
+        v.minValue(1),
+        v.description(
+          "The number printed beside the name. A test holds it to the Hebrew's sum, or to a row of `planetaryNameException`.",
+        ),
+      ),
+    ),
+    // Not a picklist, which a declaration would state per witness, and
+    // most witnesses never use: PlanetaryNames.ts types it.
+    count: v.optional(
+      v.pipe(
+        v.string(),
+        v.check(
+          (count) => ["finals", "pairs"].includes(count),
+          'one of "finals" or "pairs"',
+        ),
+        v.description(
+          "How the number is reached where it is not the plain sum of the letters: `finals`, the final letters counted at 500 to 900, as the Aiq Bekar table places them; `pairs`, each pair of letters makes the number, as Agrippa's Asboga, the eight extended, is 8 three times.",
+        ),
+      ),
+    ),
+    item: v.optional(
+      v.pipe(
+        v.string(),
+        v.regex(/^[\w.-]+$/),
+        v.description(
+          "The archive.org item the reading was made in, where it is not the one the data file's header names for the witness: another copy of the same edition, whose `leaf` then counts in it.",
+        ),
+      ),
+    ),
+    leaf: v.optional(
+      v.pipe(
+        archiveLeaf,
+        v.description(
+          "Where the witness prints it: the archive.org leaf, `n163`, of the reading's `item`, or else of the item the data file's header names.",
+        ),
+      ),
+    ),
+    note: v.optional(
+      v.pipe(
+        v.string(),
+        v.description(
+          "An uncertain reading or a detail of the page: a letter that could be another, a number cut off at the margin.",
+        ),
+      ),
+    ),
+  }),
+  v.description("One witness's reading of the name."),
+);
+
 const byHouse = (value: v.GenericSchema): Entries =>
   Object.fromEntries(HOUSE_NUMBERS.map((no) => [no, value]));
 
@@ -376,7 +479,7 @@ export const schemas = {
             ),
           }),
           v.description(
-            "The Moon's intelligence of intelligences: the name Agrippa gives the Moon in place of a single intelligence (De occulta philosophia, 1533, Book II, chapter 22), of which 777 and the Golden Dawn give variant forms. The Moon only; its `intelligenceId` is Shelachel, a name found in present-day sources.",
+            "Deprecated, and kept until a major version: `planetaryName`'s `malcha-betharsisim` has the name with every witness's reading. The Moon's intelligence of intelligences: the name Agrippa gives the Moon in place of a single intelligence (De occulta philosophia, 1533, Book II, chapter 22), of which 777 and the Golden Dawn give variant forms. The Moon only; its `intelligenceId` is Shelachel, a name found in present-day sources.",
           ),
         ),
       ),
@@ -396,9 +499,9 @@ export const schemas = {
           archangelId:
             "The planet's archangel, whose row names the planet back. The seven classical planets only.",
           intelligenceId:
-            "The planet's intelligence: Nakhiel for the Sun. Six are the names Agrippa gives with the planets' magic squares (De occulta philosophia, Book II, chapter 22). The Moon's, Shelachel, is a name found in present-day sources; we have not found it in Agrippa, in 777 (the revised edition of 1955) or in Heydon's Theomagia (1663/4); the name Agrippa gives the Moon is `intelligenceOfIntelligences`. There is no table of intelligences yet. The seven classical planets only.",
+            "The planet's intelligence, a row of `planetaryName`: Nakhiel for the Sun. Six are the names Agrippa gives with the planets' magic squares (De occulta philosophia, Book II, chapter 22). The Moon's, Shelachel, is a name found in present-day sources; we have not found it in Agrippa, in 777 (the revised edition of 1955) or in Heydon's Theomagia (1663/4); the name Agrippa gives the Moon is its intelligence of intelligences, `malcha-betharsisim`. The seven classical planets only.",
           spiritId:
-            "The planet's spirit, as Agrippa names it beside the intelligence: Sorath for the Sun. There is no table of spirits yet; a geomantic figure's `rulerIds` name the same ones. The seven classical planets only.",
+            "The planet's spirit, a row of `planetaryName`, as Agrippa names it beside the intelligence: Sorath for the Sun. A geomantic figure's `rulerIds` name the same ones. The seven classical planets only.",
         },
       }),
     }),
@@ -512,6 +615,141 @@ export const schemas = {
     }),
     v.description(
       "The twelve houses of the horoscope, each with its traditional motto and what it signifies.",
+    ),
+  ),
+
+  planetaryName: v.pipe(
+    v.strictObject({
+      id: v.pipe(
+        v.string(),
+        v.description(
+          "The row's id: for the planets' intelligences and spirits, the name in lower case as the planets already named them (`agiel`, `bartzabel`); for Venus' intelligences and the Moon's two long names, Agrippa's romanisation as a slug (`bne-seraphim`, `malcha-betharsisim`); for a divine name, the planet's id and the name (`saturn-ab`), with its number where a square has the name twice (`saturn-hod-9`).",
+        ),
+      ),
+      role: v.pipe(
+        v.picklist([
+          "intelligence",
+          "intelligences",
+          "spirit",
+          "intelligenceOfIntelligences",
+          "spiritOfSpirits",
+          "divineName",
+        ]),
+        v.description(
+          "What the name is to its planet: its `intelligence` or `spirit`; Venus' `intelligences`, the Bne Seraphim, plural in Agrippa's caption; the Moon's `intelligenceOfIntelligences` and `spiritOfSpirits`; or one of the square's `divineName`s, each given with one of the square's numbers.",
+        ),
+      ),
+      name: v.pipe(
+        v.strictObject({
+          roman: v.pipe(
+            v.string(),
+            v.description(
+              "The name as the site shows it: for the names the planets already named, the Golden Dawn's form, which is the id capitalised (Bartzabel); for the rest, Agrippa's 1533 romanisation, or Barrett's where Agrippa gives none. Three divine names no witness romanises have our transcription of their letters, which `note` says.",
+            ),
+          ),
+        }),
+        v.description("The name the site shows."),
+      ),
+      division: v.optional(
+        v.pipe(
+          planetaryHebrew,
+          v.description(
+            "Ours: a name printed as one word divided where its romanisation divides it, so that each part is traced as a figure of its own (plan 093, decision 10). The Moon's spirit of spirits only.",
+          ),
+        ),
+      ),
+      note: v.optional(
+        v.pipe(
+          v.string(),
+          v.description(
+            "About the row rather than a witness: where the name comes from when no witness here gives it, or that `name.roman` is ours.",
+          ),
+        ),
+      ),
+      witnesses: v.pipe(
+        v.strictObject(
+          Object.fromEntries(
+            PLANETARY_NAME_WITNESSES.map((witness) => [
+              witness,
+              v.optional(planetaryNameReading),
+            ]),
+          ),
+        ),
+        v.description(
+          "Each witness's reading of the name, keyed by witness, as the data file's header cites them: `agrippa1533`, `agrippa1651` (the English of 1651), `barrett1801`, `crowley777` (777 Revised, 1955) and `regardie1940` (The Golden Dawn, vol. 4). A witness that does not give the name is absent; Shelachel has none.",
+        ),
+      ),
+      ...ids("planetaryName", {
+        absent: ["godNameId"],
+        about: {
+          planetId: "The planet whose square the name goes with.",
+          godNameId:
+            "The divine name's row in `godName`, where it is one: Saturn's Iah is Yah.",
+        },
+      }),
+    }),
+    v.description(
+      "The names that go with the seven planetary squares: each square's divine names, the planets' intelligences and spirits, Venus' intelligences and the Moon's intelligence of intelligences and spirit of spirits, with each witness's reading, from Agrippa (1533) to Regardie (1940).",
+    ),
+  ),
+  planetaryNameException: v.pipe(
+    v.strictObject({
+      id: v.pipe(
+        v.string(),
+        v.description(
+          "The row's id: the name's id and the witness's, joined by a hyphen (`kedemel-agrippa1533`).",
+        ),
+      ),
+      witness: v.pipe(
+        v.picklist(PLANETARY_NAME_WITNESSES),
+        v.description("The witness whose reading it is."),
+      ),
+      printed: v.pipe(
+        v.number(),
+        v.integer(),
+        v.description("The number the witness prints beside the name."),
+      ),
+      expected: v.pipe(
+        v.number(),
+        v.integer(),
+        v.description(
+          "What the Hebrew the witness prints adds up to, counted as its reading's `count` says, which a test computes.",
+        ),
+      ),
+      whose: v.pipe(
+        v.picklist(["printing", "inherited", "unsettled"]),
+        v.description(
+          "Where the difference first appears: `printing`, in this witness, its author's or its printer's; `inherited`, copied from the witness in `from`; `unsettled`, which the evidence read does not say.",
+        ),
+      ),
+      from: v.optional(
+        v.pipe(
+          v.picklist(PLANETARY_NAME_WITNESSES),
+          v.description(
+            "For an inherited difference, the witness it is copied from.",
+          ),
+        ),
+      ),
+      leaf: v.pipe(
+        archiveLeaf,
+        v.description(
+          "Where the witness prints it, as the reading's `leaf` says.",
+        ),
+      ),
+      note: v.pipe(
+        v.string(),
+        v.description(
+          "What the difference is, in our words, and what would settle an unsettled one.",
+        ),
+      ),
+      ...ids("planetaryNameException", {
+        about: {
+          planetaryNameId: "The name whose printed number this is.",
+        },
+      }),
+    }),
+    v.description(
+      "Every number a witness prints beside a planetary name that is not the sum of the Hebrew it prints, and whose the difference is.",
     ),
   ),
 
@@ -803,7 +1041,7 @@ export const schemas = {
           planetIds:
             "The planets that rule the figure: one, or two for Caput Draconis (Venus and Jupiter) and Cauda Draconis (Saturn and Mars).",
           rulerIds:
-            "The planetary spirits that rule the figure, as the planets' `spiritId` names them: Hismael for Jupiter's figures. Not yet a table of their own.",
+            "The planetary spirits that rule the figure, rows of `planetaryName`, as the planets' `spiritId` names them: Hismael for Jupiter's figures.",
         },
       }),
     }),

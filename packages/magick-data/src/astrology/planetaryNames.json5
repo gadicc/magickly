@@ -1,0 +1,862 @@
+{
+  /*
+    The names that go with the seven planetary squares: each square's
+    divine names, the planets' intelligences and spirits, Venus'
+    intelligences (the Bne Seraphim) and the Moon's intelligence of
+    intelligences and spirit of spirits, as each witness prints them
+    (plan 093). Where a printed number is not the sum of the printed
+    Hebrew, planetaryNameExceptions.json5, beside this file, says so and
+    whose the difference is.
+
+    The witnesses, by the keys `witnesses` uses. `leaf` is the
+    archive.org BookReader leaf, archive.org/details/<item>/page/n<N>:
+      agrippa1533: Agrippa, De occulta philosophia libri tres (Cologne,
+        1533), Book II, chapter 22, archive.org DeOccultaPhilosophiaLoc1533:
+        the names of Saturn to Mercury on n163, the Moon's on n164.
+      agrippa1651: Three Books of Occult Philosophy (London, 1651), p. 243,
+        archive.org b30335231, n256. The margin is cut there, and the
+        Moon's long names are read in the EEBO copy,
+        bim_early-english-books-1641-1700_three-books-of-occult-ph_agrippa-henricus-cornel_1651,
+        whose leaves are b30335231's plus 15 (n271). A reading made in
+        that copy names it in `item`, and its `leaf` is that copy's.
+      barrett1801: Barrett, The Magus (London, 1801), I.ii.28, archive.org
+        b22006795 (Wellcome), pp. 146–147, n181–n182.
+      crowley777: Crowley, 777 Revised (London, 1955), Table III, p. 20,
+        read in Celephaïs Press's electronic edition, archive.org
+        aleister-crowley-liber-777, n27. It is in copyright: spellings and
+        numbers only, as facts. We have not seen a scan of the first
+        edition (1909), nor of 1955's printed page.
+      regardie1940: Regardie, The Golden Dawn, vol. 4 (Chicago, 1940),
+        pp. 81–86, archive.org IsraelRegardie-TheGoldenDawn-Vol4-1940,
+        n75–n80: the names in roman capitals only, as the plates' captions,
+        with no Hebrew and no numbers. In copyright where the site is read
+        (plan 091): the names only, as facts.
+
+    Who read them, and how: Claude (Opus 5.5) read the names by eye on
+    the scans on 19 November 2026, a research agent and then a reviewer,
+    knowing the values to expect; the sums were computed, not read. It is
+    one pass, recorded in plan 093's appendix and moved here unchanged.
+
+    A witness's reading holds what it prints, every field optional: `he`,
+    the Hebrew, finals as printed; `roman`, the name in roman type;
+    `caption`, the words it prints with the name to say what it is;
+    `number`, the number printed beside it; `count`, how that number is
+    reached where it is not the plain sum (`finals`: the final letters at
+    500–900; `pairs`: each pair of letters makes it, as Agrippa's
+    "octonarius extensus"); `note`, an uncertain reading or a detail of
+    the page. Where the appendix gives a witness as "the same as 1533",
+    the Hebrew, the number and a romanisation that is only the name are
+    repeated; a Latin caption, or a romanisation with Latin words in it,
+    is not, since an English printing does not print the Latin.
+
+    `name.roman` is the name the site shows. For the fourteen names the
+    planets already named it is the id capitalised, which is the Golden
+    Dawn's form (Bartzabel, Chasmodai); for the rest, Agrippa's 1533
+    romanisation, or Barrett's for Venus' אהא. Three divine names no
+    witness romanises, and theirs are our letter-for-letter transcriptions
+    of the Hebrew, with no vowels supplied (`note` says so).
+
+    Shelachel, the Moon's `intelligenceId`, has no witness here: it is a
+    name found in present-day sources, which planets.json5's header
+    explains, and there is nothing to trace.
+   */
+
+  // SATURN, 3 × 3: n = 3, n² = 9, a line 15, the square 45.
+  "saturn-ab": {
+    id: "saturn-ab",
+    planetId: "saturn",
+    role: "divineName",
+    name: { roman: "Ab" },
+    witnesses: {
+      agrippa1533: { roman: "Ab", he: "אב", number: 3, leaf: "n163" },
+      agrippa1651: { roman: "Ab", he: "אב", number: 3, leaf: "n256" },
+      barrett1801: { roman: "Ab", he: "אב", number: 3, leaf: "n181" },
+    },
+  },
+  "saturn-hod-9": {
+    id: "saturn-hod-9",
+    planetId: "saturn",
+    role: "divineName",
+    name: { roman: "Hod" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Hod",
+        he: "הד",
+        number: 9,
+        leaf: "n163",
+        note: "The dalet looks like a resh (הר).",
+      },
+      agrippa1651: { roman: "Hod", he: "הד", number: 9, leaf: "n256" },
+      barrett1801: { roman: "Hod", he: "הד", number: 9, leaf: "n181" },
+    },
+  },
+  "saturn-iah": {
+    id: "saturn-iah",
+    planetId: "saturn",
+    role: "divineName",
+    name: { roman: "Iah" },
+    godNameId: "yah",
+    witnesses: {
+      agrippa1533: { roman: "Iah", he: "יה", number: 15, leaf: "n163" },
+      agrippa1651: { roman: "Iah", he: "יה", number: 15, leaf: "n256" },
+      barrett1801: { roman: "Jah", he: "יה", number: 15, leaf: "n181" },
+    },
+  },
+  "saturn-hod-15": {
+    id: "saturn-hod-15",
+    planetId: "saturn",
+    role: "divineName",
+    name: { roman: "Hod" },
+    witnesses: {
+      agrippa1533: { roman: "Hod", he: "הוד", number: 15, leaf: "n163" },
+      agrippa1651: { roman: "Hod", he: "הוד", number: 15, leaf: "n256" },
+      barrett1801: { roman: "Hod", he: "הוד", number: 15, leaf: "n181" },
+    },
+  },
+  "saturn-tetragrammaton-extensum": {
+    id: "saturn-tetragrammaton-extensum",
+    planetId: "saturn",
+    role: "divineName",
+    name: { roman: "Tetragrammaton extensum" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Tetragrammaton extensum",
+        he: "יוד הא ואו הא",
+        number: 45,
+        leaf: "n163",
+      },
+      agrippa1651: {
+        caption: "Jehovah extended",
+        he: "יוד הא ואו הא",
+        number: 45,
+        leaf: "n256",
+      },
+      barrett1801: {
+        caption: "Jehovah extended",
+        he: "יודהאואוהא",
+        number: 45,
+        leaf: "n181",
+        note: "The four letter names are printed run together.",
+      },
+    },
+  },
+  agiel: {
+    id: "agiel",
+    planetId: "saturn",
+    role: "intelligence",
+    name: { roman: "Agiel" },
+    witnesses: {
+      agrippa1533: { roman: "Agiel", he: "אגיאל", number: 45, leaf: "n163" },
+      agrippa1651: {
+        roman: "Agiel",
+        he: "אגיאל",
+        number: 45,
+        leaf: "n256",
+        note: "The gimel is faint, and reads as a nun (אניאל).",
+      },
+      barrett1801: { roman: "Agiel", he: "אגיאל", number: 45, leaf: "n181" },
+      crowley777: { roman: "Agiel", he: "אגיאל", number: 45, leaf: "n27" },
+      regardie1940: { roman: "AGIEL", leaf: "n75" },
+    },
+  },
+  zazel: {
+    id: "zazel",
+    planetId: "saturn",
+    role: "spirit",
+    name: { roman: "Zazel" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Zazel",
+        caption: "Daemonium",
+        he: "זאזל",
+        number: 45,
+        leaf: "n163",
+      },
+      agrippa1651: {
+        roman: "Zazel",
+        caption: "spirit",
+        he: "זאזל",
+        number: 45,
+        leaf: "n256",
+      },
+      barrett1801: { roman: "Zazel", he: "זאזל", number: 45, leaf: "n181" },
+      crowley777: { roman: "Zazel", he: "זאזל", number: 45, leaf: "n27" },
+      regardie1940: { roman: "ZAZEL", leaf: "n75" },
+    },
+  },
+
+  // JUPITER, 4 × 4: n = 4, n² = 16, a line 34, the square 136.
+  "jupiter-abba": {
+    id: "jupiter-abba",
+    planetId: "jupiter",
+    role: "divineName",
+    name: { roman: "Abba" },
+    witnesses: {
+      agrippa1533: { roman: "Abba", he: "אבא", number: 4, leaf: "n163" },
+      agrippa1651: { roman: "Abab", he: "אבא", number: 4, leaf: "n256" },
+      barrett1801: { roman: "Aba", he: "אבא", number: 4, leaf: "n181" },
+    },
+  },
+  "jupiter-hvh": {
+    id: "jupiter-hvh",
+    planetId: "jupiter",
+    role: "divineName",
+    name: { roman: "HVH" },
+    note: "No witness romanises the name; `name.roman` is our transcription of its letters.",
+    witnesses: {
+      agrippa1533: { he: "הוה", number: 16, leaf: "n163" },
+      agrippa1651: { he: "הוה", number: 16, leaf: "n256" },
+      barrett1801: { he: "הוה", number: 16, leaf: "n181" },
+    },
+  },
+  "jupiter-ahy": {
+    id: "jupiter-ahy",
+    planetId: "jupiter",
+    role: "divineName",
+    name: { roman: "AHY" },
+    note: "No witness romanises the name; `name.roman` is our transcription of its letters.",
+    witnesses: {
+      agrippa1533: { he: "אהי", number: 16, leaf: "n163" },
+      agrippa1651: { he: "אהי", number: 16, leaf: "n256" },
+      barrett1801: {
+        he: "אהי",
+        number: 16,
+        leaf: "n181",
+        note: "The second letter could be a he or a heth.",
+      },
+    },
+  },
+  "jupiter-el-ab": {
+    id: "jupiter-el-ab",
+    planetId: "jupiter",
+    role: "divineName",
+    name: { roman: "El Ab" },
+    witnesses: {
+      agrippa1533: { roman: "El Ab", he: "אל אב", number: 34, leaf: "n163" },
+      agrippa1651: { he: "אלאב", number: 34, leaf: "n256" },
+      barrett1801: { he: "אלאב", number: 34, leaf: "n181" },
+    },
+  },
+  iophiel: {
+    id: "iophiel",
+    planetId: "jupiter",
+    role: "intelligence",
+    name: { roman: "Iophiel" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Iohphiel",
+        he: "יהפיאל",
+        number: 136,
+        leaf: "n163",
+      },
+      agrippa1651: {
+        roman: "Johphiel",
+        he: "יהפיאל",
+        number: 136,
+        leaf: "n256",
+      },
+      barrett1801: {
+        roman: "Johphiel",
+        he: "יהפיאל",
+        number: 136,
+        leaf: "n181",
+      },
+      crowley777: {
+        roman: "Yophiel",
+        he: "יופיל",
+        number: 136,
+        leaf: "n27",
+        note: "Another spelling from Agrippa's, of the same value, and another trace on the square.",
+      },
+      regardie1940: { roman: "YOPHIEL", leaf: "n75" },
+    },
+  },
+  hismael: {
+    id: "hismael",
+    planetId: "jupiter",
+    role: "spirit",
+    name: { roman: "Hismael" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Hismaël",
+        he: "הסמאל",
+        number: 136,
+        leaf: "n163",
+      },
+      agrippa1651: {
+        roman: "Hismael",
+        he: "הסמאל",
+        number: 136,
+        leaf: "n256",
+      },
+      barrett1801: {
+        roman: "Hismæl",
+        he: "הסמאל",
+        number: 136,
+        leaf: "n181",
+      },
+      crowley777: {
+        roman: "Hismael",
+        he: "הסמאל",
+        number: 136,
+        leaf: "n27",
+      },
+      regardie1940: { roman: "HISMAEL", leaf: "n75" },
+    },
+  },
+
+  // MARS, 5 × 5: n = 5, n² = 25, a line 65, the square 325.
+  "mars-he": {
+    id: "mars-he",
+    planetId: "mars",
+    role: "divineName",
+    name: { roman: "He" },
+    witnesses: {
+      agrippa1533: {
+        roman: "He, litera nominis sancti",
+        he: "ה",
+        number: 5,
+        leaf: "n163",
+      },
+      agrippa1651: { he: "ה", number: 5, leaf: "n256" },
+      barrett1801: { he: "ה", number: 5, leaf: "n181–n182" },
+    },
+  },
+  "mars-yhy": {
+    id: "mars-yhy",
+    planetId: "mars",
+    role: "divineName",
+    name: { roman: "YHY" },
+    note: "No witness romanises the name; `name.roman` is our transcription of its letters.",
+    witnesses: {
+      agrippa1533: { he: "יהי", number: 25, leaf: "n163" },
+      agrippa1651: { he: "יהי", number: 25, leaf: "n256" },
+      barrett1801: { he: "יהי", number: 25, leaf: "n181–n182" },
+    },
+  },
+  "mars-adonai": {
+    id: "mars-adonai",
+    planetId: "mars",
+    role: "divineName",
+    name: { roman: "Adonai" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Adonai",
+        he: "אדני",
+        number: 65,
+        leaf: "n163",
+        note: "The dalet could be a resh.",
+      },
+      agrippa1651: { roman: "Adonai", he: "אדני", number: 65, leaf: "n256" },
+      barrett1801: { he: "אדני", number: 65, leaf: "n181–n182" },
+    },
+  },
+  graphiel: {
+    id: "graphiel",
+    planetId: "mars",
+    role: "intelligence",
+    name: { roman: "Graphiel" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Graphiel",
+        he: "גראפיאל",
+        number: 325,
+        leaf: "n163",
+      },
+      agrippa1651: {
+        roman: "Graphiel",
+        he: "גראפיאל",
+        number: 325,
+        leaf: "n256",
+      },
+      barrett1801: {
+        roman: "Graphiel",
+        he: "גראפיאל",
+        number: 325,
+        leaf: "n181–n182",
+      },
+      crowley777: {
+        roman: "Graphiel",
+        he: "גראפיאל",
+        number: 325,
+        leaf: "n27",
+      },
+      regardie1940: { roman: "GRAPHIEL", leaf: "n76" },
+    },
+  },
+  bartzabel: {
+    id: "bartzabel",
+    planetId: "mars",
+    role: "spirit",
+    name: { roman: "Bartzabel" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Barzabel",
+        he: "ברצאבאל",
+        number: 325,
+        leaf: "n163",
+      },
+      agrippa1651: {
+        roman: "Barzabel",
+        he: "ברצאבאל",
+        number: 325,
+        leaf: "n256",
+      },
+      barrett1801: {
+        roman: "Barzabel",
+        he: "ברצאבאל",
+        number: 325,
+        leaf: "n181–n182",
+      },
+      crowley777: {
+        roman: "Bartzabel",
+        he: "ברצבאל",
+        number: 325,
+        leaf: "n27",
+      },
+      regardie1940: { roman: "BARTZABEL", leaf: "n76" },
+    },
+  },
+
+  // THE SUN, 6 × 6: n = 6, n² = 36, a line 111, the square 666.
+  "sol-vau": {
+    id: "sol-vau",
+    planetId: "sol",
+    role: "divineName",
+    name: { roman: "Vau" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Vau, litera nominis sancti",
+        he: "ו",
+        number: 6,
+        leaf: "n163",
+      },
+      agrippa1651: { he: "ו", number: 6, leaf: "n256" },
+      barrett1801: { he: "ו", number: 6, leaf: "n182" },
+    },
+  },
+  "sol-he-extensum": {
+    id: "sol-he-extensum",
+    planetId: "sol",
+    role: "divineName",
+    name: { roman: "He extensum" },
+    witnesses: {
+      agrippa1533: { roman: "He extensum", he: "הא", number: 6, leaf: "n163" },
+      agrippa1651: { he: "הא", number: 6, leaf: "n256" },
+      barrett1801: { he: "הא", number: 6, leaf: "n182" },
+    },
+  },
+  "sol-eloh": {
+    id: "sol-eloh",
+    planetId: "sol",
+    role: "divineName",
+    name: { roman: "Eloh" },
+    witnesses: {
+      agrippa1533: { roman: "Eloh", he: "אלה", number: 36, leaf: "n163" },
+      agrippa1651: {
+        roman: "Eloh",
+        he: "אלה",
+        number: 56,
+        leaf: "n256",
+        note: "In b30335231; in the EEBO copy the number is cut off at the margin.",
+      },
+      barrett1801: { roman: "Eloh", he: "אלה", number: 36, leaf: "n182" },
+    },
+  },
+  nakhiel: {
+    id: "nakhiel",
+    planetId: "sol",
+    role: "intelligence",
+    name: { roman: "Nakhiel" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Nachiel",
+        he: "נכיאל",
+        number: 111,
+        leaf: "n163",
+      },
+      agrippa1651: {
+        roman: "Nachiel",
+        he: "נכיאל",
+        number: 111,
+        leaf: "n256",
+      },
+      barrett1801: {
+        roman: "Nachiel",
+        he: "נכיאל",
+        number: 111,
+        leaf: "n182",
+      },
+      crowley777: {
+        roman: "Nakhiel",
+        he: "נכיאל",
+        number: 111,
+        leaf: "n27",
+      },
+      regardie1940: { roman: "NAKHIEL", leaf: "n77" },
+    },
+  },
+  sorath: {
+    id: "sorath",
+    planetId: "sol",
+    role: "spirit",
+    name: { roman: "Sorath" },
+    witnesses: {
+      agrippa1533: { roman: "Sorath", he: "סורת", number: 666, leaf: "n163" },
+      agrippa1651: {
+        roman: "Sorath",
+        he: "סורה",
+        number: 666,
+        leaf: "n256",
+        note: "The same in both copies.",
+      },
+      barrett1801: { roman: "Sorath", he: "סורה", number: 666, leaf: "n182" },
+      crowley777: { roman: "Sorath", he: "סורת", number: 666, leaf: "n27" },
+      regardie1940: { roman: "SORATH", leaf: "n77" },
+    },
+  },
+
+  // VENUS, 7 × 7: n = 7, n² = 49, a line 175, the square 1225.
+  "venus-aha": {
+    id: "venus-aha",
+    planetId: "venus",
+    role: "divineName",
+    name: { roman: "Aha" },
+    witnesses: {
+      agrippa1533: { he: "אהא", number: 7, leaf: "n163" },
+      agrippa1651: { he: "אהא", number: 7, leaf: "n256" },
+      barrett1801: { roman: "Aha", he: "אהא", number: 7, leaf: "n182" },
+    },
+  },
+  hagiel: {
+    id: "hagiel",
+    planetId: "venus",
+    role: "intelligence",
+    name: { roman: "Hagiel" },
+    witnesses: {
+      agrippa1533: { roman: "Hagiel", he: "הגיאל", number: 49, leaf: "n163" },
+      agrippa1651: { roman: "Hagiel", he: "הגיאל", number: 49, leaf: "n256" },
+      barrett1801: { roman: "Hagiel", he: "הגיאל", number: 49, leaf: "n182" },
+      crowley777: { roman: "Hagiel", he: "הגיאל", number: 49, leaf: "n27" },
+      regardie1940: { roman: "HAGIEL", leaf: "n78" },
+    },
+  },
+  kedemel: {
+    id: "kedemel",
+    planetId: "venus",
+    role: "spirit",
+    name: { roman: "Kedemel" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Kedemel",
+        he: "קדמאל",
+        number: 157,
+        leaf: "n163",
+        note: "The dalet could be a resh; קרמאל would be 371.",
+      },
+      agrippa1651: {
+        roman: "Kedemel",
+        he: "קדמאל",
+        number: 157,
+        leaf: "n256",
+      },
+      barrett1801: {
+        roman: "Kedemel",
+        he: "קדמאל",
+        number: 175,
+        leaf: "n182",
+      },
+      crowley777: {
+        roman: "Qedemel",
+        he: "קדמאל",
+        number: 175,
+        leaf: "n27",
+      },
+      regardie1940: { roman: "KEDEMEL", leaf: "n78" },
+    },
+  },
+  "bne-seraphim": {
+    id: "bne-seraphim",
+    planetId: "venus",
+    role: "intelligences",
+    name: { roman: "Bne Seraphim" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Bne Seraphim",
+        caption: "Intelligentiae Veneris",
+        he: "בני שרפים",
+        number: 1225,
+        leaf: "n163",
+        note: "The plate of Venus' seals (n166) labels its sigil Intelligentiarum Veneris.",
+      },
+      agrippa1651: {
+        caption: "The Intelligencies of Venus",
+        he: "בני שרפים",
+        number: 1252,
+        count: "finals",
+        leaf: "n256",
+        note: "1252 is the sum with the final mem at 600, and also 1533's 1225 with two digits swapped: whether the translator counted the final or the compositor transposed the number, the page does not show.",
+      },
+      barrett1801: {
+        caption: "the Intelligence of Venus",
+        he: "בני שרפים",
+        number: 1225,
+        leaf: "n182",
+      },
+      regardie1940: {
+        roman: "BENI SERAPHIM",
+        leaf: "n78",
+        note: "Named as a choir of angels.",
+      },
+    },
+  },
+
+  // MERCURY, 8 × 8: n = 8, n² = 64, a line 260, the square 2080.
+  "mercury-asboga": {
+    id: "mercury-asboga",
+    planetId: "mercury",
+    role: "divineName",
+    name: { roman: "Asboga" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Asboga",
+        caption: "Octonarius extensus",
+        he: "אזבוגה",
+        number: 8,
+        count: "pairs",
+        leaf: "n163",
+      },
+      agrippa1651: {
+        caption: "eight extended",
+        he: "אזבוגה",
+        number: 8,
+        count: "pairs",
+        leaf: "n256",
+      },
+      barrett1801: {
+        roman: "Asboga",
+        he: "אזבוגה",
+        number: 8,
+        count: "pairs",
+        leaf: "n182",
+      },
+    },
+  },
+  "mercury-din": {
+    id: "mercury-din",
+    planetId: "mercury",
+    role: "divineName",
+    name: { roman: "Din" },
+    witnesses: {
+      agrippa1533: { roman: "Din", he: "דין", number: 64, leaf: "n163" },
+      agrippa1651: { roman: "Din", he: "דין", number: 64, leaf: "n256" },
+      barrett1801: { roman: "Din", he: "דין", number: 64, leaf: "n182" },
+    },
+  },
+  "mercury-doni": {
+    id: "mercury-doni",
+    planetId: "mercury",
+    role: "divineName",
+    name: { roman: "Doni" },
+    witnesses: {
+      agrippa1533: { roman: "Doni", he: "דני", number: 64, leaf: "n163" },
+      agrippa1651: { roman: "Doni", he: "דני", number: 64, leaf: "n256" },
+      barrett1801: { roman: "Doni", he: "דני", number: 64, leaf: "n182" },
+    },
+  },
+  tiriel: {
+    id: "tiriel",
+    planetId: "mercury",
+    role: "intelligence",
+    name: { roman: "Tiriel" },
+    witnesses: {
+      agrippa1533: { roman: "Tiriel", he: "טיריאל", number: 260, leaf: "n163" },
+      agrippa1651: { roman: "Tiriel", he: "טיריאל", number: 260, leaf: "n256" },
+      barrett1801: { roman: "Tiriel", he: "טיריאל", number: 260, leaf: "n182" },
+      crowley777: {
+        roman: "Tiriel",
+        he: "תיריאל",
+        number: 260,
+        leaf: "n27",
+        note: "As read in the e-text, with a tav for the teth.",
+      },
+      regardie1940: { roman: "TIRIEL", leaf: "n79" },
+    },
+  },
+  taphthartharath: {
+    id: "taphthartharath",
+    planetId: "mercury",
+    role: "spirit",
+    name: { roman: "Taphthartharath" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Taphthartharath",
+        he: "תפתרתרת",
+        number: 2080,
+        leaf: "n163",
+      },
+      agrippa1651: {
+        roman: "Taphthartharath",
+        he: "תפתרתדת",
+        number: 2080,
+        item: "bim_early-english-books-1641-1700_three-books-of-occult-ph_agrippa-henricus-cornel_1651",
+        leaf: "n271",
+        note: "Read in the EEBO copy, where the sixth letter is a dalet. In b30335231 (n256) the letter is unclear, so whether this is the edition's reading or a damaged sort in one copy is not settled.",
+      },
+      barrett1801: {
+        roman: "Tapthartharath",
+        he: "תפתרתרת",
+        number: 2080,
+        leaf: "n182",
+      },
+      crowley777: {
+        roman: "Taphthartharath",
+        he: "תפתרתרת",
+        number: 2080,
+        leaf: "n27",
+      },
+      regardie1940: { roman: "TAPHTHARTHARATH", leaf: "n79" },
+    },
+  },
+
+  // THE MOON, 9 × 9: n = 9, n² = 81, a line 369, the square 3321.
+  "luna-hod": {
+    id: "luna-hod",
+    planetId: "luna",
+    role: "divineName",
+    name: { roman: "Hod" },
+    witnesses: {
+      agrippa1533: { roman: "Hod", he: "הד", number: 9, leaf: "n164" },
+      agrippa1651: { roman: "Hod", he: "הד", number: 9, leaf: "n256" },
+      barrett1801: { roman: "Hod", he: "הד", number: 9, leaf: "n182" },
+    },
+  },
+  "luna-elim": {
+    id: "luna-elim",
+    planetId: "luna",
+    role: "divineName",
+    name: { roman: "Elim" },
+    witnesses: {
+      agrippa1533: { roman: "Elim", he: "אלים", number: 81, leaf: "n164" },
+      agrippa1651: { roman: "Elim", he: "אלים", number: 81, leaf: "n256" },
+      barrett1801: { roman: "Elim", he: "אלים", number: 81, leaf: "n182" },
+    },
+  },
+  chasmodai: {
+    id: "chasmodai",
+    planetId: "luna",
+    role: "spirit",
+    name: { roman: "Chasmodai" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Hasmodai",
+        caption: "Daemonium Lunae",
+        he: "חשמודאי",
+        number: 369,
+        leaf: "n164",
+      },
+      agrippa1651: {
+        roman: "Hasmodai",
+        he: "השמודאי",
+        number: 369,
+        leaf: "n256",
+      },
+      barrett1801: {
+        roman: "Hasmodai",
+        he: "השמודאי",
+        number: 369,
+        leaf: "n182",
+      },
+      crowley777: {
+        roman: "Chasmodai",
+        he: "חשמודאי",
+        number: 369,
+        leaf: "n27",
+      },
+      regardie1940: { roman: "CHASHMODAI", leaf: "n80" },
+    },
+  },
+  "schedbarschemoth-schartathan": {
+    id: "schedbarschemoth-schartathan",
+    planetId: "luna",
+    role: "spiritOfSpirits",
+    name: { roman: "Schedbarschemoth Schartathan" },
+    // Decision 10: one word of fourteen letters in 1533, divided where
+    // the romanisation divides it so that each part is a figure.
+    division: "שדברשהמעת שרתתן",
+    witnesses: {
+      agrippa1533: {
+        roman: "Schedbarschemoth Schartathan",
+        caption: "Daemonium daemoniorum Lunae",
+        he: "שדברשהמעתשרתתן",
+        number: 3321,
+        count: "finals",
+        leaf: "n164",
+      },
+      agrippa1651: {
+        caption: "the spirit of the spirits of the Moon",
+        he: "שדברשהמעה שרתתו",
+        number: 3321,
+        leaf: "n256",
+        note: "Printed as two words; the same in both copies.",
+      },
+      barrett1801: {
+        caption: "the Spirit of the Spirits",
+        he: "שדברשהמעחשרתתו",
+        number: 3321,
+        leaf: "n182",
+      },
+      regardie1940: { roman: "SHAD BARSCHEMOTH HA-SCHARTATHAN", leaf: "n80" },
+    },
+  },
+  "malcha-betharsisim": {
+    id: "malcha-betharsisim",
+    planetId: "luna",
+    role: "intelligenceOfIntelligences",
+    name: { roman: "Malcha betharsisim hed beruah schehakim" },
+    witnesses: {
+      agrippa1533: {
+        roman: "Malcha betharsisim hed beruah schehakim",
+        caption: "Intelligentia intelligentiarum Lunae",
+        he: "מלכא בתרשיתים עד ברוח שחקים",
+        number: 3321,
+        count: "finals",
+        leaf: "n164",
+      },
+      agrippa1651: {
+        roman: "Malcha betharsisim hed beruah schehalim",
+        caption: "The Intelligency of the Intelligence of the Moon",
+        he: "מלכא בתרשיסים עד ברוה שהקים",
+        number: 3321,
+        item: "bim_early-english-books-1641-1700_three-books-of-occult-ph_agrippa-henricus-cornel_1651",
+        leaf: "n271",
+        note: "Read in the EEBO copy: b30335231 cuts the line off at the margin (n256).",
+      },
+      barrett1801: {
+        caption: "the Intelligence of the Intelligences",
+        he: "מלכאבתרשיסים עד ברוהשהקים",
+        number: 3321,
+        leaf: "n182",
+        note: "Printed with fewer breaks than 1533's five words; the breaks here are as read once and are not certain. The dalet of עד could be a resh (ער). The romanisation is 1651's, ending schehalim, and was not recorded in full.",
+      },
+      crowley777: {
+        roman: "Malkah Be Tarshishim va A'ad Be Ruah Shehaqim",
+        he: "מלכא בתרשישים ועד ברוח שחקים",
+        number: 3321,
+        leaf: "n27",
+      },
+      regardie1940: {
+        roman: "MALCAH BETARSHISIM VE-AD RUACHOTH HA-SCHECHALIM",
+        leaf: "n80",
+      },
+    },
+  },
+  shelachel: {
+    id: "shelachel",
+    planetId: "luna",
+    role: "intelligence",
+    name: { roman: "Shelachel" },
+    note: "A name found in present-day sources, whose origin is not known to us; no witness here gives it (planets.json5's header says where we have looked).",
+    witnesses: {},
+  },
+}
