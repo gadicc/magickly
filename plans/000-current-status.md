@@ -232,6 +232,20 @@ Follow-ups are separate from the completed migration work:
   side-by-side sheet against Vaughan (built, local only); S5, the kamea profile;
   and the A‑B‑A‑B‑A class the engine cannot place
   ([plan 088](088-rose-sigil-oracle.md#stages)). S4 is merged (below).
+- TODO (Gadi, 21 November 2026): the angels' rose sigils on the
+  `/kabbalah/yhvh/72angels` summary page too, collapsed by default,
+  deciding when the images load (on expanding, or lazily).
+- TODO (Gadi, 21 November 2026): how the sources present a sigil. Is a
+  name lettered round a ring the norm, or one author's convention?
+  Vaughan (2020) sets only the name's letters round a band, with no
+  rose; Lenain's 1823 plates (plan 031's follow-ups) and the Lévi seals
+  PDF in `~/Documents/Magick/` are not yet checked for it. And which
+  conventions met in plans 088 and 093 are worth offering as options: a
+  ringed name; Agrippa's style (circles at both ends, U returns, capped
+  crooks, closed outlines: decision 4's alternative in plan 093);
+  Agrippa's reductions (ר on 2, ל on 3, י and א as one turn) beside the
+  Golden Dawn's; Vaughan's two beads for a doubled letter on a straight
+  pass.
 - TODO: rate limiting for the public component image routes
   (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through
   WASM on request, and `/api/render/rose-sigil` takes up to about 160 ms
