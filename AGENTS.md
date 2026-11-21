@@ -150,3 +150,44 @@ Hebrew SEO launch is intentionally deferred. Keep `LOCALIZED_SEO_ENABLED` false:
 localized routes stay usable but `noindex`, absent from sitemap/hreflang. Do not
 flip this during routine copy work. The final launch checklist lives in
 `src/i18n/README.md`.
+
+## Site search embeddings
+
+A commit that adds or changes indexed public text (a new public page, prose on
+an indexed page, a component entry) moves the search catalogue's digest, and
+`src/search/embeddings/manifest.test.ts` and `src/search/semantic.test.ts`
+fail until its embeddings are published. Publishing is a paid call to the AI
+Gateway; resolving two branches' publishes is not (`pnpm search:assemble
+gemini-embedding-2-768-search-v1` rebuilds from the committed rows alone).
+
+To publish from a worktree (gate worktrees have no `.env*`, and a fresh one has
+no embedding cache, so without the second step it re-embeds every passage;
+`../magickli` is the main checkout from a worktree beside it, elsewhere use its
+full path):
+
+1. Use the repository's Node (`nvm use 24`).
+2. Seed the cache from the main checkout, which is keyed by exact text and
+   model recipe and so is safe to share:
+   `mkdir -p .private && cp -rn ../magickli/.private/site-search .private/`
+3. Pass only the gateway key, never the rest of `.env.local`:
+
+   ```bash
+   AI_GATEWAY_API_KEY="$(grep -m1 '^AI_GATEWAY_API_KEY=' ../magickli/.env.local | cut -d= -f2- | sed -e 's/^"//' -e 's/"$//')" pnpm search:publish gemini-embedding-2-768-search-v1
+   ```
+
+   Never print, log or commit the key.
+4. Copy the new cache entries back for the next worktree:
+   `cp -rn .private/site-search/. ../magickli/.private/site-search/`
+5. Commit the changed `search-vectors/` rows, the manifest and the new matrix
+   with the change that needed them.
+
+**Agents may run this without asking** when the run's conservative estimate
+(the script prints it before any paid call, and refuses anything over $1) is
+under $2, and the day's running total, including this run's estimate, stays
+under $12. The total is kept in the shared ledger
+`~/.local/state/magickli/search-publish.tsv`, one line a run, tab-separated:
+local date (`date +%F`), the estimate in dollars, the tokens the run reports,
+the worktree or branch. Add the line after every run, paid or not, and sum the
+day's estimates before starting: if the day's total is $11 or more, or a run
+would take it to $12 or more, ask the operator first. Any other paid
+embedding work (a new profile, `search:compare`) is the operator's.
