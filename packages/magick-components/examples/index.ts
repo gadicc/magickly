@@ -7,10 +7,12 @@ import { FylfotCross } from "./FylfotCross.examples.tsx";
 import { GdHall } from "./GdHall.examples.tsx";
 import { GradeTree } from "./GradeTree.examples.tsx";
 import { Kamea } from "./Kamea.examples.tsx";
+import { KameaSigil } from "./KameaSigil.examples.tsx";
 import { Lamen } from "./Lamen.examples.tsx";
 import { MercuryWidget } from "./MercuryWidget.examples.tsx";
 import { Moon } from "./Moon.examples.tsx";
 import { MoonWidget } from "./MoonWidget.examples.tsx";
+import { PlanetarySeal } from "./PlanetarySeal.examples.tsx";
 import { PlanetarySpirit } from "./PlanetarySpirit.examples.tsx";
 import { RoseSigil } from "./RoseSigil.examples.tsx";
 import { SevenBranchedCandlestick } from "./SevenBranchedCandlestick.examples.tsx";
@@ -36,6 +38,8 @@ export const COMPONENT_EXAMPLES = {
   FylfotCross,
   Tablet,
   Kamea,
+  KameaSigil,
+  PlanetarySeal,
   PlanetarySpirit,
   Chakras,
   Moon,

@@ -597,6 +597,184 @@
       }
     ]
   },
+  "KameaSigil": {
+    "description": "A name's sigil on its planet's kamea, one figure per word, each on its\nown square `size` pixels across, set right to left and wrapping onto\nthe next line where the width runs out (an empty text, the bare\nsquare). The figures are `<svg>`s in a\n`<div>`, which is the image (named by `label`). A text placement could\nnot draw with every mark clear is drawn best effort, and says so:\n`data-placement=\"failed\"` on the `<div>` and on each such word's\n`<svg>` (`kameaSigil`'s `failed` gives the same to the page).",
+    "props": [
+      {
+        "name": "planet",
+        "type": "\"sol\" | \"mercury\" | \"venus\" | \"luna\" | \"mars\" | \"jupiter\" | \"saturn\"",
+        "required": true,
+        "description": "The planet, by magick-data's id.",
+        "control": {
+          "kind": "choice",
+          "options": [
+            "sol",
+            "mercury",
+            "venus",
+            "luna",
+            "mars",
+            "jupiter",
+            "saturn"
+          ]
+        }
+      },
+      {
+        "name": "text",
+        "type": "string",
+        "required": true,
+        "description": "The text, in Hebrew letters; whitespace separates words, each its\nown figure. Anything not one of the 27 letters (points, a maqaf) is\nleft out.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "required": false,
+        "description": "The outer element's class.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "finals",
+        "type": "boolean",
+        "required": false,
+        "default": "false",
+        "description": "Count final forms at Aiq Bekar's 500 to 900 (default false).",
+        "control": { "kind": "switch" }
+      },
+      {
+        "name": "fontFamily",
+        "type": "string",
+        "required": false,
+        "description": "The square's numbers' font stack.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "ink",
+        "type": "string",
+        "required": false,
+        "default": "\"red\"",
+        "description": "The sigil's ink (default red, as the rose sigil's).",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "label",
+        "type": "string | false",
+        "required": false,
+        "description": "The drawing's accessible name: \"Sigil of <text> on the Kamea of\n<planet>\" when not given, this one when a string. `false` marks it\ndecorative, hidden from assistive technology (`aria-hidden`).",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "paper",
+        "type": "string",
+        "required": false,
+        "description": "The square's ground (default white).",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "sigil",
+        "type": "KameaSigilFigure",
+        "required": false,
+        "description": "The text already worked out by `kameaSigil` for this planet, text and\nfinals, so a page that needs it too does not place it twice. One for\nanother planet, text or finals is ignored, and the drawing worked out\nfrom the props, so what is drawn is always what the props say."
+      },
+      {
+        "name": "size",
+        "type": "number",
+        "required": false,
+        "description": "Each word's figure's width in CSS pixels, its square's frame and\nmargin included: never under the square's own minimum\n(`kameaSigilMinSize`, 240 to 329), which is also the default.",
+        "control": { "kind": "number" }
+      },
+      {
+        "name": "squareInk",
+        "type": "string",
+        "required": false,
+        "description": "The square's frame, rules and numbers (default black).",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "style",
+        "type": "CSSProperties",
+        "required": false,
+        "description": "The outer element's style."
+      }
+    ]
+  },
+  "PlanetarySeal": {
+    "description": "A planet's seal after Agrippa (1533) in an `<svg>` of its own, square,\n120 across unless `width` or `height` says otherwise. On the page (the\ndefault) it is drawn in the text's colour, the box close about the\nfigure; on the plate, the plate fills the box. It is an image named by\nits planet (\"Seal of Saturn\") unless `label` names it otherwise or is\nfalse.",
+    "props": [
+      {
+        "name": "planet",
+        "type": "\"sol\" | \"mercury\" | \"venus\" | \"luna\" | \"mars\" | \"jupiter\" | \"saturn\"",
+        "required": true,
+        "description": "The planet, by magick-data's id (`saturn` … `sol` … `luna`); without\none, or with one that is not of the seven, nothing.",
+        "control": {
+          "kind": "choice",
+          "options": [
+            "sol",
+            "mercury",
+            "venus",
+            "luna",
+            "mars",
+            "jupiter",
+            "saturn"
+          ]
+        }
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "required": false,
+        "description": "The `<svg>`'s class.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "height",
+        "type": "string | number",
+        "required": false,
+        "description": "The drawing's height; the width's when only that is given.",
+        "control": { "kind": "parsed" }
+      },
+      {
+        "name": "ink",
+        "type": "string",
+        "required": false,
+        "description": "The lines' colour. On the page, `currentColor` unless given, so the\nseal takes the text's colour, light or dark; it is set as a style, so\nit may be a custom property (`var(--ink)`). On the plate, black\nunless given.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "label",
+        "type": "string | false",
+        "required": false,
+        "description": "The drawing's accessible name: the seal's own (\"Seal of Saturn\") when\nnot given, this one when a string. `false` marks it decorative,\nhidden from assistive technology (`aria-hidden`).",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "look",
+        "type": "PlanetarySealLook",
+        "required": false,
+        "description": "`page` (the default): the lines alone, in `ink`, the rings open, for\na page in any colour scheme. `plate`: engraved on a silver plate with\na rounded edge, as the temple hall draws it, the rings filled silver.",
+        "control": { "kind": "choice", "options": ["page", "plate"] }
+      },
+      {
+        "name": "plate",
+        "type": "string",
+        "required": false,
+        "description": "The plate's colour, `look=\"plate\"` only.",
+        "control": { "kind": "text" }
+      },
+      {
+        "name": "style",
+        "type": "CSSProperties",
+        "required": false,
+        "description": "The `<svg>`'s style."
+      },
+      {
+        "name": "width",
+        "type": "string | number",
+        "required": false,
+        "description": "The drawing's width (CSS pixels for a number); the height's when only\nthat is given, as it is square, and 120 when neither is.",
+        "control": { "kind": "parsed" }
+      }
+    ]
+  },
   "PlanetarySpirit": {
     "description": "A planetary spirit's geomantic sigil, centred in a flex box as tall as its\ncontainer allows.",
     "props": [

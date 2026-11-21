@@ -38,6 +38,67 @@ describe("/api/render/[slug]", () => {
     }
   });
 
+  describe("kamea-sigil", () => {
+    const he = (text: string) => encodeURIComponent(text);
+    const canonical = (props: Record<string, string>) =>
+      `/api/render/kamea-sigil?${new URLSearchParams(props)}`;
+
+    it.each([
+      [
+        `?text=${he("אגיאל")}&planet=saturn`,
+        canonical({ planet: "saturn", text: "אגיאל" }),
+      ],
+      [
+        `?planet=saturn&text=${he("אגיאל")}&finals=false`,
+        canonical({ planet: "saturn", text: "אגיאל" }),
+      ],
+      [
+        `?planet=venus&text=${he(" בני  שרפים ")}`,
+        canonical({ planet: "venus", text: "בני שרפים" }),
+      ],
+      [
+        `?planet=venus&text=${he("בני שרפים")}`,
+        canonical({ planet: "venus", text: "בני שרפים" }),
+      ],
+      [
+        `?planet=luna&finals=true&text=${he("אלים")}&fmt=png&width=300`,
+        `${canonical({ fmt: "png", planet: "luna", text: "אלים", finals: "true", width: "300" })}`,
+      ],
+      [
+        `?download=1&planet=saturn&text=${he("זאזל")}`,
+        `${canonical({ planet: "saturn", text: "זאזל", download: "1" })}`,
+      ],
+    ])(
+      "sends %s to its canonical query",
+      async (query, location) => {
+        const response = await get("kamea-sigil", query);
+        expect(response.status).toBe(308);
+        expect(response.headers.get("location")).toBe(location);
+        // The canonical query is drawn, not sent on again.
+        const again = await GET(new Request(`https://magick.ly${location}`), {
+          params: Promise.resolve({ slug: "kamea-sigil" }),
+        });
+        expect(again.status).toBe(200);
+      },
+      30_000,
+    );
+
+    it("draws a canonical query, and refuses a wrong one", async () => {
+      const response = await get(
+        "kamea-sigil",
+        `?${new URLSearchParams({ planet: "saturn", text: "אגיאל" })}`,
+      );
+      expect(response.status).toBe(200);
+      expect(response.headers.get("content-type")).toBe("image/svg+xml");
+      for (const query of [
+        "?planet=saturn",
+        "?planet=pluto&text=%D7%90",
+        `?planet=saturn&text=${he("א")}&download=2`,
+      ])
+        expect((await get("kamea-sigil", query)).status).toBe(400);
+    });
+  });
+
   it("still draws every other slug", async () => {
     const response = await get("seven-branched-candlestick");
     expect(response.status).toBe(200);

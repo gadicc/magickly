@@ -45,7 +45,11 @@ export async function componentImageResponse(slug: string, request: Request) {
     const contract = CONTRACTS[image.request.slug];
     const etag = `"${image.sha256}"`;
     const filename = `${componentImageFilename(image.request)}.${image.request.format}`;
+    // The registration's own (`X-` names only) first, beneath the route's.
     const headers: Record<string, string> = {
+      ...Object.fromEntries(
+        Object.entries(image.headers).filter(([name]) => /^X-/i.test(name)),
+      ),
       "Content-Type": image.contentType,
       "X-Content-Type-Options": "nosniff",
       "Cache-Control": COMPONENT_IMAGE_CACHE_CONTROL,
@@ -57,6 +61,7 @@ export async function componentImageResponse(slug: string, request: Request) {
     };
     if (contract.personal || contract.indexed === false)
       headers["X-Robots-Tag"] = "noindex";
+
     if (matchesEtag(request.headers.get("if-none-match"), etag))
       return new Response(null, { status: 304, headers });
     return new Response(image.bytes, {

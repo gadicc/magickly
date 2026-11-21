@@ -10,7 +10,11 @@ import {
   componentImageResponse,
 } from "./componentImageResponse";
 
-function rendered(slug: string, query: string) {
+function rendered(
+  slug: string,
+  query: string,
+  headers: Record<string, string> = {},
+) {
   const request = parseComponentImageRequest(slug, new URLSearchParams(query));
   const bytes = Buffer.from(`<svg>${slug}</svg>`);
   return {
@@ -18,6 +22,7 @@ function rendered(slug: string, query: string) {
     bytes,
     byteSize: bytes.length,
     sha256: "abc123",
+    headers,
     contentType:
       request.format === "svg" ? "image/svg+xml" : ("image/png" as const),
   };
@@ -52,6 +57,34 @@ describe("component image responses", () => {
       "tree-of-life",
       new URLSearchParams("field=name.roman"),
     );
+  });
+
+  it("sends a registration's X- headers beneath its own, on a 304 too", async () => {
+    mocks.render.mockImplementation(
+      async (slug: string, params: URLSearchParams) =>
+        rendered(slug, params.toString(), {
+          "X-Sigil-Placement": "failed",
+          "X-Content-Type-Options": "sniff",
+          "Content-Type": "text/html",
+          "Cache-Control": "no-cache",
+        }),
+    );
+    for (const header of [null, '"abc123"']) {
+      const response = await componentImageResponse(
+        "tree-of-life",
+        new Request("https://magick.ly/api/render/tree-of-life", {
+          headers: header ? { "if-none-match": header } : {},
+        }),
+      );
+      expect(response.status).toBe(header ? 304 : 200);
+      expect(response.headers.get("x-sigil-placement")).toBe("failed");
+      expect(response.headers.get("x-content-type-options")).toBe("nosniff");
+      expect(response.headers.get("cache-control")).toBe(
+        COMPONENT_IMAGE_CACHE_CONTROL,
+      );
+      if (!header)
+        expect(response.headers.get("content-type")).toBe("image/svg+xml");
+    }
   });
 
   it("returns 304 for a matching ETag, including weak and list forms", async () => {

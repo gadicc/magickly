@@ -26,6 +26,11 @@ export default function AstrologyText() {
           Moon and the dates of the last and next new moon, quarters and full
           moon in your own time zone.
         </li>
+        <li>
+          <Link href="/astrology/kamea/sigils">Kamea Sigils</Link> traces a
+          Hebrew name on the kamea, or magic square, of a planet, by the Golden
+          Dawn&apos;s reduction of its letters, and draws its sigil.
+        </li>
       </List>
       <H3>The planets</H3>
       <p>

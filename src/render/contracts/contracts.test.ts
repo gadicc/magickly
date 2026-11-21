@@ -1,3 +1,5 @@
+import Kamea from "magick-components/astrology/Kamea";
+import { KameaSigilImage } from "magick-components/astrology/KameaSigil";
 import {
   tabletViewBox,
   UNION_VIEWBOX,
@@ -6,6 +8,7 @@ import {
 import RoseSigilImage from "magick-components/gd/RoseSigilImage";
 import { ROSE_VERSIONS } from "magick-components/gd/roseSigilGeometry";
 import { CANDLESTICK_VERSIONS } from "magick-components/gd/SevenBranchedCandlestick";
+import { KAMEA_PLANETS } from "magick-data/astrology/kameas";
 import tablets, {
   TABLET_VERSIONS,
   tabletVersion,
@@ -35,6 +38,12 @@ import {
   InvalidComponentImageRequest,
   isComponentImageSlug,
 } from "./index";
+import { KAMEA_IMAGE_PLANETS, KAMEA_VIEWBOX } from "./kamea";
+import {
+  canonicalKameaSigilText,
+  KAMEA_SIGIL_LETTERS,
+  KAMEA_SIGIL_MAX_LETTERS,
+} from "./kameaSigil";
 import {
   canonicalSigilText,
   foldFinalForms,
@@ -115,6 +124,14 @@ describe("component image contracts", () => {
       "text=כתר&rose=false&version=regardie1939&width=50",
       "text=יהוה אלהים",
       "text=יוד הא ואו הא&rose=false&height=100",
+    ],
+    kamea: ["planet=saturn", "planet=luna&width=300", "planet=sol&height=50"],
+    "kamea-sigil": [
+      "planet=saturn&text=אגיאל",
+      "planet=venus&text=בני שרפים",
+      "planet=luna&text=אלים&finals=true",
+      "planet=luna&text=מלכא בתרשיתים עד ברוח שחקים&finals=true&width=400",
+      "planet=mercury&text=תפתרתרת&height=100",
     ],
     // Sizes are PNG-only, so they round-trip in gdHall.test.ts.
     "gd-hall": ["", "hall=zelator-1", "hall=portal-2"],
@@ -313,9 +330,18 @@ describe("component image contracts", () => {
   });
 
   it("never accepts download as a render key, so saved references cannot carry it", () => {
+    // Each slug's least valid query, which parses without `download`.
+    const least: Partial<Record<ComponentImageSlug, string>> = {
+      "rose-sigil": "text=א",
+      kamea: "planet=saturn",
+      "kamea-sigil": "planet=saturn&text=א",
+    };
     for (const slug of COMPONENT_IMAGE_SLUGS) {
-      const query = slug === "rose-sigil" ? "text=א&download=1" : "download=1";
-      expect(() => parse(slug, query)).toThrow(InvalidComponentImageRequest);
+      const query = least[slug] ?? "";
+      expect(() => parse(slug, query)).not.toThrow();
+      expect(() =>
+        parse(slug, `${query}${query ? "&" : ""}download=1`),
+      ).toThrow(InvalidComponentImageRequest);
     }
   });
 
@@ -327,6 +353,7 @@ describe("component image contracts", () => {
       (slug) =>
         slug !== "gd-hall" &&
         slug !== "rose-sigil" &&
+        slug !== "kamea-sigil" &&
         slug !== "enochian-tablet",
     )) {
       const contract = CONTRACTS[
@@ -450,6 +477,151 @@ describe("component image contracts", () => {
       expect(() => parse("seven-branched-candlestick", query)).toThrow(
         InvalidComponentImageRequest,
       );
+  });
+
+  it("names the seven kameas by the planet table's ids, and no default", () => {
+    // Written out so that the contracts do not import the squares.
+    expect([...KAMEA_IMAGE_PLANETS]).toEqual([...KAMEA_PLANETS]);
+    for (const slug of ["kamea", "kamea-sigil"] as const)
+      for (const query of [
+        "",
+        "planet=",
+        "planet=Saturn",
+        "planet=sun",
+        "planet=earth",
+        "planet=constructor",
+        "planet=saturn&planet=luna",
+      ])
+        expect(() =>
+          parse(slug, `${query}${slug === "kamea-sigil" ? "&text=א" : ""}`),
+        ).toThrow(InvalidComponentImageRequest);
+    expect(
+      componentImageQuery({
+        slug: "kamea",
+        props: parse("kamea", "planet=sol"),
+      }).toString(),
+    ).toBe("planet=sol");
+    expect(CONTRACTS.kamea.filename(parse("kamea", "planet=luna"))).toBe(
+      "kamea-luna",
+    );
+    expect(CONTRACTS.kamea.personal).toBe(false);
+    expect(() => parse("kamea", "planet=saturn&text=א")).toThrow(
+      InvalidComponentImageRequest,
+    );
+  });
+
+  it("draws each kamea on Kamea's own page, 1,024 pixels square", () => {
+    const contract = CONTRACTS.kamea as unknown as ComponentImageContract<
+      ImageDimensions & { planet: string }
+    >;
+    for (const planet of KAMEA_IMAGE_PLANETS) {
+      const props = parse("kamea", `planet=${planet}`);
+      expect(contractViewBox(contract, props)).toEqual(KAMEA_VIEWBOX);
+      expect(renderToStaticMarkup(createElement(Kamea, { planet }))).toContain(
+        `viewBox="${KAMEA_VIEWBOX.join(" ")}"`,
+      );
+    }
+    expect(
+      contractRasterDefault(contract, parse("kamea", "planet=sol")),
+    ).toEqual({ width: 1024, height: 1024 });
+  });
+
+  it("keeps a kamea sigil's letters as typed, finals its own key", () => {
+    // The 22 letters and the five finals, each once.
+    expect([...KAMEA_SIGIL_LETTERS]).toHaveLength(27);
+    expect(new Set(KAMEA_SIGIL_LETTERS).size).toBe(27);
+    // Whitespace collapses; the forms stay, since with finals a form is
+    // a value of its own.
+    expect(parse("kamea-sigil", "planet=luna&text= אלים  חשמודאי ").text).toBe(
+      "אלים חשמודאי",
+    );
+    expect(parse("kamea-sigil", "planet=luna&text=אלימ").text).toBe("אלימ");
+    expect(canonicalKameaSigilText("ם")).toBe("ם");
+    expect(canonicalKameaSigilText("  ")).toBeNull();
+    expect(parse("kamea-sigil", "planet=saturn&text=זאזל").finals).toBe(false);
+    expect(
+      parse("kamea-sigil", "planet=saturn&text=זאזל&finals=true").finals,
+    ).toBe(true);
+    // A default is left out of the link, a set flag kept.
+    expect(
+      componentImageQuery({
+        slug: "kamea-sigil",
+        props: parse("kamea-sigil", "planet=saturn&text=זאזל&finals=false"),
+      }).toString(),
+    ).toBe(new URLSearchParams({ planet: "saturn", text: "זאזל" }).toString());
+    expect(
+      componentImageQuery({
+        slug: "kamea-sigil",
+        props: parse("kamea-sigil", "planet=luna&text=אלים  עד&finals=true"),
+      }).toString(),
+    ).toBe(
+      new URLSearchParams({
+        planet: "luna",
+        text: "אלים עד",
+        finals: "true",
+      }).toString(),
+    );
+    expect(
+      parse(
+        "kamea-sigil",
+        `planet=luna&text=${"א".repeat(KAMEA_SIGIL_MAX_LETTERS)}`,
+      ).text,
+    ).toHaveLength(KAMEA_SIGIL_MAX_LETTERS);
+    for (const query of [
+      "planet=saturn",
+      "planet=saturn&text=",
+      "planet=saturn&text= ",
+      "planet=saturn&text=abc",
+      "planet=saturn&text=אגיאל1",
+      "planet=saturn&text=א־ב",
+      "planet=saturn&text=אָ",
+      `planet=saturn&text=${"א".repeat(KAMEA_SIGIL_MAX_LETTERS + 1)}`,
+      `planet=saturn&text=${"א ".repeat(KAMEA_SIGIL_MAX_LETTERS + 1)}`,
+      "planet=saturn&text=א&finals=1",
+      "planet=saturn&text=א&finals=",
+      "planet=saturn&text=א&rose=false",
+      "planet=saturn&text=א&version=gd",
+    ])
+      expect(() => parse("kamea-sigil", query)).toThrow(
+        InvalidComponentImageRequest,
+      );
+    expect(CONTRACTS["kamea-sigil"].personal).toBe(true);
+    expect(CONTRACTS["kamea-sigil"].indexed).toBe(false);
+    for (const [query, name] of [
+      ["planet=saturn&text=אגיאל", "kamea-sigil-saturn-אגיאל"],
+      ["planet=venus&text=בני שרפים", "kamea-sigil-venus-בני-שרפים"],
+      ["planet=luna&text=אלים&finals=true", "kamea-sigil-luna-אלים-finals"],
+    ])
+      expect(
+        CONTRACTS["kamea-sigil"].filename(parse("kamea-sigil", query)),
+      ).toBe(name);
+  });
+
+  it("frames a kamea sigil's words as the package draws them", () => {
+    const contract = CONTRACTS[
+      "kamea-sigil"
+    ] as unknown as ComponentImageContract<
+      ImageDimensions & { planet: string; text: string }
+    >;
+    for (const [planet, text, viewBox] of [
+      ["saturn", "אגיאל", [-50, -50, 100, 100]],
+      ["venus", "בני שרפים", [-150, -50, 200, 100]],
+      ["luna", "מלכא בתרשיתים עד ברוח שחקים", [-450, -50, 500, 100]],
+    ] as const) {
+      const props = parse("kamea-sigil", `planet=${planet}&text=${text}`);
+      expect(contractViewBox(contract, props)).toEqual(viewBox);
+      expect(
+        renderToStaticMarkup(
+          createElement(KameaSigilImage, { planet, text: props.text }),
+        ),
+      ).toContain(`viewBox="${viewBox.join(" ")}"`);
+    }
+    expect(
+      contractRasterDefault(
+        contract,
+        parse("kamea-sigil", "planet=venus&text=בני שרפים"),
+      ),
+    ).toEqual({ width: 2048, height: 1024 });
   });
 
   it("offers the rose's versions, the Golden Dawn's by default", () => {

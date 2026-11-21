@@ -1,6 +1,8 @@
 import { astroGeomancyChart } from "./astroGeomancyChart";
 import { enochianTablet } from "./enochianTablet";
 import { gdHallImage } from "./gdHall";
+import { kamea } from "./kamea";
+import { kameaSigil } from "./kameaSigil";
 import { roseSigil } from "./roseSigil";
 import { sevenBranchedCandlestick } from "./sevenBranchedCandlestick";
 import { tableOfShewbread } from "./tableOfShewbread";
@@ -18,6 +20,8 @@ export const CONTRACTS = {
   "seven-branched-candlestick": sevenBranchedCandlestick,
   "table-of-shewbread": tableOfShewbread,
   "rose-sigil": roseSigil,
+  kamea,
+  "kamea-sigil": kameaSigil,
   "gd-hall": gdHallImage,
 } as const;
 

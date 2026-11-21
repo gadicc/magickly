@@ -6,7 +6,7 @@ describe("component pages", () => {
   const pages = componentPages();
 
   it("has one per component, at its own path", () => {
-    expect(pages).toHaveLength(15);
+    expect(pages).toHaveLength(17);
     expect(pages[0]).toMatchObject({
       path: "/open-source/components/tree-of-life",
       title: "Tree of Life React Component",

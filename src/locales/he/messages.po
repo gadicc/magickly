@@ -8,6 +8,11 @@ msgstr ""
 "Language: he\n"
 
 #. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/names.ts
+msgid "777"
+msgstr "777"
+
+#. js-lingui-explicit-id
 #: src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx
 #: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
 #: src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx
@@ -1491,6 +1496,12 @@ msgstr "כל אחד מ<0>דפי 72 המלאכים</0> מציג את הסיגיל
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/SigilsText.tsx
+msgid "The Golden Dawn also traced names on the planets' magic squares: the <0>kamea sigil generator</0> draws a name's sigil on the kamea of its planet."
+msgstr "השחר הזהוב שרטט שמות גם על ריבועי הקסם של כוכבי הלכת: <0>מחולל סיגילי הקמיעות</0> משרטט את הסיגיל של שם על הקמיע של כוכב הלכת שלו."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+#: src/app/gd/sigils/SigilsText.tsx
 msgid "Sources"
 msgstr "מקורות"
 
@@ -1515,6 +1526,7 @@ msgid "Separate words with spaces: each word is its own sigil, drawn right to le
 msgstr "הפרידו בין מילים ברווחים: כל מילה היא סיגיל משלה, משורטט מימין לשמאל."
 
 #. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
 #: src/app/gd/sigils/sigils.tsx
 msgid "A sigil takes at most {max} letters; this text has {count}."
 msgstr "סיגיל מקבל לכל היותר {max} אותיות; בטקסט הזה יש {count}."
@@ -1947,6 +1959,7 @@ msgid "What the panel shows"
 msgstr "מה מוצג בחלונית"
 
 #. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
 #: src/app/enochian/tablets/tablets.tsx
 msgid "Names"
 msgstr "שמות"
@@ -2440,6 +2453,301 @@ msgstr "המהדורה מובאת בצרפתית, פרק אחר פרק, מתוך
 #: src/app/books/BooksText.tsx
 msgid "Lenain died in 1877 and Papus in 1916, so both texts are in the public domain. This reading of them is CC BY 4.0."
 msgstr "לנן נפטר בשנת 1877 ופאפוס בשנת 1916, ולכן שני הטקסטים נמצאים בנחלת הכלל. נוסח הקריאה המובא כאן זמין ברישיון CC BY 4.0."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/names.ts
+msgid "Agrippa 1533"
+msgstr "אגריפה 1533"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/names.ts
+msgid "Agrippa 1651"
+msgstr "אגריפה 1651"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/names.ts
+msgid "Barrett 1801"
+msgstr "בארט 1801"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/names.ts
+msgid "Regardie 1940"
+msgstr "רגרדי 1940"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilHeading.tsx
+msgid "Kamea Sigil Generator"
+msgstr "מחולל סיגילים על קמיע"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Saturn"
+msgstr "שבתאי"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Jupiter"
+msgstr "צדק"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Mars"
+msgstr "מאדים"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "The Sun"
+msgstr "השמש"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Venus"
+msgstr "נוגה"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Mercury"
+msgstr "כוכב"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "The Moon"
+msgstr "הירח"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Sigil of {text} on the Kamea of Saturn"
+msgstr "הסיגיל של {text} על הקמיע של שבתאי"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Sigil of {text} on the Kamea of Jupiter"
+msgstr "הסיגיל של {text} על הקמיע של צדק"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Sigil of {text} on the Kamea of Mars"
+msgstr "הסיגיל של {text} על הקמיע של מאדים"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Sigil of {text} on the Kamea of the Sun"
+msgstr "הסיגיל של {text} על הקמיע של השמש"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Sigil of {text} on the Kamea of Venus"
+msgstr "הסיגיל של {text} על הקמיע של נוגה"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Sigil of {text} on the Kamea of Mercury"
+msgstr "הסיגיל של {text} על הקמיע של כוכב"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Sigil of {text} on the Kamea of the Moon"
+msgstr "הסיגיל של {text} על הקמיע של הירח"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Kamea of Saturn"
+msgstr "הקמיע של שבתאי"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Kamea of Jupiter"
+msgstr "הקמיע של צדק"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Kamea of Mars"
+msgstr "הקמיע של מאדים"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Kamea of the Sun"
+msgstr "הקמיע של השמש"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Kamea of Venus"
+msgstr "הקמיע של נוגה"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Kamea of Mercury"
+msgstr "הקמיע של כוכב"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Kamea of the Moon"
+msgstr "הקמיע של הירח"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Planet"
+msgstr "כוכב לכת"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Hebrew name"
+msgstr "שם בעברית"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Clear"
+msgstr "ניקוי"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Count final letters at 500 to 900"
+msgstr "ספירת האותיות הסופיות כ־500 עד 900"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Separate words with spaces: each word is its own figure, on its own square, drawn right to left."
+msgstr "הפרידו בין מילים ברווחים: כל מילה היא צורה משלה, על ריבוע משלה, משורטטת מימין לשמאל."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Agrippa prints the spirit of spirits as one word of fourteen letters; it is divided here as its romanisation divides it, Schedbarschemoth Schartathan, and that division is ours."
+msgstr "אגריפה מדפיס את רוח הרוחות כמילה אחת בת ארבע עשרה אותיות; כאן היא מחולקת כפי שהתעתיק הלטיני שלה מחלק אותה, Schedbarschemoth Schartathan, והחלוקה הזאת היא שלנו."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Only Hebrew letters can be traced:"
+msgstr "אפשר לשרטט רק אותיות עבריות:"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Placing the sigil…"
+msgstr "הסיגיל משורטט…"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "This sigil could not be drawn."
+msgstr "לא ניתן היה לשרטט את הסיגיל."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "This sigil could not be drawn so that every mark stands clear of the others and of the square's lines; it is drawn as well as it can be, and may be hard to read."
+msgstr "לא ניתן היה לשרטט את הסיגיל כך שכל סימן בו יעמוד בנפרד מהאחרים ומקווי הריבוע; הוא משורטט כמיטב האפשר, וייתכן שיהיה קשה לקרוא אותו."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Each letter, its number and its cell"
+msgstr "כל אות, המספר שלה והמשבצת שלה"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Letter"
+msgstr "אות"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Number"
+msgstr "מספר"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Cell"
+msgstr "משבצת"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "Word {number}"
+msgstr "מילה {number}"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "How a kamea sigil is drawn"
+msgstr "כיצד משרטטים סיגיל על קמיע"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "A kamea is a planet's magic square: the numbers from one up to the square of its order, set so that every row, column and diagonal adds up to the same sum. Agrippa printed the seven in <0>De occulta philosophia</0> (1533), from Saturn's three by three to the Moon's nine by nine, with the names of each planet's intelligence and spirit, whose letters add up to the square's numbers. The Golden Dawn traced those names on the squares to draw their sigils, and this generator traces any Hebrew name the same way."
+msgstr "קמיע הוא ריבוע הקסם של כוכב לכת: המספרים מאחד ועד ריבוע סדרו, מסודרים כך שכל שורה, עמודה ואלכסון מסתכמים באותו סכום. אגריפה הדפיס את שבעתם ב<0>De occulta philosophia</0> (1533), מריבוע שלוש על שלוש של שבתאי ועד תשע על תשע של הירח, יחד עם שמות התבונה והרוח של כל כוכב לכת, שאותיותיהם מסתכמות במספרי הריבוע. השחר הזהוב שרטט את השמות האלה על הריבועים כדי לצייר את הסיגילים שלהם, והמחולל הזה משרטט כל שם עברי באותה דרך."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "The method"
+msgstr "השיטה"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "Each letter is counted at its number: Aleph 1 to Tet 9, Yod 10 to Tzadi 90, Qof 100 to Tav 400."
+msgstr "כל אות נספרת לפי מספרה: מאל״ף 1 עד טי״ת 9, מיו״ד 10 עד צד״י 90, מקו״ף 100 עד תי״ו 400."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "A number the square has is kept. A larger one is reduced by Aiq Bekar, the Qabalah of nine chambers, to its tens or its units: divided by ten until the square has it. On Saturn's square Zazel keeps 7, 1 and 7 and takes Lamed's 30 as 3; on Mercury's, Taphthartharath takes Tav's 400 as 40."
+msgstr "מספר שיש בריבוע נשאר כמות שהוא. מספר גדול יותר מוקטן באי״ק בכ״ר, קבלת תשעת התאים, לעשרות שלו או לאחדות שלו: מחולק בעשר עד שהריבוע מכיל אותו. בריבוע של שבתאי זאזל שומר על 7, 1 ו־7 ולוקח את 30 של הלמ״ד כ־3; בריבוע של כוכב, תפתרתרת לוקח את 400 של התי״ו כ־40."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "A line runs through the cells in the order of the letters, from a small circle at the first to a short bar at the last."
+msgstr "קו עובר דרך המשבצות לפי סדר האותיות, מעיגול קטן בראשונה ועד קו סיום קצר באחרונה."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "Where two letters in a row fall on one cell, the line makes a crook there; where it passes straight through a cell of the name, a small loop marks the stop; and a line that comes back to a cell it has visited is drawn just beside the first visit, as on the <0>Rose Cross sigils</0>."
+msgstr "כששתי אותיות רצופות נופלות על משבצת אחת, הקו יוצר בה עיקול; כשהוא עובר בקו ישר דרך משבצת של השם, לולאה קטנה מסמנת את העצירה; וקו שחוזר למשבצת שכבר עבר בה משורטט ממש לצד הביקור הראשון, כמו ב<0>סיגילים של צלב הוורד</0>."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "The table under the sigil shows each letter, its number and the cell it falls on."
+msgstr "הטבלה שמתחת לסיגיל מציגה כל אות, את המספר שלה ואת המשבצת שהיא נופלת עליה."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "What the generator chooses"
+msgstr "מה המחולל בוחר"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "Final letters. Aiq Bekar puts the five final forms in the hundreds from 500 to 900, but neither of the Golden Dawn's worked examples has one. A final letter counts at its ordinary letter's number unless you choose the table's values, which some of Agrippa's printed sums need."
+msgstr "אותיות סופיות. אי״ק בכ״ר מציב את חמש האותיות הסופיות במאות מ־500 עד 900, אבל באף אחת משתי הדוגמאות המפורטות של השחר הזהוב אין אות סופית. אות סופית נספרת לפי מספר האות הרגילה שלה, אלא אם תבחרו בערכי הטבלה, שחלק מהסכומים שאגריפה הדפיס זקוקים להם."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "Words. Each word of a name is its own figure on its own square, set right to left, as the Rose Cross sigils are."
+msgstr "מילים. כל מילה בשם היא צורה משלה על ריבוע משלה, מסודרות מימין לשמאל, כמו הסיגילים של צלב הוורד."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "The marks. The crook, the loop and the end bar are the Rose Cross sigil's, at a size fixed against the square. Agrippa's own characters put a circle at both ends of most figures, and the Golden Dawn's redrawings mostly a circle at the start and a bar or nothing at the end."
+msgstr "הסימנים. העיקול, הלולאה וקו הסיום הם אלה של סיגיל צלב הוורד, בגודל קבוע ביחס לריבוע. בחותמות של אגריפה עצמו יש עיגול בשני הקצוות של רוב הצורות, ובשרטוטים החדשים של השחר הזהוב לרוב עיגול בהתחלה וקו או כלום בסוף."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "The Moon's square. On it 10 to 80 stand in one column, so nearly every letter from Yod on falls there, and a long name runs up and down that column. A name whose marks cannot all be set clear of each other and of the square's lines is drawn as well as it can be, and the page says so."
+msgstr "הריבוע של הירח. בו המספרים 10 עד 80 עומדים בעמודה אחת, ולכן כמעט כל אות מיו״ד והלאה נופלת שם, ושם ארוך עולה ויורד לאורך העמודה הזאת. שם שלא ניתן להציב את כל סימניו בנפרד זה מזה ומקווי הריבוע משורטט כמיטב האפשר, והעמוד אומר זאת."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "Agrippa prints the Moon's spirit of spirits as one word of fourteen letters. The list gives it so, and first divided as its romanisation divides it, Schedbarschemoth Schartathan, which is how this site traces it; that division is ours, not Agrippa's."
+msgstr "אגריפה מדפיס את רוח הרוחות של הירח כמילה אחת בת ארבע עשרה אותיות. הרשימה מביאה אותה כך, ולפני כן מחולקת כפי שהתעתיק הלטיני שלה מחלק אותה, Schedbarschemoth Schartathan, שכך האתר הזה משרטט אותה; החלוקה הזאת היא שלנו, לא של אגריפה."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "Agrippa's printed characters are largely traces of the names on the squares, drawn freely, but not every one follows this reduction, so the sigils here are not presented as his. Try <0>Agiel</0> on Saturn's square, <1>Taphthartharath</1> on Mercury's or <2>Chasmodai</2> on the Moon's, or choose a name from the list for each planet, which gives every witness's spelling where they differ."
+msgstr "החותמות שאגריפה הדפיס הן ברובן שרטוטים של השמות על הריבועים, ביד חופשית, אבל לא כולן הולכות לפי ההקטנה הזאת, ולכן הסיגילים כאן אינם מוצגים כשלו. נסו את <0>אגיאל</0> על הריבוע של שבתאי, את <1>תפתרתרת</1> על זה של כוכב או את <2>חשמודאי</2> על זה של הירח, או בחרו שם מהרשימה של כל כוכב לכת, שמביאה את הכתיב של כל עד במקום שהם נבדלים."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "Heinrich Cornelius Agrippa, <0>De occulta philosophia</0> (Cologne, 1533), book II, chapter 22: the names and their numbers on <1>leaf 163</1>, the Moon's with the squares of Saturn and Jupiter on <2>leaf 164</2>, and the Moon's square on <3>leaf 168</3>, from the Library of Congress copy on archive.org."
+msgstr "היינריך קורנליוס אגריפה, <0>De occulta philosophia</0> (קלן, 1533), ספר שני, פרק 22: השמות ומספריהם ב<1>דף 163</1>, אלה של הירח יחד עם הריבועים של שבתאי וצדק ב<2>דף 164</2>, והריבוע של הירח ב<3>דף 168</3>, מהעותק של ספריית הקונגרס ב־archive.org."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "Israel Regardie, <0>The Golden Dawn</0>, volume 4 (Aries Press, Chicago, 1940): the method on <1>pages 78</1> to <2>80</2>, with the Aiq Bekar table on <3>page 79</3>. The book is in the public domain in the United States but still in copyright elsewhere, so its pages are linked rather than shown here."
+msgstr "ישראל רגרדי, <0>The Golden Dawn</0>, כרך 4 (Aries Press, שיקגו, 1940): השיטה ב<1>עמודים 78</1> עד <2>80</2>, וטבלת אי״ק בכ״ר ב<3>עמוד 79</3>. הספר נמצא בנחלת הכלל בארצות הברית אך עדיין מוגן בזכויות יוצרים במקומות אחרים, ולכן עמודיו מקושרים ולא מוצגים כאן."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+msgid "The names by witness, where the printings disagree, and how the generator is tested on every name and every triple of letters on each square, are set out in <0>the project's design notes</0>."
+msgstr "השמות לפי כל עד, המקומות שבהם הדפוסים חלוקים, והאופן שבו המחולל נבדק על כל שם ועל כל שלשת אותיות בכל ריבוע, מפורטים ב<0>הערות התכנון של הפרויקט</0>."
 
 #. js-lingui-explicit-id
 #: src/app/about/AboutPage.tsx

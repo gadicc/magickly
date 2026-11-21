@@ -3,6 +3,7 @@ import path from "node:path";
 import { vi } from "vitest";
 import type { ComponentImageSlug } from "@/render/contracts";
 import { GD_HALL_SLUGS } from "@/render/contracts/gdHall";
+import { KAMEA_IMAGE_PLANETS } from "@/render/contracts/kamea";
 import { TREE_IMAGE_FIELDS } from "@/render/contracts/treeOfLife";
 
 /**
@@ -133,6 +134,9 @@ export const DRAWING_QUERIES: Record<ComponentImageSlug, readonly string[]> = {
   "seven-branched-candlestick": ["", "version=modern"],
   "table-of-shewbread": [""],
   "rose-sigil": ["text=א&rose=false"],
+  // Each planet's square and name; one letter traces through a cell.
+  kamea: KAMEA_IMAGE_PLANETS.map((planet) => `planet=${planet}`),
+  "kamea-sigil": KAMEA_IMAGE_PLANETS.map((planet) => `planet=${planet}&text=א`),
   // Every hall: between them they draw every tablet, trump and board.
   "gd-hall": GD_HALL_SLUGS.map((slug) => `hall=${slug}`),
 };

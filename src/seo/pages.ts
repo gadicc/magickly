@@ -42,6 +42,12 @@ export const PUBLIC_PAGES = {
       "Astrology tools for magical work: planetary hours for your location, " +
       "the planets with their Hebrew names, the zodiac signs and moon phases.",
   },
+  "/astrology/kamea/sigils": {
+    title: "Kamea Sigil Generator: Magic Square Sigils",
+    description:
+      "Trace the sigil of a Hebrew name on the kamea of its planet by the " +
+      "Golden Dawn's Aiq Bekar reduction, from Saturn's square to the Moon's.",
+  },
   "/astrology/moon": {
     title: "Moon Phases",
     description:

@@ -189,6 +189,11 @@ const ALIASES: Record<string, string[]> = {
     "Planetary hour calculator",
   ],
   "/gd/sigils": ["Rose Cross sigils", "Sigil generator"],
+  "/astrology/kamea/sigils": [
+    "Kamea sigils",
+    "Magic square sigils",
+    "Planetary sigil generator",
+  ],
   "/geomancy/reading": ["Cast geomancy", "Geomancy chart"],
   "/enochian/keys": ["Enochian calls", "The nineteen keys"],
   "/gd/halls": ["Temple floor plans"],

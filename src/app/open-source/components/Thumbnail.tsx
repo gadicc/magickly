@@ -1,6 +1,6 @@
-import Kamea from "magick-components/astrology/Kamea";
 import Moon from "magick-components/astrology/Moon";
 import MoonWidget from "magick-components/astrology/MoonWidget";
+import PlanetarySeal from "magick-components/astrology/PlanetarySeal";
 import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";
 import Chakras from "magick-components/chakras/Chakras";
 import FylfotCross from "magick-components/gd/FylfotCross";
@@ -29,7 +29,7 @@ const LIVE_TILES: Partial<Record<string, ComponentType<any>>> = {
   GradeTree,
   Lamen,
   FylfotCross,
-  Kamea,
+  PlanetarySeal,
   PlanetarySpirit,
   Chakras,
   Moon,

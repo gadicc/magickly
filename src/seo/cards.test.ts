@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { kameaSigilFromSearchParams } from "@/app/astrology/kamea/sigils/kameaSigilState";
 import { sigilFromSearchParams } from "@/app/gd/sigils/sigilState";
 import { socialCards } from "./cardList";
 import { hallCardArt, socialCard, socialCardImage } from "./cards";
@@ -101,6 +102,16 @@ describe("social cards", () => {
       slug: "rose-sigil",
       query: `text=${sigilFromSearchParams(new URLSearchParams()).text}`,
     });
+    // The kamea generator's card draws its own default, never a link's.
+    const kamea = kameaSigilFromSearchParams(new URLSearchParams());
+    expect(socialCard("/astrology/kamea/sigils", "x").art).toEqual({
+      kind: "diagram",
+      slug: "kamea-sigil",
+      query: `planet=${kamea.planet}&text=${kamea.text}`,
+    });
+    expect(socialCard("/astrology/kamea/sigils", "x").section).toBe(
+      "Astrology",
+    );
     expect(socialCard("/geomancy/reading", "x").art).toEqual({
       kind: "diagram",
       slug: "astro-geomancy-chart",

@@ -44,6 +44,8 @@ export const IMAGE_COMPONENTS = [
   "RoseSigil",
   "SevenBranchedCandlestick",
   "TableOfShewbread",
+  "Kamea",
+  "KameaSigil",
 ] as const;
 
 /**
@@ -100,6 +102,27 @@ export function componentImage(name: string, props: Props): string | null {
       });
     case "TableOfShewbread":
       return viaContract("table-of-shewbread", {});
+    case "Kamea":
+    case "KameaSigil":
+      // The images draw the page's colours and Noto Serif, named as the
+      // component names them; a square in the caller's own colours, font
+      // or name, or with the caller's own drawing over it, has no image.
+      if (
+        props.children !== undefined ||
+        props.label !== undefined ||
+        props.ink !== undefined ||
+        props.paper !== undefined ||
+        props.squareInk !== undefined ||
+        props.fontFamily !== undefined
+      )
+        return null;
+      return name === "Kamea"
+        ? viaContract("kamea", { planet: text(props.planet) })
+        : viaContract("kamea-sigil", {
+            planet: text(props.planet),
+            text: text(props.text),
+            finals: flag(props.finals),
+          });
     default:
       return null;
   }

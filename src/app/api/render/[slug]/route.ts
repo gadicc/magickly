@@ -3,6 +3,7 @@ import {
   parseComponentImageRequest,
 } from "@/render/componentImageRequest";
 import { componentImageResponse } from "@/render/componentImageResponse";
+import { componentImageQuery } from "@/render/componentImageUrl";
 import { gdHall } from "@/render/contracts/gdHall";
 import { hallFiles } from "@/seo/halls";
 
@@ -37,11 +38,51 @@ function hallImageRedirect(request: Request): Response {
   }
 }
 
+/**
+ * A kamea sigil asked for by any but its canonical query (another key
+ * order, `finals=false`, a text with extra spaces, a percent-encoded
+ * space) is sent there with a permanent redirect before anything is
+ * drawn, so the CDN holds one copy of each figure: a text placement
+ * cannot clear costs about 4 s of the server's time to draw, once per
+ * key the CDN sees. Null for a canonical query, which is drawn; a query
+ * the contract refuses falls through to the route's usual 400.
+ */
+function kameaSigilRedirect(request: Request): Response | null {
+  const url = new URL(request.url);
+  let canonical: string;
+  try {
+    const query = new URLSearchParams(url.searchParams);
+    const download = query.get("download");
+    query.delete("download");
+    const { format, props } = parseComponentImageRequest("kamea-sigil", query);
+    canonical = componentImageQuery(
+      { slug: "kamea-sigil", props },
+      { format, download: download === "1" },
+    ).toString();
+    if (download !== null && download !== "1") return null;
+  } catch (error) {
+    if (!(error instanceof InvalidComponentImageRequest)) throw error;
+    return null;
+  }
+  if (url.search.slice(1) === canonical) return null;
+  return new Response(null, {
+    status: 308,
+    headers: {
+      Location: `${url.pathname}?${canonical}`,
+      "Cache-Control": "public, max-age=86400",
+    },
+  });
+}
+
 export async function GET(
   request: Request,
   context: RouteContext<"/api/render/[slug]">,
 ) {
   const { slug } = await context.params;
   if (slug === "gd-hall") return hallImageRedirect(request);
+  if (slug === "kamea-sigil") {
+    const redirect = kameaSigilRedirect(request);
+    if (redirect) return redirect;
+  }
   return componentImageResponse(slug, request);
 }

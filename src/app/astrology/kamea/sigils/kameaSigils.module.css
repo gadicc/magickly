@@ -1,0 +1,76 @@
+/* The kamea sigil generator (plan 093, K3). */
+
+/* Hebrew that stands alone, letters and names: Frank Ruhl Libre (plan 079,
+   decision 6). */
+.hebrew {
+  font-family: "Frank Ruhl Libre", "Noto Sans Hebrew", serif;
+  font-size: 1.15em;
+}
+
+/* The text field: what is typed in Frank Ruhl Libre, which has only
+   Hebrew; the Latin placeholder keeps the field's own face. */
+.hebrewInput:not(:placeholder-shown) {
+  font-family: "Frank Ruhl Libre", "Noto Sans Hebrew", serif;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.invalid {
+  color: var(--mui-palette-error-main);
+  text-decoration: underline wavy;
+}
+
+/* The figures wrap from right to left; centred under the controls. */
+.stage {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.sigil {
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.15s;
+}
+
+/* The last figure, while the newest is placed. */
+.stale {
+  opacity: 0.55;
+}
+
+.status {
+  min-height: 1.5em;
+  position: relative;
+  margin: 8px 0;
+  text-align: center;
+}
+
+.reduction {
+  margin: 8px auto 16px;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.reduction caption {
+  padding-bottom: 4px;
+  white-space: nowrap;
+  color: var(--mui-palette-text-secondary);
+}
+
+.reduction th,
+.reduction td {
+  padding: 2px 12px;
+  border-bottom: 1px solid var(--mui-palette-divider);
+}
+
+.word {
+  text-align: start;
+  font-weight: 500;
+}

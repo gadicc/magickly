@@ -50,7 +50,47 @@ describe("componentImage", () => {
       null,
     );
     expect(componentImage("TreeOfLife", { activeSephirah: null })).toBe(null);
-    expect(componentImage("Kamea", { planet: "saturn" })).toBe(null);
+    // A square in the caller's own colours or font.
+    expect(componentImage("Kamea", { planet: "luna", paper: "#1d2b53" })).toBe(
+      null,
+    );
+    expect(
+      componentImage("KameaSigil", {
+        planet: "saturn",
+        text: "אגיאל",
+        ink: "blue",
+      }),
+    ).toBe(null);
+    // No text, or one the contract refuses.
+    expect(componentImage("KameaSigil", { planet: "saturn" })).toBe(null);
+    expect(
+      componentImage("KameaSigil", { planet: "saturn", text: "Agiel" }),
+    ).toBe(null);
+    expect(componentImage("PlanetarySeal", { planet: "saturn" })).toBe(null);
+    expect(
+      componentImage("Kamea", { planet: "saturn", children: "drawn over" }),
+    ).toBe(null);
+  });
+
+  it("maps a kamea's planet, and its sigil's text and finals", () => {
+    expect(componentImage("Kamea", { planet: "saturn" })).toBe(
+      "/api/render/kamea?planet=saturn",
+    );
+    expect(
+      componentImage("KameaSigil", { planet: "venus", text: "בני שרפים" }),
+    ).toBe(
+      `/api/render/kamea-sigil?${new URLSearchParams({ planet: "venus", text: "בני שרפים" })}`,
+    );
+    expect(
+      componentImage("KameaSigil", {
+        planet: "luna",
+        text: "אלים",
+        finals: true,
+        size: 400,
+      }),
+    ).toBe(
+      `/api/render/kamea-sigil?${new URLSearchParams({ planet: "luna", text: "אלים", finals: "true" })}`,
+    );
   });
 
   it("draws a tablet in its version, and the two fixed figures", () => {

@@ -1,4 +1,6 @@
 import "server-only";
+import Kamea from "magick-components/astrology/Kamea";
+import { KameaSigilImage } from "magick-components/astrology/KameaSigil";
 import Tablet from "magick-components/enochian/Tablet";
 import { RoseSigilImage } from "magick-components/gd/RoseSigilImage";
 import SevenBranchedCandlestick, {
@@ -13,6 +15,7 @@ import { pathHref, sephirahHref } from "@/app/kabbalah/treeLinks";
 import type { ComponentImageProps, ComponentImageSlug } from "./contracts";
 import { mothersFromString } from "./contracts/astroGeomancyChart";
 import { TABLET_IDS } from "./contracts/enochianTablet";
+import { KAMEA_IMAGE_PLANETS } from "./contracts/kamea";
 import { TREE_IMAGE_FIELDS, TREE_PATHS } from "./contracts/treeOfLife";
 import { type DataInputsSpec, resolvedInputsHash } from "./dataInputs";
 import {
@@ -35,6 +38,34 @@ import {
  * sigil planned and placed by rule, with each word its own sigil.
  */
 export const ROSE_SIGIL_IMAGE_PROFILE = "magickli-rose-sigil-image-v1";
+
+/**
+ * The renderer's identity for the bare kameas (plan 093): the square, its
+ * rules and its numbers in Noto Serif italic, outlined. It moves only when
+ * the drawing does; the numbers are inputs (`KAMEA_INPUTS`).
+ */
+export const KAMEA_IMAGE_PROFILE = "magickli-kamea-image-v1";
+
+/**
+ * The renderer's identity for a name's sigil on its kamea (plan 093, K3):
+ * the square under each word's figure, placed by the rose's rules under
+ * `KAMEA_SIGIL_PROFILE`. The engine is code, so this moves when a figure
+ * does; the squares' numbers and the planets' names are inputs.
+ */
+export const KAMEA_SIGIL_IMAGE_PROFILE = "magickli-kamea-sigil-image-v1";
+
+/**
+ * The response header a kamea sigil carries when placement could not draw
+ * a word of it with every mark clear: the image is drawn best effort, as
+ * the generator draws it, and may be hard to read.
+ */
+export const SIGIL_PLACEMENT_HEADER = "X-Sigil-Placement";
+
+/**
+ * `KameaSigilImage`'s mark on its root for a figure drawn best effort,
+ * which the route turns into its header and strips from the bytes.
+ */
+const PLACEMENT_FAILED = /^(<svg\b[^>]*?) data-placement="failed"/;
 
 export interface ComponentImageRegistration<S extends ComponentImageSlug> {
   /** Trusted JSX for validated props; never caller-supplied markup. */
@@ -62,6 +93,13 @@ export interface ComponentImageRegistration<S extends ComponentImageSlug> {
   outlined?(svg: Buffer): Buffer;
   /** Quantise PNGs to a palette (libimagequant), as the social cards do. */
   palette?: boolean;
+  /**
+   * Response headers read from the rendered markup, before `source`
+   * rewrites it: what the image cannot say in its bytes (a sigil drawn
+   * best effort). Only `X-` names, which the route sets beneath its own,
+   * so a registration cannot change the type, caching or disposition.
+   */
+  headers?(markup: string): Readonly<Record<`X-${string}`, string>>;
   /**
    * The final bytes of either format, after encoding: the halls' licence
    * metadata. Nothing re-encodes after it.
@@ -154,6 +192,23 @@ const SHEWBREAD_INPUTS: DataInputsSpec = [
     fields: ["name.he"],
   },
 ];
+
+/**
+ * What a kamea's image draws from the data: the square's numbers, which
+ * magick-data computes, and the planet's English name, in the image's
+ * accessible name ("Kamea of Saturn", "Sigil of … on the Kamea of Luna").
+ * Every planet's, since any of the seven can be asked for.
+ */
+const KAMEA_INPUTS: DataInputsSpec = [
+  { table: "kamea", rows: KAMEA_IMAGE_PLANETS, fields: ["cells"] },
+  { table: "planet", rows: KAMEA_IMAGE_PLANETS, fields: ["name.en.en"] },
+];
+
+/**
+ * The bundled face resvg resolves for the squares' italic numbers: the
+ * temple halls' Noto Serif italic, which draws their kameas too.
+ */
+const KAMEA_FONT_FAMILY = "Noto Serif";
 
 /**
  * The only components the image route can render. Each entry pairs a pure
@@ -279,6 +334,36 @@ export const COMPONENT_IMAGE_REGISTRY: {
     // move its identity. The drawing's rules are code, so the profile
     // moves when they do.
     inputs: [],
+  },
+  kamea: {
+    render: (props) => (
+      <Kamea planet={props.planet} fontFamily={KAMEA_FONT_FAMILY} />
+    ),
+    profile: KAMEA_IMAGE_PROFILE,
+    fonts: ["NotoSerif-Italic-latin1.ttf"],
+    inputs: KAMEA_INPUTS,
+  },
+  "kamea-sigil": {
+    // One row, one `<svg>`, as the generator's download.
+    render: (props) => (
+      <KameaSigilImage
+        planet={props.planet}
+        text={props.text}
+        finals={props.finals}
+        fontFamily={KAMEA_FONT_FAMILY}
+      />
+    ),
+    // The component marks a best-effort figure on its root, which no
+    // image may carry (the closed SVG profile admits no data attribute);
+    // the route's header says it instead.
+    source: (svg) => svg.replace(PLACEMENT_FAILED, "$1"),
+    headers: (markup): Record<`X-${string}`, string> =>
+      PLACEMENT_FAILED.test(markup)
+        ? { [SIGIL_PLACEMENT_HEADER]: "failed" }
+        : {},
+    profile: KAMEA_SIGIL_IMAGE_PROFILE,
+    fonts: ["NotoSerif-Italic-latin1.ttf"],
+    inputs: KAMEA_INPUTS,
   },
   "gd-hall": {
     render: renderGdHallImage,

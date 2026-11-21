@@ -66,6 +66,12 @@ const ART = {
   // Page defaults only: shared readings and sigils never reach a card.
   geomancyChart: { kind: "diagram", slug: "astro-geomancy-chart" },
   sigil: { kind: "diagram", slug: "rose-sigil", query: "text=גדי" },
+  // The generator's default: Agiel on Saturn's square.
+  kameaSigil: {
+    kind: "diagram",
+    slug: "kamea-sigil",
+    query: "planet=saturn&text=אגיאל",
+  },
   // The Neophyte hall, at the full size the halls' contract draws.
   hall: { kind: "diagram", slug: "gd-hall", raster: "query" },
 } satisfies Record<string, CardArt>;
@@ -81,6 +87,7 @@ export const hallCardArt = (slug: string): CardArt => ({
 /** Most specific prefix first; every path matches the final entry. */
 const SECTIONS: [prefix: string, section: string, art: CardArt][] = [
   ["/astrology/planetary-hours", "Astrology", ART.planetaryHours],
+  ["/astrology/kamea/sigils", "Astrology", ART.kameaSigil],
   ["/astrology/planet", "Astrology", ART.planets],
   ["/astrology", "Astrology", ART.astrology],
   ["/books", "Books", ART.kabbalah],

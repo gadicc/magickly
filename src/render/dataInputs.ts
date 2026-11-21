@@ -2,6 +2,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import { readFieldPath } from "magick-components/kabbalah/fieldPath";
 import data from "magick-data";
+import kameas, { KAMEA_PLANETS } from "magick-data/astrology/kameas";
 import enochianTablet, {
   TABLET_VERSION_RULES,
 } from "magick-data/enochian/tablets";
@@ -29,8 +30,8 @@ export const IMAGE_INPUTS_PROFILE = "magickli-image-inputs-v1";
 
 /**
  * The tables a spec may read: the barrel, plus the one table a registered
- * component draws that the barrel leaves out, and the tablets' version
- * rules. `enochianTablet` is named in no
+ * component draws that the barrel leaves out, the tablets' version
+ * rules and the kameas. `enochianTablet` is named in no
  * link in either direction, so the barrel does not assemble it
  * ([data.ts](../../packages/magick-data/src/data.ts)) and its rows are the raw JSON either way.
  */
@@ -44,6 +45,18 @@ export const DATA_INPUT_TABLES = {
    * draws, so they are hashed like the data.
    */
   enochianTabletVersion: TABLET_VERSION_RULES,
+  /**
+   * Not a table either: the seven squares, which magick-data computes by
+   * Agrippa's constructions rather than storing, each as a row of its
+   * planet with its numbers as `cells`, row by row. A kamea image draws
+   * them, and a sigil on a kamea goes through their cells, so a
+   * construction that moved a number re-identifies those images.
+   */
+  kamea: Object.freeze(
+    Object.fromEntries(
+      KAMEA_PLANETS.map((planet) => [planet, { cells: kameas[planet] }]),
+    ),
+  ),
 };
 
 /** A table a component may declare inputs from. */

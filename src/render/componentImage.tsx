@@ -20,6 +20,8 @@ export interface RenderedComponentImage<
   byteSize: number;
   sha256: string;
   contentType: "image/svg+xml" | "image/png";
+  /** The registration's response headers for this markup (`X-` names). */
+  headers: Readonly<Record<string, string>>;
 }
 
 /** Render only the closed registry; callers cannot provide JSX, URLs or SVG. */
@@ -92,6 +94,7 @@ export async function renderComponentImage(
     bytes,
     byteSize: bytes.length,
     sha256: createHash("sha256").update(bytes).digest("hex"),
+    headers: registration.headers?.(markup) ?? {},
     contentType:
       request.format === "svg"
         ? ("image/svg+xml" as const)

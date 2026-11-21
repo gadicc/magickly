@@ -44,13 +44,20 @@ describe("/open-source/components", () => {
     expect(tile("/open-source/components/rose-sigil")).toContain(
       'src="/api/render/rose-sigil?text=',
     );
+    // The kamea and its sigils, whose engine the index never loads.
+    expect(tile("/open-source/components/kamea")).toContain(
+      'src="/api/render/kamea?planet=saturn"',
+    );
+    expect(tile("/open-source/components/kamea-sigil")).toContain(
+      'src="/api/render/kamea-sigil?planet=saturn&amp;text=',
+    );
     expect(tile("/open-source/components/gd-hall")).toContain(
       'src="/gd/halls/neophyte/golden-dawn-neophyte-temple-small.png"',
     );
   });
 
   it("draws the rest live on the server, Mercury as its picture", () => {
-    expect(tile("/open-source/components/kamea")).toContain("<svg");
+    expect(tile("/open-source/components/planetary-seal")).toContain("<svg");
     expect(tile("/open-source/components/fylfot-cross")).toContain("<table");
     expect(tile("/open-source/components/mercury-widget")).toContain(
       'src="/pics/mercury.webp"',

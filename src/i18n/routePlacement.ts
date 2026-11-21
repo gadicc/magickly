@@ -22,6 +22,7 @@ export const ROUTE_PLACEMENT = {
   "/admin": "private",
   "/astrology/moon": "public",
   "/astrology": "public",
+  "/astrology/kamea/sigils": "public",
   "/astrology/planet/[id]": "public",
   "/astrology/planetary-hours": "public",
   "/astrology/planets": "public",

@@ -19,8 +19,8 @@ interface ComponentPage {
   /**
    * How the dark scheme shows the live drawing (plan 076, decision 4): an
    * `Ink` drawing re-inked, `plate` on a light card, or nothing, for a
-   * drawing that brings its own ground (the kamea, the Moon, Mercury) or
-   * inks itself with the theme (the fylfot cross).
+   * drawing that brings its own ground (the kamea and its sigils, the Moon,
+   * Mercury) or inks itself with the theme (the fylfot cross, the seals).
    */
   dark?: InkDrawing | "plate";
 }
@@ -94,6 +94,18 @@ const PAGES: Record<ComponentName, ComponentPage> = {
     description:
       "A React component that draws the kamea, or magic square, of any of the " +
       "seven planets from Saturn's three by three to the Moon's nine by nine.",
+  },
+  KameaSigil: {
+    title: "Kamea Sigil",
+    description:
+      "A React component that draws a Hebrew name's sigil on its planet's " +
+      "kamea, traced by the Golden Dawn's Aiq Bekar reduction, a figure per word.",
+  },
+  PlanetarySeal: {
+    title: "Planetary Seal",
+    description:
+      "A React component that draws the seals of the seven planets after " +
+      "Agrippa's woodcuts of 1533, on the bare page or on a silver plate.",
   },
   PlanetarySpirit: {
     title: "Planetary Spirit Sigil",

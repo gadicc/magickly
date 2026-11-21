@@ -62,16 +62,27 @@ describe("the explorer's components", () => {
         { specifier, exportName: exported ?? "default" },
       ]),
     );
+    // KameaSigil is drawn through a wrapper that places its edits off the
+    // main thread, and the wrapper draws the entry's own component.
+    const wrapped: Record<string, string> = {
+      KameaSigil: "./LiveKameaSigil",
+    };
     expect(loaded).toEqual(
       Object.fromEntries(
         EXPLORER_COMPONENTS.map((component) => [
           component.name,
           {
-            specifier: component.specifier,
+            specifier: wrapped[component.name] ?? component.specifier,
             exportName: component.exportName,
           },
         ]),
       ),
     );
+    for (const [name, file] of Object.entries(wrapped))
+      expect(
+        readFileSync(path.resolve("src/explorer", `${file}.tsx`), "utf8"),
+      ).toContain(
+        `from "${EXPLORER_COMPONENTS.find((c) => c.name === name)?.specifier}"`,
+      );
   });
 });

@@ -1,3 +1,5 @@
+import Kamea from "magick-components/astrology/Kamea";
+import { KameaSigilImage } from "magick-components/astrology/KameaSigil";
 import Tablet from "magick-components/enochian/Tablet";
 import SevenBranchedCandlestick from "magick-components/gd/SevenBranchedCandlestick";
 import TableOfShewbread from "magick-components/gd/TableOfShewbread";
@@ -24,9 +26,20 @@ import { componentImage } from "./images";
  * them; the Tree takes the fixed root id the route gives it (its other
  * ids are stripped from the outlines), where the page's comes from `useId`,
  * and the links the route's source SVG carries, which outlining drops.
+ * The kameas' numbers are set in the bundled Noto Serif the route
+ * resolves, where the page's are in the browser's serif; and a kamea
+ * sigil's image is the one-row `KameaSigilImage` of the figures the
+ * explorer's `KameaSigil` wraps.
  */
 const CASES: [
-  "TreeOfLife" | "Tablet" | "SevenBranchedCandlestick" | "TableOfShewbread",
+  (
+    | "TreeOfLife"
+    | "Tablet"
+    | "SevenBranchedCandlestick"
+    | "TableOfShewbread"
+    | "Kamea"
+    | "KameaSigil"
+  ),
   // biome-ignore lint/suspicious/noExplicitAny: each takes its examples' props
   ComponentType<any>,
   ComponentImageSlug,
@@ -39,6 +52,8 @@ const CASES: [
     "seven-branched-candlestick",
   ],
   ["TableOfShewbread", TableOfShewbread, "table-of-shewbread"],
+  ["Kamea", Kamea, "kamea"],
+  ["KameaSigil", KameaSigilImage, "kamea-sigil"],
 ];
 
 describe.each(CASES)("%s's image", (name, live, slug) => {
@@ -72,7 +87,9 @@ describe.each(CASES)("%s's image", (name, live, slug) => {
           ? { ...props, frame: false, label: false }
           : name === "TreeOfLife"
             ? { ...props, id: "TreeOfLife", sephirahHref, pathHref }
-            : props;
+            : name === "Kamea" || name === "KameaSigil"
+              ? { ...props, fontFamily: "Noto Serif" }
+              : props;
       expect(image).toBe(renderToStaticMarkup(createElement(live, own)));
     },
   );

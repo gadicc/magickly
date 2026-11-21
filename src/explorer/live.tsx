@@ -27,6 +27,11 @@ export const LIVE: Record<ComponentName, ComponentType<any>> = {
   FylfotCross: dynamic(() => import("magick-components/gd/FylfotCross")),
   Tablet: dynamic(() => import("magick-components/enochian/Tablet")),
   Kamea: dynamic(() => import("magick-components/astrology/Kamea")),
+  // Placed off the main thread after each edit (LiveKameaSigil.tsx).
+  KameaSigil: dynamic(() => import("./LiveKameaSigil")),
+  PlanetarySeal: dynamic(
+    () => import("magick-components/astrology/PlanetarySeal"),
+  ),
   PlanetarySpirit: dynamic(
     () => import("magick-components/astrology/PlanetarySpirit"),
   ),

@@ -10,11 +10,17 @@ import {
   roseSigilLayout,
 } from "magick-components/gd/roseSigilLayout";
 import { TreeOfLifeSvg } from "magick-components/kabbalah/TreeOfLife";
+import {
+  KAMEA_SIGIL_PROFILE,
+  kameaLayout,
+} from "magick-components/sigil/kameaLayout";
 import { sigilFigure } from "magick-components/sigil/SigilImage";
 import type { ReactElement } from "react";
 import { createRitualSvgValidator } from "@/files/validateRitualSvg";
 import { renderComponentImage } from "./componentImage";
+import { componentImageResponse } from "./componentImageResponse";
 import { COMPONENT_IMAGE_SLUGS, CONTRACTS } from "./contracts";
+import type { KameaImagePlanet } from "./contracts/kamea";
 import { contractViewBox } from "./contracts/types";
 import { IMAGE_INPUTS_PROFILE } from "./dataInputs";
 import {
@@ -24,7 +30,10 @@ import {
 import {
   COMPONENT_IMAGE_REGISTRY,
   componentInputsHash,
+  KAMEA_IMAGE_PROFILE,
+  KAMEA_SIGIL_IMAGE_PROFILE,
   ROSE_SIGIL_IMAGE_PROFILE,
+  SIGIL_PLACEMENT_HEADER,
 } from "./registry";
 
 const hash = (bytes: Uint8Array) =>
@@ -54,6 +63,14 @@ describe("component image registry", () => {
       ROSE_SIGIL_IMAGE_PROFILE,
     );
     expect(ROSE_SIGIL_IMAGE_PROFILE).not.toBe(COMPONENT_IMAGE_PROFILE);
+    // The kameas publish under profiles of their own from the start
+    // (plan 093, K3), so that their pins move with their drawings alone.
+    expect(COMPONENT_IMAGE_REGISTRY.kamea.profile).toBe(KAMEA_IMAGE_PROFILE);
+    expect(KAMEA_IMAGE_PROFILE).toBe("magickli-kamea-image-v1");
+    expect(COMPONENT_IMAGE_REGISTRY["kamea-sigil"].profile).toBe(
+      KAMEA_SIGIL_IMAGE_PROFILE,
+    );
+    expect(KAMEA_SIGIL_IMAGE_PROFILE).toBe("magickli-kamea-sigil-image-v1");
     // The other components still publish under the shared profile, so
     // their identities did not move with the sigil's.
     for (const slug of [
@@ -132,6 +149,16 @@ describe("component image registry", () => {
       "rose-sigil",
       "f88d8766945579ec0fffa38d7271d4f59717f79dac05c9ae57cc7ab1c9dabc28",
     ],
+    // The seven squares' numbers and the planets' English names (plan
+    // 093, K3); the bare square and the sigil on it read the same.
+    [
+      "kamea",
+      "533226af5c9cd2bb14ee91c389ae94607fb64febdf120c8c779691415f659f5d",
+    ],
+    [
+      "kamea-sigil",
+      "533226af5c9cd2bb14ee91c389ae94607fb64febdf120c8c779691415f659f5d",
+    ],
   ] as const)("pins the data %s draws", (slug, sha256) => {
     expect(componentInputsHash(slug)).toBe(sha256);
   });
@@ -203,6 +230,12 @@ describe("component image registry", () => {
     ["rose-sigil", "text=יהוה אלהים", 2048, 1024, 52],
     ["rose-sigil", "text=יוד הא ואו הא&rose=false", 4096, 1024, 1],
     ["rose-sigil", `text=${"א ".repeat(8).trim()}&rose=false`, 4096, 512, 1],
+    // The squares: the frame and rules, then a path a number glyph.
+    ["kamea", "planet=saturn", 1024, 1024, 10],
+    ["kamea", "planet=luna&width=256", 256, 256, 82],
+    // A word on its square, then two, side by side (plan 093, decision 10).
+    ["kamea-sigil", "planet=saturn&text=אגיאל", 1024, 1024, 12],
+    ["kamea-sigil", "planet=venus&text=בני שרפים", 2048, 1024, 100],
   ] as const)(
     "renders %s?%s as validated outlined SVG and a %dx%d PNG",
     async (slug, query, width, height, minimumPaths) => {
@@ -250,6 +283,14 @@ describe("component image registry", () => {
     expect(await files("astro-geomancy-chart")).toEqual(base);
     expect(await files("seven-branched-candlestick")).toEqual(base);
     expect(await files("rose-sigil", "text=א")).toEqual(base);
+    for (const [slug, query] of [
+      ["kamea", "planet=saturn"],
+      ["kamea-sigil", "planet=saturn&text=א"],
+    ])
+      expect(await files(slug, query)).toEqual([
+        ...base,
+        "NotoSerif-Italic-latin1.ttf",
+      ]);
     expect(await files("enochian-tablet")).toEqual([
       ...base,
       "EnochianPlain.ttf",
@@ -553,6 +594,210 @@ describe("component image registry", () => {
         "If the drawing changed on purpose, bump ROSE_SIGIL_IMAGE_PROFILE in registry.tsx " +
         "and record the new digest under the new profile; never re-pin a shipped profile.",
     ).toBe(ROSE_SIGIL_DRAWING_DIGESTS[ROSE_SIGIL_IMAGE_PROFILE]);
+  });
+
+  // The kameas' reviewed bytes, by the image profile they were reviewed
+  // under, as the rose sigil's above: bytes that change come with a new
+  // profile and a new set, and a shipped profile's set never changes. The
+  // squares' numbers are inputs too, so a construction that moved a
+  // number moves the inputs pin above as well.
+  const KAMEA_PINS: Record<
+    string,
+    readonly (readonly [query: string, byteSize: number, sha256: string])[]
+  > = {
+    "magickli-kamea-image-v1": [
+      // Saturn's three by three and the Moon's nine by nine, in Noto
+      // Serif italic, as the halls draw them. Reviewed as rasterised.
+      [
+        "planet=saturn",
+        12_346,
+        "d3caa7dd9d9f2b4d55ba2d9891f69ddb2c5c4b40dad21b72489d1be68ffe2540",
+      ],
+      [
+        "planet=luna",
+        186_103,
+        "e9c15fd6e676df65a569e12ea1a2d5ef1d0b0adb4752254bdbc7a6efcb04d2d9",
+      ],
+    ],
+  };
+  const KAMEA_SIGIL_PINS: Record<
+    string,
+    readonly (readonly [query: string, byteSize: number, sha256: string])[]
+  > = {
+    "magickli-kamea-sigil-image-v1": [
+      // Agiel on Saturn's square, the crook where Yod and Aleph both
+      // fall on 1; the Bne Seraphim on Venus', two words; Elim on the
+      // Moon's with finals (final Mem 600, so 60). Reviewed as rasterised.
+      [
+        "planet=saturn&text=אגיאל",
+        13_378,
+        "ea4fe040183d2d440ce1507cbf630f14228200747b024049e6bc7b8285c4b008",
+      ],
+      [
+        "planet=venus&text=בני שרפים",
+        235_171,
+        "2fa68a8dd61a1fba373d80c025335696c1e2aa5beb08fc2b037152a38f9248a2",
+      ],
+      [
+        "planet=luna&text=אלים&finals=true",
+        188_096,
+        "19d5943430e46ac4505173c71826c87771b1c54a4c29c722ddb8314a8af56e50",
+      ],
+    ],
+  };
+
+  it.each([
+    ["kamea", KAMEA_IMAGE_PROFILE, KAMEA_PINS],
+    ["kamea-sigil", KAMEA_SIGIL_IMAGE_PROFILE, KAMEA_SIGIL_PINS],
+  ] as const)(
+    "pins %s's reviewed bytes under its image profile",
+    async (slug, profile, sets) => {
+      const pins = sets[profile];
+      expect(
+        pins,
+        `no reviewed bytes for ${profile}: add its set`,
+      ).toBeDefined();
+      for (const [query, byteSize, sha256] of pins) {
+        const image = await render(slug, query);
+        expect(
+          [image.byteSize, image.sha256],
+          `${slug}?${query} draws other bytes than ${profile} was reviewed with. ` +
+            "If the drawing changed on purpose, bump the profile in registry.tsx " +
+            "and pin the reviewed bytes under the new profile; never re-pin a shipped profile.",
+        ).toEqual([byteSize, sha256]);
+      }
+    },
+  );
+
+  // A digest of the kamea sigil's drawings, as the rose's: every name the
+  // planetary names table traces, in its traced spelling (Agrippa 1533's,
+  // the spirit of spirits divided; plan 093, decisions 6 and 10), in both
+  // finals modes, and texts that use the marks on the grid. Written out
+  // as they stood when v1 was reviewed (magick-data at 7a9ad086), so that
+  // a correction to the data does not move the digest.
+  const KAMEA_SIGIL_DIGEST_TEXTS: readonly (readonly [
+    KameaImagePlanet,
+    string,
+  ])[] = [
+    ["saturn", "אב"],
+    ["saturn", "הד"],
+    ["saturn", "יה"],
+    ["saturn", "הוד"],
+    ["saturn", "יוד הא ואו הא"],
+    ["saturn", "אגיאל"],
+    ["saturn", "זאזל"],
+    ["jupiter", "אבא"],
+    ["jupiter", "הוה"],
+    ["jupiter", "אהי"],
+    ["jupiter", "אל אב"],
+    ["jupiter", "יהפיאל"],
+    ["jupiter", "יופיל"], // 777's Yophiel, another trace (decision 6)
+    ["jupiter", "הסמאל"],
+    ["mars", "ה"],
+    ["mars", "יהי"],
+    ["mars", "אדני"],
+    ["mars", "גראפיאל"],
+    ["mars", "ברצאבאל"],
+    ["mars", "ברצבאל"], // 777's Bartzabel
+    ["sol", "ו"],
+    ["sol", "הא"],
+    ["sol", "אלה"],
+    ["sol", "נכיאל"],
+    ["sol", "סורת"],
+    ["venus", "אהא"],
+    ["venus", "הגיאל"],
+    ["venus", "קדמאל"],
+    ["venus", "בני שרפים"],
+    ["mercury", "אזבוגה"],
+    ["mercury", "דין"],
+    ["mercury", "דני"],
+    ["mercury", "טיריאל"],
+    ["mercury", "תפתרתרת"],
+    ["luna", "הד"],
+    ["luna", "אלים"],
+    ["luna", "חשמודאי"],
+    ["luna", "שדברשהמעת שרתתן"],
+    ["luna", "מלכא בתרשיתים עד ברוח שחקים"],
+    ["mercury", "בבבב"], // A-A-A-A: crooks in one cell
+    ["sol", "אבאבא"], // A-B-A-B-A
+    ["luna", "יכלמנסעפצ"], // a run down the Moon's column
+  ];
+  const KAMEA_SIGIL_DRAWING_DIGESTS: Record<string, string> = {
+    "magickli-kamea-sigil-image-v1":
+      "802fea6392e7d6a55d935f38093107a4df5de7a59c767d90ec9f26e45a056ba9",
+  };
+
+  it("pins a digest of the kamea sigil's drawings under its image profile", () => {
+    const drawings = KAMEA_SIGIL_DIGEST_TEXTS.flatMap(([planet, text]) =>
+      [false, true].map(
+        (finals) =>
+          `${planet} ${finals} ${text}\n${sigilFigure(text, kameaLayout(planet, { finals }), KAMEA_SIGIL_PROFILE).paths.join("\n")}`,
+      ),
+    );
+    expect(
+      createHash("sha256").update(drawings.join("\n\n")).digest("hex"),
+      `the kamea sigil's drawings differ from those ${KAMEA_SIGIL_IMAGE_PROFILE} was reviewed with. ` +
+        "If the drawing changed on purpose, bump KAMEA_SIGIL_IMAGE_PROFILE in registry.tsx " +
+        "and record the new digest under the new profile; never re-pin a shipped profile.",
+    ).toBe(KAMEA_SIGIL_DRAWING_DIGESTS[KAMEA_SIGIL_IMAGE_PROFILE]);
+  }, 60_000);
+
+  it("draws a sigil placement cannot clear, and says so in a header", async () => {
+    // 777's spelling of the Moon's intelligence of intelligences, with
+    // finals: the one name spelling the generator offers that does not
+    // clear (plan 093, K3). Drawn best effort, the same kind of image,
+    // with nothing in its bytes to say so; the header does.
+    const query = `planet=luna&text=${encodeURIComponent("מלכא בתרשישים ועד ברוח שחקים")}&finals=true`;
+    const failed = await componentImageResponse(
+      "kamea-sigil",
+      new Request(`https://magick.ly/api/render/kamea-sigil?${query}`),
+    );
+    expect(failed.status).toBe(200);
+    expect(failed.headers.get(SIGIL_PLACEMENT_HEADER)).toBe("failed");
+    expect(failed.headers.get("X-Robots-Tag")).toBe("noindex");
+    const bytes = Buffer.from(await failed.arrayBuffer());
+    expect(bytes.toString()).not.toContain("data-placement");
+    expect(await validate(bytes)).toMatchObject({ status: "validated" });
+    // A revalidation says so too.
+    const revalidated = await componentImageResponse(
+      "kamea-sigil",
+      new Request(`https://magick.ly/api/render/kamea-sigil?${query}`, {
+        headers: { "If-None-Match": failed.headers.get("ETag") ?? "" },
+      }),
+    );
+    expect(revalidated.status).toBe(304);
+    expect(revalidated.headers.get(SIGIL_PLACEMENT_HEADER)).toBe("failed");
+    const clear = await componentImageResponse(
+      "kamea-sigil",
+      new Request(
+        `https://magick.ly/api/render/kamea-sigil?planet=saturn&text=${encodeURIComponent("אגיאל")}`,
+      ),
+    );
+    expect(clear.headers.get(SIGIL_PLACEMENT_HEADER)).toBeNull();
+    const square = await componentImageResponse(
+      "kamea",
+      new Request("https://magick.ly/api/render/kamea?planet=luna"),
+    );
+    expect(square.headers.get(SIGIL_PLACEMENT_HEADER)).toBeNull();
+    expect(square.headers.get("X-Robots-Tag")).toBeNull();
+    // Read from the markup, which no registration but the sigil's marks.
+    const registration = COMPONENT_IMAGE_REGISTRY["kamea-sigil"];
+    expect(
+      registration.headers?.('<svg viewBox="0 0 1 1" data-placement="failed">'),
+    ).toEqual({ [SIGIL_PLACEMENT_HEADER]: "failed" });
+    expect(registration.headers?.('<svg viewBox="0 0 1 1">')).toEqual({});
+  }, 60_000);
+
+  it("draws a kamea sigil differently with finals, and the same without one", async () => {
+    // Elim's Mem is final: 40 without finals, 600 (so 60) with.
+    expect(
+      (await render("kamea-sigil", "planet=luna&text=אלים&finals=true")).sha256,
+    ).not.toBe((await render("kamea-sigil", "planet=luna&text=אלים")).sha256);
+    // Agiel has no final letter.
+    expect(
+      (await render("kamea-sigil", "planet=saturn&text=אגיאל&finals=true"))
+        .sha256,
+    ).toBe((await render("kamea-sigil", "planet=saturn&text=אגיאל")).sha256);
   });
 
   it("draws different geomancy readings and sigils differently", async () => {
