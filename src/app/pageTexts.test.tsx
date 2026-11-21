@@ -53,11 +53,15 @@ const TEXTS: Record<string, ComponentType> = {
 };
 
 /**
- * The other sites a text may link: licences and where the packages live.
+ * The other sites a text may link: licences, where the packages live, and
+ * the scans, manuscript records and transcriptions a text cites.
  * Their pages cannot be checked here, so each host is named on purpose.
  */
 const OUTSIDE_HOSTS = new Set([
+  "archive.org",
   "creativecommons.org",
+  "esotericarchives.com",
+  "searcharchives.bl.uk",
   "github.com",
   "opensource.org",
   "www.gnu.org",

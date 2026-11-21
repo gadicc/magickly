@@ -101,8 +101,8 @@ export const PUBLIC_PAGES = {
   "/enochian/oration": {
     title: "John Dee's Oration to God",
     description:
-      "John Dee's Oration to God, to be spoken every day, three times over, from " +
-      "Geoffrey James's The Enochian Magick of Dr. John Dee.",
+      "John Dee's Oration to God, to be said every day, three times over, from " +
+      "his own manuscript, with Geoffrey James's version and where they differ.",
   },
   "/enochian/translate": {
     title: "Enochian Translator",
