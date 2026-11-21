@@ -117,6 +117,37 @@ why. So, for facts taken from books and manuscripts:
 This sits beside "Outside sources" above, which governs what may enter the
 repository at all.
 
+## Layout: phones first, wide screens used well
+
+Every page is built for a phone first and checked on a wide screen too.
+Extra width is used for what helps the reader, never just for longer lines.
+
+1. **Phones.** Every page works from 320 px: no sideways page scroll, a
+   16 px side gutter, controls large enough to tap, and nothing that needs
+   a hover to reach. A wide table or drawing scrolls or scales inside its
+   own box, not the page.
+2. **A reading column.** Running text (prose, prayers, rituals, quoted
+   sources, a page's text below its tool) sits in a column of at most
+   46rem, about 70 characters a line, as the ritual reader's does (plan
+   089, decision 2). Text starts at the left (right in Hebrew) rather than
+   being justified, which leaves gaps on a phone.
+3. **Extra width goes beside the column.** On a wide screen, put the
+   things a reader looks at alongside the text there: the contents, the
+   controls, notes, sources, a translation or other version, a drawing.
+   Side rails start at about 1,200 px (the reader's 15rem | 46rem | 15rem);
+   a tool or drawing may use the full width, while its explanation stays in
+   the column.
+4. **One page, arranged by CSS.** Each piece is rendered once and placed
+   by the grid at each width. Never render it twice and hide one copy, or
+   choose between copies in JavaScript, which breaks search, prerendering
+   and screen readers. Use logical properties (`inline-start`), so Hebrew
+   mirrors.
+5. **Check it.** Before calling a page done, look at it in the browser at
+   375, 768 and 1,440 px, in light and dark, and in Hebrew where the page
+   has a Hebrew edition. Check for sideways scroll, line length, and where
+   controls and notes land. A visual choice between options goes to the owner
+   as a side-by-side mock-up at real sizes before it is built.
+
 ## Hebrew fonts
 
 Hebrew that stands alone (single letters, names, short or large words) is
