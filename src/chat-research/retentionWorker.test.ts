@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { createMemoryPgliteHarness } from "@gadicc/loom/db/testing";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, expect, it, vi } from "vitest";
+import { shortResearchArtifactsDdl } from "../../tests/chat-research/shortRetentionDdl";
 import {
   chatResearchPermits as permits,
   chatResearchWindows as windows,
@@ -25,14 +26,15 @@ const { db, client } = await createMemoryPgliteHarness({
 });
 const active = () => new AbortController().signal;
 const sha = (s: string) => createHash("sha256").update(s).digest("hex");
-beforeAll(() =>
-  client.exec(
+beforeAll(async () => {
+  await client.exec(
     readFileSync(
       new URL("../../drizzle/0023_lethal_hydra.sql", import.meta.url),
       "utf8",
     ),
-  ),
-);
+  );
+  await client.exec(shortResearchArtifactsDdl);
+});
 afterAll(() => client.close());
 beforeEach(async () => {
   await createSqlResearchArtifactPurger(db)(100, active());

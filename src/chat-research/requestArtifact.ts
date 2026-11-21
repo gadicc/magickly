@@ -32,7 +32,7 @@ const uuid = v.pipe(
   v.check((s) => isUuidV7(s) && s === s.toLowerCase()),
 );
 const fields = {
-  storage_profile: v.literal("private-research-artifacts-30d-v1"),
+  storage_profile: v.literal("private-research-artifacts-48h-v1"),
   window_id: uuid,
   operation_id: uuid,
   request_revision: hash,
@@ -133,7 +133,7 @@ export function prepareResearchRequestArtifact(
       "history_binding" in inspection ? inspection.history_binding : undefined;
     const packet = normalize({
       schema_version: history ? 2 : 1,
-      storage_profile: "private-research-artifacts-30d-v1",
+      storage_profile: "private-research-artifacts-48h-v1",
       window_id: windowId,
       operation_id: operationId,
       ...inspection,

@@ -210,7 +210,7 @@ function compilePublication(
     return fail();
   }
 }
-/** Bind the original local formats. Its canonical bytes and strict binary-pinned retention contract remain unchanged. */
+/** Bind the local format to the prospective fixed policy and independently pinned runtime. New policy bytes require fresh adoption. */
 export function prepareResearchPublication(
   value: ResearchPublicationInput,
 ): PreparedResearchPublication {

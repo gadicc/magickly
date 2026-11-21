@@ -160,10 +160,10 @@ it("retains source and duplicate-scope refusals", () => {
   ).toThrow(RESEARCH_PUBLICATION_ERROR);
 });
 
-// Captured from the unmodified compiler at 1fd564d5, then compared byte-for-byte
-// through the same fixture/test harness. A managed-format change cannot relabel local approvals.
-it("preserves the pre-managed local canonical publication digest", () => {
+// The prospective retention change deliberately has a new identity. Frozen old
+// local approvals/workers keep their original bytes and are never relabelled.
+it("binds the new prospective policy to a distinct canonical publication digest", () => {
   expect(prepareResearchPublication(publicationFixture().input).sha256).toBe(
-    "9f17b40f81a92bf0fbc2c28ae817d74feef425165b61f007dc4a7752360a8d09",
+    "5573dba8ef3ddf2e3333989d96b37a6c6f35a7bd56a18df1d6b20a62dab535ad",
   );
 });

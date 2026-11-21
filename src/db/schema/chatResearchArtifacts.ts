@@ -35,7 +35,7 @@ export const chatResearchArtifacts = pgTable(
     ),
     check(
       "chat_research_artifacts_retention",
-      sql`pg_catalog.isfinite(${t.jobCreatedAt}) and pg_catalog.isfinite(${t.storedAt}) and pg_catalog.isfinite(${t.retainUntil}) and (${t.purgedAt} is null or pg_catalog.isfinite(${t.purgedAt})) and ${t.retainUntil}=${t.jobCreatedAt}+interval '720 hours' and ${t.storedAt}>=${t.jobCreatedAt} and ${t.storedAt}<${t.retainUntil}`,
+      sql`pg_catalog.isfinite(${t.jobCreatedAt}) and pg_catalog.isfinite(${t.storedAt}) and pg_catalog.isfinite(${t.retainUntil}) and (${t.purgedAt} is null or pg_catalog.isfinite(${t.purgedAt})) and (${t.retainUntil}=${t.jobCreatedAt}+interval '720 hours' or ${t.retainUntil}=${t.jobCreatedAt}+interval '48 hours') and ${t.storedAt}>=${t.jobCreatedAt} and ${t.storedAt}<${t.retainUntil}`,
     ),
     check(
       "chat_research_artifacts_body",

@@ -23,7 +23,8 @@ import {
 
 export const RESEARCH_READ_ADOPTION_ERROR =
   "Private research read scope unavailable";
-export const RESEARCH_MAX_READ_WINDOW_MS = 7 * 86400000;
+/** The read envelope cannot outlive the earliest prospective packet expiry. */
+export const RESEARCH_MAX_READ_WINDOW_MS = RESEARCH_ARTIFACT_RETENTION_MS;
 const hash = v.pipe(v.string(), v.length(64), v.regex(/^[a-f0-9]{64}$/));
 const instant = v.pipe(v.number(), v.safeInteger(), v.minValue(0));
 const sha = (s: string) => createHash("sha256").update(s, "utf8").digest("hex");

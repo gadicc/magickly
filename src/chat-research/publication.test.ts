@@ -213,10 +213,10 @@ it.each([
       grant.capabilities.processor_profiles = [];
     else if (kind === "source-from") source.valid_from_ms = 1001;
     else if (kind === "source-until")
-      source.valid_until_ms = 1000 + 7 * 86400000 - 1;
+      source.valid_until_ms = 1000 + 2 * 86400000 - 1;
     else if (kind === "grant-from") grant.valid_from_ms = 1001;
     else if (kind === "grant-until")
-      grant.valid_until_ms = 1000 + 7 * 86400000 - 1;
+      grant.valid_until_ms = 1000 + 2 * 86400000 - 1;
     expect(() =>
       prepareResearchPublication(publicationFixture(policy).input),
     ).toThrow(RESEARCH_PUBLICATION_ERROR);
@@ -226,7 +226,7 @@ it("accepts exact initial interval boundaries and preserves explicitly proposed 
   const policy = sourcePolicyFixture();
   for (const s of policy.sources) {
     s.valid_from_ms = 1000;
-    s.valid_until_ms = 1000 + 7 * 86400000;
+    s.valid_until_ms = 1000 + 2 * 86400000;
     s.grants[0].valid_from_ms = 1000;
     s.grants[0].valid_until_ms = s.valid_until_ms;
     s.rights.processor_profiles!.push("synthetic_local_prep");

@@ -40,7 +40,7 @@ describe("private canonical request packet", () => {
     expect(a.packet).toMatchObject({
       window_id: f.window,
       operation_id: f.operation,
-      storage_profile: "private-research-artifacts-30d-v1",
+      storage_profile: "private-research-artifacts-48h-v1",
     });
     const decoded = readResearchRequestPacket(a.packet_json, a.packet_sha256);
     expect(decoded).toEqual(a.packet);
@@ -78,6 +78,7 @@ describe("private canonical request packet", () => {
       );
     for (const delta of [
       { schema_version: 2 },
+      { storage_profile: "private-research-artifacts-30d-v1" },
       { extra: true },
       { processor_profile: "other" },
       { request_revision: "a".repeat(64) },

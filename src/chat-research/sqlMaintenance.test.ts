@@ -45,6 +45,7 @@ beforeAll(async () => {
   for (const file of [
     "0023_lethal_hydra.sql",
     "0024_chat_research_maintenance.sql",
+    "0029_research_short_pilot.sql",
   ])
     await client.exec(
       readFileSync(new URL(`../../drizzle/${file}`, import.meta.url), "utf8"),

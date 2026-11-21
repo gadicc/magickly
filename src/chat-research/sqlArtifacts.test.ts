@@ -12,6 +12,7 @@ import {
   it,
   vi,
 } from "vitest";
+import { shortResearchArtifactsDdl } from "../../tests/chat-research/shortRetentionDdl";
 import {
   chatResearchPermits as permits,
   chatResearchWindows as windows,
@@ -52,14 +53,15 @@ import {
 vi.mock("server-only", () => ({}));
 const h = await createMemoryPgliteHarness({ schema: { windows, permits } }),
   { db, client } = h;
-beforeAll(() =>
-  client.exec(
+beforeAll(async () => {
+  await client.exec(
     readFileSync(
       new URL("../../drizzle/0023_lethal_hydra.sql", import.meta.url),
       "utf8",
     ),
-  ),
-);
+  );
+  await client.exec(shortResearchArtifactsDdl);
+});
 afterAll(() => client.close());
 afterEach(() => vi.restoreAllMocks());
 const active = () => new AbortController().signal;

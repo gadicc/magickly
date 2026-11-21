@@ -14,6 +14,10 @@ import {
   it,
   vi,
 } from "vitest";
+import {
+  shortResearchArtifactsDdl,
+  shortResearchMaintenanceDdl,
+} from "../../tests/chat-research/shortRetentionDdl";
 import { createSqlAuth, getFreshSqlSession } from "../auth/sqlAuth";
 import * as authSchema from "../db/schema/auth";
 import {
@@ -126,6 +130,7 @@ beforeAll(async () => {
         "utf8",
       ),
     );
+  await client.exec(shortResearchArtifactsDdl);
 });
 afterAll(() => client.close());
 afterEach(() => {
@@ -583,7 +588,7 @@ function retainedConfig(
     scope: options.scope,
     sourceStorage: { corpusVersion: scope.corpusVersion },
     authOptions: settings,
-    readUntilMs: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    readUntilMs: Date.now() + 2 * 24 * 60 * 60 * 1000,
     requireReadActive: vi.fn(async (_stage, binding, signal) => {
       signal.throwIfAborted();
       expect(binding.database).toBe(options.database);
@@ -994,7 +999,7 @@ it("reconstructing a reader with the same adopted absolute deadline renews neith
   expect(requestFetch).toHaveBeenCalledOnce();
 });
 
-function fixedReadPorts(readUntilMs = scope.beginsAtMs + 7 * 86400000) {
+function fixedReadPorts(readUntilMs = scope.beginsAtMs + 2 * 86400000) {
   const config = retainedConfig(),
     prepared = prepareResearchReadEnvelope({
       schema_version: 1,
@@ -1032,7 +1037,7 @@ it("uses exact immutable read-envelope ports with actual current-cookie delivery
   for (let n = 0; n < 2; n++) {
     const ports = createResearchReadAdoptionPorts(config.syntheticReadOptions),
       reader = createSqlResearchRetainedDelivery({ ...config, ...ports });
-    expect(ports.readUntilMs).toBe(scope.beginsAtMs + 7 * 86400000);
+    expect(ports.readUntilMs).toBe(scope.beginsAtMs + 2 * 86400000);
     await collectResearchAnswer(
       await reader.createResponse(result.permitId, headers, active()),
       ANSWER_ID,
@@ -1167,6 +1172,7 @@ beforeAll(async () => {
   );
   // Reader controls use the actual constrained table shape; native writer/session ownership is verified by phases58/61.
   await client.exec(ddl.split("--> statement-breakpoint")[0]);
+  await client.exec(shortResearchMaintenanceDdl);
 });
 
 async function maintenanceFixture(ageMs = 60000, unpurged = 0) {
@@ -1228,6 +1234,11 @@ async function maintenanceGate(readers: ResearchSourceReaders) {
     active(),
   );
 }
+it("admits a healthy six-hour observation without requiring an idle hourly wake", async () => {
+  const f = await maintenanceFixture(6 * 3600000);
+  await expect(maintenanceGate(f.reader())).resolves.toBeUndefined();
+  expect(requestFetch).not.toHaveBeenCalled();
+});
 it.each([0, 2])(
   "joins actual signed session/window/policy and healthy maintenance with %i unexpired packets",
   async (unpurged) => {
@@ -1253,7 +1264,7 @@ it.each([
   "cutoff",
 ] as const)("denies new generation for %s maintenance", async (mode) => {
   const f = await maintenanceFixture(
-    mode === "stale" ? 7200000 : mode === "future" ? -60000 : 60000,
+    mode === "stale" ? 7 * 3600000 : mode === "future" ? -60000 : 60000,
   );
   if (mode === "missing")
     await client.query(
@@ -1327,7 +1338,7 @@ it("refuses a replacement physical artifact table despite matching names and old
   }
 });
 it("does not let final acknowledgement latency outlive the maintenance observation", async () => {
-  const f = await maintenanceFixture(7200000 - 1000),
+  const f = await maintenanceFixture(7 * 3600000 - 1000),
     base = f.reader();
   let elapsed = 0;
   const at = performance.now();
@@ -1420,7 +1431,7 @@ it("completes an actual bound job and allows current window-authorized delivery 
   expect(requestFetch).toHaveBeenCalledOnce();
 });
 it("blocks a real bound job before provider work when cleanup health is stale", async () => {
-  const f = await maintenanceFixture(7200000);
+  const f = await maintenanceFixture(7 * 3600000);
   options.createSourceReaders = f.configured().createSourceReaders;
   await expect(
     createResearchAnswerJob(options).execute(active()),

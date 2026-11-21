@@ -18,6 +18,16 @@ navigation, browser persistence, analytics and service-worker activity. A normal
 site deployment keeps its existing chat behavior. Enabling this adapter is a
 separate operational/privacy decision with its own real-target checks.
 
+## Prospective short pilot
+
+The current codec/profile uses48-hour packet retention from reservation, up to
+48-hour answer access from the accounting window start, a six-hour cleanup
+cadence and a seven-hour stale-health fence. Expired content is denied before a
+scheduled sweep; logical payload purge happens on the next successful run.
+This is a new prospective configuration, not a shortening of earlier records.
+The additive migration retains legacy storage constraints and timestamps. No
+schedule, native publication or hosted enablement follows from source changes.
+
 ## External private inputs
 
 Keep PDFs, text/OCR/figure data, vectors and catalog manifests outside Git. The
@@ -131,7 +141,7 @@ site's other jobs. Platform cron credentials are shared across the project's
 cron endpoints; choosing this mode is not purpose-isolated token custody. Use a
 separately adopted dedicated scheduler when that isolation is required.
 
-No hourly schedule, secret value, source/window/retention publication, credential
+No cleanup schedule, secret value, source/window/retention publication, credential
 custody, health write or service activation follows from this adapter. A release
 must adopt those operations separately and verify actual scheduler delivery.
 

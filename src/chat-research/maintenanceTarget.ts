@@ -11,8 +11,10 @@ import { RESEARCH_ARTIFACT_RETENTION_MS } from "./requestArtifact";
 import { researchArtifactNamespace } from "./sqlArtifacts";
 export const RESEARCH_MAINTENANCE_ERROR =
   "Private research maintenance unavailable";
-export const RESEARCH_PACKET_PURGE_LAG_MS = 3600000;
-export const RESEARCH_MAINTENANCE_STALE_MS = 7200000;
+/** Scheduled sweep opportunity; missed delivery is a health failure, not a TTL extension. */
+export const RESEARCH_PACKET_PURGE_LAG_MS = 6 * 3600000;
+/** Six-hour cadence plus one hour of delivery grace; checked against the SQL clock. */
+export const RESEARCH_MAINTENANCE_STALE_MS = 7 * 3600000;
 export const RESEARCH_MAINTENANCE_LEASE_MS = 60000;
 export const RESEARCH_MAINTENANCE_LOCK_PREFIX =
   "magickli-retention-controller-v1:";

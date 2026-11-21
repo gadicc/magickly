@@ -52,7 +52,7 @@ const prepare = (f: ReturnType<typeof fixture>) =>
   );
 
 describe("explicit quoted history protocol", () => {
-  it("preserves exact original no-history body AND private packet bytes from the parent commit", () => {
+  it("preserves the original model body while explicitly separating the new retention packet", () => {
     const f = artifactRequestFixture(legacy.expires_at_ms, legacy.question),
       view = inspectFrozenResearchModelRequest(f.request),
       a = inspectResearchRequestArtifact(
@@ -63,7 +63,16 @@ describe("explicit quoted history protocol", () => {
         ),
       );
     expect(sha(view.body_json)).toBe(legacy.body_sha256);
-    expect(sha(a.packet_json)).toBe(legacy.packet_sha256);
+    const oldPacket = JSON.stringify({
+      ...a.packet,
+      storage_profile: "private-research-artifacts-30d-v1",
+    });
+    expect(sha(oldPacket)).toBe(legacy.packet_sha256);
+    expect(a.packet_sha256).not.toBe(legacy.packet_sha256);
+    expect(a.packet.storage_profile).toBe("private-research-artifacts-48h-v1");
+    expect(() =>
+      readResearchRequestPacket(oldPacket, sha(oldPacket)),
+    ).toThrow();
     expect(a.packet.schema_version).toBe(1);
     expect(view).not.toHaveProperty("history_binding");
   });

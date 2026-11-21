@@ -89,6 +89,7 @@ beforeAll(async () => {
     "0022_massive_whiplash.sql",
     "0023_lethal_hydra.sql",
     "0024_chat_research_maintenance.sql",
+    "0029_research_short_pilot.sql",
   ])
     await client.exec(
       readFileSync(new URL(`../../drizzle/${f}`, import.meta.url), "utf8"),
@@ -194,7 +195,7 @@ beforeEach(async () => {
   });
   Object.assign(f.readInput, {
     accounting_storage: { schemaName: "public" },
-    read_until_ms: f.scope.beginsAtMs + 7 * 86400000,
+    read_until_ms: f.scope.beginsAtMs + 2 * 86400000,
   });
   const retention = prepareResearchRetentionProfile(f.retentionInput),
     read = prepareResearchReadEnvelope(f.readInput);

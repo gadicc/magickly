@@ -78,6 +78,7 @@ beforeAll(async () => {
     "0022_massive_whiplash.sql",
     "0023_lethal_hydra.sql",
     "0024_chat_research_maintenance.sql",
+    "0029_research_short_pilot.sql",
     "0026_chat_research_window_guard.sql",
   ])
     await client.exec(
@@ -136,7 +137,7 @@ beforeAll(async () => {
       original_scope: scope,
       accounting_storage: { schemaName: "public" },
       source_storage: sourceStorage,
-      read_until_ms: scope.beginsAtMs + 7 * 86400000,
+      read_until_ms: scope.beginsAtMs + 2 * 86400000,
     }),
     publicationInput = {
       ...raw.input.publication_input,

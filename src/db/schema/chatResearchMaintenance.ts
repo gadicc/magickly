@@ -63,7 +63,7 @@ export const chatResearchMaintenance = pgTable(
     ),
     check(
       "chat_research_maintenance_coverage",
-      sql`pg_catalog.isfinite(${t.publicationCutoff}) and ${t.publicationCutoff}>=timestamptz '1970-01-01T00:00:00Z' and pg_catalog.isfinite(${t.coverageThrough}) and ${t.coverageThrough}=${t.publicationCutoff}+interval '721 hours'`,
+      sql`pg_catalog.isfinite(${t.publicationCutoff}) and ${t.publicationCutoff}>=timestamptz '1970-01-01T00:00:00Z' and pg_catalog.isfinite(${t.coverageThrough}) and (${t.coverageThrough}=${t.publicationCutoff}+interval '721 hours' or ${t.coverageThrough}=${t.publicationCutoff}+interval '54 hours')`,
     ),
     check(
       "chat_research_maintenance_times",
@@ -85,7 +85,7 @@ export const chatResearchMaintenance = pgTable(
     ),
     check(
       "chat_research_maintenance_terminal",
-      sql`(${t.state}<>'healthy' or (${t.expiredPackets}=0 and (${t.latestRetainUntil} is null or ${t.latestRetainUntil}<=${t.coverageThrough}-interval '1 hour'))) and (${t.state}<>'closed' or ${t.unpurgedPackets}=0)`,
+      sql`(${t.state}<>'healthy' or (${t.expiredPackets}=0 and (${t.latestRetainUntil} is null or ${t.latestRetainUntil}<=${t.coverageThrough}-(case when ${t.coverageThrough}=${t.publicationCutoff}+interval '54 hours' then interval '6 hours' else interval '1 hour' end)))) and (${t.state}<>'closed' or ${t.unpurgedPackets}=0)`,
     ),
   ],
 );

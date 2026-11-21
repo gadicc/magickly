@@ -40,6 +40,7 @@ beforeAll(async () => {
     "0022_massive_whiplash.sql",
     "0023_lethal_hydra.sql",
     "0024_chat_research_maintenance.sql",
+    "0029_research_short_pilot.sql",
   ])
     await client.exec(
       readFileSync(new URL(`../../drizzle/${name}`, import.meta.url), "utf8"),
@@ -82,7 +83,7 @@ beforeEach(async () => {
   });
   Object.assign(original.readInput, {
     accounting_storage: { schemaName: "public" },
-    read_until_ms: original.scope.beginsAtMs + 7 * 86400000,
+    read_until_ms: original.scope.beginsAtMs + 2 * 86400000,
   });
   f = managedPublicationFixture(original);
   const read = prepareResearchReadEnvelope(f.readInput);

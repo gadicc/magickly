@@ -49,6 +49,7 @@ beforeAll(async () => {
     "0022_massive_whiplash.sql",
     "0023_lethal_hydra.sql",
     "0024_chat_research_maintenance.sql",
+    "0029_research_short_pilot.sql",
   ])
     await client.exec(
       readFileSync(new URL(`../../drizzle/${f}`, import.meta.url), "utf8"),
@@ -109,7 +110,7 @@ beforeEach(async () => {
   });
   Object.assign(f.readInput, {
     accounting_storage: { schemaName: "public" },
-    read_until_ms: f.scope.beginsAtMs + 7 * 86400000,
+    read_until_ms: f.scope.beginsAtMs + 2 * 86400000,
   });
   recompile();
   vi.stubGlobal(
@@ -245,7 +246,7 @@ it.each(["beginsAtMs", "expiresAtMs"] as const)(
         expiresAtMs: Date.now() - 60000,
       });
     Object.assign(f.readInput, {
-      read_until_ms: f.scope.beginsAtMs + 7 * 86400000,
+      read_until_ms: f.scope.beginsAtMs + 2 * 86400000,
     });
     recompile();
     await expect(publish()).rejects.toThrow(RESEARCH_PUBLICATION_ERROR);
@@ -529,7 +530,7 @@ it("recognizes exact expired configuration without renewing its dates, quota or 
     expiresAtMs: Date.now() - 60000,
   });
   Object.assign(f.readInput, {
-    read_until_ms: f.scope.beginsAtMs + 7 * 86400000,
+    read_until_ms: f.scope.beginsAtMs + 2 * 86400000,
   });
   recompile();
   await existingPolicy();

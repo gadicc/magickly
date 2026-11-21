@@ -13,7 +13,7 @@ import { RESEARCH_ARTIFACT_RETENTION_MS } from "./requestArtifact";
 
 export const RESEARCH_RETENTION_PROFILE_ERROR =
   "Private research cleanup profile unavailable";
-export const RESEARCH_RETENTION_CADENCE_MS = 3600000;
+export const RESEARCH_RETENTION_CADENCE_MS = 6 * 3600000;
 const hash = v.pipe(v.string(), v.length(64), v.regex(/^[a-f0-9]{64}$/));
 const runtimeShape = v.strictObject({
   worker_sha256: hash,

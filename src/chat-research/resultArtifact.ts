@@ -93,7 +93,7 @@ export type ResearchResultBinding = v.InferOutput<typeof bindingShape>;
 const packetShape = v.strictObject({
   schema_version: v.literal(1),
   result_profile: v.literal("private-research-result-packet-v1"),
-  storage_profile: v.literal("private-research-artifacts-30d-v1"),
+  storage_profile: v.literal("private-research-artifacts-48h-v1"),
   binding: bindingShape,
   request_artifact_sha256: hash,
   request_revision: hash,
@@ -256,7 +256,7 @@ export function materializeResearchResult(
       {
         schema_version: 1,
         result_profile: "private-research-result-packet-v1",
-        storage_profile: "private-research-artifacts-30d-v1",
+        storage_profile: "private-research-artifacts-48h-v1",
         binding: b,
         request_artifact_sha256: request.packet_sha256,
         request_revision: request.packet.request_revision,

@@ -47,12 +47,14 @@ and its PID disappears; uncertain final commits can be reconciled only after
 controller settlement, native PID absence and an exact run/revision observation.
 Unknown resource or acknowledgement states remain unavailable, without retries.
 
-Cleanup logically nulls expired request/response packet JSON after thirty days;
+The prospective short-pilot codec marks request/response packets with48-hour
+retention from their original reservation time. Cleanup logically nulls expired
+packet JSON on the next successful six-hour sweep;
 immutable metadata remains. It does not delete original books, canonical corpus
 text/vectors, accounts or unrelated app data. PostgreSQL history/WAL and provider
 backups are outside that logical purge guarantee. Answer access remains separately
-bounded to seven days; generation's native cleanup-health fence expires after two
-hours. An empty backlog does not establish future cleanup or physical erasure.
+bounded to48 hours from the window start; generation's native cleanup-health
+fence expires after seven hours (six-hour cadence plus one hour of grace). An empty backlog does not establish future cleanup or physical erasure.
 
 Migration `0026_chat_research_window_guard` prevents changes to published window
 scope, refunds to conservative counters and reopening stopped windows. Terminal
@@ -71,7 +73,7 @@ runtime or cleanup credential.
 
 ## Scheduler and adoption work
 
-The intended cadence is hourly; no `vercel.json` cron entry has been added.
+The intended cadence is every six hours; no `vercel.json` cron entry has been added.
 Vercel sends its configured cron secret as a bearer token; invocations can overlap
 or duplicate, and failed invocations are not retried. Native exclusivity and
 idempotent packet purging handle those cases. See
@@ -80,13 +82,24 @@ checked 16 November 2026. Cron configuration/secret rotation is a separate relea
 operation; this worker is not given a Vercel control-plane token.
 
 The project's actual scheduling entitlement still needs verification: legacy
-Vercel Cron on Hobby is daily, whereas the required cadence is hourly. See
+Vercel Cron on Hobby is daily, whereas the prospective cadence is every six hours. See
 [cron usage](https://vercel.com/docs/schedules/cron-jobs/usage-and-pricing), checked
 16 November 2026. Choosing another scheduler or adopting Vercel Schedules requires
 its own concrete implementation/adoption review. No upgrade or new service is
 selected here.
 
-A native closed result stops packet work. The deployment owner must then retire
+Migration `0029_research_short_pilot` adds the explicit48-hour packet/54-hour
+coverage alternatives while retaining legacy720-hour/721-hour rows and their
+one-hour terminal margin. It changes no stored expiry dates or trigger/grant
+ownership. The prospective codec/profile accepts only its new fixed policy;
+frozen earlier runtimes and adopted records are not relabelled or renewed.
+Fresh post-migration native fingerprints and independent adoption precede use.
+
+A six-hour schedule creates four scheduled opportunities per day. Missed delivery,
+jitter and failures can delay logical packet purge beyond the intended six-hour lag;
+logical read expiry still denies access independently. Scheduled runs can wake
+an idle database, and unrelated traffic can also keep it active. A native closed
+result stops packet work. The deployment owner must then retire
 the schedule and credentials after a verified final receipt; this adapter cannot
 remove a provider job. No process-local timer or cache is treated as a durable
 scheduler or a source-authorization grant.
