@@ -31,7 +31,14 @@
  * to the stroke into it, on sides that alternate in pairs. A start that
  * repeats an earlier one's positions is skipped, and the best figure of
  * all is kept. Everything stops when `budget` units of checking work are
- * spent.
+ * spent. With `fallback` (a kamea's profile), a word still failing then
+ * gets more starts, each vertex at a seeded random point in its slack,
+ * until one passes or the fallback's own budget is spent.
+ *
+ * With `lineRun` (a kamea's profile), a stroke also fails where it runs
+ * within touching distance of one of the layout's `lines` for longer
+ * than that, and lane starts keep their vertices out of touching
+ * distance of the lines.
  *
  * A run of nooses in a row is settled together, onto the chord between
  * the run's outer neighbours, so the line through them stays unbent;
@@ -54,6 +61,7 @@ import {
   dist,
   dot,
   halfPlane,
+  nearLength,
   normal,
   overlapLength,
   quantised,
@@ -114,11 +122,22 @@ export function placementOf(profile: SigilProfile): SigilPlacementSettings {
  * (plan 088's O2, whose limits are a stroke width or two at the smallest
  * size a sigil is published), with a margin where O2's own tolerance
  * would leave none.
+ *
+ * The limits between inks (`overlapDistance`, the clearances, `ownSkip`)
+ * are counted in stroke widths: a unit, or the profile's `strokeWidth`
+ * where that is wider (plan 093, K3: a kamea's 0.6 is 1.58 units on the
+ * Moon's square), so that inks kept "a stroke width" apart do not touch
+ * however wide the stroke. So is `overlapLength`, how long two inks may
+ * touch (Gadi, 21 November 2026): it is `overlapDistance` over the sine
+ * of the narrowest wedge F1 must allow, so counted in the same widths it
+ * keeps that wedge's angle, about 7°. The noose's bend, the corner's
+ * angle and the marks' sizes stay in units. The rose's stroke is a unit,
+ * so its limits are as they were.
  */
 const LIMITS = {
   /** Centre lines closer than this overlap. */
   overlapDistance: 1,
-  /** No overlap longer than this, nor than half the shorter stroke. */
+  /** No overlap longer than this (in stroke widths), nor than half the shorter stroke. */
   overlapLength: 8,
   /** A stroke stays this far from another vertex of the name. */
   vertexClearance: 2,
@@ -156,7 +175,8 @@ export interface PlacementFailure {
     | "crook"
     | "bar-clearance"
     | "crook-clearance"
-    | "loop-clearance";
+    | "loop-clearance"
+    | "line-run";
   vertices: number[];
   /** How far it misses, in units; 0 for a plain miss. */
   excess: number;
@@ -178,6 +198,52 @@ interface Context {
   frame: SigilFrame;
   anchors: readonly Point[];
   unit: number;
+  /**
+   * The layout's lines a stroke may not run along, each with the band
+   * within which a stroke's ink touches it, when the settings give a
+   * `lineRun`; empty otherwise.
+   */
+  lines: readonly { seg: Segment; band: number }[];
+  /** The longest run along one of `lines`, in layout coordinates. */
+  lineRun: number;
+  /**
+   * The width of a stroke, the unit the limits between inks are given in:
+   * `unit`, or the profile's stroke where it is wider (a kamea's 0.6 on
+   * the larger squares), so that two strokes a "stroke width" apart do
+   * not touch.
+   */
+  clear: number;
+}
+
+/** The checks' context for `word` on `layout` under `profile`. */
+function contextOf(
+  word: SigilWord,
+  layout: SigilGeometry,
+  profile: SigilProfile,
+  frame: SigilFrame,
+): Context {
+  const unit = layout.unit;
+  const { lineRun } = placementOf(profile);
+  // Touching: the stroke's centre line within half its width and half
+  // the line's of the line's centre line.
+  const stroke = profile.strokeWidth ?? unit;
+  const half = stroke / 2;
+  return {
+    word,
+    layout,
+    frame,
+    anchors: word.map((v) => quantised(layout.anchor(v.place))),
+    unit,
+    lines:
+      lineRun === undefined
+        ? []
+        : (layout.lines ?? []).map((l) => ({
+            seg: { a: l.a, b: l.b },
+            band: half + l.width / 2,
+          })),
+    lineRun: (lineRun ?? Number.POSITIVE_INFINITY) * unit,
+    clear: Math.max(unit, stroke),
+  };
 }
 
 /** The vertices a check involves; a noose vertex moves with its neighbours. */
@@ -308,16 +374,17 @@ function pointsToSegment(points: readonly Point[], s: Segment): number {
 /**
  * How close a segment comes to a wave's cups: the least distance to them,
  * or, where it crosses the wave's line between its ends, minus how far it
- * would have to move along that line to clear them.
+ * would have to move along that line to clear them. `clear` is the
+ * context's stroke width, which scales `FAR`.
  */
-function segmentToWave(s: Segment, w: InkWave, unit: number): number {
+function segmentToWave(s: Segment, w: InkWave, clear: number): number {
   const chord = { a: w.from, b: w.to };
   const c = crossing(s, chord);
   if (c) return -Math.min(c.t, 1 - c.t) * dist(w.from, w.to);
   // The cups lie within their depth of their line: farther than that from
   // it, the segment's distance to them is at least the difference.
   const far = segmentDistance(s, chord) - w.depth;
-  if (far > FAR * unit) return far;
+  if (far > FAR * clear) return far;
   return pointsToSegment(w.points, s);
 }
 
@@ -418,6 +485,18 @@ function single(e: Element, ctx: Context): PlacementFailure[] {
         n - 1,
       ]);
       break;
+    case "line":
+      // No stroke lying along a line the layout draws (`lineRun`).
+      for (const l of ctx.lines) {
+        const run = nearLength(e.seg, l.seg, l.band);
+        if (run > ctx.lineRun)
+          out.push({
+            check: "line-run",
+            vertices: involve(word, verticesOf(e, n)),
+            excess: (run - ctx.lineRun) / unit,
+          });
+      }
+      break;
   }
   return out;
 }
@@ -435,18 +514,19 @@ const KIND_ORDER = [
 
 /** Checks between two elements; `a` comes first in `KIND_ORDER`. */
 function pair(a: Element, b: Element, ctx: Context): PlacementFailure[] {
-  const { word, unit } = ctx;
+  const { word, unit, clear } = ctx;
   const n = word.length;
   const out: PlacementFailure[] = [];
+  // Every limit `fail` takes is a distance between inks, in stroke widths.
   const fail = (check: PlacementFailure["check"], limit: number, d: number) => {
-    if (d < limit * unit)
+    if (d < limit * clear)
       out.push({
         check,
         vertices: involve(word, [...verticesOf(a, n), ...verticesOf(b, n)]),
-        excess: (limit * unit - d) / unit,
+        excess: (limit * clear - d) / unit,
       });
   };
-  const skip = LIMITS.ownSkip * unit;
+  const skip = LIMITS.ownSkip * clear;
 
   if (a.kind === "vertex" && b.kind === "line") {
     // No stroke near another vertex of the name. A stroke may pass another
@@ -461,9 +541,9 @@ function pair(a: Element, b: Element, ctx: Context): PlacementFailure[] {
       toSegment(a.p, b.seg).d,
     );
   } else if (a.kind === "line" && b.kind === "line") {
-    const overlap = overlapLength(a.seg, b.seg, LIMITS.overlapDistance * unit);
+    const overlap = overlapLength(a.seg, b.seg, LIMITS.overlapDistance * clear);
     const limit = Math.min(
-      LIMITS.overlapLength * unit,
+      LIMITS.overlapLength * clear,
       0.5 * Math.min(dist(a.seg.a, a.seg.b), dist(b.seg.a, b.seg.b)),
     );
     if (overlap > limit)
@@ -495,7 +575,7 @@ function pair(a: Element, b: Element, ctx: Context): PlacementFailure[] {
       fail(
         "crook-clearance",
         fromVertex ? LIMITS.ownClearance : LIMITS.crookClearance,
-        segmentToWave(part, w, unit),
+        segmentToWave(part, w, clear),
       );
   } else if (a.kind === "line" && b.kind === "bar") {
     // The last stroke meets the bar square at its middle and only there.
@@ -536,8 +616,8 @@ function pair(a: Element, b: Element, ctx: Context): PlacementFailure[] {
       [b.wave, a.wave],
     ]) {
       const side = sideOf(w);
-      let d = segmentToWave({ a: o.from, b: o.to }, w, unit);
-      if (d > 0 && d - o.depth <= FAR * unit)
+      let d = segmentToWave({ a: o.from, b: o.to }, w, clear);
+      if (d > 0 && d - o.depth <= FAR * clear)
         for (const q of o.points)
           if (side(q) >= 0)
             for (const p of w.points) d = Math.min(d, dist(p, q));
@@ -549,22 +629,22 @@ function pair(a: Element, b: Element, ctx: Context): PlacementFailure[] {
     fail(
       "bar-clearance",
       LIMITS.barClearance,
-      segmentToWave(b.seg, a.wave, unit),
+      segmentToWave(b.seg, a.wave, clear),
     );
     const part = halfPlane(b.seg, sideOf(a.wave));
     if (part)
       fail(
         "crook-clearance",
         LIMITS.crookClearance,
-        segmentToWave(part, a.wave, unit),
+        segmentToWave(part, a.wave, clear),
       );
   }
   return out;
 }
 
 /**
- * Beyond this many units, a lower bound on a distance is as good as the
- * distance: no limit placement checks comes near it.
+ * Beyond this many stroke widths, a lower bound on a distance is as good
+ * as the distance: no limit placement checks comes near it.
  */
 const FAR = 3;
 
@@ -692,7 +772,8 @@ class Judgement {
 /**
  * What a placed word fails of placement's checks (plan 088's O2: overlap,
  * clearance of vertices, loops, the bar and crooks, visible corners,
- * unbent nooses, room for crooks, the outer ring and each place's slack),
+ * unbent nooses, room for crooks, the outer ring and each place's slack;
+ * and runs along the layout's lines when the profile sets `lineRun`),
  * drawn on `layout` under `profile`. Empty when every mark stands clear;
  * `placeSigilWords` gives the same for the words it places.
  */
@@ -703,13 +784,7 @@ export function wordFailures(
 ): PlacementFailure[] {
   const frame = sigilFrame(layout);
   const ink = wordInk(word, layout.unit, profile, frame);
-  const ctx: Context = {
-    word,
-    layout,
-    frame,
-    anchors: word.map((v) => quantised(layout.anchor(v.place))),
-    unit: layout.unit,
-  };
+  const ctx = contextOf(word, layout, profile, frame);
   return new Judgement(
     elements(
       word,
@@ -796,12 +871,14 @@ function roomier(
 type RevisitWay = "beside" | "other" | "inward";
 
 /**
- * A lane start's first visits: each `width` beside its anchor, square to
- * the stroke into it, on side `sides[i mod length]` (`laneStarts`).
+ * A lane start's first visits: vertex `i` `widths[i]` beside its anchor,
+ * square to the stroke into it, on side `sides[i mod length]`
+ * (`laneStarts`).
  */
 interface Lanes {
   sides: readonly (1 | -1)[];
-  width: number;
+  /** How far beside its anchor each vertex of the word is set. */
+  widths: readonly number[];
 }
 
 /**
@@ -844,7 +921,7 @@ function rulePositions(
             : direction(anchors[i], next);
         const side = lanes.sides[i % lanes.sides.length];
         points.push(
-          quantised(along(anchors[i], normal(d), side * lanes.width)),
+          quantised(along(anchors[i], normal(d), side * lanes.widths[i])),
         );
         return;
       }
@@ -883,8 +960,13 @@ export interface PlacedSigilWord {
   word: PlacedWord;
   /** Empty when every mark stands clear; otherwise the figure is drawn best effort. */
   failures: readonly PlacementFailure[];
-  /** The checking work it took. */
+  /** The checking work it took, before any fallback. */
   work: number;
+  /**
+   * The checking work the seeded fallback took (`fallback`), when the
+   * normal search left the word failing and the profile has one.
+   */
+  fallbackWork?: number;
 }
 
 /** Placed words kept for reuse, by layout, profile, budget and plan word. */
@@ -932,8 +1014,9 @@ function frozen(placed: PlacedSigilWord): PlacedSigilWord {
  * hard words' time and an eighth for each beyond, and what a word is
  * given depends on the words before it alone.
  *
- * Cache: a word's placement depends only on its plan word, its budget,
- * the layout and the profile, so placed words are kept by all four (up to
+ * Cache: a word's placement depends only on its plan word, its budget
+ * (and the fallback's, for a word the search alone does not clear), the
+ * layout and the profile, so placed words are kept by these (up to
  * `CACHE_SIZE` per layout and profile) and handed out frozen; a word met
  * again, in the same text or the next keystroke's, is not placed again.
  * The cache keys on the layout's and profile's identity, so it assumes
@@ -952,21 +1035,33 @@ export function placeSigilWords(
   if (!cache) byProfile.set(profile, (cache = new Map()));
   let left = 2 * settings.budget;
   const floor = BUDGET_FLOOR * settings.budget;
+  // The fallback's own pool: one word's, shared by the text's words in
+  // order, with no floor.
+  let fallbackLeft = settings.fallback?.budget ?? 0;
   const here = new Map<string, PlacedSigilWord>();
   return plan.map((word) => {
     const key = JSON.stringify(word);
     const again = here.get(key);
     if (again) return again;
     const budget = Math.max(floor, Math.min(settings.budget, left));
-    const cacheKey = `${budget} ${key}`;
-    let result = cache.get(cacheKey);
+    const fallbackBudget = Math.min(
+      settings.fallback?.budget ?? 0,
+      fallbackLeft,
+    );
+    // A word the search clears without the fallback is the same whatever
+    // the fallback is given, so it is kept without it.
+    const cleared = `${budget} ${key}`;
+    const cacheKey = `${budget} ${fallbackBudget} ${key}`;
+    let result = cache.get(cleared) ?? cache.get(cacheKey);
     if (!result) {
-      result = frozen(placeWord(word, layout, profile, budget));
-      cache.set(cacheKey, result);
+      result = frozen(placeWord(word, layout, profile, budget, fallbackBudget));
+      const clean = result.failures.length === 0 && !result.fallbackWork;
+      cache.set(clean ? cleared : cacheKey, result);
       if (cache.size > CACHE_SIZE)
         cache.delete(cache.keys().next().value as string);
     }
     left = Math.max(0, left - result.work);
+    fallbackLeft = Math.max(0, fallbackLeft - (result.fallbackWork ?? 0));
     here.set(key, result);
     return result;
   });
@@ -987,12 +1082,16 @@ export function placeSigil(
   return placeSigilWords(plan, layout, profile).map((p) => p.word);
 }
 
-/** One word placed with up to `budget` units of checking work. */
+/**
+ * One word placed with up to `budget` units of checking work, and up to
+ * `fallbackBudget` more for the seeded fallback if it still fails.
+ */
 function placeWord(
   word: SigilWord,
   layout: SigilGeometry,
   profile: SigilProfile,
   budget: number,
+  fallbackBudget = 0,
 ): PlacedSigilWord {
   const settings = placementOf(profile);
   const marks = marksOf(profile);
@@ -1003,8 +1102,8 @@ function placeWord(
   const gap = (2 * marks.nooseRadius + marks.minStraight) * unit;
   const least = 0.05 * unit;
   const n = word.length;
-  const anchors = word.map((v) => quantised(layout.anchor(v.place)));
-  const ctx: Context = { word, layout, frame, anchors, unit };
+  const ctx = contextOf(word, layout, profile, frame);
+  const anchors = ctx.anchors;
   const noose = word.map((v) => v.marks.includes("noose"));
   const settle = (pts: Point[]) => {
     // A run of nooses in a row lies on one chord, between the run's outer
@@ -1033,7 +1132,9 @@ function placeWord(
   const build = (pts: Point[], sds: Sides) =>
     elements(word, pts, wordInk(placed(pts, sds), unit, profile, frame), unit);
   let work = 0;
-  const spent = () => work >= budget;
+  // The work allowed so far: `budget`, and then the fallback's too.
+  let allowed = budget;
+  const spent = () => work >= allowed;
 
   /** The search from one start; its figure and what is left failing. */
   const search = (points: Point[]) => {
@@ -1042,7 +1143,7 @@ function placeWord(
       v.crooks > 0 || noose[i] ? defaultSide(points, i, frame) : undefined,
     );
     const judgement = new Judgement(build(points, sides), ctx, work);
-    while (judgement.score > 0 && judgement.work < budget) {
+    while (judgement.score > 0 && judgement.work < allowed) {
       const involved = [
         ...new Set(judgement.failures().flatMap((f) => f.vertices)),
       ].sort((a, b) => a - b);
@@ -1065,7 +1166,7 @@ function placeWord(
           round.best = { ...proposal, pts, sds };
       };
       for (const i of involved) {
-        if (judgement.work >= budget) break;
+        if (judgement.work >= allowed) break;
         const side = sides[i];
         if (side) {
           const flipped = [...sides];
@@ -1149,6 +1250,19 @@ function placeWord(
     [edge, "beside", -offset],
     [edge, "other", -offset],
   ];
+  // A lane keeps each vertex clear of the lines strokes may not run
+  // along: at the slack's edge, a lane can lie within touching distance
+  // of a cell's rule or the frame (on the larger squares), and every
+  // stroke along it would then run on the line.
+  const laneWidths = anchors.map((a) => {
+    let width = edge;
+    for (const l of ctx.lines)
+      width = Math.min(
+        width,
+        toSegment(a, l.seg).d - l.band - settings.slackMargin * unit,
+      );
+    return width;
+  });
   if (settings.laneStarts)
     starts.splice(
       1,
@@ -1158,7 +1272,7 @@ function placeWord(
           by,
           "beside",
           0,
-          { sides, width: edge },
+          { sides, widths: laneWidths },
         ]),
       ),
     );
@@ -1181,10 +1295,69 @@ function placeWord(
     const result = search(points);
     if (!best || result.score < best.score) best = result;
   }
+  const mainWork = work;
+  // The seeded fallback (`fallback`): random starts, each vertex anywhere
+  // in its slack, drawn from a generator seeded by the plan word, so
+  // every engine draws the same ones.
+  const fallback = settings.fallback;
+  if (fallback && best && best.score > 0 && fallbackBudget > 0) {
+    allowed = work + fallbackBudget;
+    const random = seededRandom(JSON.stringify(word));
+    for (let k = 0; k < fallback.starts && best.score > 0 && !spent(); k++) {
+      const points = anchors.map((a, i) =>
+        noose[i]
+          ? a
+          : inDisc(
+              a,
+              layout.slack(word[i].place) - settings.slackMargin * unit,
+              random,
+            ),
+      );
+      const key = JSON.stringify(points);
+      if (tried.has(key)) continue;
+      tried.add(key);
+      const result = search(points);
+      if (result.score < best.score) best = result;
+    }
+  }
   const chosen = best as ReturnType<typeof search>;
   return {
     word: placed(chosen.points, chosen.sides),
     failures: chosen.failures,
-    work,
+    work: mainWork,
+    ...(work > mainWork ? { fallbackWork: work - mainWork } : {}),
   };
+}
+
+/**
+ * A generator of numbers in [0, 1) seeded by `text` (FNV-1a, then
+ * mulberry32): integer arithmetic only, so every engine gives the same
+ * sequence.
+ */
+function seededRandom(text: string): () => number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++)
+    h = Math.imul(h ^ text.charCodeAt(i), 0x01000193);
+  let state = h >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * A point uniformly inside the disc of `radius` about `center`, drawn by
+ * rejection from the square round it (no trigonometry, which engines may
+ * round differently), quantised.
+ */
+function inDisc(center: Point, radius: number, random: () => number): Point {
+  for (;;) {
+    const x = 2 * random() - 1;
+    const y = 2 * random() - 1;
+    if (x * x + y * y <= 1)
+      return quantised({ x: center.x + x * radius, y: center.y + y * radius });
+  }
 }

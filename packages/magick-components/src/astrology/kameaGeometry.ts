@@ -8,6 +8,12 @@
 /** The square's side, in the figure's units; the figure is centred on 0,0. */
 export const KAMEA_SIDE = 96;
 
+/** The width of the rules between the cells, in the figure's units. */
+export const KAMEA_RULE_WIDTH = 0.6;
+
+/** The width of the frame round the square, in the figure's units. */
+export const KAMEA_FRAME_WIDTH = 2;
+
 /**
  * Where a square's cells lie in the figure: what a drawing laid over the
  * numbers (a planet's seal, or a sigil traced from cell to cell) needs to
@@ -20,6 +26,12 @@ export interface KameaGeometry {
   cell: number;
   /** A cell's centre, by its row from the top and its column from the left. */
   center(row: number, column: number): [x: number, y: number];
+  /**
+   * Where the rules between the cells lie, across and down alike: the
+   * `order - 1` coordinates, from the left (or top), each runs the
+   * square's side at.
+   */
+  rules: readonly number[];
 }
 
 /** The geometry of a square of `order` cells a side, in `KameaFigure`. */
@@ -33,5 +45,6 @@ export function kameaGeometry(order: number): KameaGeometry {
       -half + (column + 0.5) * cell,
       -half + (row + 0.5) * cell,
     ],
+    rules: Array.from({ length: order - 1 }, (_, i) => -half + (i + 1) * cell),
   };
 }

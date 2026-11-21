@@ -206,6 +206,11 @@ const SERVER_DRAWINGS = [
     `<Kamea planet="saturn" />`,
   ],
   [
+    "kamea-sigil",
+    `import KameaSigil from "magick-components/astrology/KameaSigil";`,
+    `<KameaSigil planet="saturn" text="זאזל" />`,
+  ],
+  [
     "spirit",
     `import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";`,
     `<PlanetarySpirit spirit="zazel" style={{ height: "2em" }} />`,
@@ -663,6 +668,10 @@ if (!own.includes('viewBox="-102 -34 136 68"') || (own.match(/<path /g) ?? []).l
 const plan = planSigil(sigilWords("מטטרון"), roseSigilLayout(), ROSE_SIGIL_PROFILE);
 if (JSON.stringify(plan[0].map((v) => v.marks)) !== JSON.stringify([["start"], ["crook"], ["noose"], [], ["end"]])) throw new Error("the plan: " + JSON.stringify(plan));
 if (placeSigil(plan, roseSigilLayout(), ROSE_SIGIL_PROFILE)[0].length !== 5) throw new Error("the placed plan");
+// A name on its kamea: each word its own square under the sigil, 240 wide.
+const { KameaSigil } = await import("magick-components/astrology/KameaSigil");
+const kamea = renderToStaticMarkup(h(KameaSigil, { planet: "saturn", text: "זאזל אגיאל" }));
+if ((kamea.match(/<svg /g) ?? []).length !== 2 || !kamea.includes('width="240"') || !kamea.includes('stroke="red" stroke-width="0.6"')) throw new Error("the kamea sigil: " + kamea.slice(0, 300));
 console.log(entries.length, "entries;", tree.length, hall.length, rose.length, "bytes of markup");
 `,
     );
@@ -731,6 +740,8 @@ import Moon from "magick-components/astrology/Moon";
 import { currentOrNextRetrograde } from "magick-components/astrology/mercuryRetrograde";
 import PlanetarySpirit from "magick-components/astrology/PlanetarySpirit";
 import { Kamea } from "magick-components/astrology/Kamea";
+import { KameaSigil, KameaSigilImage, kameaSigil, type KameaSigilFigure } from "magick-components/astrology/KameaSigil";
+import { kameaSigilMinSize } from "magick-components/sigil/kameaLayout";
 import Lamen from "magick-components/gd/Lamen";
 import FylfotCross, { FYLFOT_CELLS, type FylfotCellClick } from "magick-components/gd/FylfotCross";
 import { GradeTree } from "magick-components/gd/GradeTree";
@@ -771,6 +782,9 @@ const zazel: SigilProfile = { id: "kamea", nooseTolerance: 1 };
 export const plan: SigilPlan = planSigil([[7, 1, 7, 3]], square, zazel);
 export const placed: PlacedWord[] = placeSigil(plan, square, zazel);
 export const words: string[][] = sigilWords("יהוה אלהים");
+const agiel: KameaSigilFigure = kameaSigil("saturn", "אגיאל", { finals: true });
+export const unclear: boolean = agiel.failed;
+export const least: number = kameaSigilMinSize("luna");
 
 export const page = (
   <>
@@ -806,6 +820,10 @@ export const page = (
     <PlanetarySpirit spirit="zazel" style={{ height: "1em" }} ink="currentColor" className="seal" />
     <Kamea planet="saturn" width={120} label="Saturn's square" />
     <Kamea planet="luna" height="4em" label={false} />
+    <KameaSigil planet="saturn" text="אגיאל" finals sigil={agiel} size={300} ink="currentColor" squareInk="#ccc" paper="#111" />
+    <KameaSigilImage planet="luna" text="מלכא בתרשיתים" finals label={false} />
+    {/* @ts-expect-error: the planet is one with a kamea */}
+    <KameaSigil planet="earth" text="א" />
     <Lamen officer="hierophant" ringStyle={{ fill: "gold" }} discStyle={{ stroke: "red" }} />
     <FylfotCross cells={[["fire", "", "cursor", null, "water"]]} onCellClick={onCellClick} />
     {tagged}

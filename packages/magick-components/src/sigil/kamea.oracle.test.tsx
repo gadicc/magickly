@@ -38,9 +38,24 @@ import {
 import { KAMEA_TEMPLATES } from "./oracle/kameaTemplates.ts";
 import { checkReadBack } from "./oracle/readBack.ts";
 import { referencePlan, referenceWords } from "./oracle/referencePlan.ts";
+import { placeSigilWords } from "./placeSigil.ts";
 import { planSigil, sigilWords } from "./planSigil.ts";
 import { SigilImage, sigilFigure } from "./SigilImage.tsx";
-import type { SigilLayout, SigilPlan } from "./types.ts";
+import type { SigilLayout, SigilPlan, SigilProfile } from "./types.ts";
+
+/** The kamea's profile without some of its placement settings. */
+const without = (...keys: ("lineRun" | "fallback")[]): SigilProfile => {
+  const placement = { ...KAMEA_SIGIL_PROFILE.placement } as Record<
+    string,
+    unknown
+  >;
+  for (const key of keys) delete placement[key];
+  return {
+    ...KAMEA_SIGIL_PROFILE,
+    id: `kamea without ${keys.join(" ")}`,
+    placement: placement as unknown as SigilProfile["placement"],
+  };
+};
 
 /** `text` drawn by the engine on a kamea layout, as a page would. */
 const draw = (text: string, layout: SigilLayout<string>): string =>
@@ -160,11 +175,31 @@ describe("the engine on the kameas, against O1–O3", () => {
       expect(failing(planet, texts)).toEqual(expectedFailures(planet, texts));
     }, 60_000);
 
+  // In two halves by length, so no one test runs long: words that fail
+  // spend the fallback's budget too.
+  const { minLength, maxLength } = KAMEA_RANDOM_CORPUS;
+  const middle = Math.floor((minLength + maxLength) / 2);
   for (const planet of CORPUS_KAMEA_PLANETS)
-    it(`plans and draws random words of ${KAMEA_RANDOM_CORPUS.minLength} to ${KAMEA_RANDOM_CORPUS.maxLength} letters on ${planet}'s square`, () => {
-      const texts = randomKameaTexts(planet);
-      expect(failing(planet, texts)).toEqual(expectedFailures(planet, texts));
-    }, 60_000);
+    for (const [lo, hi] of [
+      [minLength, middle],
+      [middle + 1, maxLength],
+    ])
+      it(`plans and draws random words of ${lo} to ${hi} letters on ${planet}'s square`, () => {
+        const texts = randomKameaTexts(planet).filter(
+          (text) => [...text].length >= lo && [...text].length <= hi,
+        );
+        expect(failing(planet, texts)).toEqual(expectedFailures(planet, texts));
+      }, 60_000);
+
+  it("splits the random words into halves that cover them all", () => {
+    for (const planet of CORPUS_KAMEA_PLANETS)
+      expect(
+        randomKameaTexts(planet).every((text) => {
+          const n = [...text].length;
+          return n >= minLength && n <= maxLength;
+        }),
+      ).toBe(true);
+  });
 
   it("draws a name's words side by side, right to left, each in its square", () => {
     const layout = kameaLayout("luna");
@@ -175,6 +210,37 @@ describe("the engine on the kameas, against O1–O3", () => {
     expect(plan).toHaveLength(2);
     expect(checksFailed(svg, plan, layout)).toBe("");
   });
+
+  it("catches K2's figures, whose strokes ran along the Moon's rules (O2)", () => {
+    // 1651's בתרשיסים: 20 to 30 on the rule right of the fourth column
+    // for seven cells when placement did not know the rule.
+    const layout = kameaLayout("luna");
+    const text = "בתרשיסים";
+    const plan = planSigil(sigilWords(text), layout, KAMEA_SIGIL_PROFILE);
+    const k2 = renderToStaticMarkup(
+      <SigilImage text={text} layout={layout} profile={without("lineRun")} />,
+    );
+    expect(checkInvariants(k2, plan, layout).map((f) => f.check)).toContain(
+      "line-run",
+    );
+    expect(checksFailed(draw(text, layout), plan, layout)).toBe("");
+  });
+
+  it("clears Barrett's Malcha only through the seeded fallback, the same each time", () => {
+    const layout = kameaLayout("luna");
+    const text = "מלכאבתרשיסים";
+    const plan = planSigil(sigilWords(text), layout, KAMEA_SIGIL_PROFILE);
+    const [plain] = placeSigilWords(plan, layout, without("fallback"));
+    expect(plain.failures.length).toBeGreaterThan(0);
+    expect(plain.fallbackWork).toBeUndefined();
+    const [rescued] = placeSigilWords(plan, layout, KAMEA_SIGIL_PROFILE);
+    expect(rescued.failures).toEqual([]);
+    expect(rescued.fallbackWork).toBeGreaterThan(0);
+    // Seeded by the word: another profile object, the same figure.
+    const [again] = placeSigilWords(plan, layout, { ...KAMEA_SIGIL_PROFILE });
+    expect(again).not.toBe(rescued);
+    expect(again.word).toEqual(rescued.word);
+  }, 60_000);
 
   it("draws with the profile's stroke, fixed against the square", () => {
     const svg = draw("זאזל", kameaLayout("saturn"));
@@ -193,25 +259,28 @@ describe("the engine on the kameas, against O1–O3", () => {
 });
 
 describe("the engine on the kameas under a one-ulp nudge (O2)", () => {
-  it("draws vol. 4's examples and every name identically", async () => {
-    const unstable: string[] = [];
-    const cases = [
-      ...KAMEA_FIXTURES.map((f) => ({
-        id: f.id,
-        planet: f.planet,
-        text: f.text,
-        finals: false,
-      })),
-      ...kameaNameCases(),
-    ];
-    for (const c of cases) {
-      const layout = kameaLayout(c.planet, { finals: c.finals });
-      const result = await checkStability(draw, c.text, layout, {
-        unrounded: kameaUnroundedAnchor(Math.sqrt(layout.places.length)),
-        quantise: svgCoordinate,
-      });
-      if (!result.stable) unstable.push(c.id);
-    }
-    expect(unstable).toEqual([]);
-  }, 60_000);
+  const cases = [
+    ...KAMEA_FIXTURES.map((f) => ({
+      id: f.id,
+      planet: f.planet,
+      text: f.text,
+      finals: false,
+    })),
+    ...kameaNameCases(),
+  ];
+  // By square, so no one test runs long: each nudge is a new layout,
+  // placed afresh, the fallback included.
+  for (const planet of CORPUS_KAMEA_PLANETS)
+    it(`draws vol. 4's examples and every name on ${planet}'s square identically`, async () => {
+      const unstable: string[] = [];
+      for (const c of cases.filter((c) => c.planet === planet)) {
+        const layout = kameaLayout(c.planet, { finals: c.finals });
+        const result = await checkStability(draw, c.text, layout, {
+          unrounded: kameaUnroundedAnchor(Math.sqrt(layout.places.length)),
+          quantise: svgCoordinate,
+        });
+        if (!result.stable) unstable.push(c.id);
+      }
+      expect(unstable).toEqual([]);
+    }, 60_000);
 });

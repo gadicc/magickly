@@ -15,6 +15,7 @@ import { svgCoordinate } from "../../svgCoordinate.ts";
 import {
   KAMEA_CELL_UNITS,
   KAMEA_SIGIL_PROFILE,
+  KAMEA_SIGIL_STROKE_WIDTH,
   kameaLayout,
 } from "../kameaLayout.ts";
 import type { Point, SigilLayout, SigilPlan } from "../types.ts";
@@ -228,6 +229,8 @@ export const KNOWN_GOOD: readonly { id: string; figure: () => JudgedFigure }[] =
       id: "zazel-kamea",
       figure: zazelOnSaturn,
     },
+    // A stroke down the Moon's column a quarter of a cell from its rule.
+    { id: "moon-column", figure: () => moonColumn(0.25) },
   ];
 
 /**
@@ -267,6 +270,30 @@ export function zazelOnSaturn(): {
     plan,
     layout,
   };
+}
+
+/**
+ * Yod and Lamed, 10 and 30, five rows apart in one column of the Moon's
+ * square, each visit moved `share` of a cell right of its cell's centre,
+ * towards the rule between the fourth column and the fifth, and drawn with
+ * the kamea's stroke. At 0.45 of a cell (inside the slack's 0.46) the
+ * stroke's centre line lies 0.53 of the square's units from the rule's,
+ * inside the 0.6 at which their inks touch, for five cells.
+ */
+export function moonColumn(share: number): JudgedFigure {
+  const layout = kameaLayout("luna");
+  const text = "יל";
+  const plan = referencePlan(referenceWords(text), layout, KAMEA_SIGIL_PROFILE);
+  const cell = KAMEA_CELL_UNITS * layout.unit;
+  const moved = plan[0].map((v) => {
+    const a = layout.anchor(v.place);
+    return { x: svgCoordinate(a.x + share * cell), y: a.y };
+  });
+  const svg = drawPlaced(placeSimply(plan, layout, [moved]), layout).replace(
+    /stroke-width="[^"]*"/,
+    `stroke-width="${KAMEA_SIGIL_STROKE_WIDTH}"`,
+  );
+  return { svg, plan, layout };
 }
 
 /** A broken figure, and which checks must catch it. */
@@ -358,6 +385,13 @@ export const MUTANTS: readonly Mutant[] = [
     check: "crook-clearance",
     // Pe moved up instead of down: Pe→Shin runs through Aleph's cups.
     figure: () => crookedFigure(-4),
+  },
+  {
+    id: "a stroke along a kamea's rule",
+    // Read back exactly: only the eye cannot tell the column.
+    caughtBy: ["O2"],
+    check: "line-run",
+    figure: () => moonColumn(0.45),
   },
   {
     id: "a noose through the start circle",

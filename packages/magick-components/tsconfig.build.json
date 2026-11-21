@@ -16,6 +16,7 @@
   "files": [
     "src/vendor.d.ts",
     "src/astrology/Kamea.tsx",
+    "src/astrology/KameaSigil.tsx",
     "src/astrology/MercuryWidget.tsx",
     "src/astrology/mercuryRetrograde.ts",
     "src/astrology/Moon.tsx",

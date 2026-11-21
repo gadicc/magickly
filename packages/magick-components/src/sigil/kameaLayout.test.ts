@@ -1,15 +1,24 @@
 import { traceHebrew } from "magick-data/astrology/aiqBekar";
 import kameas, { KAMEA_PLANETS } from "magick-data/astrology/kameas";
 import { describe, expect, it } from "vitest";
-import { KAMEA_SIDE, kameaGeometry } from "../astrology/kameaGeometry.ts";
-import { svgCoordinate } from "../svgCoordinate.ts";
+import {
+  KAMEA_FRAME_WIDTH,
+  KAMEA_RULE_WIDTH,
+  KAMEA_SIDE,
+  kameaGeometry,
+} from "../astrology/kameaGeometry.ts";
 import { sigilFrame, sigilViewBox } from "./ink.ts";
 import {
   KAMEA_CELL_UNITS,
+  KAMEA_LINE_RUN,
+  KAMEA_SIGIL_PITCH,
   KAMEA_SIGIL_PROFILE,
+  KAMEA_SIGIL_SIZE_FLOOR,
   KAMEA_SIGIL_STROKE_WIDTH,
   kameaLayout,
+  kameaSigilMinSize,
 } from "./kameaLayout.ts";
+import { placeSigilWords, wordFailures } from "./placeSigil.ts";
 import { planSigil, sigilWords } from "./planSigil.ts";
 
 describe("kamea layout", () => {
@@ -141,11 +150,99 @@ describe("kamea layout", () => {
       12,
     );
     expect(KAMEA_SIGIL_PROFILE.strokeWidth).toBe(KAMEA_SIGIL_STROKE_WIDTH);
-    // One unit of the finest square, as the SVG writes it, so the figure
-    // grammar's one-stroke gaps still show there.
-    expect(KAMEA_SIGIL_STROKE_WIDTH).toBe(
-      svgCoordinate(kameaLayout("luna").unit),
+    // The grid's rule (Gadi, 21 November 2026).
+    expect(KAMEA_SIGIL_STROKE_WIDTH).toBe(KAMEA_RULE_WIDTH);
+    expect(String(KAMEA_SIGIL_STROKE_WIDTH)).toBe("0.6");
+  });
+
+  it("gives placement the rules and the frame KameaFigure draws, and a cell's run along one", () => {
+    for (const planet of KAMEA_PLANETS) {
+      const layout = kameaLayout(planet);
+      const order = Math.sqrt(layout.places.length);
+      const { rules } = kameaGeometry(order);
+      const lines = layout.lines ?? [];
+      expect(lines).toHaveLength(2 * (order - 1) + 4);
+      for (const line of lines) {
+        // Down or across the whole square, at a rule or the frame.
+        const down = line.a.x === line.b.x;
+        const at = down ? line.a.x : line.a.y;
+        const frame = Math.abs(at) === KAMEA_SIDE / 2;
+        expect(line.width).toBe(frame ? KAMEA_FRAME_WIDTH : KAMEA_RULE_WIDTH);
+        if (!frame)
+          expect(rules.some((r) => Math.abs(r - at) < 0.001)).toBe(true);
+        expect(down ? [line.a.y, line.b.y] : [line.a.x, line.b.x]).toEqual([
+          -48, 48,
+        ]);
+      }
+      expect(lines.filter((l) => l.width === KAMEA_FRAME_WIDTH)).toHaveLength(
+        4,
+      );
+    }
+    expect(KAMEA_LINE_RUN).toBe(KAMEA_CELL_UNITS);
+    expect(KAMEA_SIGIL_PROFILE.placement?.lineRun).toBe(KAMEA_LINE_RUN);
+  });
+
+  it("fails a stroke that runs along a rule for more than a cell", () => {
+    // Yod 10 and Lamed 30, five rows apart in the Moon's fourth column,
+    // drawn a share of a cell towards the rule on its right.
+    const luna = kameaLayout("luna");
+    const [word] = planSigil(sigilWords("יל"), luna, KAMEA_SIGIL_PROFILE);
+    const cell = KAMEA_SIDE / 9;
+    const at = (share: number) =>
+      word.map((v) => {
+        const a = luna.anchor(v.place);
+        return { ...v, point: { x: a.x + share * cell, y: a.y } };
+      });
+    const runs = (share: number) =>
+      wordFailures(at(share), luna, KAMEA_SIGIL_PROFILE).filter(
+        (f) => f.check === "line-run",
+      );
+    // 0.53 of the square's units from the rule: inside the 0.6 where the
+    // inks touch, for five cells.
+    expect(runs(0.45)).toHaveLength(1);
+    // Five cells less the one allowed, less the start circle's radius
+    // where the stroke leaves its rim.
+    expect(runs(0.45)[0].excess).toBeGreaterThan(4 * KAMEA_CELL_UNITS - 2.5);
+    expect(runs(0.45)[0].excess).toBeLessThanOrEqual(4 * KAMEA_CELL_UNITS);
+    // 0.57 from it: clear.
+    expect(runs(0.44)).toEqual([]);
+    // Without the setting, nothing is checked.
+    const plain = {
+      ...KAMEA_SIGIL_PROFILE,
+      placement: { ...KAMEA_SIGIL_PROFILE.placement, lineRun: undefined },
+    } as typeof KAMEA_SIGIL_PROFILE;
+    expect(
+      wordFailures(at(0.45), luna, plain).filter((f) => f.check === "line-run"),
+    ).toEqual([]);
+  });
+
+  it("places 1651's Malcha off the rules it ran along before", () => {
+    const luna = kameaLayout("luna");
+    const plan = planSigil(sigilWords("בתרשיסים"), luna, KAMEA_SIGIL_PROFILE);
+    const [placed] = placeSigilWords(plan, luna, KAMEA_SIGIL_PROFILE);
+    expect(placed.failures).toEqual([]);
+  });
+
+  it("draws a word's figure at 1.25 pixels a unit or more, and never under 240", () => {
+    const sizes = Object.fromEntries(
+      KAMEA_PLANETS.map((planet) => [planet, kameaSigilMinSize(planet)]),
     );
-    expect(String(KAMEA_SIGIL_STROKE_WIDTH)).toBe("0.381");
+    expect(sizes).toEqual({
+      saturn: 240,
+      jupiter: 240,
+      mars: 240,
+      sol: 240,
+      venus: 256,
+      mercury: 292,
+      luna: 329,
+    });
+    for (const planet of KAMEA_PLANETS) {
+      const unit = kameaLayout(planet).unit;
+      const pixelsPerUnit = (size: number) => (size / KAMEA_SIGIL_PITCH) * unit;
+      expect(pixelsPerUnit(sizes[planet])).toBeGreaterThanOrEqual(1.25);
+      if (sizes[planet] > KAMEA_SIGIL_SIZE_FLOOR)
+        expect(pixelsPerUnit(sizes[planet] - 1)).toBeLessThan(1.25);
+    }
+    expect(() => kameaSigilMinSize("earth" as "saturn")).toThrow(RangeError);
   });
 });

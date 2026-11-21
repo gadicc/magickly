@@ -86,6 +86,10 @@
  *   avoided is ללהאל's return from He, about 7.9° when He and both Lameds sit
  *   at the edge of their slack, touching for 7.3 units. Half the shorter
  *   stroke keeps a short stroke drawn back over itself from passing.
+ * - **Line runs.** Where the layout draws lines under the figure (a kamea's
+ *   cell rules), no stroke runs within touching distance of one for longer
+ *   than the lines' spacing, a cell: the reader could not tell which cell
+ *   it is in (plan 093, K3).
  * - **Clearance.** No stroke passes within 2 units of a drawn vertex of the
  *   name other than its own ends (a clear gap of one stroke width between
  *   inks), and none comes within 1 unit of another vertex's loop. Strokes
@@ -152,7 +156,15 @@ import type { Point, SigilLayout } from "../types.ts";
  * comment gives the reasoning for each.
  */
 export const FIGURE_GRAMMAR = {
-  /** Stroke width the sizes assume: SVG's default, 1 unit. */
+  /**
+   * Stroke width the sizes assume: SVG's default, 1 unit. Where a figure
+   * is drawn wider (a kamea's 0.6, 1.58 units on the Moon's square), the
+   * limits between inks (`overlap.distance` and the clearances) are
+   * counted in its widths instead, so inks kept a stroke width apart do
+   * not touch (plan 093, K3), and so is `overlap.length`, which keeps
+   * F1's narrowest wedge at its 7°; the marks' sizes, tolerances and
+   * angles are not.
+   */
   strokeWidth: 1,
   /**
    * The smallest rendering the grammar keeps legible: 1.25 px per unit, a
@@ -211,6 +223,16 @@ export const FIGURE_GRAMMAR = {
    * (ללהאל's return from He, about 7°: 1 / sin 7° ≈ 8.2 units of touching ink).
    */
   overlap: { distance: 1, length: 8, fractionOfShorter: 0.5 },
+  /**
+   * Where the layout draws lines under the figure (a kamea's cell rules,
+   * `SigilLayout.lines`), no stroke lies within touching distance of one
+   * (its centre line within half the drawn stroke and half the line of the
+   * line's centre line) for longer than `spacings` times the least
+   * distance between two parallel lines: one cell. Longer, a reader cannot
+   * tell which side of the line, which cell, the stroke is in (plan 093,
+   * K3, Gadi's rule of 21 November 2026).
+   */
+  lineRun: { spacings: 1 },
   /**
    * No stroke passes closer than this to a drawn vertex of the name other
    * than its own ends: two stroke widths, a clear gap of one between inks.

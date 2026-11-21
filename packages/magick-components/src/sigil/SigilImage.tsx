@@ -94,6 +94,25 @@ export interface SigilImageProps {
    * renders) does not place the sigil twice.
    */
   figure?: SigilFigure;
+  /** The `<svg>`'s width (CSS pixels for a number); none unless given. */
+  width?: number | string;
+  /** The `<svg>`'s height (CSS pixels for a number); none unless given. */
+  height?: number | string;
+  /** The `<svg>`'s class. */
+  className?: string;
+  /** The `<svg>`'s style. */
+  style?: React.CSSProperties;
+  /** The `<svg>`'s role (`img` for a named drawing). */
+  role?: string;
+  /** The `<svg>`'s accessible name. */
+  "aria-label"?: string;
+  /** Hides a decorative drawing from assistive technology. */
+  "aria-hidden"?: boolean;
+  /**
+   * Written to the `<svg>` as is: `KameaSigil` marks a figure placement
+   * could not clear with `failed`.
+   */
+  "data-placement"?: string;
 }
 
 /**
@@ -114,6 +133,14 @@ export function SigilImage({
   ref,
   inkRef,
   figure = sigilFigure(text, layout, profile),
+  width,
+  height,
+  className,
+  style,
+  role,
+  "aria-label": ariaLabel,
+  "aria-hidden": ariaHidden,
+  "data-placement": placement,
 }: SigilImageProps) {
   const regions = Math.max(1, figure.plan.length);
   return (
@@ -122,6 +149,14 @@ export function SigilImage({
       version="1.1"
       viewBox={figure.viewBox.join(" ")}
       ref={ref}
+      width={width}
+      height={height}
+      className={className}
+      style={style}
+      role={role}
+      aria-label={ariaLabel}
+      aria-hidden={ariaHidden}
+      data-placement={placement}
     >
       {children}
       {backdrop &&

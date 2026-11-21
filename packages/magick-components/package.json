@@ -40,6 +40,7 @@
   ],
   "exports": {
     "./astrology/Kamea": "./src/astrology/Kamea.tsx",
+    "./astrology/KameaSigil": "./src/astrology/KameaSigil.tsx",
     "./astrology/mercuryRetrograde": "./src/astrology/mercuryRetrograde.ts",
     "./astrology/MercuryWidget": "./src/astrology/MercuryWidget.tsx",
     "./astrology/Moon": "./src/astrology/Moon.tsx",
@@ -76,6 +77,10 @@
       "./astrology/Kamea": {
         "types": "./lib/astrology/Kamea.d.ts",
         "default": "./lib/astrology/Kamea.js"
+      },
+      "./astrology/KameaSigil": {
+        "types": "./lib/astrology/KameaSigil.d.ts",
+        "default": "./lib/astrology/KameaSigil.js"
       },
       "./astrology/mercuryRetrograde": {
         "types": "./lib/astrology/mercuryRetrograde.d.ts",

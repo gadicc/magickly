@@ -55,6 +55,7 @@ export type InvariantCheck =
   | "bar-clearance"
   | "crook-clearance"
   | "loop-clearance"
+  | "line-run"
   | "domain";
 
 /** One broken invariant. */
@@ -109,12 +110,95 @@ function overlapLength(a: Segment, b: Segment, within: number): number {
   return (inside / (steps + 1)) * l;
 }
 
+/**
+ * The layout's lines, each with the band within which a stroke `stroke`
+ * wide touches it, and the longest a stroke may run in one
+ * (`FIGURE_GRAMMAR.lineRun`); none when the layout draws no lines.
+ */
+interface LineRuns {
+  lines: { seg: Segment; band: number }[];
+  limit: number;
+}
+
+function lineRunsOf(layout: SigilGeometry, stroke: number): LineRuns {
+  const lines = (layout.lines ?? []).map((l) => ({
+    seg: { a: l.a, b: l.b },
+    band: (stroke + l.width) / 2,
+  }));
+  // The least distance between two parallel lines: a cell.
+  let spacing = Number.POSITIVE_INFINITY;
+  for (const p of lines)
+    for (const q of lines) {
+      const u = sub(p.seg.b, p.seg.a);
+      const v = sub(q.seg.b, q.seg.a);
+      const lu = length(p.seg);
+      if (Math.abs(u.x * v.y - u.y * v.x) > 1e-9 * lu * length(q.seg)) continue;
+      const w = sub(q.seg.a, p.seg.a);
+      const d = Math.abs(u.x * w.y - u.y * w.x) / lu;
+      if (d > 1e-9) spacing = Math.min(spacing, d);
+    }
+  return { lines, limit: G.lineRun.spacings * spacing };
+}
+
+/**
+ * How long `s` lies within `band` of `line`, sampled every 0.02 along
+ * the part of `s` within `band` of the line's infinite extension (where
+ * the distance to it, linear along `s`, is under `band`).
+ */
+function runLength(s: Segment, line: Segment, band: number): number {
+  const l = length(s);
+  const v = sub(line.b, line.a);
+  const lv = length(line);
+  if (l === 0 || lv === 0) return 0;
+  const side = (p: Point) =>
+    (v.x * (p.y - line.a.y) - v.y * (p.x - line.a.x)) / lv;
+  const da = side(s.a);
+  const db = side(s.b);
+  // Where |da + t (db − da)| < band, for t in [0, 1].
+  let t0 = 0;
+  let t1 = 1;
+  if (da === db) {
+    if (Math.abs(da) >= band) return 0;
+  } else {
+    const r0 = (-band - da) / (db - da);
+    const r1 = (band - da) / (db - da);
+    t0 = Math.max(0, Math.min(r0, r1));
+    t1 = Math.min(1, Math.max(r0, r1));
+    if (t0 >= t1) return 0;
+  }
+  const span = (t1 - t0) * l;
+  const steps = Math.max(1, Math.ceil(span / 0.02));
+  let inside = 0;
+  for (let i = 0; i <= steps; i++) {
+    const t = t0 + ((t1 - t0) * i) / steps;
+    const p = {
+      x: s.a.x + t * (s.b.x - s.a.x),
+      y: s.a.y + t * (s.b.y - s.a.y),
+    };
+    if (toSegment(p, line).d < band) inside++;
+  }
+  return (inside / (steps + 1)) * span;
+}
+
+/**
+ * The ink's stroke width as the SVG writes it: the last `stroke-width`
+ * (the sigil's ink comes after any backdrop), or SVG's default 1.
+ */
+function inkStrokeWidth(svg: string): number {
+  let width = 1;
+  for (const match of svg.matchAll(/stroke-width\s*=\s*["']([^"']+)["']/g))
+    width = Number(match[1]);
+  return Number.isFinite(width) ? width : 1;
+}
+
 function checkWord(
   index: number,
   pieces: Parameters<typeof inkShapes>[0],
   word: SigilPlan[number],
   layout: SigilGeometry,
   frame: SigilFrame,
+  runs: LineRuns,
+  widths: number,
 ): InvariantFailure[] {
   const unit = layout.unit;
   const failures: InvariantFailure[] = [];
@@ -387,16 +471,25 @@ function checkWord(
 
   // Nothing but the last stroke near the bar, nothing but its own strokes near a crook.
   if (bars.length > 0) {
-    const touch = barIntrusion(merged, bars[0], unit, G.barClearance * unit);
-    if (touch.distance < (G.barClearance - SIZE_TOLERANCE) * unit)
+    const touch = barIntrusion(
+      merged,
+      bars[0],
+      unit,
+      G.barClearance * widths * unit,
+    );
+    if (touch.distance < (G.barClearance * widths - SIZE_TOLERANCE) * unit)
       fail(
         "bar-clearance",
         `other ink comes ${touch.distance.toFixed(2)} from the end bar at ${fmt(touch.at)}`,
         last.place,
       );
   }
-  for (const touch of waveIntrusions(merged, unit, G.crookClearance * unit))
-    if (touch.distance < (G.crookClearance - SIZE_TOLERANCE) * unit)
+  for (const touch of waveIntrusions(
+    merged,
+    unit,
+    G.crookClearance * widths * unit,
+  ))
+    if (touch.distance < (G.crookClearance * widths - SIZE_TOLERANCE) * unit)
       fail(
         "crook-clearance",
         `other ink comes ${touch.distance.toFixed(2)} from the crook at ${fmt(touch.at)}`,
@@ -405,25 +498,40 @@ function checkWord(
 
   // No two loops touching: a noose through the start circle is one mark.
   for (const touch of loopContacts(merged, unit))
-    if (touch.distance < (G.loopClearance - SIZE_TOLERANCE) * unit)
+    if (touch.distance < (G.loopClearance * widths - SIZE_TOLERANCE) * unit)
       fail(
         "loop-clearance",
         `loops at ${fmt(merged.loops[touch.a].center)} and ${fmt(merged.loops[touch.b].center)} come ${touch.distance.toFixed(2)} apart`,
         placeNear(touch.at, places, layout) ?? undefined,
       );
 
+  // No stroke lying along a line the layout draws (a kamea's rules).
+  for (const [i, s] of merged.lines.entries()) {
+    if (barLines.has(i)) continue;
+    for (const line of runs.lines) {
+      const run = runLength(s, line.seg, line.band);
+      // Sampled every 0.02: at least two samples' worth of tolerance.
+      if (run > runs.limit + Math.max(SIZE_TOLERANCE * unit, 0.05))
+        fail(
+          "line-run",
+          `a stroke from ${fmt(s.a)} runs along the line from ${fmt(line.seg.a)} for ${run.toFixed(2)}, more than ${runs.limit.toFixed(2)}`,
+          placeNear(s.a, places, layout) ?? undefined,
+        );
+    }
+  }
+
   // No two strokes lying on each other.
   for (let i = 0; i < strokes.length; i++)
     for (let j = i + 1; j < strokes.length; j++) {
       const a = strokes[i];
       const b = strokes[j];
-      const within = G.overlap.distance * unit;
+      const within = G.overlap.distance * widths * unit;
       const overlap = Math.max(
         overlapLength(a, b, within),
         overlapLength(b, a, within),
       );
       const limit = Math.min(
-        G.overlap.length * unit,
+        G.overlap.length * widths * unit,
         G.overlap.fractionOfShorter * Math.min(length(a), length(b)),
       );
       if (overlap > limit + SIZE_TOLERANCE * unit)
@@ -549,7 +657,7 @@ function checkWord(
       const own = place !== null && ownPlaces.has(place);
       const d = toSegment(v, s).d;
       const min = own ? G.samePlaceClearance : G.vertexClearance;
-      if (d < min * unit - SIZE_TOLERANCE * unit)
+      if (d < min * widths * unit - SIZE_TOLERANCE * unit)
         fail(
           "clearance",
           `a stroke from ${fmt(s.a)} passes ${d.toFixed(2)} from the vertex at ${fmt(v)}`,
@@ -564,7 +672,7 @@ function checkWord(
       )
         continue;
       const d = Math.min(...loop.points.map((p) => toSegment(p, s).d));
-      if (d < G.markClearance * unit - SIZE_TOLERANCE * unit)
+      if (d < G.markClearance * widths * unit - SIZE_TOLERANCE * unit)
         fail(
           "clearance",
           `a stroke from ${fmt(s.a)} comes ${d.toFixed(2)} from the loop at ${fmt(loop.center)}`,
@@ -579,6 +687,11 @@ function checkWord(
 export interface InvariantOptions {
   /** The outer bound, when the layout's slack-disc hull is not the right one. */
   bound?: { center: Point; radius: number };
+  /**
+   * The ink's width, for the line-run check, when the SVG's last
+   * `stroke-width` is not it.
+   */
+  strokeWidth?: number;
 }
 
 /**
@@ -605,10 +718,15 @@ export function checkInvariants(
       word: null,
       message: `${drawnWords} word region(s) have ink, ${plan.length} word(s) planned`,
     });
+  const stroke = options.strokeWidth ?? inkStrokeWidth(svg);
+  const runs = lineRunsOf(layout, stroke);
+  // The limits between inks in stroke widths: a unit, or the drawn
+  // stroke where it is wider (`FIGURE_GRAMMAR.strokeWidth`).
+  const widths = Math.max(1, stroke / layout.unit);
   plan.forEach((word, i) => {
     const pieces = words[i] ?? [];
     if (pieces.length === 0) return;
-    failures.push(...checkWord(i, pieces, word, layout, frame));
+    failures.push(...checkWord(i, pieces, word, layout, frame, runs, widths));
   });
   return failures;
 }

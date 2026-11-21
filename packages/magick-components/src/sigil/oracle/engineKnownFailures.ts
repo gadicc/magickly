@@ -248,6 +248,18 @@ export const ENGINE_KNOWN_FAILURES: Readonly<Record<string, string>> = {
  * triples and 24 of the 1,260 random words, all on Mercury's square (35)
  * and the Moon's (35). The grid's templates and vol. 4's examples pass.
  *
+ * Derived again 21 November 2026 (K3), with the stroke at the rule's
+ * 0.6; the rule against runs along a cell's rule or the frame
+ * (`KAMEA_LINE_RUN`, and O2's `line-run`); lane starts kept off those
+ * lines; the seeded fallback; and the limits between inks, and how long
+ * two inks may touch, counted in stroke widths where the stroke is wider
+ * than a unit (Gadi's option B: 1.58 units on the Moon's square, 1.4 on
+ * Mercury's, 1.22 on Venus', 1.05 on the Sun's). 87 of the corpus's
+ * 16,533: 63 of the 15,273 triples and 24 of the 1,260 random words; 35
+ * on Mercury's square (20 triples, 15 random words) and 52 on the Moon's
+ * (43 triples, 9 random words). The 70 above are unchanged, and none
+ * fails `line-run`; the fallback, tried on every one, clears none.
+ *
  * - A return across most of the square (69 figures, `overlap`): A-B-A
  *   with A and B 7.6 to 9.9 cells apart (Mercury's corners, the ends of
  *   the Moon's column and its far corners), or A-B-C with A and C
@@ -264,6 +276,16 @@ export const ENGINE_KNOWN_FAILURES: Readonly<Record<string, string>> = {
  *   5, 7.07 cells apart, with a crook at the second visit to 50; the last
  *   stroke passes within two units of the first visit, the rose's own
  *   long A-B-A-B-A failure.
+ * - One letter three times on the Moon's square (17 triples, `bar-
+ *   clearance crook-clearance`, added in K3): a word of one vertex that
+ *   carries the start circle, two crooks running from its rim and the end
+ *   bar through it. Their clearances are counted in the Moon's 1.58-unit
+ *   stroke widths, but the marks are sized in units (a cup 1 to 2 deep,
+ *   the bar 3 to 6 long), so the bar and the cups cannot stand that far
+ *   apart, wherever the one vertex is placed. Mercury's 1.4 still leaves
+ *   room. Scaling the marks too would need marks per square (the profile
+ *   is one for all seven) and O2's mark ranges scaled with them, so they
+ *   are listed rather than drawn differently.
  */
 export const KAMEA_KNOWN_FAILURES: Readonly<Record<string, string>> = {
   "mercury אבא": "overlap",
@@ -336,12 +358,46 @@ export const KAMEA_KNOWN_FAILURES: Readonly<Record<string, string>> = {
   "luna זססהדהגסוהיכ": "overlap",
   "luna דוגגוגדדגגסד": "overlap",
   "luna ייכבדואדדבכנ": "overlap",
+  "luna אאא": "bar-clearance crook-clearance",
+  "luna בבב": "bar-clearance crook-clearance",
+  "luna גגג": "bar-clearance crook-clearance",
+  "luna דדד": "bar-clearance crook-clearance",
+  "luna ההה": "bar-clearance crook-clearance",
+  "luna ווו": "bar-clearance crook-clearance",
+  "luna זזז": "bar-clearance crook-clearance",
+  "luna חחח": "bar-clearance crook-clearance",
+  "luna טטט": "bar-clearance crook-clearance",
+  "luna ייי": "bar-clearance crook-clearance",
+  "luna כככ": "bar-clearance crook-clearance",
+  "luna ללל": "bar-clearance crook-clearance",
+  "luna מממ": "bar-clearance crook-clearance",
+  "luna נננ": "bar-clearance crook-clearance",
+  "luna ססס": "bar-clearance crook-clearance",
+  "luna עעע": "bar-clearance crook-clearance",
+  "luna פפפ": "bar-clearance crook-clearance",
 };
 
 /**
  * Names in a spelling the pages trace (`kameaNameCases`) that the engine
- * draws wrongly, by the case's id, with the checks each fails. The gate
- * allows none, and there are none; a name that comes to fail must be
- * listed here, with why, for the plan to accept.
+ * draws wrongly, by the case's id, with the checks each fails. A name
+ * that comes to fail must be listed here, with why, for the plan to
+ * accept.
+ *
+ * One, accepted by Gadi on 21 November 2026 (K3, option B): 777's Malcha
+ * with finals, בתרשישים with final Mem as 600, a spelling only the
+ * generator traces (the pages trace at ordinary values, decision 3).
+ * Its second word folds onto the Moon's fourth column, and with the
+ * limits between inks counted in the Moon's 1.58-unit strokes, a return
+ * along that column cannot open its wedge wide enough within the slack:
+ * two strokes touch for longer than eight stroke widths. The seeded
+ * fallback spends its whole budget on it without clearing it.
+ * `KameaSigil` draws it best effort and marks it failed.
+ *
+ * Two cases place only through the kamea profile's seeded fallback since
+ * the rule against runs along a rule (K3): Barrett's Malcha in both
+ * finals modes, whose first word folds onto the Moon's fourth column (12
+ * vertices, 10 of them in it). Without the fallback they fail overlap.
  */
-export const KAMEA_NAME_KNOWN_FAILURES: Readonly<Record<string, string>> = {};
+export const KAMEA_NAME_KNOWN_FAILURES: Readonly<Record<string, string>> = {
+  "malcha-betharsisim crowley777 finals": "overlap",
+};

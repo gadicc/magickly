@@ -22,7 +22,12 @@ import kameas, {
   type Kamea,
   type KameaPlanetId,
 } from "magick-data/astrology/kameas";
-import { KAMEA_SIDE, kameaGeometry } from "../astrology/kameaGeometry.ts";
+import {
+  KAMEA_FRAME_WIDTH,
+  KAMEA_RULE_WIDTH,
+  KAMEA_SIDE,
+  kameaGeometry,
+} from "../astrology/kameaGeometry.ts";
 import { svgCoordinate } from "../svgCoordinate.ts";
 import { DEFAULT_SIGIL_PLACEMENT } from "./placeSigil.ts";
 import type {
@@ -30,6 +35,7 @@ import type {
   Point,
   SigilLayout,
   SigilLayoutFrame,
+  SigilLayoutLine,
   SigilProfile,
 } from "./types.ts";
 
@@ -48,8 +54,8 @@ import type {
  * that places every name the pages trace, in both finals modes, with its
  * vertices farthest from the grid's lines (plan 093, K2). The Moon's unit
  * is then 0.91 pixels at `Kamea`'s 240, under the grammar's 1.25: a figure
- * on the Moon's square is legible by that measure from about 328 pixels
- * across.
+ * on the Moon's square is legible by that measure only from 329 pixels
+ * across (`kameaSigilMinSize`).
  */
 export const KAMEA_CELL_UNITS = 28;
 
@@ -84,17 +90,37 @@ export const KAMEA_SIGIL_FRAME: SigilLayoutFrame = Object.freeze({
 
 /**
  * The ink's default width on a kamea, in `KameaFigure`'s units, the same
- * on every square (provisional: K3 chooses the final weight from a
- * mock-up at real size). One sigil unit of the finest square, the Moon's
- * (0.381, rounded as the SVG writes it): the figure grammar's sizes assume
- * a stroke one unit wide, so its gaps of one stroke width still show
- * there, and on the coarser squares, whose units are larger, the line is
- * lighter against the cell (a third of a unit on Saturn's). It is lighter
- * than the grid's 0.6 rules; the sigil's colour sets it apart.
+ * on every square: the grid's rule, 0.6 (Gadi, 21 November 2026, from
+ * K3's mock-up at real size, over the 0.381 K2 left provisional, one
+ * sigil unit of the Moon's square). It matches the square's own lines,
+ * the sigil's colour setting it apart, with no casing. It is wider than
+ * the figure grammar's one unit on the larger squares (1.58 units on the
+ * Moon's, 1.4 on Mercury's, 1.22 on Venus', 1.05 on the Sun's), and a gap
+ * between inks is the same share of the figure at any size, so placement
+ * and O2 count their limits between inks in this width there rather than
+ * in units (`placeSigil`'s `LIMITS`, `FIGURE_GRAMMAR.strokeWidth`).
+ * `kameaSigilMinSize` keeps the marks, sized in units, at the grammar's
+ * 1.25 pixels a unit; it does not widen the gaps.
  */
-export const KAMEA_SIGIL_STROKE_WIDTH = svgCoordinate(
-  KAMEA_SIDE / (9 * KAMEA_CELL_UNITS),
-);
+export const KAMEA_SIGIL_STROKE_WIDTH = svgCoordinate(KAMEA_RULE_WIDTH);
+
+/**
+ * How long a stroke may run within touching distance of a cell's rule or
+ * the square's frame, in sigil units: one cell (`KAMEA_CELL_UNITS`), the
+ * same share of a cell on every square (plan 093, K3). On the Moon's square the method
+ * folds runs of letters onto one column, and placement, free to move a
+ * visit up to 0.46 of a cell from its centre, could lay a stroke along
+ * the rule beside it (1651's בתרשיסים: 20 to 30 on the rule right of the
+ * fourth column, which holds 10 to 80, for 7 cells); the reader then
+ * cannot tell which column it is in. Touching is the stroke's centre
+ * line within half the stroke and half the rule (0.3 + 0.3 = 0.6 of the
+ * square's units) of the rule's, or half the frame's 2 (0.3 + 1 = 1.3) of
+ * the frame's.
+ * A stroke that crosses a rule square to it lies in that band for 1.2
+ * units of the square, far under a cell; one crossing at under about 6°
+ * on the Moon's square, or running beside it, is held to a cell.
+ */
+export const KAMEA_LINE_RUN = KAMEA_CELL_UNITS;
 
 /**
  * The Golden Dawn's rules on a kamea (plan 093, decision 4): the rose's
@@ -109,6 +135,18 @@ export const KAMEA_SIGIL_STROKE_WIDTH = svgCoordinate(
  *   runs along the Moon's column need: at this scale, with the rose's
  *   placement settings 7 of the names fail, with its budget and the lane
  *   starts 7, and with eight budgets and no lane starts 3 (plan 093, K2);
+ * - no stroke along a cell's rule or the frame for more than a cell
+ *   (`KAMEA_LINE_RUN`);
+ * - a seeded fallback for a word the search leaves failing: up to 64
+ *   random starts and three more of these budgets of work, shared by a
+ *   text's words. Barrett's Malcha (both finals modes) clears only
+ *   through it, after 1.3 and 2.4 million units of its work (1.4 and 2.1
+ *   s for the text on a 2026 desktop); 777's with finals, which the
+ *   generator alone traces, does not clear in its budget. A word that
+ *   still fails costs at most four of these budgets in all (about 4 s,
+ *   which a page should spend on the server or off the main thread); a
+ *   text, at most two, an eighth for each word beyond the second, and
+ *   the fallback's three, which its words share (plan 093, K3);
  * - the stroke fixed against the square (`KAMEA_SIGIL_STROKE_WIDTH`).
  */
 export const KAMEA_SIGIL_PROFILE: SigilProfile = Object.freeze({
@@ -118,9 +156,48 @@ export const KAMEA_SIGIL_PROFILE: SigilProfile = Object.freeze({
     ...DEFAULT_SIGIL_PLACEMENT,
     budget: 8 * DEFAULT_SIGIL_PLACEMENT.budget,
     laneStarts: true,
+    lineRun: KAMEA_LINE_RUN,
+    fallback: Object.freeze({
+      starts: 64,
+      budget: 3 * 8 * DEFAULT_SIGIL_PLACEMENT.budget,
+    }),
   }),
   strokeWidth: KAMEA_SIGIL_STROKE_WIDTH,
 });
+
+/**
+ * The least width, in CSS pixels, a word's figure on any square is drawn
+ * at: `Kamea`'s default size.
+ */
+export const KAMEA_SIGIL_SIZE_FLOOR = 240;
+
+/**
+ * The least width, in CSS pixels, of one word's figure on `planet`'s
+ * square (its region, `KAMEA_SIGIL_PITCH` across): the figure grammar's
+ * smallest legible rendering, 1.25 pixels a sigil unit
+ * (`FIGURE_GRAMMAR.minPixelsPerUnit`), rounded up to a whole pixel, and
+ * never under `KAMEA_SIGIL_SIZE_FLOOR` (Gadi, 21 November 2026). A unit
+ * is `KAMEA_SIDE / (order × KAMEA_CELL_UNITS)` of the region's 100, so
+ * the bound is 36.46 pixels a cell along the side: Saturn, Jupiter, Mars
+ * and the Sun 240 (the grammar asks 110, 146, 183 and 219), Venus 256,
+ * Mercury 292 and the Moon 329.
+ */
+export function kameaSigilMinSize(planet: KameaPlanetId): number {
+  if (!Object.hasOwn(kameas, planet))
+    throw new RangeError(`Not a planet with a kamea: ${planet}`);
+  const order = kameas[planet].length;
+  const unit = KAMEA_SIDE / (order * KAMEA_CELL_UNITS);
+  // 1.25 px a unit; less a hair, so an exact product is not rounded up.
+  const least = (MIN_PIXELS_PER_UNIT * KAMEA_SIGIL_PITCH) / unit;
+  return Math.max(KAMEA_SIGIL_SIZE_FLOOR, Math.ceil(least - 1e-9));
+}
+
+/**
+ * The figure grammar's smallest legible rendering, in pixels a sigil unit
+ * (`FIGURE_GRAMMAR.minPixelsPerUnit` in the oracle, which the package's
+ * runtime code does not import).
+ */
+const MIN_PIXELS_PER_UNIT = 1.25;
 
 /** How a kamea layout reads letters. */
 export interface KameaLayoutOptions {
@@ -146,8 +223,35 @@ function squareLayout<Token>(
   number: (token: Token) => number | null,
 ): SigilLayout<Token> {
   const order = square.length;
-  const { cell, center } = kameaGeometry(order);
+  const { cell, center, rules } = kameaGeometry(order);
   const half = KAMEA_SIDE / 2;
+  // The lines `KameaFigure` draws: the rules between the cells, down and
+  // across, and the frame's four sides.
+  const line = (
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number,
+    width: number,
+  ): SigilLayoutLine =>
+    Object.freeze({
+      a: Object.freeze({ x: x0, y: y0 }),
+      b: Object.freeze({ x: x1, y: y1 }),
+      width,
+    });
+  const lines: SigilLayoutLine[] = [
+    ...rules.flatMap((r) => {
+      const at = svgCoordinate(r);
+      return [
+        line(at, -half, at, half, KAMEA_RULE_WIDTH),
+        line(-half, at, half, at, KAMEA_RULE_WIDTH),
+      ];
+    }),
+    ...[-half, half].flatMap((at) => [
+      line(at, -half, at, half, KAMEA_FRAME_WIDTH),
+      line(-half, at, half, at, KAMEA_FRAME_WIDTH),
+    ]),
+  ];
   const cells = new Map<number, PlaceId>();
   const anchors = new Map<PlaceId, Point>();
   square.forEach((row, r) =>
@@ -182,6 +286,7 @@ function squareLayout<Token>(
     unit: cell / KAMEA_CELL_UNITS,
     places: [...anchors.keys()],
     frame: KAMEA_SIGIL_FRAME,
+    lines: Object.freeze(lines),
   };
 }
 

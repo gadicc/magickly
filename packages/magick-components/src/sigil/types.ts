@@ -54,6 +54,23 @@ export interface SigilLayout<Token = string> {
    * (`sigilFrame`), as on the rose.
    */
   frame?: SigilLayoutFrame;
+  /**
+   * Lines the layout draws under a figure, which its ink should not run
+   * along (a kamea's cell rules): placement keeps strokes off them when
+   * its settings give a `lineRun`. Without any, nothing is checked.
+   */
+  lines?: readonly SigilLayoutLine[];
+}
+
+/**
+ * A line a layout draws under a figure (plan 093, K3), in layout
+ * coordinates: from `a` to `b`, `width` wide.
+ */
+export interface SigilLayoutLine {
+  a: Point;
+  b: Point;
+  /** The line's drawn width, in layout coordinates. */
+  width: number;
 }
 
 /**
@@ -209,4 +226,27 @@ export interface SigilPlacementSettings {
    * onto one line). Tried after the first rule start. Off unless set.
    */
   laneStarts?: boolean;
+  /**
+   * The longest stretch, in sigil units, a stroke may run within touching
+   * distance of one of the layout's `lines`: its centre line within half
+   * the stroke's width (the profile's `strokeWidth`, or one unit) and
+   * half the line's of the line's centre line
+   * (plan 093, K3). Longer, the stroke reads as lying on the line, and
+   * the eye cannot tell which side of it, which cell, it is in. Measured
+   * per stroke and line as the length of the stroke inside that band,
+   * so a stroke that crosses a line at a shallow angle counts as well as
+   * one that runs beside it. Not checked unless set; a layout without
+   * lines has nothing to check.
+   */
+  lineRun?: number;
+  /**
+   * A last resort for a word the search above leaves failing: up to
+   * `starts` more starts, each vertex at a random point in its slack, from
+   * a generator seeded by the plan word (so by the text and the layout's
+   * places, and the same in every engine), each searched as the others
+   * are, until one passes or `budget` more units of work are spent. A
+   * text's words share one `budget` between them, in order. Off unless
+   * set (plan 093, K3: a kamea's few words that fold onto one column).
+   */
+  fallback?: { starts: number; budget: number };
 }

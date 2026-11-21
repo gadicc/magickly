@@ -134,6 +134,15 @@ function nearInterval(
 }
 
 /**
+ * How long a stretch of segment `a` lies within `within` of segment `b`
+ * (the length of `a` inside the capsule round `b`).
+ */
+export function nearLength(a: Segment, b: Segment, within: number): number {
+  const ab = nearInterval(a, b, within);
+  return ab ? (ab[1] - ab[0]) * dist(a.a, a.b) : 0;
+}
+
+/**
  * How long two strokes' centre lines run closer than `within`: the longer
  * of the stretch of each within `within` of the other, as plan 088's O2
  * overlap check measures it.

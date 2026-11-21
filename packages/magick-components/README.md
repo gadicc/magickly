@@ -139,13 +139,14 @@ assembled graph, so they import magick-data's root entry, every table.
 | `sigil/ink` | The renderer: `wordInk()` and `sigilSubpaths()`, placed words as ink and path data, `sigilFrame()` and `sigilViewBox()`, and `DEFAULT_SIGIL_MARKS`, the mark sizes a profile can change |
 | `sigil/placeSigil` | `placeSigil()`, where each vertex of a plan is drawn, by rule; `placeSigilWords()`, the same with what each word still fails of placement's checks; `DEFAULT_SIGIL_PLACEMENT` |
 | `sigil/SigilImage` | `SigilImage`, a text's sigil planned, placed and drawn on any layout, with no hooks, and `sigilFigure()`, the same worked out without drawing |
-| `sigil/kameaLayout` | A planet's kamea as a sigil layout, `kameaLayout()`, its letters reduced by Aiq Bekar to cells, and the Golden Dawn's rules for it, `KAMEA_SIGIL_PROFILE` |
+| `sigil/kameaLayout` | A planet's kamea as a sigil layout, `kameaLayout()`, its letters reduced by Aiq Bekar to cells, the Golden Dawn's rules for it, `KAMEA_SIGIL_PROFILE`, and `kameaSigilMinSize()`, the least width a figure on each square is drawn at |
 | `gd/SevenBranchedCandlestick` | The seven-branched candlestick, with its planets, in two versions: *The Equinox*'s figure of 1909 (the default) and the modern arrangement (`CANDLESTICK_VERSIONS`, `CANDLESTICK_VERSION_NOTES`) |
 | `gd/TableOfShewbread` | The table of shewbread, with the signs and the tribes |
 | `gd/FylfotCross` | The fylfot cross of the signs and elements |
 | `enochian/Tablet` | An Enochian tablet, a Watchtower or the Tablet of Union, in the Golden Dawn's, Dee's or another tradition's letters |
 | `chakras/Chakras` | The seven chakras, in their colours, on the outline of a body |
 | `astrology/Kamea` | A planet's kamea, its magic square |
+| `astrology/KameaSigil` | A name's sigil traced on its planet's kamea, a figure per word on its own square, wrapping (`KameaSigil`), or in one row in one `<svg>` for a download (`KameaSigilImage`), with no hooks; `kameaSigil()` works it out without drawing and says whether placement left a word failing |
 | `astrology/PlanetarySpirit` | A planetary spirit's geomantic sigil (the Rulers of the figures) |
 | `astrology/Moon` | The Moon in a phase you give, or a date's, as seen from either hemisphere |
 | `astrology/MoonWidget` | A tile of today's Moon and its phase's name, as seen from the viewer's hemisphere (`"use client"`) |
@@ -500,6 +501,33 @@ objects themselves, and hands them out frozen. So give it a layout or
 profile that does not change after first use; to change one, make a new
 object.
 
+### A sigil on a kamea
+
+`astrology/KameaSigil` traces a name on its planet's magic square by the
+Golden Dawn's method: each letter reduced by Aiq Bekar to a number the
+square holds (`sigil/kameaLayout`), the line drawn from cell to cell
+with the rose's marks. Each word is its own figure on its own square,
+set right to left and wrapping on a narrow screen; `KameaSigilImage`
+draws the same figures in one row, one `<svg>`, for a download:
+
+```tsx
+import { KameaSigil } from "magick-components/astrology/KameaSigil";
+
+export const Agiel = () => <KameaSigil planet="saturn" text="אגיאל" />;
+```
+
+`finals` counts final forms at Aiq Bekar's 500 to 900; `ink`,
+`squareInk` and `paper` colour the sigil, the square and its ground, for
+a dark theme too. A figure is never drawn smaller than its square needs
+for the marks to show (`kameaSigilMinSize()`: 240 pixels a word on the
+smaller squares, 256 on Venus', 292 on Mercury's and 329 on the Moon's),
+and `size` larger is taken as asked. Placement keeps strokes off the
+square's rules and frame (a stroke along a rule for more than a cell
+could be in either column) and, for a word it cannot otherwise clear, tries seeded
+random starts, the same in every engine. A word that still fails is
+drawn best effort and marked `data-placement="failed"`; `kameaSigil()`
+gives the figure and `failed` for the page to say so.
+
 ## A tablet's highlights
 
 `Tablet` draws over a Watchtower's grid what `highlights` asks for, one
@@ -692,6 +720,7 @@ package's entries.
 | The Air sigil's four Yods (`enochian/Tablet`) | Regardie, *The Golden Dawn*, vol. 4 (1940), p. 307 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaf n299) describes a Tau with four Yods above it; drawn as small flames after Plate X (above), hand-placed curves in code, not traced. That the Yods stand for the 4 over the T of Dee's Sigillum Dei Aemeth (*The Equinox* I(7), Plate II, leaf n238) is our inference, not a source's. They replace two fonts' glyphs, which the repository's history keeps | 2026-11-14 |
 | The kameas (`astrology/Kamea`) | A grid drawn in code around magick-data's squares (`magick-data/astrology/kameas`), which are Agrippa's, *De occulta philosophia* (Cologne, 1533), book II, ch. 22, pp. CXLIX–CLIII (archive.org `DeOccultaPhilosophiaLoc1533`, leaves n164–n168), checked cell by cell; where the 1533 printing repeats a number (Venus, row 4: 45 for 43, which its Hebrew table gives; the Moon, row 1: 45 for 54) the square has the number that makes it magic | 2026-11-14 |
 | A sigil traced on a kamea (`sigil/kameaLayout`) | Drawn in code. The rose-cross sigil's engine (its row below), over the cells of magick-data's squares (Agrippa's, as the row above says); each letter is reduced to a cell by Aiq Bekar, the Qabalah of Nine Chambers (`magick-data/astrology/aiqBekar`), by the rule and the two worked examples in Regardie, *The Golden Dawn*, vol. 4 (Aries Press, Chicago, 1940), pp. 78–80 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaves n72–n74), from which only the method is taken | 2026-11-20 |
+| A name's sigil on its kamea (`astrology/KameaSigil`) | Drawn in code: the sigil traced on a kamea (`sigil/kameaLayout`, the row above) over the square `astrology/Kamea` draws (two rows above), a figure per word on its own square | 2026-11-21 |
 | The rose-cross sigil (`gd/RoseSigil`, `gd/RoseSigilImage`, `gd/roseSigilGeometry`, `gd/roseSigilLayout`, `sigil/types`, `sigil/planSigil`, `sigil/placeSigil`, `sigil/ink`, `sigil/SigilImage`) | Drawn in code. The rose's construction, three rings of letters at equal angles, is Gadi Cohen's original geometry, written out in `gd/roseSigilGeometry`, and the sigil is planned and placed over it by rule, our code, after the rules Regardie gives in *The Golden Dawn*, vol. 4 (Aries Press, Chicago, 1940), p. 57 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaf n51), from which only the rules are taken. The order of the letters is in two versions. The Golden Dawn's (`gd`, the default) is the figure Crowley printed in *The Equinox* I(3) (1910), Diagram 63, plate facing p. 210 (archive.org `crowley-equinox_202110`, "The Equinox Vol. 1, No. 3", leaf n220), and the colour key to the rose in "The Complete Symbol of the Tarot", *The Equinox* I(8) (1912), plate facing p. 145 (the same item, "The Equinox Vol. 1, No. 8", leaf n174). Regardie's (`regardie1939`), which exchanges Kaph and Tau, is *The Golden Dawn*, vol. 3 (Aries Press, Chicago, 1939), p. 53 and Diagram 20, p. 56 (archive.org `IsraelRegardie-TheGoldenDawn-Vol3-1939`, leaves n46 and n49) | 2026-11-19 |
 | The temple halls' art (`gd/hall`, `gd/hall/presets`, `gd/hall/tags`, `gd/hall/editor`) | Our own art, in code. The halls' layouts are facts from Regardie, *The Golden Dawn*, vol. 2 (Aries Press, Chicago, 1938), cited for each hall by page and archive.org leaf (`IsraelRegardie-TheGoldenDawn-Vol2-1938`); no drawing of his is copied. Venus' and the Moon's seals follow Agrippa's woodcuts (1533), book II, ch. 22, pp. CLI and CLIII (archive.org `DeOccultaPhilosophiaLoc1533`, leaves n166 and n168), their geometry only. Each art records its source in its `provenance` | 2026-11-17 |
 | The halls' fonts (`fonts/*`) | Subsets of Noto Serif and Frank Ruhl Libre under the SIL Open Font License 1.1, made from google/fonts at a pinned commit; [fonts/SOURCES.md](./fonts/SOURCES.md) gives the files, their hashes and how they are made | 2026-11-14 |

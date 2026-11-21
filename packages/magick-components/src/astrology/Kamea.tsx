@@ -2,9 +2,16 @@ import kameas, { type KameaPlanetId } from "magick-data/astrology/kameas";
 import planets from "magick-data/astrology/planets";
 import type { CSSProperties, ReactNode } from "react";
 import { svgCoordinate } from "../svgCoordinate.ts";
-import { KAMEA_SIDE, kameaGeometry } from "./kameaGeometry.ts";
+import {
+  KAMEA_FRAME_WIDTH,
+  KAMEA_RULE_WIDTH,
+  KAMEA_SIDE,
+  kameaGeometry,
+} from "./kameaGeometry.ts";
 
 export {
+  KAMEA_FRAME_WIDTH,
+  KAMEA_RULE_WIDTH,
   KAMEA_SIDE,
   type KameaGeometry,
   kameaGeometry,
@@ -18,8 +25,6 @@ export {
  * after stage F"): the temple hall's `kamea` art wraps `KameaFigure`.
  */
 
-const FRAME = 2;
-const RULE = 0.6;
 /** The numbers' size, as a share of a cell. */
 const NUMBER_SIZE = 0.48;
 
@@ -64,7 +69,7 @@ export function KameaFigure({
       height={KAMEA_SIDE}
       fill={paper}
       stroke={ink}
-      strokeWidth={FRAME}
+      strokeWidth={KAMEA_FRAME_WIDTH}
     />
   );
   // Only the seven: a name from untrusted input ("constructor") is none.
@@ -79,11 +84,10 @@ export function KameaFigure({
         {children}
       </>
     );
-  const { order, cell, center } = kameaGeometry(square.length);
+  const geometry = kameaGeometry(square.length);
+  const { cell, center } = geometry;
   const size = cell * NUMBER_SIZE;
-  const rules = Array.from({ length: order - 1 }, (_, i) =>
-    svgCoordinate(-half + (i + 1) * cell),
-  );
+  const rules = geometry.rules.map(svgCoordinate);
   return (
     <>
       {frame}
@@ -92,7 +96,7 @@ export function KameaFigure({
           .map((at) => `M${at},${-half}V${half}M${-half},${at}H${half}`)
           .join("")}
         stroke={ink}
-        strokeWidth={RULE}
+        strokeWidth={KAMEA_RULE_WIDTH}
         fill="none"
       />
       <g
