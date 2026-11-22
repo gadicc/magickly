@@ -43,6 +43,12 @@ import { planSigil, sigilWords } from "./planSigil.ts";
 import { SigilImage, sigilFigure } from "./SigilImage.tsx";
 import type { SigilLayout, SigilPlan, SigilProfile } from "./types.ts";
 
+// A test that draws a corpus allows 180 s. The slowest take 20–45 s alone
+// under coverage, on a performance or an efficiency core alike; with other
+// runs on the machine they reached 61 s inside a CPU grant, 72 s with two
+// coverage runs at once and 148 s with four (22 November 2026), when 60 s
+// timed out.
+
 /** The kamea's profile without some of its placement settings. */
 const without = (...keys: ("lineRun" | "fallback")[]): SigilProfile => {
   const placement = { ...KAMEA_SIGIL_PROFILE.placement } as Record<
@@ -167,13 +173,13 @@ describe("the engine on the kameas, against O1–O3", () => {
       if (problems || placed) failed[c.id] = problems || "placement";
     }
     expect(failed).toEqual(KAMEA_NAME_KNOWN_FAILURES);
-  }, 60_000);
+  }, 180_000);
 
   for (const planet of CORPUS_KAMEA_PLANETS)
     it(`draws every letter-reachable triple on ${planet}'s square`, () => {
       const texts = kameaTriples(planet);
       expect(failing(planet, texts)).toEqual(expectedFailures(planet, texts));
-    }, 60_000);
+    }, 180_000);
 
   // In two halves by length, so no one test runs long: words that fail
   // spend the fallback's budget too.
@@ -189,7 +195,7 @@ describe("the engine on the kameas, against O1–O3", () => {
           (text) => [...text].length >= lo && [...text].length <= hi,
         );
         expect(failing(planet, texts)).toEqual(expectedFailures(planet, texts));
-      }, 60_000);
+      }, 180_000);
 
   it("splits the random words into halves that cover them all", () => {
     for (const planet of CORPUS_KAMEA_PLANETS)
@@ -240,7 +246,7 @@ describe("the engine on the kameas, against O1–O3", () => {
     const [again] = placeSigilWords(plan, layout, { ...KAMEA_SIGIL_PROFILE });
     expect(again).not.toBe(rescued);
     expect(again.word).toEqual(rescued.word);
-  }, 60_000);
+  }, 180_000);
 
   it("draws with the profile's stroke, fixed against the square", () => {
     const svg = draw("זאזל", kameaLayout("saturn"));
@@ -282,5 +288,5 @@ describe("the engine on the kameas under a one-ulp nudge (O2)", () => {
         if (!result.stable) unstable.push(c.id);
       }
       expect(unstable).toEqual([]);
-    }, 60_000);
+    }, 180_000);
 });

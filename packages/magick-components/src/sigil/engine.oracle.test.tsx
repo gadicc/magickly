@@ -39,6 +39,12 @@ import { planSigil, sigilWords } from "./planSigil.ts";
 import { SigilImage } from "./SigilImage.tsx";
 import type { SigilLayout, SigilPlan } from "./types.ts";
 
+// A test that draws a corpus allows 180 s. The slowest take 20–45 s alone
+// under coverage, on a performance or an efficiency core alike; with other
+// runs on the machine they reached 61 s inside a CPU grant, 72 s with two
+// coverage runs at once and 148 s with four (22 November 2026), when 60 s
+// timed out.
+
 /** Figures the engine draws wrongly, by version and text, with the checks each fails. */
 const KNOWN_FAILURES: Readonly<Record<string, string>> = ENGINE_KNOWN_FAILURES;
 
@@ -143,7 +149,7 @@ describe("the engine against O2 and O3", () => {
       expect(failing(texts.map((text) => ({ text, version })))).toEqual(
         expectedFailures(version, texts),
       );
-    }, 60_000);
+    }, 180_000);
 
   // Words of 4 to 12 letters within the grammar's domain, from a fixed
   // seed, and four-visit words at its edge.
@@ -165,7 +171,7 @@ describe("the engine against O2 and O3", () => {
       expect(failing(random.map((text) => ({ text, version })))).toEqual(
         expectedFailures(version, random),
       );
-    }, 60_000);
+    }, 180_000);
 
   for (const version of CORPUS_ROSE_VERSIONS)
     it(`draws every A-B-A-B-A word on the ${version} rose`, () => {
@@ -179,7 +185,7 @@ describe("the engine against O2 and O3", () => {
       expect(failing(texts.map((text) => ({ text, version })))).toEqual(
         expectedFailures(version, texts),
       );
-    }, 60_000);
+    }, 180_000);
 
   it("draws every word of a collinear run, nooses in a row, on the gd rose", () => {
     const texts = collinearRunTexts();
@@ -187,7 +193,7 @@ describe("the engine against O2 and O3", () => {
     expect(failing(texts.map((text) => ({ text, version: "gd" })))).toEqual(
       expectedFailures("gd", texts),
     );
-  }, 120_000);
+  }, 180_000);
 
   it("draws words side by side, right to left, in one SVG", () => {
     const rose = roseSigilLayout();
