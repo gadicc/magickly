@@ -68,11 +68,13 @@ function Reading({ id, children }: { id: ReadingId; children: string }) {
  * Dee's Oration to God, in Dee's words or James's (`?version=james`). The
  * prayer is written out here, Dee's text in our modern spelling, so that
  * site search reads it; where James differs, a `Reading` holds the place.
- * The paragraph break is Peterson's. `notes`, the notes on James's wording
- * (`ReadingNotes`), go beside the prayer on a wide screen and below it on a
- * narrow one (oration.module.css).
+ * The paragraph break is Peterson's. The children, the notes on James's
+ * wording (`ReadingNotes`), go beside the prayer on a wide screen and below
+ * it on a narrow one (oration.module.css). They are children, not a prop,
+ * because site search reads a page's JSX children and no props
+ * (scripts/search/prose.ts).
  */
-export default function Oration({ notes }: { notes?: React.ReactNode }) {
+export default function Oration({ children }: { children?: React.ReactNode }) {
   const [version, setVersion] = useOrationVersion();
   return (
     <VersionContext.Provider value={version}>
@@ -201,9 +203,9 @@ export default function Oration({ notes }: { notes?: React.ReactNode }) {
             <a href="#oration-text-source">the text</a> below.
           </p>
         )}
-        {notes && (
+        {children && (
           <aside className={styles.notes} aria-labelledby="oration-readings">
-            {notes}
+            {children}
           </aside>
         )}
       </div>

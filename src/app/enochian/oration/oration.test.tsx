@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { act, cleanup, render, renderHook } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it } from "vitest";
+import { pageProse } from "../../../../scripts/search/prose";
 import Oration from "./Oration";
 import ReadingNotes from "./ReadingNotes";
 import {
@@ -121,7 +122,11 @@ describe("the Oration's versions", () => {
   it("keeps reading order, the rails placed by CSS alone", () => {
     // Version, heading, prayer, source, notes: a screen reader and a phone
     // read them so; a wide screen moves them into the rails.
-    const html = renderToString(<Oration notes={<ReadingNotes />} />);
+    const html = renderToString(
+      <Oration>
+        <ReadingNotes />
+      </Oration>,
+    );
     const at = (needle: string) => {
       const i = html.indexOf(needle);
       expect(i, needle).toBeGreaterThan(-1);
@@ -138,6 +143,14 @@ describe("the Oration's versions", () => {
     ].map(at);
     expect(order).toEqual([...order].sort((a, b) => a - b));
     expect(html.match(/<aside/g)).toHaveLength(1);
+  });
+
+  it("is in site search whole: the prayer and the notes on James", () => {
+    // The notes once went in as a prop, which search does not read.
+    const prose = pageProse(resolve("."), "/enochian/oration");
+    expect(prose).toContain("O Almighty");
+    expect(prose).toContain("Where James differs");
+    expect(prose).toContain("does not parse: most likely a slip in copying");
   });
 
   it("keeps no copy of James's text, only his readings", () => {

@@ -9,7 +9,9 @@ export const metadata = pageMetadata("/enochian/oration");
 const OrationPage = () => (
   <>
     <PageBreadcrumbs path="/enochian/oration" />
-    <Oration notes={<ReadingNotes />} />
+    <Oration>
+      <ReadingNotes />
+    </Oration>
     <OrationText />
   </>
 );
