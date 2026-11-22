@@ -147,6 +147,12 @@ export default async function (phase: string): Promise<NextConfig> {
       "/api/rituals/publication/backfill": [...ritualPublicationTraceFiles],
     },
     experimental: {
+      // Inside a machine-wide CPU grant (`loom slots run`), size the build's
+      // workers to it: Next counts every CPU, not the job's affinity.
+      ...(Number.isSafeInteger(Number(process.env.LOOM_SLOTS)) &&
+      Number(process.env.LOOM_SLOTS) > 0
+        ? { cpus: Number(process.env.LOOM_SLOTS) }
+        : {}),
       globalNotFound: true,
       swcPlugins: [["@lingui/swc-plugin", {}]],
     },

@@ -2,6 +2,15 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { configDefaults, defineConfig } from "vitest/config";
 
+/**
+ * Inside a machine-wide CPU grant (`loom slots run`, Loom's
+ * docs/machine-slots.md), one worker per granted CPU; elsewhere Vitest's own
+ * default. CI never has a grant, so its shards are unchanged.
+ */
+const slots = Number(process.env.LOOM_SLOTS);
+const grantedWorkers =
+  Number.isSafeInteger(slots) && slots > 0 ? { maxWorkers: slots } : {};
+
 export default defineConfig({
   resolve: {
     alias: {
@@ -17,6 +26,7 @@ export default defineConfig({
     },
   },
   test: {
+    ...grantedWorkers,
     environment: "node",
     // The data tables are generated; a test file run on its own builds them.
     globalSetup: ["./packages/magick-data/src/build.ts"],
