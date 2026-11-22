@@ -502,32 +502,45 @@ describe("source and drawing in step", { timeout: 20_000 }, () => {
   it("reads unread typing before an undo, a gesture or a copy", async () => {
     runtime.copyText.mockResolvedValue(undefined);
     render(<HallPlayground />);
-    const first = source();
-    type(first.replace("Neophyte Temple", "Mine"));
-    // Undo takes the unread edit back whole, and Redo restores it.
-    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
-    expect(source()).toBe(first);
-    fireEvent.click(screen.getByRole("button", { name: "Redo" }));
-    expect(titles()).toEqual(["Mine", "Mine"]);
-    type(source().replace('text="Mine"', 'text="Copied"'));
-    fireEvent.click(screen.getByRole("button", { name: "Copy Pug source" }));
-    await screen.findByText(
-      "Copied the Pug source. Paste it into a ritual's source.",
-    );
-    expect(runtime.copyText.mock.calls[0][0]).toContain('text="Copied"');
-    type(source().replace('text="Copied"', 'text="Typed"'));
-    // A gesture on the hall drawn before the typing would write over it:
-    // it is refused, and the typing kept.
-    const typed = source();
-    nudgeFirst();
-    expect(source()).toBe(typed);
-    expect(titles()).toEqual(["Typed", "Typed"]);
-    expect(
-      screen.getAllByText("That change was not made; the hall is as it was."),
-    ).not.toHaveLength(0);
-    // Typing that has not paused is one step: Undo takes both edits back.
-    fireEvent.click(screen.getByRole("button", { name: "Undo" }));
-    expect(source()).toContain('text="Mine"');
+    // The page's timers stand still, so the typing below never pauses into
+    // steps of its own. On real ones, a loaded machine spent the typing's
+    // 700 ms pause waiting for the copy's message, and Undo took back only
+    // the last edit (22 Nov 2026).
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    try {
+      const first = source();
+      type(first.replace("Neophyte Temple", "Mine"));
+      // Undo takes the unread edit back whole, and Redo restores it.
+      fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+      expect(source()).toBe(first);
+      fireEvent.click(screen.getByRole("button", { name: "Redo" }));
+      expect(titles()).toEqual(["Mine", "Mine"]);
+      type(source().replace('text="Mine"', 'text="Copied"'));
+      fireEvent.click(screen.getByRole("button", { name: "Copy Pug source" }));
+      // The copy's promise settles, and its message shows.
+      await act(async () => {});
+      expect(
+        screen.getByText(
+          "Copied the Pug source. Paste it into a ritual's source.",
+        ),
+      ).toBeTruthy();
+      expect(runtime.copyText.mock.calls[0][0]).toContain('text="Copied"');
+      type(source().replace('text="Copied"', 'text="Typed"'));
+      // A gesture on the hall drawn before the typing would write over it:
+      // it is refused, and the typing kept.
+      const typed = source();
+      nudgeFirst();
+      expect(source()).toBe(typed);
+      expect(titles()).toEqual(["Typed", "Typed"]);
+      expect(
+        screen.getAllByText("That change was not made; the hall is as it was."),
+      ).not.toHaveLength(0);
+      // Typing that has not paused is one step: Undo takes both edits back.
+      fireEvent.click(screen.getByRole("button", { name: "Undo" }));
+      expect(source()).toContain('text="Mine"');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("refuses a gesture made before read typing is drawn", async () => {
