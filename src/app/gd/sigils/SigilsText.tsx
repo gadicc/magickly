@@ -192,7 +192,7 @@ export default function SigilsText() {
       <p>
         <UiRichText
           message={
-            /*i18n*/ "The Golden Dawn also traced names on the planets' magic squares: the <0>kamea sigil generator</0> draws a name's sigil on the kamea of its planet."
+            /*i18n*/ "Regardie also sets out a way of tracing names on the planets' magic squares: the <0>kamea sigil generator</0> draws a name's sigil on the kamea of its planet."
           }
           components={{ 0: <Link href="/astrology/kamea/sigils" /> }}
         />

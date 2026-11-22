@@ -1,11 +1,17 @@
 import Data from "magick-data";
 import { divisions } from "magick-data/kabbalah/lenain/volume";
 import { expect } from "vitest";
+import { TABLE_NAMES, tablePath } from "@/app/open-source/data/tables";
 import { publicRitualQueryKeys } from "@/doc/publicRituals";
 import { angelSlugs } from "@/lib/angelSlugs";
 import { allAngelSigilFiles } from "@/seo/angelSigils";
 import { allHallFiles, hallPages } from "@/seo/halls";
+import { allKameaFiles } from "@/seo/kameas";
 import { PUBLIC_PAGES } from "@/seo/pages";
+import {
+  allPlanetaryNameSigilFiles,
+  planetaryNamePages,
+} from "@/seo/planetaryNames";
 
 /**
  * What every entity page's markup must hold (plan 036, "Tests").
@@ -85,6 +91,13 @@ const ROUTES = new Set<string>([
   ...allHallFiles().map(({ file }) => file.path),
   // The angels' sigil files (plan 088, S4).
   ...allAngelSigilFiles().map(({ file }) => file.path),
+  // The kameas' squares, and the planetary names' pages and sigil files
+  // (plan 093, K4).
+  ...allKameaFiles().map(({ file }) => file.path),
+  ...planetaryNamePages().map((page) => page.path),
+  ...allPlanetaryNameSigilFiles().map(({ file }) => file.path),
+  // The data tables' pages, which a name page's verdicts cite (plan 080).
+  ...TABLE_NAMES.map(tablePath),
 ]);
 
 /**

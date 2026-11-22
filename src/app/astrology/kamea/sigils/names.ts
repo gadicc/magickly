@@ -50,11 +50,5 @@ export function kameaSigilNames(planet: KameaPlanetId): KameaSigilName[] {
   return names;
 }
 
-/** Each witness as the name list labels it. */
-export const WITNESS_LABELS: Record<PlanetaryNameWitness, string> = {
-  agrippa1533: /*i18n*/ "Agrippa 1533",
-  agrippa1651: /*i18n*/ "Agrippa 1651",
-  barrett1801: /*i18n*/ "Barrett 1801",
-  crowley777: /*i18n*/ "777",
-  regardie1940: /*i18n*/ "Regardie 1940",
-};
+/** Each witness as the name list labels it, as the reference pages do. */
+export { WITNESS_LABELS } from "../witnesses";

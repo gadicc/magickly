@@ -5,8 +5,10 @@ import { allAngelSigilFiles } from "@/seo/angelSigils";
 import { componentPages } from "@/seo/components";
 import { entityPages } from "@/seo/entities";
 import { hallFiles, hallPath } from "@/seo/halls";
+import { allKameaFiles } from "@/seo/kameas";
 import { lenainPages } from "@/seo/lenain";
 import { PUBLIC_PAGES } from "@/seo/pages";
+import { allPlanetaryNameSigilFiles } from "@/seo/planetaryNames";
 import { SITE_URL } from "@/seo/site";
 
 /**
@@ -18,10 +20,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Each angel's page with its sigil's two files, the PNG first (plan 088,
   // S4), as the halls' below. Next writes them unescaped, so the URLs
   // carry no query.
-  const sigils = new Map<string, string[]>();
-  for (const { file } of allAngelSigilFiles()) {
+  // Each kamea's page with its square's two files likewise, and each
+  // planetary intelligence's and spirit's with its sigil's (plan 093, K4).
+  const images = new Map<string, string[]>();
+  for (const { file } of [
+    ...allKameaFiles(),
+    ...allAngelSigilFiles(),
+    ...allPlanetaryNameSigilFiles(),
+  ]) {
     const page = file.path.slice(0, file.path.lastIndexOf("/"));
-    sigils.set(page, [...(sigils.get(page) ?? []), SITE_URL + file.path]);
+    images.set(page, [...(images.get(page) ?? []), SITE_URL + file.path]);
   }
   return [
     ...[
@@ -32,7 +40,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       ...indexableLocalizedPaths(),
     ].map((path) => ({
       url: path === "/" ? SITE_URL : SITE_URL + path,
-      ...(sigils.has(path) && { images: sigils.get(path) }),
+      ...(images.has(path) && { images: images.get(path) }),
       ...(publicAlternates(path)
         ? {
             alternates: {

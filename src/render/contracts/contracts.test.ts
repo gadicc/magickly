@@ -505,6 +505,8 @@ describe("component image contracts", () => {
       "kamea-luna",
     );
     expect(CONTRACTS.kamea.personal).toBe(false);
+    // The kameas' pages publish the squares as static files (plan 093, K4).
+    expect(CONTRACTS.kamea.indexed).toBe(false);
     expect(() => parse("kamea", "planet=saturn&text=א")).toThrow(
       InvalidComponentImageRequest,
     );

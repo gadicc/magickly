@@ -32,6 +32,12 @@
         with no Hebrew and no numbers. In copyright where the site is read
         (plan 091): the names only, as facts.
 
+    The captions of Agrippa 1533's and 1651's intelligences and spirits
+    were read again from the leaves (n163, n164; 1651's n256) by Claude
+    (Opus 5.5) on 22 November 2026, in full, the long s and æ written s
+    and ae and the rest as printed; Barrett's are given only where the
+    first pass recorded them.
+
     Who read them, and how: Claude (Opus 5.5) read the names by eye on
     the scans on 19 November 2026, a research agent and then a reviewer,
     knowing the values to expect; the sums were computed, not read. It is
@@ -146,9 +152,16 @@
     role: "intelligence",
     name: { roman: "Agiel" },
     witnesses: {
-      agrippa1533: { roman: "Agiel", he: "אגיאל", number: 45, leaf: "n163" },
+      agrippa1533: {
+        roman: "Agiel",
+        caption: "Intelligentia Saturni",
+        he: "אגיאל",
+        number: 45,
+        leaf: "n163",
+      },
       agrippa1651: {
         roman: "Agiel",
+        caption: "The Intelligence of Saturn",
         he: "אגיאל",
         number: 45,
         leaf: "n256",
@@ -167,14 +180,14 @@
     witnesses: {
       agrippa1533: {
         roman: "Zazel",
-        caption: "Daemonium",
+        caption: "Daemonium Saturni",
         he: "זאזל",
         number: 45,
         leaf: "n163",
       },
       agrippa1651: {
         roman: "Zazel",
-        caption: "spirit",
+        caption: "The spirit of Saturn",
         he: "זאזל",
         number: 45,
         leaf: "n256",
@@ -245,12 +258,14 @@
     witnesses: {
       agrippa1533: {
         roman: "Iohphiel",
+        caption: "Intelligentia Iouis",
         he: "יהפיאל",
         number: 136,
         leaf: "n163",
       },
       agrippa1651: {
         roman: "Johphiel",
+        caption: "The Intelligence of Jupiter",
         he: "יהפיאל",
         number: 136,
         leaf: "n256",
@@ -279,12 +294,14 @@
     witnesses: {
       agrippa1533: {
         roman: "Hismaël",
+        caption: "Daemonium Iouis",
         he: "הסמאל",
         number: 136,
         leaf: "n163",
       },
       agrippa1651: {
         roman: "Hismael",
+        caption: "The spirit of Jupiter",
         he: "הסמאל",
         number: 136,
         leaf: "n256",
@@ -359,12 +376,14 @@
     witnesses: {
       agrippa1533: {
         roman: "Graphiel",
+        caption: "Intelligentia Martis",
         he: "גראפיאל",
         number: 325,
         leaf: "n163",
       },
       agrippa1651: {
         roman: "Graphiel",
+        caption: "The Intelligence of Mars",
         he: "גראפיאל",
         number: 325,
         leaf: "n256",
@@ -392,12 +411,14 @@
     witnesses: {
       agrippa1533: {
         roman: "Barzabel",
+        caption: "Daemonium Martis",
         he: "ברצאבאל",
         number: 325,
         leaf: "n163",
       },
       agrippa1651: {
         roman: "Barzabel",
+        caption: "The spirit of Mars",
         he: "ברצאבאל",
         number: 325,
         leaf: "n256",
@@ -471,12 +492,14 @@
     witnesses: {
       agrippa1533: {
         roman: "Nachiel",
+        caption: "Intelligentia Solis",
         he: "נכיאל",
         number: 111,
         leaf: "n163",
       },
       agrippa1651: {
         roman: "Nachiel",
+        caption: "The Intelligence of the Sun",
         he: "נכיאל",
         number: 111,
         leaf: "n256",
@@ -502,9 +525,16 @@
     role: "spirit",
     name: { roman: "Sorath" },
     witnesses: {
-      agrippa1533: { roman: "Sorath", he: "סורת", number: 666, leaf: "n163" },
+      agrippa1533: {
+        roman: "Sorath",
+        caption: "Daemonium Solis",
+        he: "סורת",
+        number: 666,
+        leaf: "n163",
+      },
       agrippa1651: {
         roman: "Sorath",
+        caption: "The spirit of the Sun",
         he: "סורה",
         number: 666,
         leaf: "n256",
@@ -534,8 +564,20 @@
     role: "intelligence",
     name: { roman: "Hagiel" },
     witnesses: {
-      agrippa1533: { roman: "Hagiel", he: "הגיאל", number: 49, leaf: "n163" },
-      agrippa1651: { roman: "Hagiel", he: "הגיאל", number: 49, leaf: "n256" },
+      agrippa1533: {
+        roman: "Hagiel",
+        caption: "Intelligentia Veneris",
+        he: "הגיאל",
+        number: 49,
+        leaf: "n163",
+      },
+      agrippa1651: {
+        roman: "Hagiel",
+        caption: "The Intelligence of Venus",
+        he: "הגיאל",
+        number: 49,
+        leaf: "n256",
+      },
       barrett1801: { roman: "Hagiel", he: "הגיאל", number: 49, leaf: "n182" },
       crowley777: { roman: "Hagiel", he: "הגיאל", number: 49, leaf: "n27" },
       regardie1940: { roman: "HAGIEL", leaf: "n78" },
@@ -549,6 +591,7 @@
     witnesses: {
       agrippa1533: {
         roman: "Kedemel",
+        caption: "Daemonium Veneris",
         he: "קדמאל",
         number: 157,
         leaf: "n163",
@@ -556,6 +599,7 @@
       },
       agrippa1651: {
         roman: "Kedemel",
+        caption: "The spirit of Venus",
         he: "קדמאל",
         number: 157,
         leaf: "n256",
@@ -670,8 +714,20 @@
     role: "intelligence",
     name: { roman: "Tiriel" },
     witnesses: {
-      agrippa1533: { roman: "Tiriel", he: "טיריאל", number: 260, leaf: "n163" },
-      agrippa1651: { roman: "Tiriel", he: "טיריאל", number: 260, leaf: "n256" },
+      agrippa1533: {
+        roman: "Tiriel",
+        caption: "Intelligentia Mercurij",
+        he: "טיריאל",
+        number: 260,
+        leaf: "n163",
+      },
+      agrippa1651: {
+        roman: "Tiriel",
+        caption: "The Intelligence of Mercury",
+        he: "טיריאל",
+        number: 260,
+        leaf: "n256",
+      },
       barrett1801: { roman: "Tiriel", he: "טיריאל", number: 260, leaf: "n182" },
       crowley777: {
         roman: "Tiriel",
@@ -691,12 +747,14 @@
     witnesses: {
       agrippa1533: {
         roman: "Taphthartharath",
+        caption: "Daemonium Mercurij",
         he: "תפתרתרת",
         number: 2080,
         leaf: "n163",
       },
       agrippa1651: {
         roman: "Taphthartharath",
+        caption: "The spirit of Mercury",
         he: "תפתרתדת",
         number: 2080,
         item: "bim_early-english-books-1641-1700_three-books-of-occult-ph_agrippa-henricus-cornel_1651",
@@ -757,6 +815,7 @@
       },
       agrippa1651: {
         roman: "Hasmodai",
+        caption: "the spirit of the Moon",
         he: "השמודאי",
         number: 369,
         leaf: "n256",

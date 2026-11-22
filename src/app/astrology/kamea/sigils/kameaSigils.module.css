@@ -51,26 +51,3 @@
   margin: 8px 0;
   text-align: center;
 }
-
-.reduction {
-  margin: 8px auto 16px;
-  border-collapse: collapse;
-  text-align: center;
-}
-
-.reduction caption {
-  padding-bottom: 4px;
-  white-space: nowrap;
-  color: var(--mui-palette-text-secondary);
-}
-
-.reduction th,
-.reduction td {
-  padding: 2px 12px;
-  border-bottom: 1px solid var(--mui-palette-divider);
-}
-
-.word {
-  text-align: start;
-  font-weight: 500;
-}

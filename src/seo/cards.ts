@@ -1,7 +1,11 @@
 import type { ComponentImageSlug } from "@/render/contracts";
+import { KAMEA_IMAGE_PLANETS } from "@/render/contracts/kamea";
 import type { SocialImage } from "./pages";
 
 export const CARD_SIZE = { width: 1200, height: 630 } as const;
+
+/** The framed art area on the right of a card, in card pixels. */
+export const CARD_ART_BOX = { width: 440, height: 510 } as const;
 
 /** Card art: a raster or SVG file from the repository, or a closed diagram. */
 export type CardArt =
@@ -76,6 +80,25 @@ const ART = {
   hall: { kind: "diagram", slug: "gd-hall", raster: "query" },
 } satisfies Record<string, CardArt>;
 
+/**
+ * A kamea's card art: its own square (plan 093, K4), drawn through the
+ * `kamea` contract as the page's static files are.
+ */
+export const kameaCardArt = (planet: string): CardArt => ({
+  kind: "diagram",
+  slug: "kamea",
+  query: `planet=${planet}`,
+});
+
+/** Each kamea page's prefix and its square, as the sections list them. */
+const KAMEA_SECTIONS = KAMEA_IMAGE_PLANETS.map(
+  (planet): [string, string, CardArt] => [
+    `/astrology/kamea/${planet}`,
+    "Astrology",
+    kameaCardArt(planet),
+  ],
+);
+
 /** A temple hall's card art: its own drawing (plan 062). */
 export const hallCardArt = (slug: string): CardArt => ({
   kind: "diagram",
@@ -88,6 +111,9 @@ export const hallCardArt = (slug: string): CardArt => ({
 const SECTIONS: [prefix: string, section: string, art: CardArt][] = [
   ["/astrology/planetary-hours", "Astrology", ART.planetaryHours],
   ["/astrology/kamea/sigils", "Astrology", ART.kameaSigil],
+  ...KAMEA_SECTIONS,
+  // The hub: the Sun's square, the middle of the seven.
+  ["/astrology/kamea", "Astrology", kameaCardArt("sol")],
   ["/astrology/planet", "Astrology", ART.planets],
   ["/astrology", "Astrology", ART.astrology],
   ["/books", "Books", ART.kabbalah],
@@ -119,6 +145,23 @@ const SECTIONS: [prefix: string, section: string, art: CardArt][] = [
 
 function matches(path: string, prefix: string) {
   return prefix === "/" || path === prefix || path.startsWith(`${prefix}/`);
+}
+
+/**
+ * The image request a diagram's card art is drawn from: its query, as a
+ * PNG, at twice the art box's height unless the query names its own size
+ * (`raster: "query"`), which the drawing then shrinks to the box. The
+ * request must pass its contract's `parse`, as `cards.test.ts` holds for
+ * every card.
+ */
+export function cardArtRequest(
+  art: Extract<CardArt, { kind: "diagram" }>,
+): URLSearchParams {
+  const params = new URLSearchParams(art.query);
+  params.set("fmt", "png");
+  if (art.raster !== "query")
+    params.set("height", String(CARD_ART_BOX.height * 2));
+  return params;
 }
 
 /** The card for an indexable path and its page title. */

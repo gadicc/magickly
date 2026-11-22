@@ -139,7 +139,7 @@ assembled graph, so they import magick-data's root entry, every table.
 | `sigil/ink` | The renderer: `wordInk()` and `sigilSubpaths()`, placed words as ink and path data, `sigilFrame()` and `sigilViewBox()`, and `DEFAULT_SIGIL_MARKS`, the mark sizes a profile can change |
 | `sigil/placeSigil` | `placeSigil()`, where each vertex of a plan is drawn, by rule; `placeSigilWords()`, the same with what each word still fails of placement's checks; `DEFAULT_SIGIL_PLACEMENT` |
 | `sigil/SigilImage` | `SigilImage`, a text's sigil planned, placed and drawn on any layout, with no hooks, and `sigilFigure()`, the same worked out without drawing |
-| `sigil/kameaLayout` | A planet's kamea as a sigil layout, `kameaLayout()`, its letters reduced by Aiq Bekar to cells, the Golden Dawn's rules for it, `KAMEA_SIGIL_PROFILE`, and `kameaSigilMinSize()`, the least width a figure on each square is drawn at |
+| `sigil/kameaLayout` | A planet's kamea as a sigil layout, `kameaLayout()`, its letters reduced by Aiq Bekar to cells, the rules Regardie gives for it with the rose's marks, `KAMEA_SIGIL_PROFILE`, and `kameaSigilMinSize()`, the least width a figure on each square is drawn at |
 | `gd/SevenBranchedCandlestick` | The seven-branched candlestick, with its planets, in two versions: *The Equinox*'s figure of 1909 (the default) and the modern arrangement (`CANDLESTICK_VERSIONS`, `CANDLESTICK_VERSION_NOTES`) |
 | `gd/TableOfShewbread` | The table of shewbread, with the signs and the tribes |
 | `gd/FylfotCross` | The fylfot cross of the signs and elements |
@@ -505,7 +505,8 @@ object.
 ### A sigil on a kamea
 
 `astrology/KameaSigil` traces a name on its planet's magic square by the
-Golden Dawn's method: each letter reduced by Aiq Bekar to a number the
+method Regardie sets out in *The Golden Dawn*, vol. 4 (1940), pp. 78–80:
+each letter reduced by Aiq Bekar to a number the
 square holds (`sigil/kameaLayout`), the line drawn from cell to cell
 with the rose's marks. Each word is its own figure on its own square,
 set right to left and wrapping on a narrow screen; `KameaSigilImage`

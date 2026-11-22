@@ -120,7 +120,9 @@ describe("the sections insightsUrl knows", () => {
       (page) => PUBLIC_SECTIONS.has(page.split("/")[0]) && page.includes("["),
     );
     expect(dynamic.sort()).toEqual([
+      "astrology/intelligence/[id]/page.tsx",
       "astrology/planet/[id]/page.tsx",
+      "astrology/spirit/[id]/page.tsx",
       "books/la-science-cabalistique/[division]/page.tsx",
       "gd/grade/[id]/page.tsx",
       "gd/halls/[slug]/page.tsx",

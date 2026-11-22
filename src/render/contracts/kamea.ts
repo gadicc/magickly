@@ -44,9 +44,9 @@ export interface KameaImageProps extends ImageDimensions {
 /**
  * A planet's kamea, the bare square with its numbers (plan 093, "Pages":
  * the square alone, with its own profile, inputs and pins). Not personal:
- * there are seven. Indexed for now; K4 sets `indexed: false` once each
- * kamea page publishes its square as static files, the copies to index,
- * as plan 088's S4 did for the rose sigil.
+ * there are seven. Not indexed: each kamea page publishes its square as
+ * static files, the copies to index (plan 093, K4), as plan 088's S4 did
+ * for the rose sigil.
  */
 export const kamea: ComponentImageContract<KameaImageProps> = {
   slug: "kamea",
@@ -54,6 +54,7 @@ export const kamea: ComponentImageContract<KameaImageProps> = {
   rasterDefault: { width: 1024, height: 1024 },
   keys: ["planet"],
   personal: false,
+  indexed: false,
   parse(searchParams) {
     return {
       planet: kameaPlanet(searchParams),

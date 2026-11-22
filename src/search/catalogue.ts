@@ -1,6 +1,8 @@
+import { setupI18n } from "@lingui/core";
 import { describeHall } from "magick-components/gd/hall";
 import { hallPreset } from "magick-components/gd/hall/presets";
 import Data from "magick-data";
+import kameas from "magick-data/astrology/kameas";
 import planets from "magick-data/astrology/planets";
 import zodiacs from "magick-data/astrology/zodiac";
 import dictionary from "magick-data/enochian/dictionary";
@@ -22,15 +24,52 @@ import paths from "magick-data/kabbalah/paths";
 import sephirot from "magick-data/kabbalah/sephirot";
 import angels from "magick-data/kabbalah/seventyTwoAngels";
 import { loadAngelTexts } from "magick-data/kabbalah/seventyTwoAngels/text";
+import {
+  AS_PRINTED_MESSAGE,
+  CONSTRUCTION_MESSAGES,
+  CORRECTED_MESSAGE,
+  IN_PRINT_MESSAGES,
+  KAMEA_LEDE_MESSAGE,
+  MOON_COLUMN_MESSAGE,
+  MOON_NAMES_MESSAGE,
+  SQUARE_NOTES,
+} from "@/app/astrology/kamea/kameaCopy";
+import {
+  AGRIPPA_SQUARE_LEAVES,
+  CORRECTED_PLANETS,
+  KAMEA_PLANET_ENGLISH,
+  KAMEA_PLANETS,
+  kameaConstants,
+  kameaConstruction,
+  kameaPath,
+  REGARDIE_SQUARE_LEAVES,
+} from "@/app/astrology/kamea/kameaPlanets";
+import {
+  characterOf,
+  otherSpellings,
+  planetaryNamePath,
+  planetaryNamesOf,
+  planetaryNamesWithPages,
+  planetOfName,
+  readingOf,
+} from "@/app/astrology/kamea/planetaryNames";
+import { reduceOnKamea } from "@/app/astrology/kamea/sigils/reduction";
+import {
+  PLANETARY_NAME_WITNESSES,
+  WITNESS_LABELS,
+} from "@/app/astrology/kamea/witnesses";
 import { COMPONENT_EXAMPLES, EXPLORER_COMPONENTS } from "@/explorer/components";
 import { PROPS } from "@/explorer/props";
 import { angelSlug } from "@/lib/angelSlugs";
+import { messages as englishMessages } from "@/locales/en/messages.js";
 import { GD_HALLS, gdHallTitle } from "@/render/contracts/gdHall";
 import { componentPages } from "@/seo/components";
 import { entityPages } from "@/seo/entities";
 import { hallDescription, hallPath } from "@/seo/halls";
 import { BOOK_PATH, lenainPages } from "@/seo/lenain";
 import { PUBLIC_PAGES } from "@/seo/pages";
+import { planetaryNameSigilText } from "@/seo/planetaryNames";
+import { ADAPTED_PAGES } from "./adaptedPages";
 import prose from "./generated/prose.json";
 import type { SearchCatalogue, SearchDocument, SearchSection } from "./types";
 
@@ -42,6 +81,21 @@ function words(value: unknown): string {
   if (value && typeof value === "object")
     return Object.values(value).map(words).join(" ");
   return "";
+}
+
+// The English catalog, never activated: an adapter's text reads as the
+// English page does.
+const englishI18n = setupI18n({
+  locale: "en",
+  messages: { en: englishMessages },
+});
+
+/** A message's English, its values filled in and its markup tags dropped. */
+function englishText(
+  message: string,
+  values?: Record<string, string | number>,
+): string {
+  return englishI18n._(message, values).replace(/<\/?\d+>/g, "");
 }
 
 /** Names the entity pages display through explicit public relationships. */
@@ -189,6 +243,16 @@ const ALIASES: Record<string, string[]> = {
     "Planetary hour calculator",
   ],
   "/gd/sigils": ["Rose Cross sigils", "Sigil generator"],
+  "/astrology/kamea": [
+    // The word itself, which the components explorer's Kamea page also
+    // answers: the reference outranks the component (plan 093, K4
+    // review), so the hub keeps few aliases, each passage short.
+    "Kamea",
+    "Kameas",
+    "Planetary magic squares",
+    "Planetary kamea",
+  ],
+
   "/astrology/kamea/sigils": [
     "Kamea sigils",
     "Magic square sigils",
@@ -236,7 +300,7 @@ export async function buildSearchCatalogue(): Promise<SearchCatalogue> {
     document.sections.push(...searchSections(id, title, text, href));
   }
   for (const [path, text] of Object.entries(prose))
-    add(path, "prose", "", text);
+    if (!ADAPTED_PAGES.has(path)) add(path, "prose", "", text);
 
   for (const [kind, rows, prefix] of [
     ["planet", planets, "/astrology/planet/"],
@@ -259,6 +323,167 @@ export async function buildSearchCatalogue(): Promise<SearchCatalogue> {
   for (const [id, planet] of Object.entries(planets)) {
     const text = words("keyOfSolomon" in planet ? planet.keyOfSolomon : "");
     if (text) add("/astrology/planetary-hours", id, words(planet.name), text);
+  }
+  // Each kamea's square and names, which its page builds from the data
+  // (plan 093, K4): the numbers row by row, then each name as every
+  // witness romanises and spells it, with the numbers they print.
+  for (const planet of KAMEA_PLANETS) {
+    const path = kameaPath(planet);
+    const document = documents.get(path)!;
+    document.aliases.push(
+      `Kamea of ${KAMEA_PLANET_ENGLISH[planet]}`,
+      `Magic square of ${KAMEA_PLANET_ENGLISH[planet]}`,
+      `${Data.planet[planet].name.en.en} kamea`,
+    );
+    // The page's own words for this square only: its lede, how it is
+    // made, where it is printed and how the printings differ, and on the
+    // Moon's the two paragraphs no other square has (`kameaCopy.ts`).
+    const constants = kameaConstants(planet);
+    const { page } = AGRIPPA_SQUARE_LEAVES[planet];
+    add(
+      path,
+      "square",
+      "The square",
+      [
+        englishText(KAMEA_LEDE_MESSAGE, { ...constants }),
+        kameas[planet].map((row) => row.join(" ")).join(", "),
+      ].join(" "),
+    );
+    add(
+      path,
+      "construction",
+      "How the square is made",
+      englishText(CONSTRUCTION_MESSAGES[kameaConstruction(planet)], {
+        cells: constants.cells,
+        complement: constants.cells + 1,
+      }),
+    );
+    add(
+      path,
+      "in-print",
+      "The square in print",
+      [
+        englishText(IN_PRINT_MESSAGES[planet], {
+          page,
+          regardiePage: REGARDIE_SQUARE_LEAVES[planet] + 6,
+        }),
+        englishText(
+          CORRECTED_PLANETS.includes(planet)
+            ? CORRECTED_MESSAGE
+            : AS_PRINTED_MESSAGE,
+        ),
+        ...SQUARE_NOTES[planet].map((note) => englishText(note.message)),
+      ].join(" "),
+      `${path}#in-print`,
+    );
+    if (planet === "luna") {
+      add(
+        path,
+        "moon-names",
+        "The names of the square",
+        englishText(MOON_NAMES_MESSAGE),
+      );
+      add(
+        path,
+        "column",
+        "The Moon's column",
+        englishText(MOON_COLUMN_MESSAGE),
+        `${path}#column`,
+      );
+    }
+    add(
+      path,
+      "names",
+      "The names of the square",
+      planetaryNamesOf(planet)
+        .map((name) =>
+          [
+            name.name.roman,
+            ...PLANETARY_NAME_WITNESSES.map((witness) => {
+              const reading = readingOf(name, witness);
+              return words([
+                reading?.roman,
+                reading?.caption,
+                reading?.he,
+                reading?.number,
+              ]);
+            }),
+          ].join(" "),
+        )
+        .join(". "),
+    );
+  }
+  // Each planetary intelligence's and spirit's page (plan 093, K4), which
+  // its page builds from the data: the name as every witness romanises
+  // and spells it, the readings with their numbers, the sigil's reduction
+  // (letter, number, cell) and our verdicts on Agrippa's character and
+  // Regardie's redrawing of it.
+  for (const name of planetaryNamesWithPages()) {
+    const path = planetaryNamePath(name) as string;
+    const planet = planetOfName(name);
+    const readings = PLANETARY_NAME_WITNESSES.flatMap((witness) => {
+      const reading = readingOf(name, witness);
+      return reading ? [{ witness, reading }] : [];
+    });
+    documents
+      .get(path)!
+      .aliases.push(
+        ...new Set(
+          [
+            name.name.roman,
+            `Sigil of ${name.name.roman}`,
+            ...readings.flatMap(({ reading }) => [reading.roman, reading.he]),
+          ].filter((alias): alias is string => Boolean(alias)),
+        ),
+      );
+    add(
+      path,
+      "witnesses",
+      "The name in each witness",
+      readings
+        .map(({ witness, reading }) =>
+          words([
+            WITNESS_LABELS[witness],
+            reading.roman,
+            reading.caption,
+            reading.he,
+            reading.number,
+            reading.note,
+          ]),
+        )
+        .join(". "),
+    );
+    add(
+      path,
+      "sigil",
+      "The sigil",
+      [planetaryNameSigilText(name), ...otherSpellings(name).map((o) => o.he)]
+        .map((text) =>
+          reduceOnKamea(planet, text, false)
+            .flat()
+            .map((letter) => `${letter.letter} ${letter.value} ${letter.cell}`)
+            .join(", "),
+        )
+        .join(". "),
+    );
+    add(
+      path,
+      "character",
+      "Agrippa's character",
+      (["agrippa1533", "regardie1940"] as const)
+        .map((witness) => {
+          const character = characterOf(name, witness);
+          return character
+            ? words([
+                character.spelling,
+                character.departures,
+                character.marks,
+                character.note,
+              ])
+            : "";
+        })
+        .join(" "),
+    );
   }
   for (const [id, zodiac] of Object.entries(zodiacs))
     add("/astrology/zodiac", id, words(zodiac.name), words(zodiac));

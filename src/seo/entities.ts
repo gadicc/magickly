@@ -7,6 +7,7 @@ import { dayOf } from "@/lib/planetDays";
 import { planetName } from "@/lib/planetName";
 import { RWSName } from "@/tarot";
 import type { SeoPage } from "./pages";
+import { planetaryNamePages } from "./planetaryNames";
 
 /** An indexable page generated from one row of the data set. */
 export interface EntityPage extends SeoPage {
@@ -210,6 +211,8 @@ export function entityPages(): EntityPage[] {
     ...Object.keys(Data.sephirah).map(sephirahPage),
     ...Object.keys(Data.treeOfLifePath).map(pathPage),
     ...angelSlugs().map(angelPage),
+    // The intelligences' and spirits' sigils (plan 093, decision 8).
+    ...planetaryNamePages(),
   ].filter((page): page is EntityPage => page !== null);
 }
 

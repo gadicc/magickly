@@ -26,6 +26,12 @@ import {
   Trail,
 } from "@/ui/entity";
 import Link from "@/ui/Link";
+import {
+  isKameaPlanet,
+  KAMEA_PLANET_ENGLISH,
+  kameaPath,
+} from "../../kamea/kameaPlanets";
+import { planetaryNamePath } from "../../kamea/planetaryNames";
 import { Intelligence, IntelligenceNotes } from "../Intelligence";
 import styles from "./planet.module.css";
 
@@ -284,13 +290,19 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
           </Row>
           <Row label="Intelligence">
             {planet.intelligence ? (
-              <Intelligence planet={planet} hebrew />
+              <Intelligence planet={planet} hebrew linked />
             ) : null}
           </Row>
           <Row label="Spirit">
             {planet.spiritId ? (
               <>
-                {planet.spirit?.name.roman}{" "}
+                {planet.spirit && planetaryNamePath(planet.spirit) ? (
+                  <Link href={planetaryNamePath(planet.spirit) as string}>
+                    {planet.spirit.name.roman}
+                  </Link>
+                ) : (
+                  planet.spirit?.name.roman
+                )}{" "}
                 {/* The component spreads its other props into its style. The
                     sigil is decoration beside the name it draws. */}
                 <Ink drawing="spirit">
@@ -306,6 +318,15 @@ export default function PlanetPage({ planet }: { planet: PlanetRow }) {
                 </Ink>
                 <SigilSource spiritId={planet.spiritId} />
               </>
+            ) : null}
+          </Row>
+          {/* The planet's magic square, for the seven that have one
+              (plan 093, K4). */}
+          <Row label="Kamea">
+            {isKameaPlanet(planet.id) ? (
+              <Link href={kameaPath(planet.id)}>
+                Kamea of {KAMEA_PLANET_ENGLISH[planet.id]}
+              </Link>
             ) : null}
           </Row>
           <Row label="Rules">

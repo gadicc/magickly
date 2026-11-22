@@ -8,7 +8,7 @@ msgstr ""
 "Language: en\n"
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/names.ts
+#: src/app/astrology/kamea/witnesses.ts
 msgid "777"
 msgstr "777"
 
@@ -284,6 +284,59 @@ msgstr "Admin"
 #: src/app/pathnames.ts
 msgid "Astrology"
 msgstr "Astrology"
+
+#. js-lingui-explicit-id
+#: src/app/pathnames.ts
+msgid "Kameas"
+msgstr "Kameas"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+#: src/app/pathnames.ts
+msgid "Kamea of Saturn"
+msgstr "Kamea of Saturn"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+#: src/app/pathnames.ts
+msgid "Kamea of Jupiter"
+msgstr "Kamea of Jupiter"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+#: src/app/pathnames.ts
+msgid "Kamea of Mars"
+msgstr "Kamea of Mars"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+#: src/app/pathnames.ts
+msgid "Kamea of the Sun"
+msgstr "Kamea of the Sun"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+#: src/app/pathnames.ts
+msgid "Kamea of Venus"
+msgstr "Kamea of Venus"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+#: src/app/pathnames.ts
+msgid "Kamea of Mercury"
+msgstr "Kamea of Mercury"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+#: src/app/pathnames.ts
+msgid "Kamea of the Moon"
+msgstr "Kamea of the Moon"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+#: src/app/pathnames.ts
+msgid "Kamea Sigil Generator"
+msgstr "Kamea Sigil Generator"
 
 #. js-lingui-explicit-id
 #: src/app/pathnames.ts
@@ -1325,11 +1378,15 @@ msgid "The sigil traces the letters of {name}'s Hebrew name through the Golden D
 msgstr "The sigil traces the letters of {name}'s Hebrew name through the Golden Dawn's Rose Cross, by the Order's rules. <0>Watch it drawn</0> in the sigil generator, or draw another name there."
 
 #. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaFigures.tsx
+#: src/app/astrology/kamea/NamePage.tsx
 #: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
 msgid "Download PNG"
 msgstr "Download PNG"
 
 #. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaFigures.tsx
+#: src/app/astrology/kamea/NamePage.tsx
 #: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
 msgid "Download SVG"
 msgstr "Download SVG"
@@ -1496,8 +1553,8 @@ msgstr "Every one of the <0>72 angels' pages</0> shows the sigil of its name, wi
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/SigilsText.tsx
-msgid "The Golden Dawn also traced names on the planets' magic squares: the <0>kamea sigil generator</0> draws a name's sigil on the kamea of its planet."
-msgstr "The Golden Dawn also traced names on the planets' magic squares: the <0>kamea sigil generator</0> draws a name's sigil on the kamea of its planet."
+msgid "Regardie also sets out a way of tracing names on the planets' magic squares: the <0>kamea sigil generator</0> draws a name's sigil on the kamea of its planet."
+msgstr "Regardie also sets out a way of tracing names on the planets' magic squares: the <0>kamea sigil generator</0> draws a name's sigil on the kamea of its planet."
 
 #. js-lingui-explicit-id
 #: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
@@ -2455,64 +2512,748 @@ msgid "Lenain died in 1877 and Papus in 1916, so both texts are in the public do
 msgstr "Lenain died in 1877 and Papus in 1916, so both texts are in the public domain. This reading of them is CC BY 4.0."
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/names.ts
-msgid "Agrippa 1533"
-msgstr "Agrippa 1533"
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "In Agrippa's square the number in row 1, column 2 is damaged in the print; his Hebrew table beside it has 24, which the square needs."
+msgstr "In Agrippa's square the number in row 1, column 2 is damaged in the print; his Hebrew table beside it has 24, which the square needs."
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/names.ts
-msgid "Agrippa 1651"
-msgstr "Agrippa 1651"
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "Agrippa's square prints 45 in row 4, column 5, where his Hebrew table has 43, which the square needs; the square here has 43."
+msgstr "Agrippa's square prints 45 in row 4, column 5, where his Hebrew table has 43, which the square needs; the square here has 43."
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/names.ts
-msgid "Barrett 1801"
-msgstr "Barrett 1801"
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "Regardie's volume 4 prints 43 in row 2, column 3, where Agrippa has 48, so that 43 stands in the square twice."
+msgstr "Regardie's volume 4 prints 43 in row 2, column 3, where Agrippa has 48, so that 43 stands in the square twice."
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/names.ts
-msgid "Regardie 1940"
-msgstr "Regardie 1940"
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "Agrippa's Hebrew table leaves the cell of 10 blank."
+msgstr "Agrippa's Hebrew table leaves the cell of 10 blank."
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigilHeading.tsx
-msgid "Kamea Sigil Generator"
-msgstr "Kamea Sigil Generator"
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "Regardie's volume 4 swaps three pairs of numbers: 45 and 48 in row 3, and 35 and 38, and 25 and 28, in row 4. Its rows still add up to 260; its columns do not. None of the swapped cells is one that Taphthartharath's sigil passes through."
+msgstr "Regardie's volume 4 swaps three pairs of numbers: 45 and 48 in row 3, and 35 and 38, and 25 and 28, in row 4. Its rows still add up to 260; its columns do not. None of the swapped cells is one that Taphthartharath's sigil passes through."
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "Agrippa prints 45 in row 1, column 8, in both his tables, where the square needs 54; the square here has 54."
+msgstr "Agrippa prints 45 in row 1, column 8, in both his tables, where the square needs 54; the square here has 54."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "Regardie's volume 4 prints 54 there, as the square needs."
+msgstr "Regardie's volume 4 prints 54 there, as the square needs."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "A magic square of {order} by {order}: the numbers 1 to {cells}, set so that every row, every column and both diagonals add up to {line}, and all of them together to {total}."
+msgstr "A magic square of {order} by {order}: the numbers 1 to {cells}, set so that every row, every column and both diagonals add up to {line}, and all of them together to {total}."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "Agrippa's square is the one this rule makes: 1 goes in the cell just below the centre, and each next number one cell down and one to the right, wrapping round at the edges, or two cells down where that cell is taken."
+msgstr "Agrippa's square is the one this rule makes: 1 goes in the cell just below the centre, and each next number one cell down and one to the right, wrapping round at the edges, or two cells down where that cell is taken."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "Agrippa's square is the one this rule makes: write the numbers 1 to {cells} in order, row by row; exchange every number on a diagonal of each four-by-four block for {complement} less that number; then read the rows from the bottom up."
+msgstr "Agrippa's square is the one this rule makes: write the numbers 1 to {cells} in order, row by row; exchange every number on a diagonal of each four-by-four block for {complement} less that number; then read the rows from the bottom up."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "No rule as simple as the odd squares' or those of four and eight makes a square of six, and the square here is Agrippa's as he prints it."
+msgstr "No rule as simple as the odd squares' or those of four and eight makes a square of six, and the square here is Agrippa's as he prints it."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "Agrippa prints the square in <0>De occulta philosophia</0> (Cologne, 1533), book II, chapter 22, on <1>page {page}</1>, in numbers and again in Hebrew letters, with the planet's seal and the characters of its intelligence and its spirit. Regardie's plates in <2>The Golden Dawn</2>, volume 4 (1940), draw it again, on <3>page {regardiePage}</3>."
+msgstr "Agrippa prints the square in <0>De occulta philosophia</0> (Cologne, 1533), book II, chapter 22, on <1>page {page}</1>, in numbers and again in Hebrew letters, with the planet's seal and the characters of its intelligence and its spirit. Regardie's plates in <2>The Golden Dawn</2>, volume 4 (1940), draw it again, on <3>page {regardiePage}</3>."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "Agrippa prints the square in <0>De occulta philosophia</0> (Cologne, 1533), book II, chapter 22, on <1>page {page}</1>, in numbers and again in Hebrew letters, with the planet's seal and the characters of its intelligence, its spirit and its intelligences, the Bne Seraphim. Regardie's plates in <2>The Golden Dawn</2>, volume 4 (1940), draw it again, on <3>page {regardiePage}</3>."
+msgstr "Agrippa prints the square in <0>De occulta philosophia</0> (Cologne, 1533), book II, chapter 22, on <1>page {page}</1>, in numbers and again in Hebrew letters, with the planet's seal and the characters of its intelligence, its spirit and its intelligences, the Bne Seraphim. Regardie's plates in <2>The Golden Dawn</2>, volume 4 (1940), draw it again, on <3>page {regardiePage}</3>."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "Agrippa prints the square in <0>De occulta philosophia</0> (Cologne, 1533), book II, chapter 22, on <1>page {page}</1>, in numbers and again in Hebrew letters, with the planet's seal and the characters of its spirit, its spirit of spirits and its intelligence of intelligences. Regardie's plates in <2>The Golden Dawn</2>, volume 4 (1940), draw it again, on <3>page {regardiePage}</3>."
+msgstr "Agrippa prints the square in <0>De occulta philosophia</0> (Cologne, 1533), book II, chapter 22, on <1>page {page}</1>, in numbers and again in Hebrew letters, with the planet's seal and the characters of its spirit, its spirit of spirits and its intelligence of intelligences. Regardie's plates in <2>The Golden Dawn</2>, volume 4 (1940), draw it again, on <3>page {regardiePage}</3>."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "The square here is Agrippa's as the 1533 printing gives it."
+msgstr "The square here is Agrippa's as the 1533 printing gives it."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "The square here is Agrippa's with the slip of the 1533 printing noted below corrected; whether it is the author's or the printer's, the evidence read does not settle."
+msgstr "The square here is Agrippa's with the slip of the 1533 printing noted below corrected; whether it is the author's or the printer's, the evidence read does not settle."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "Agrippa gives the Moon no single intelligence. In its place he names an intelligence of intelligences, and beside its spirit a spirit of spirits, both numbered 3321, the sum of the square, which their letters reach only with the final letters counted at 500 to 900. Shelachel, the Moon's intelligence in present-day sources, comes last."
+msgstr "Agrippa gives the Moon no single intelligence. In its place he names an intelligence of intelligences, and beside its spirit a spirit of spirits, both numbered 3321, the sum of the square, which their letters reach only with the final letters counted at 500 to 900. Shelachel, the Moon's intelligence in present-day sources, comes last."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaCopy.ts
+msgid "On the Moon's square the tens from 10 to 80 stand in one column, the fourth, with 9 among them. The method Regardie sets out keeps a letter's number where the square has it and takes a larger one down to its tens or units, so every letter from Yod to Tav falls in that column: Yod to Peh keep their tens, Tzadi's 90 becomes 9, and Qof to Tav become 10 to 40. A long name's sigil on this square runs up and down that one column, and its marks are hard to set clear of each other, as the <0>generator</0> shows. This is the method's doing, not a fault of the square."
+msgstr "On the Moon's square the tens from 10 to 80 stand in one column, the fourth, with 9 among them. The method Regardie sets out keeps a letter's number where the square has it and takes a larger one down to its tens or units, so every letter from Yod to Tav falls in that column: Yod to Peh keep their tens, Tzadi's 90 becomes 9, and Qof to Tav become 10 to 40. A long name's sigil on this square runs up and down that one column, and its marks are hard to set clear of each other, as the <0>generator</0> shows. This is the method's doing, not a fault of the square."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
 msgid "Saturn"
 msgstr "Saturn"
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+#: src/app/astrology/kamea/kameaPlanets.ts
 msgid "Jupiter"
 msgstr "Jupiter"
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+#: src/app/astrology/kamea/kameaPlanets.ts
 msgid "Mars"
 msgstr "Mars"
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+#: src/app/astrology/kamea/kameaPlanets.ts
 msgid "The Sun"
 msgstr "The Sun"
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+#: src/app/astrology/kamea/kameaPlanets.ts
 msgid "Venus"
 msgstr "Venus"
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+#: src/app/astrology/kamea/kameaPlanets.ts
 msgid "Mercury"
 msgstr "Mercury"
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+#: src/app/astrology/kamea/kameaPlanets.ts
 msgid "The Moon"
 msgstr "The Moon"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+msgid "{square}, the magic square of {order} by {order}: the numbers 1 to {cells}, every row, column and diagonal adding up to {line}, and the whole to {total}, as Agrippa prints it"
+msgstr "{square}, the magic square of {order} by {order}: the numbers 1 to {cells}, every row, column and diagonal adding up to {line}, and the whole to {total}, as Agrippa prints it"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+msgid "{square}, the magic square of {order} by {order}: the numbers 1 to {cells}, every row, column and diagonal adding up to {line}, and the whole to {total}, as Agrippa prints it with one misprinted number corrected"
+msgstr "{square}, the magic square of {order} by {order}: the numbers 1 to {cells}, every row, column and diagonal adding up to {line}, and the whole to {total}, as Agrippa prints it with one misprinted number corrected"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+msgid "The sigil of {name}, {hebrew}, traced on the {square} by the method Regardie sets out"
+msgstr "The sigil of {name}, {hebrew}, traced on the {square} by the method Regardie sets out"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+msgid "the square's order"
+msgstr "the square's order"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+msgid "the square's count of cells"
+msgstr "the square's count of cells"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+msgid "the sum of a line"
+msgstr "the sum of a line"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/kameaPlanets.ts
+msgid "the sum of the square"
+msgstr "the sum of the square"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/planetaryNames.ts
+msgid "Divine name"
+msgstr "Divine name"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/planetaryNames.ts
+msgid "Intelligence"
+msgstr "Intelligence"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/planetaryNames.ts
+msgid "Intelligences"
+msgstr "Intelligences"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/planetaryNames.ts
+msgid "Spirit"
+msgstr "Spirit"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/planetaryNames.ts
+msgid "Intelligence of intelligences"
+msgstr "Intelligence of intelligences"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/planetaryNames.ts
+msgid "Spirit of spirits"
+msgstr "Spirit of spirits"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/witnesses.ts
+msgid "Agrippa 1533"
+msgstr "Agrippa 1533"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/witnesses.ts
+msgid "Agrippa 1651"
+msgstr "Agrippa 1651"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/witnesses.ts
+msgid "Barrett 1801"
+msgstr "Barrett 1801"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/witnesses.ts
+msgid "Regardie 1940"
+msgstr "Regardie 1940"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaFigures.tsx
+msgid "Seal of Saturn"
+msgstr "Seal of Saturn"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaFigures.tsx
+msgid "Seal of Jupiter"
+msgstr "Seal of Jupiter"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaFigures.tsx
+msgid "Seal of Mars"
+msgstr "Seal of Mars"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaFigures.tsx
+msgid "Seal of the Sun"
+msgstr "Seal of the Sun"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaFigures.tsx
+msgid "Seal of Venus"
+msgstr "Seal of Venus"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaFigures.tsx
+msgid "Seal of Mercury"
+msgstr "Seal of Mercury"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaFigures.tsx
+msgid "Seal of the Moon"
+msgstr "Seal of the Moon"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaFigures.tsx
+msgid "The seven kameas"
+msgstr "The seven kameas"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaHub.tsx
+msgid "The seven planetary squares"
+msgstr "The seven planetary squares"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaHub.tsx
+msgid "A kamea is a planet's magic square: the numbers from 1 to the square of its order, set so that every row, every column and both diagonals add up to the same sum. Seven planets have one, from Saturn's three by three to the Moon's nine by nine. Agrippa says that the magi call them the planets' sacred tables (<0>page CXLV</0>), and tells what each is said to do when it is engraved in metal, Saturn's on a plate of lead (<1>page CXLVI</1>) and the Sun's on one of gold (<2>page CXLVII</2>)."
+msgstr "A kamea is a planet's magic square: the numbers from 1 to the square of its order, set so that every row, every column and both diagonals add up to the same sum. Seven planets have one, from Saturn's three by three to the Moon's nine by nine. Agrippa says that the magi call them the planets' sacred tables (<0>page CXLV</0>), and tells what each is said to do when it is engraved in metal, Saturn's on a plate of lead (<1>page CXLVI</1>) and the Sun's on one of gold (<2>page CXLVII</2>)."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaHub.tsx
+msgid "{order} by {order}, each line {line}, the whole {total}"
+msgstr "{order} by {order}, each line {line}, the whole {total}"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaHub.tsx
+msgid "Each square has four numbers of its own: its order, its count of cells, which is also its highest number, the sum of a line and the sum of the whole. Saturn's are 3, 9, 15 and 45. The names of the planet's angels and spirits are made to add up to them, letter by letter, and each square's page lists its names with every printing's reading of them."
+msgstr "Each square has four numbers of its own: its order, its count of cells, which is also its highest number, the sum of a line and the sum of the whole. Saturn's are 3, 9, 15 and 45. The names of the planet's angels and spirits are made to add up to them, letter by letter, and each square's page lists its names with every printing's reading of them."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaHub.tsx
+msgid "Agrippa's squares"
+msgstr "Agrippa's squares"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaHub.tsx
+msgid "Heinrich Cornelius Agrippa printed the seven squares in <0>De occulta philosophia</0> (Cologne, 1533), book II, chapter 22, each in numbers and again in Hebrew letters, with the planet's seal and the characters of the names he gives it: its intelligence and spirit, and Venus' intelligences too; the Moon has a spirit, a spirit of spirits and an intelligence of intelligences. Before them he lists, planet by planet, the divine names, intelligences and spirits whose letters add up to the squares' numbers: on <1>page CXLVIII</1>, and the Moon's on <2>page CXLIX</2>. The English translation of 1651 and Barrett's <3>The Magus</3> (1801) reprint them. The squares on this site are Agrippa's, with two slips of the 1533 printing corrected, a number each in Venus' and the Moon's; whether they are the author's or the printer's, the evidence read does not settle."
+msgstr "Heinrich Cornelius Agrippa printed the seven squares in <0>De occulta philosophia</0> (Cologne, 1533), book II, chapter 22, each in numbers and again in Hebrew letters, with the planet's seal and the characters of the names he gives it: its intelligence and spirit, and Venus' intelligences too; the Moon has a spirit, a spirit of spirits and an intelligence of intelligences. Before them he lists, planet by planet, the divine names, intelligences and spirits whose letters add up to the squares' numbers: on <1>page CXLVIII</1>, and the Moon's on <2>page CXLIX</2>. The English translation of 1651 and Barrett's <3>The Magus</3> (1801) reprint them. The squares on this site are Agrippa's, with two slips of the 1533 printing corrected, a number each in Venus' and the Moon's; whether they are the author's or the printer's, the evidence read does not settle."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaHub.tsx
+msgid "The Golden Dawn"
+msgstr "The Golden Dawn"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaHub.tsx
+msgid "The Hermetic Order of the Golden Dawn took the squares into its grades: the Moon's is drawn in the hall of the <0>second part of the Theoricus grade</0> and Venus' in that of the <1>fourth part of the Philosophus grade</1>. Israel Regardie, in <2>The Golden Dawn</2> (volume 4, Chicago, 1940), writes that while he was a member the Order no longer knew how to form sigils from the squares, that its Chiefs had taken the squares, and Aiq Bekar with them, out of its knowledge lectures, and that the method and the right form of the squares were to be had in books and manuscripts in the British Museum (<4>pages 78 and 79</4>). He sets the method out himself, and his plates give the seven squares with the seals of the planets and of their intelligences and spirits (<5>pages 81 to 86</5>). His forms of the names are often nearer to those of Crowley's <3>777</3> than to Agrippa's: Yophiel for Agrippa's Iohphiel, Bartzabel for his Barzabel."
+msgstr "The Hermetic Order of the Golden Dawn took the squares into its grades: the Moon's is drawn in the hall of the <0>second part of the Theoricus grade</0> and Venus' in that of the <1>fourth part of the Philosophus grade</1>. Israel Regardie, in <2>The Golden Dawn</2> (volume 4, Chicago, 1940), writes that while he was a member the Order no longer knew how to form sigils from the squares, that its Chiefs had taken the squares, and Aiq Bekar with them, out of its knowledge lectures, and that the method and the right form of the squares were to be had in books and manuscripts in the British Museum (<4>pages 78 and 79</4>). He sets the method out himself, and his plates give the seven squares with the seals of the planets and of their intelligences and spirits (<5>pages 81 to 86</5>). His forms of the names are often nearer to those of Crowley's <3>777</3> than to Agrippa's: Yophiel for Agrippa's Iohphiel, Bartzabel for his Barzabel."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaHub.tsx
+msgid "Tracing a name on a square"
+msgstr "Tracing a name on a square"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaHub.tsx
+msgid "In the method Regardie sets out, each letter of a name is counted at its number and found on the square. A number the square does not have is taken down to its tens or its units, as Aiq Bekar, the Qabalah of nine chambers, groups the letters: on Saturn's square of nine, Lamed's 30 becomes 3. A line drawn through the cells in the order of the letters, from a small circle at the first, is the name's sigil. He gives it on <0>pages 78 to 80</0> of volume 4, with two worked examples: Zazel on Saturn's square, and a second of his own, Taphthartharath on Mercury's."
+msgstr "In the method Regardie sets out, each letter of a name is counted at its number and found on the square. A number the square does not have is taken down to its tens or its units, as Aiq Bekar, the Qabalah of nine chambers, groups the letters: on Saturn's square of nine, Lamed's 30 becomes 3. A line drawn through the cells in the order of the letters, from a small circle at the first, is the name's sigil. He gives it on <0>pages 78 to 80</0> of volume 4, with two worked examples: Zazel on Saturn's square, and a second of his own, Taphthartharath on Mercury's."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaHub.tsx
+msgid "The <0>kamea sigil generator</0> traces any Hebrew name on any of the seven squares, and says what it chooses where the method is silent."
+msgstr "The <0>kamea sigil generator</0> traces any Hebrew name on any of the seven squares, and says what it chooses where the method is silent."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "Order"
+msgstr "Order"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "Numbers"
+msgstr "Numbers"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "Each line"
+msgstr "Each line"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "The whole square"
+msgstr "The whole square"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "How the square is made"
+msgstr "How the square is made"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "The square in print"
+msgstr "The square in print"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "page {page}"
+msgstr "page {page}"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "The names of the square"
+msgstr "The names of the square"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "Agrippa gives each square names whose letters add up to one of its numbers: its order, its count of cells, the sum of a line or the sum of the whole. The divine names come first, then the intelligence and the spirit. The Hebrew is Agrippa's of 1533, the spelling this site traces; under each name is every witness's reading, linked to its page, with its own spelling where it differs. A name with a page of its own has its sigil there, traced on this square."
+msgstr "Agrippa gives each square names whose letters add up to one of its numbers: its order, its count of cells, the sum of a line or the sum of the whole. The divine names come first, then the intelligence and the spirit. The Hebrew is Agrippa's of 1533, the spelling this site traces; under each name is every witness's reading, linked to its page, with its own spelling where it differs. A name with a page of its own has its sigil there, traced on this square."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "The seal"
+msgstr "The seal"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "The planet's seal, after Agrippa's woodcut on <0>page {page}</0> of the 1533 printing: our own drawing of its lines, not a copy of the print. Regardie describes a planet's seal as a figure drawn so as to touch each of the square's numbers (<1>page 80</1>)."
+msgstr "The planet's seal, after Agrippa's woodcut on <0>page {page}</0> of the 1533 printing: our own drawing of its lines, not a copy of the print. Regardie describes a planet's seal as a figure drawn so as to touch each of the square's numbers (<1>page 80</1>)."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "The Moon's column"
+msgstr "The Moon's column"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "See also"
+msgstr "See also"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The planet's correspondences"
+msgstr "The planet's correspondences"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "The temple hall that has this square in it:"
+msgstr "The temple hall that has this square in it:"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+msgid "Trace any Hebrew name on this square in the <0>kamea sigil generator</0>, by the method Regardie sets out in <2>The Golden Dawn</2>, volume 4, on <1>pages 78 to 80</1>."
+msgstr "Trace any Hebrew name on this square in the <0>kamea sigil generator</0>, by the method Regardie sets out in <2>The Golden Dawn</2>, volume 4, on <1>pages 78 to 80</1>."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/KameaPage.tsx
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "All seven kameas"
+msgstr "All seven kameas"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The intelligence of Saturn."
+msgstr "The intelligence of Saturn."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The spirit of Saturn."
+msgstr "The spirit of Saturn."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The intelligence of Jupiter."
+msgstr "The intelligence of Jupiter."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The spirit of Jupiter."
+msgstr "The spirit of Jupiter."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The intelligence of Mars."
+msgstr "The intelligence of Mars."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The spirit of Mars."
+msgstr "The spirit of Mars."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The intelligence of the Sun."
+msgstr "The intelligence of the Sun."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The spirit of the Sun."
+msgstr "The spirit of the Sun."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The intelligence of Venus."
+msgstr "The intelligence of Venus."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The spirit of Venus."
+msgstr "The spirit of Venus."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The intelligences of Venus, in Agrippa's plural."
+msgstr "The intelligences of Venus, in Agrippa's plural."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The intelligence of Mercury."
+msgstr "The intelligence of Mercury."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The spirit of Mercury."
+msgstr "The spirit of Mercury."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The spirit of the Moon."
+msgstr "The spirit of the Moon."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The spirit of spirits of the Moon."
+msgstr "The spirit of spirits of the Moon."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The intelligence of intelligences of the Moon, which Agrippa names where the other planets have an intelligence."
+msgstr "The intelligence of intelligences of the Moon, which Agrippa names where the other planets have an intelligence."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "That trace counts the final letters at 500 to 900."
+msgstr "That trace counts the final letters at 500 to 900."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "That trace counts the final letters at 500 to 900 in some words and at their ordinary values in others."
+msgstr "That trace counts the final letters at 500 to 900 in some words and at their ordinary values in others."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Our reading: it is the trace of <0>{spelling}</0> on the square, drawn freely."
+msgstr "Our reading: it is the trace of <0>{spelling}</0> on the square, drawn freely."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Our reading: it is the trace of <0>{spelling}</0> on the square, in part."
+msgstr "Our reading: it is the trace of <0>{spelling}</0> on the square, in part."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Our reading: it is not recognisably the trace of any spelling; the nearest is <0>{spelling}</0>."
+msgstr "Our reading: it is not recognisably the trace of any spelling; the nearest is <0>{spelling}</0>."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The two judges differed, one finding a match and the other a partial one."
+msgstr "The two judges differed, one finding a match and the other a partial one."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The two judges differed, one finding no trace and the other a partial one."
+msgstr "The two judges differed, one finding no trace and the other a partial one."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The two judges differed, one finding a match and the other no trace."
+msgstr "The two judges differed, one finding a match and the other no trace."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+msgid "This sigil could not be drawn so that every mark stands clear of the others and of the square's lines; it is drawn as well as it can be, and may be hard to read."
+msgstr "This sigil could not be drawn so that every mark stands clear of the others and of the square's lines; it is drawn as well as it can be, and may be hard to read."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Where it departs from that trace:"
+msgstr "Where it departs from that trace:"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Its turns sit on the cells {cells}."
+msgstr "Its turns sit on the cells {cells}."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Its marks:"
+msgstr "Its marks:"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+#: src/app/astrology/kamea/NamesTable.tsx
+msgid "Name"
+msgstr "Name"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Agrippa 1533: {name}"
+msgstr "Agrippa 1533: {name}"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+#: src/app/astrology/kamea/NamesTable.tsx
+msgid "Hebrew"
+msgstr "Hebrew"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "as Agrippa prints it in 1533"
+msgstr "as Agrippa prints it in 1533"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+#: src/app/astrology/kamea/NamesTable.tsx
+#: src/app/astrology/kamea/ReductionTable.tsx
+msgid "Number"
+msgstr "Number"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "With the final letters counted at 500 to 900."
+msgstr "With the final letters counted at 500 to 900."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Agrippa 1533 prints {printed}; his reading below says whose the slip is."
+msgstr "Agrippa 1533 prints {printed}; his reading below says whose the slip is."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Its letters give {expected}; Agrippa 1533's reading below says why."
+msgstr "Its letters give {expected}; Agrippa 1533's reading below says why."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Kamea"
+msgstr "Kamea"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The name in each witness"
+msgstr "The name in each witness"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Each printing's reading of the name, linked to its page: its romanisation or caption, its own spelling where it is not Agrippa's of 1533, and the number it prints, with what its letters give where that differs and whose the difference is."
+msgstr "Each printing's reading of the name, linked to its page: its romanisation or caption, its own spelling where it is not Agrippa's of 1533, and the number it prints, with what its letters give where that differs and whose the difference is."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The sigil"
+msgstr "The sigil"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The sigil traces the name's letters on its planet's <0>kamea</0> by the method Regardie sets out in <1>The Golden Dawn</1>, volume 4 (1940), on <2>pages 78 to 80</2>: each letter is counted at its number, a number the square does not have is taken down to its tens or its units, and a line runs through the cells in the order of the letters, from a small circle at the first. The spelling traced is Agrippa's of 1533, with any final letter at its ordinary value."
+msgstr "The sigil traces the name's letters on its planet's <0>kamea</0> by the method Regardie sets out in <1>The Golden Dawn</1>, volume 4 (1940), on <2>pages 78 to 80</2>: each letter is counted at its number, a number the square does not have is taken down to its tens or its units, and a line runs through the cells in the order of the letters, from a small circle at the first. The spelling traced is Agrippa's of 1533, with any final letter at its ordinary value."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+#: src/app/astrology/kamea/NamesTable.tsx
+msgid "Agrippa prints it as one word of fourteen letters. Dividing it in two, where its romanisation divides it, is ours, and is how this site traces it."
+msgstr "Agrippa prints it as one word of fourteen letters. Dividing it in two, where its romanisation divides it, is ours, and is how this site traces it."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Open in the generator"
+msgstr "Open in the generator"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Agrippa's character"
+msgstr "Agrippa's character"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Agrippa prints a character for the name beside its planet's square, on <0>page {page}</0> of the 1533 printing, which is in the public domain. Below is the character redrawn from our reading of the woodcut, not a copy of the print."
+msgstr "Agrippa prints a character for the name beside its planet's square, on <0>page {page}</0> of the 1533 printing, which is in the public domain. Below is the character redrawn from our reading of the woodcut, not a copy of the print."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Agrippa's character of {name}, redrawn from our reading of the woodcut"
+msgstr "Agrippa's character of {name}, redrawn from our reading of the woodcut"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Drawn from the strokes recorded by {reader}, one of the two readers: straight between the points it read, curved where it read a curve. A ring is a circle it read at an end or on a line; a bar or a hook is drawn where it placed one; a dashed ring is an end mark it did not name. The woodcut's line weight and rounded turns are not drawn."
+msgstr "Drawn from the strokes recorded by {reader}, one of the two readers: straight between the points it read, curved where it read a curve. A ring is a circle it read at an end or on a line; a bar or a hook is drawn where it placed one; a dashed ring is an end mark it did not name. The woodcut's line weight and rounded turns are not drawn."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The reader placed only the tips of the hook's curls; how they bend is ours."
+msgstr "The reader placed only the tips of the hook's curls; how they bend is ours."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "The reader did not record which way a bar or hook turns; the direction drawn is ours."
+msgstr "The reader did not record which way a bar or hook turns; the direction drawn is ours."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Regardie's redrawing"
+msgstr "Regardie's redrawing"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Regardie's plates in <0>The Golden Dawn</0>, volume 4 (1940), draw the character again, on <1>page {page}</1>. That book is in copyright where this site is read, so his figure is neither shown nor redrawn here; this is our reading of it."
+msgstr "Regardie's plates in <0>The Golden Dawn</0>, volume 4 (1940), draw the character again, on <1>page {page}</1>. That book is in copyright where this site is read, so his figure is neither shown nor redrawn here; this is our reading of it."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "How this was read: each figure was cropped from the scan and given a number in place of its name. Two readers, Claude Opus 5.5 and Claude Fable 5.2, working apart, recorded its strokes, the points along them and the marks at their ends. Two judges, the same two models working apart, then compared each figure and both readings with the trace of every witness's spelling. Where the judges agreed, their verdict stands; where they differed, on 7 of the 32 figures, Claude Opus 5.5 weighed both judges' reasons against the figure and settled it, and the note with the verdict says how. The readings and verdicts are in the <0>table of Agrippa's characters</0>."
+msgstr "How this was read: each figure was cropped from the scan and given a number in place of its name. Two readers, Claude Opus 5.5 and Claude Fable 5.2, working apart, recorded its strokes, the points along them and the marks at their ends. Two judges, the same two models working apart, then compared each figure and both readings with the trace of every witness's spelling. Where the judges agreed, their verdict stands; where they differed, on 7 of the 32 figures, Claude Opus 5.5 weighed both judges' reasons against the figure and settled it, and the note with the verdict says how. The readings and verdicts are in the <0>table of Agrippa's characters</0>."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Other witnesses' spellings"
+msgstr "Other witnesses' spellings"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Where another witness spells the name so that it traces otherwise, and no note above calls that spelling a slip, its trace too, by the same method."
+msgstr "Where another witness spells the name so that it traces otherwise, and no note above calls that spelling a slip, its trace too, by the same method."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamePage.tsx
+msgid "Whose this spelling is, the evidence read does not settle:"
+msgstr "Whose this spelling is, the evidence read does not settle:"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamesTable.tsx
+msgid "with the final letters at 500 to 900"
+msgstr "with the final letters at 500 to 900"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamesTable.tsx
+msgid "for each pair of its letters"
+msgstr "for each pair of its letters"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamesTable.tsx
+msgid "A slip of this printing, its author's or its printer's."
+msgstr "A slip of this printing, its author's or its printer's."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamesTable.tsx
+msgid "Whose the difference is, the evidence read does not settle."
+msgstr "Whose the difference is, the evidence read does not settle."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamesTable.tsx
+msgid "Taken over from Agrippa 1533."
+msgstr "Taken over from Agrippa 1533."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamesTable.tsx
+msgid "Taken over from Agrippa 1651."
+msgstr "Taken over from Agrippa 1651."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamesTable.tsx
+msgid "Taken over from an earlier printing."
+msgstr "Taken over from an earlier printing."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamesTable.tsx
+msgid "Prints {printed}, where its letters give {expected}."
+msgstr "Prints {printed}, where its letters give {expected}."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamesTable.tsx
+msgid "A name found in present-day sources, which none of these witnesses gives. We have not found where it comes from, and it has no sigil here: there are no letters to trace."
+msgstr "A name found in present-day sources, which none of these witnesses gives. We have not found where it comes from, and it has no sigil here: there are no letters to trace."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/NamesTable.tsx
+msgid "No witness romanises it; the name given here is our transcription of its letters."
+msgstr "No witness romanises it; the name given here is our transcription of its letters."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/ReductionTable.tsx
+msgid "Each letter, its number and its cell"
+msgstr "Each letter, its number and its cell"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/ReductionTable.tsx
+msgid "Letter"
+msgstr "Letter"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/ReductionTable.tsx
+msgid "Cell"
+msgstr "Cell"
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/ReductionTable.tsx
+msgid "Word {number}"
+msgstr "Word {number}"
 
 #. js-lingui-explicit-id
 #: src/app/astrology/kamea/sigils/KameaSigils.tsx
@@ -2548,41 +3289,6 @@ msgstr "Sigil of {text} on the Kamea of Mercury"
 #: src/app/astrology/kamea/sigils/KameaSigils.tsx
 msgid "Sigil of {text} on the Kamea of the Moon"
 msgstr "Sigil of {text} on the Kamea of the Moon"
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
-msgid "Kamea of Saturn"
-msgstr "Kamea of Saturn"
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
-msgid "Kamea of Jupiter"
-msgstr "Kamea of Jupiter"
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
-msgid "Kamea of Mars"
-msgstr "Kamea of Mars"
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
-msgid "Kamea of the Sun"
-msgstr "Kamea of the Sun"
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
-msgid "Kamea of Venus"
-msgstr "Kamea of Venus"
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
-msgid "Kamea of Mercury"
-msgstr "Kamea of Mercury"
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
-msgid "Kamea of the Moon"
-msgstr "Kamea of the Moon"
 
 #. js-lingui-explicit-id
 #: src/app/astrology/kamea/sigils/KameaSigils.tsx
@@ -2630,44 +3336,14 @@ msgid "This sigil could not be drawn."
 msgstr "This sigil could not be drawn."
 
 #. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
-msgid "This sigil could not be drawn so that every mark stands clear of the others and of the square's lines; it is drawn as well as it can be, and may be hard to read."
-msgstr "This sigil could not be drawn so that every mark stands clear of the others and of the square's lines; it is drawn as well as it can be, and may be hard to read."
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
-msgid "Each letter, its number and its cell"
-msgstr "Each letter, its number and its cell"
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
-msgid "Letter"
-msgstr "Letter"
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
-msgid "Number"
-msgstr "Number"
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
-msgid "Cell"
-msgstr "Cell"
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/sigils/KameaSigils.tsx
-msgid "Word {number}"
-msgstr "Word {number}"
-
-#. js-lingui-explicit-id
 #: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
 msgid "How a kamea sigil is drawn"
 msgstr "How a kamea sigil is drawn"
 
 #. js-lingui-explicit-id
 #: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
-msgid "A kamea is a planet's magic square: the numbers from one up to the square of its order, set so that every row, column and diagonal adds up to the same sum. Agrippa printed the seven in <0>De occulta philosophia</0> (1533), from Saturn's three by three to the Moon's nine by nine, with the names of each planet's intelligence and spirit, whose letters add up to the square's numbers. The Golden Dawn traced those names on the squares to draw their sigils, and this generator traces any Hebrew name the same way."
-msgstr "A kamea is a planet's magic square: the numbers from one up to the square of its order, set so that every row, column and diagonal adds up to the same sum. Agrippa printed the seven in <0>De occulta philosophia</0> (1533), from Saturn's three by three to the Moon's nine by nine, with the names of each planet's intelligence and spirit, whose letters add up to the square's numbers. The Golden Dawn traced those names on the squares to draw their sigils, and this generator traces any Hebrew name the same way."
+msgid "A kamea is a planet's magic square: the numbers from one up to the square of its order, set so that every row, column and diagonal adds up to the same sum. Agrippa printed the seven in <0>De occulta philosophia</0> (1533), from Saturn's three by three to the Moon's nine by nine, with the names of each planet's intelligence and spirit, whose letters add up to the square's numbers. Israel Regardie, in <1>The Golden Dawn</1> (volume 4, 1940), sets out a method of tracing those names on the squares to draw their sigils, which he writes the Order had lost by his day (<2>page 78</2>), and this generator traces any Hebrew name by it."
+msgstr "A kamea is a planet's magic square: the numbers from one up to the square of its order, set so that every row, column and diagonal adds up to the same sum. Agrippa printed the seven in <0>De occulta philosophia</0> (1533), from Saturn's three by three to the Moon's nine by nine, with the names of each planet's intelligence and spirit, whose letters add up to the square's numbers. Israel Regardie, in <1>The Golden Dawn</1> (volume 4, 1940), sets out a method of tracing those names on the squares to draw their sigils, which he writes the Order had lost by his day (<2>page 78</2>), and this generator traces any Hebrew name by it."
 
 #. js-lingui-explicit-id
 #: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
@@ -2706,8 +3382,8 @@ msgstr "What the generator chooses"
 
 #. js-lingui-explicit-id
 #: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
-msgid "Final letters. Aiq Bekar puts the five final forms in the hundreds from 500 to 900, but neither of the Golden Dawn's worked examples has one. A final letter counts at its ordinary letter's number unless you choose the table's values, which some of Agrippa's printed sums need."
-msgstr "Final letters. Aiq Bekar puts the five final forms in the hundreds from 500 to 900, but neither of the Golden Dawn's worked examples has one. A final letter counts at its ordinary letter's number unless you choose the table's values, which some of Agrippa's printed sums need."
+msgid "Final letters. Aiq Bekar puts the five final forms in the hundreds from 500 to 900, but neither of Regardie's worked examples has one. A final letter counts at its ordinary letter's number unless you choose the table's values, which some of Agrippa's printed sums need."
+msgstr "Final letters. Aiq Bekar puts the five final forms in the hundreds from 500 to 900, but neither of Regardie's worked examples has one. A final letter counts at its ordinary letter's number unless you choose the table's values, which some of Agrippa's printed sums need."
 
 #. js-lingui-explicit-id
 #: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
@@ -2716,8 +3392,8 @@ msgstr "Words. Each word of a name is its own figure on its own square, set righ
 
 #. js-lingui-explicit-id
 #: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
-msgid "The marks. The crook, the loop and the end bar are the Rose Cross sigil's, at a size fixed against the square. Agrippa's own characters put a circle at both ends of most figures, and the Golden Dawn's redrawings mostly a circle at the start and a bar or nothing at the end."
-msgstr "The marks. The crook, the loop and the end bar are the Rose Cross sigil's, at a size fixed against the square. Agrippa's own characters put a circle at both ends of most figures, and the Golden Dawn's redrawings mostly a circle at the start and a bar or nothing at the end."
+msgid "The marks. The crook, the loop and the end bar are the Rose Cross sigil's, at a size fixed against the square. Agrippa's own characters put a circle at both ends of most figures, and Regardie's plates mostly a circle at the start and a bar or nothing at the end."
+msgstr "The marks. The crook, the loop and the end bar are the Rose Cross sigil's, at a size fixed against the square. Agrippa's own characters put a circle at both ends of most figures, and Regardie's plates mostly a circle at the start and a bar or nothing at the end."
 
 #. js-lingui-explicit-id
 #: src/app/astrology/kamea/sigils/KameaSigilsText.tsx

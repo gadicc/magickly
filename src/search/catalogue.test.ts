@@ -79,6 +79,99 @@ describe("the real public search catalogue", () => {
     ).toBeGreaterThan(1900);
   });
 
+  it("indexes each kamea's square and its names by every witness (plan 093, K4)", () => {
+    const saturn = catalogue.documents.find(
+      (page) => page.path === "/astrology/kamea/saturn",
+    )!;
+    expect(saturn.aliases).toContain("Magic square of Saturn");
+    const text = saturn.sections.map((section) => section.text).join(" ");
+    expect(text).toContain("4 9 2, 3 5 7, 8 1 6");
+    for (const word of ["Agiel", "אגיאל", "Zazel", "Daemonium", "AGIEL"])
+      expect(text).toContain(word);
+    expect(engine.search("Kamea of the Sun")[0]?.path).toBe(
+      "/astrology/kamea/sol",
+    );
+    expect(engine.search("magic square of Jupiter")[0]?.path).toBe(
+      "/astrology/kamea/jupiter",
+    );
+    expect(engine.search("Taphthartharath").map((r) => r.path)).toContain(
+      "/astrology/kamea/mercury",
+    );
+    // Each square's document is its own: the Moon's paragraphs on the
+    // Moon's alone, each square's construction and notes on its own page,
+    // and none of the component's other branches (plan 093, K4 review).
+    const textAt = (path: string) =>
+      catalogue.documents
+        .find((page) => page.path === path)!
+        .sections.map((section) => section.text)
+        .join(" ");
+    for (const planet of [
+      "saturn",
+      "jupiter",
+      "mars",
+      "sol",
+      "venus",
+      "mercury",
+    ]) {
+      const own = textAt(`/astrology/kamea/${planet}`);
+      expect(own, planet).not.toContain("Shelachel");
+      expect(own, planet).not.toContain(
+        "the tens from 10 to 80 stand in one column",
+      );
+      expect(own, planet).not.toMatch(/A magic square of\s+by\s+:/);
+    }
+    expect(textAt("/astrology/kamea/luna")).toContain("Shelachel");
+    expect(textAt("/astrology/kamea/saturn")).toContain(
+      "A magic square of 3 by 3: the numbers 1 to 9",
+    );
+    expect(textAt("/astrology/kamea/saturn")).not.toContain("square of six");
+    expect(textAt("/astrology/kamea/sol")).toContain("square of six");
+    const top = (query: string) => engine.search(query)[0]?.path;
+    expect(top("Moon's column")).toBe("/astrology/kamea/luna");
+    // The planet's page names Shelachel too; of the squares, the Moon's alone.
+    const shelachel = engine.search("Shelachel").map((r) => r.path);
+    expect(shelachel).toContain("/astrology/kamea/luna");
+    expect(
+      shelachel.filter((path) => path.startsWith("/astrology/kamea/")),
+    ).toEqual(["/astrology/kamea/luna"]);
+    expect(top("square of six")).toBe("/astrology/kamea/sol");
+    expect(top("43 twice")).toBe("/astrology/kamea/venus");
+    // The hub outranks the components explorer's Kamea.
+    expect(top("kamea")).toBe("/astrology/kamea");
+    // The hub's own prose reaches the index through its components.
+    const hub = catalogue.documents.find(
+      (page) => page.path === "/astrology/kamea",
+    )!;
+    expect(
+      hub.sections.some((section) => section.text.includes("Aiq Bekar")),
+    ).toBe(true);
+  });
+
+  it("indexes each planetary name's page under every witness's spelling (plan 093, K4)", () => {
+    const bartzabel = catalogue.documents.find(
+      (page) => page.path === "/astrology/spirit/bartzabel",
+    )!;
+    for (const alias of [
+      "Bartzabel",
+      "Sigil of Bartzabel",
+      "Barzabel",
+      "ברצאבאל",
+      "ברצבאל",
+      "BARTZABEL",
+    ])
+      expect(bartzabel.aliases).toContain(alias);
+    const text = bartzabel.sections.map((section) => section.text).join(" ");
+    // The reduction, and the verdict on the character.
+    expect(text).toContain("ר 200 20");
+    expect(text).toContain("777's spelling");
+    expect(engine.search("sigil of Agiel")[0]?.path).toBe(
+      "/astrology/intelligence/agiel",
+    );
+    expect(engine.search("Barzabel").map((r) => r.path)).toContain(
+      "/astrology/spirit/bartzabel",
+    );
+  });
+
   it("indexes each Key's English and its words in each version it has", () => {
     const ids = catalogue.documents
       .find((page) => page.path === "/enochian/keys")!

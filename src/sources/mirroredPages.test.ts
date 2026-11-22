@@ -1,10 +1,12 @@
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
+import characters from "magick-data/astrology/planetaryNameCharacters";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 import { precacheEntries } from "../../next.config";
 import {
   bookUrl,
+  citedPage,
   MIRROR_WIDTH,
   MIRRORED_PAGES,
   type MirroredPage,
@@ -60,15 +62,24 @@ describe("the mirrored source pages", () => {
   // source of Lenain's first table's last two columns, which every one of
   // its rows and the notes on its departures link. 4.5 MB leaves room for a
   // page more; past that the mirror moves to the app's file storage (plan
-  // 080), not here.
+  // 080), not here. That page was Agrippa's names leaf (1533, n163),
+  // 293,488 bytes, on 21 November 2026 (plan 093, decision 7): the leaf six
+  // of the seven kameas' names rest on. 426,008 bytes remain.
   it("stay small: under 4.5 MB together", () => {
     const total = pages.reduce((sum, page) => sum + page.output.bytes, 0);
-    expect(total).toBe(3780504);
+    expect(total).toBe(4073992);
     expect(total).toBeLessThan(4.5e6);
   });
 
   it("outline a region on the page", () => {
-    for (const { id, highlight } of pages) {
+    const regions = pages.flatMap(({ id, highlight, regions }) => [
+      { id, highlight },
+      ...Object.entries(regions ?? {}).map(([key, region]) => ({
+        id: `${id}#${key}`,
+        highlight: region.highlight,
+      })),
+    ]);
+    for (const { id, highlight } of regions) {
       expect(highlight.x, id).toBeGreaterThanOrEqual(0);
       expect(highlight.y, id).toBeGreaterThanOrEqual(0);
       expect(highlight.width, id).toBeGreaterThan(0);
@@ -80,6 +91,82 @@ describe("the mirrored source pages", () => {
         expect(highlight.ring.inner, id).toBeLessThan(1);
       }
     }
+  });
+
+  it("outline Agrippa's characters on n164 where K6 read them", () => {
+    // Each region is the character's box in planetaryNameCharacters, in
+    // the pixels of this very image, as a fraction of it widened to the
+    // next thousandth: it holds the box and is at most a thousandth over.
+    const page = MIRRORED_PAGES.agrippa149;
+    for (const id of ["agiel", "zazel", "iophiel", "hismael"] as const) {
+      const box = characters[`${id}-agrippa1533`];
+      expect(box.leaf, id).toBe(`n${page.scan.leaf}`);
+      const { highlight } = page.regions[`${id}Character`];
+      const { width, height } = page.original;
+      const edges = [
+        [highlight.x, box.region.x / width],
+        [highlight.y, box.region.y / height],
+      ];
+      for (const [region, read] of edges) {
+        expect(region, id).toBeLessThanOrEqual(read);
+        expect(read - region, id).toBeLessThan(0.001);
+      }
+      const ends = [
+        [
+          highlight.x + highlight.width,
+          (box.region.x + box.region.width) / width,
+        ],
+        [
+          highlight.y + highlight.height,
+          (box.region.y + box.region.height) / height,
+        ],
+      ];
+      for (const [region, read] of ends) {
+        expect(region + 1e-9, id).toBeGreaterThanOrEqual(read);
+        expect(region - read, id).toBeLessThan(0.0011);
+      }
+    }
+  });
+
+  it("outline each planet's names on Agrippa's leaves, one block each", () => {
+    // The six planets' blocks on n163 run down the page in the Chaldean
+    // order, each below the last, as the page prints them.
+    const blocks = Object.values(MIRRORED_PAGES.agrippa148.regions);
+    expect(Object.keys(MIRRORED_PAGES.agrippa148.regions)).toEqual([
+      "saturn",
+      "jupiter",
+      "mars",
+      "sol",
+      "venus",
+      "mercury",
+    ]);
+    for (let i = 1; i < blocks.length; i++)
+      expect(blocks[i].highlight.y).toBeGreaterThan(blocks[i - 1].highlight.y);
+    // The page's own outline holds every block.
+    const all = MIRRORED_PAGES.agrippa148.highlight;
+    for (const { highlight } of blocks) {
+      expect(highlight.y).toBeGreaterThanOrEqual(all.y);
+      expect(highlight.y + highlight.height).toBeLessThanOrEqual(
+        all.y + all.height + 1e-9,
+      );
+    }
+    // A region outlines and names its passage; no region, the page's own.
+    const moon = citedPage(MIRRORED_PAGES.agrippa149, "luna");
+    expect(moon.cited).toBe(
+      "the names of the Moon's square, with their numbers",
+    );
+    expect(moon.highlight).toBe(
+      MIRRORED_PAGES.agrippa149.regions.luna.highlight,
+    );
+    expect(citedPage(MIRRORED_PAGES.agrippa149)).toBe(
+      MIRRORED_PAGES.agrippa149,
+    );
+    expect(citedPage(MIRRORED_PAGES.agrippa149, "constructor")).toBe(
+      MIRRORED_PAGES.agrippa149,
+    );
+    expect(pageUrl(MIRRORED_PAGES.agrippa148)).toBe(
+      "https://archive.org/details/DeOccultaPhilosophiaLoc1533/page/n163/mode/1up",
+    );
   });
 
   it("outline Kircher's wheel as a ring about its centre", () => {

@@ -1,0 +1,105 @@
+/* The kameas' hub and pages (plan 093, K4). */
+
+/* The square, large: the 1,024-pixel file within the column. */
+.square {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  height: auto;
+  margin: 0.5em auto 0.75em;
+}
+
+/* The square's four numbers, as a short list of terms. */
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.2em 1em;
+  margin: 0.5em 0 1em;
+}
+
+.facts dt {
+  color: var(--mui-palette-text-secondary);
+}
+
+.facts dd {
+  margin: 0;
+}
+
+.downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1.4em;
+  margin: 0 0 1em;
+}
+
+/* The seal, in the text's own colour, light or dark. */
+.seal {
+  display: block;
+  width: 10rem;
+  height: 10rem;
+  margin: 0.5em 0 0.75em;
+}
+
+.notes {
+  padding-inline-start: 1.2em;
+}
+
+.notes li {
+  margin-bottom: 0.4em;
+}
+
+.seeAlso {
+  padding-inline-start: 1.2em;
+}
+
+.prevNext {
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  margin-top: 2.5em;
+  font-size: 0.9rem;
+}
+
+/* The hub's seven squares: as many to a row as fit, two on a phone. */
+.squares {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 1.25rem 1rem;
+  margin: 1em 0 2em;
+  padding: 0;
+  list-style: none;
+}
+
+.squares li {
+  margin: 0;
+}
+
+.card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.card:hover .cardName,
+.card:focus-visible .cardName {
+  text-decoration: underline;
+}
+
+.cardName {
+  display: block;
+  margin-top: 0.4em;
+  font-weight: 600;
+  color: var(--mui-palette-primary-main);
+}
+
+.cardFacts {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--mui-palette-text-secondary);
+}

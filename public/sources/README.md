@@ -3,11 +3,13 @@
 Pages of public-domain books that the site cites, so a reader can see the
 cited page without leaving it: the source links on the planet pages, the
 geomancy reference, the component explorer, Lenain's *La Science
-cabalistique* and the 72 angels page open them in a dialog
+cabalistique*, the 72 angels page and the kameas' pages open them in a dialog
 (`src/sources/SourceLink.tsx`), and without JavaScript the same links go to
 the page on archive.org or Google Books. `src/sources/mirroredPages.ts` is
 the manifest: each page's scan, the original's size and SHA-256, the region
-outlined on it, and the committed file's size and hash.
+outlined on it (and, where pages cite parts of it apart, such as one
+planet's names on Agrippa's leaves, a region for each), and the committed
+file's size and hash.
 
 `scripts/sources/mirror.mts` (`pnpm sources:mirror --originals <dir>`) makes
 the files. It downloads each archive.org leaf's full-size JPEG
@@ -41,7 +43,8 @@ image.
 | --- | --- | --- | --- | --- |
 | heydon-theomagia-1663-p13.webp | John Heydon, *Theomagia, or The Temple of Wisdome*, vol. 1 (London: Brome and Rooks, 1663/4), book I, ch. 5, p. 13; [archive.org `theomagiaortempl00heyd`, leaf n124](https://archive.org/details/theomagiaortempl00heyd/page/n124/mode/1up), the Getty Research Institute's copy | JPEG, 1860 × 3172, SHA-256 8942795dca6abbbde55ff46bfa1974c4e1c5cd812e632f1457c97b3235aa7a09 | 228774 | 5c94f32a0d8c393168b5cb714f02eb48c9990158fff17ade5156b18ca7de9817 |
 | heydon-theomagia-1663-p15.webp | The same, p. 15; [leaf n126](https://archive.org/details/theomagiaortempl00heyd/page/n126/mode/1up) | JPEG, 1860 × 3172, SHA-256 05d36cd6d3240951e3a2731520ca793ac8bec5b1eeee0434ec7d7f176690f7e9 | 203016 | 995cc4f5d536b4f8cee09a6491e2ea911b4a74ae680d1f9168528d6eee2fa761 |
-| agrippa-de-occulta-philosophia-1533-p149.webp | Heinrich Cornelius Agrippa, *De occulta philosophia libri tres* (Cologne: Soter, 1533), book II, ch. 22, p. CXLIX; [archive.org `DeOccultaPhilosophiaLoc1533`, leaf n164](https://archive.org/details/DeOccultaPhilosophiaLoc1533/page/n164/mode/1up), the Library of Congress's copy | JPEG, 1800 × 2428, SHA-256 a765a1d827da2319d93ae421683ed3ee946272bd634510a537af440c9505ec39 | 212048 | 5c0e39e1c5f0ab8721abb9015de606d92c1dde682b7d59a30b4e62f5881159ae |
+| agrippa-de-occulta-philosophia-1533-p148.webp | Heinrich Cornelius Agrippa, *De occulta philosophia libri tres* (Cologne: Soter, 1533), book II, ch. 22, p. CXLVIII, the names of the squares of Saturn to Mercury with their numbers, which the kameas' pages cite planet by planet; [archive.org `DeOccultaPhilosophiaLoc1533`, leaf n163](https://archive.org/details/DeOccultaPhilosophiaLoc1533/page/n163/mode/1up), the Library of Congress's copy | JPEG, 1800 × 2395, SHA-256 32f7f8289bed9242bcb4b4c16c3717f253bc96897a13902b332388f893288460 | 293488 | 852534b7c0ad3dad40b575638129d475aabecb0e15037a69a712325375112c9c |
+| agrippa-de-occulta-philosophia-1533-p149.webp | Heinrich Cornelius Agrippa, *De occulta philosophia libri tres* (Cologne: Soter, 1533), book II, ch. 22, p. CXLIX, the Moon's names, and the squares of Saturn and Jupiter with their seals and characters, which the kameas' pages cite too; [archive.org `DeOccultaPhilosophiaLoc1533`, leaf n164](https://archive.org/details/DeOccultaPhilosophiaLoc1533/page/n164/mode/1up), the Library of Congress's copy | JPEG, 1800 × 2428, SHA-256 a765a1d827da2319d93ae421683ed3ee946272bd634510a537af440c9505ec39 | 212048 | 5c0e39e1c5f0ab8721abb9015de606d92c1dde682b7d59a30b4e62f5881159ae |
 | lenain-science-cabalistique-1823-p25.webp | Lazare Lenain, *La Science cabalistique* (Amiens: the author, 1823), ch. IV, p. 25, the first cabalistic table, folded so that rows 57 to 72 show; [Google Books `qt9SAAAAcAAJ`, p. 25](https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA25), the Koninklijke Bibliotheek's copy, digitised by Google Books | PNG, 1574 × 2500, SHA-256 2519a63a554e331ee1f1d33b54f4c07851a309a1854c2b274bc57065e7d7077a | 223294 | 313b468478b548b4497ab50eb100386d27251e8bef7d4fbadfeeab870b616360 |
 | lenain-science-cabalistique-reissue-p25.webp | The same, the undated reissue with Papus's preface (first recorded as Dujols and Thomas, 1909), p. 25, the same table, folded so that rows 62 to 72 show; [Google Books `ZqgpxTZ43HkC`, p. 25](https://books.google.com/books?id=ZqgpxTZ43HkC&pg=PA25), the Bibliothèque municipale de Lyon's copy (Bibliothèque jésuite des Fontaines), digitised by Google Books | PNG, 1633 × 2500, SHA-256 4b70bceaf9421a8ddfd1d618ded326de1d7ca473808ea2c601db86dd31ef41b6 | 174376 | 791476c6d4aee7f784641481cade0e1f8c53b6f071a340fc24933010260438cc |
 | kircher-oedipus-aegyptiacus-1653-p271.webp | Athanasius Kircher, *Oedipus Aegyptiacus*, vol. II part 1 (Rome: Mascardi, 1653), class IV, ch. 6, p. 271, the seventy-two names of God from Exodus 14, rows 1 to 24; [archive.org `A027083`, leaf n278](https://archive.org/details/A027083/page/n278/mode/1up), the Universidad de Sevilla's copy (A 027/083) | JPEG, 3456 × 5184, SHA-256 7801818bfe0619c7a5deaf740f4979d32376262662710f878e67b5dbb358b9d0 | 302400 | c810b18f98ca7dc50f5bef4b04af20e602b00599b6df006e3a7fba2cbcb19018 |
@@ -52,8 +55,9 @@ image.
 | agrippa-philosophie-occulte-1727-p109.webp | Agrippa, *La Philosophie occulte*, translated anonymously (The Hague, 1727), vol. II, book III, p. 109, the line introducing the seventy-two angels' table; [archive.org `per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22`, leaf n588](https://archive.org/details/per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22/page/n588/mode/1up), from a microfilm in the series *Witchcraft in Europe and America* | JPEG, 5560 × 9289, SHA-256 384e4aa44f17f10bd6621c040929673bd3f2486df774c91ea26f800f2cf89564 | 240202 | 5a69930290d512b0debc9c9cdc5a65bc581aca180b2dd4e02eef039971de030f |
 | agrippa-philosophie-occulte-1727-p110.webp | The same, p. 110, the table of the seventy-two angels' names in French spelling; [leaf n589](https://archive.org/details/per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22/page/n589/mode/1up) | JPEG, 5459 × 9247, SHA-256 9adfba99c5da26301bf4894d1d5efcb1da9de1f78cffac409588c57aa9dd2687 | 253674 | 616ed4befc67676ab210696fa470f7713e22fd687bf0f0d99f6a5fa8e913fc2b |
 
-Total: 3780504 bytes (643838 for the sigils' three pages, 3136666 for
-Lenain's nine). Each WebP is 1600 pixels wide except the 1823 Lenain page,
+Total: 4073992 bytes (643838 for the sigils' three pages, 293488 for
+Agrippa's names leaf, which the kameas' pages added on 21 November 2026
+(plan 093, decision 7), and 3136666 for Lenain's nine). Each WebP is 1600 pixels wide except the 1823 Lenain page,
 which keeps its original's 1574. Kircher's plate is the heaviest at 779994:
 a whole fold-out engraving, fine lines throughout, at the same width as a
 page.

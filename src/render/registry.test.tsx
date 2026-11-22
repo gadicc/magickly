@@ -779,7 +779,9 @@ describe("component image registry", () => {
       new Request("https://magick.ly/api/render/kamea?planet=luna"),
     );
     expect(square.headers.get(SIGIL_PLACEMENT_HEADER)).toBeNull();
-    expect(square.headers.get("X-Robots-Tag")).toBeNull();
+    // The kamea pages' static files are the squares' copies to index (plan
+    // 093, K4).
+    expect(square.headers.get("X-Robots-Tag")).toBe("noindex");
     // Read from the markup, which no registration but the sigil's marks.
     const registration = COMPONENT_IMAGE_REGISTRY["kamea-sigil"];
     expect(

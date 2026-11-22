@@ -50,6 +50,7 @@ const LABELS = [
   "Archangel",
   "Intelligence",
   "Spirit",
+  "Kamea",
   "Rules",
   "Geomantic figures",
   "Grade",
@@ -187,14 +188,23 @@ describe("the planet page", () => {
       "יהוה אלוה ודעת YHVH Eloah VeDa'at “Lord God of Knowledge”",
     );
     expect(row(html, "Archangel").text).toBe("מיכאל Michael");
-    expect(row(html, "Intelligence").text).toBe("Nakhiel");
+    // The intelligence and the spirit link their own pages (plan 093).
+    expect(row(html, "Intelligence")).toMatchObject({
+      text: "Nakhiel",
+      hrefs: ["/astrology/intelligence/nakhiel"],
+    });
     // The sigil is decoration beside the name, hidden from a screen reader.
     // Below it, the page of Heydon's it is drawn after, linked to its scan.
     expect(row(html, "Spirit")).toMatchObject({
       text: "Sorath [sigil of sorath, hidden]Sigil after Heydon, Theomagia (1663/4), p. 13.",
       hrefs: [
+        "/astrology/spirit/sorath",
         "https://archive.org/details/theomagiaortempl00heyd/page/n124/mode/1up",
       ],
+    });
+    expect(row(html, "Kamea")).toMatchObject({
+      text: "Kamea of the Sun",
+      hrefs: ["/astrology/kamea/sol"],
     });
     expect(row(html, "Rules").text).toBe("♌︎ Leo");
     expect(row(html, "Geomantic figures")).toMatchObject({
@@ -289,6 +299,7 @@ describe("the planet page", () => {
         new RegExp(`Sigil after Heydon, Theomagia \\(1663/4\\), ${cited}\\.$`),
       );
       expect(spirit.hrefs, id).toEqual([
+        `/astrology/spirit/${Data.planet[id as keyof typeof Data.planet].spiritId}`,
         `https://archive.org/details/theomagiaortempl00heyd/page/${leaves[cited]}/mode/1up`,
       ]);
     }
@@ -301,9 +312,12 @@ describe("the planet page", () => {
     expect(intelligence.text).toBe(
       "מלכא בתרשיתים עד ברוח שחקים Malcha betharsisim hed beruah schehakim1 / Shelachel2",
     );
-    // Same-page links only, which `expectEntityPage` holds to ids that
-    // exist; the markup is read below.
-    expect(intelligence.hrefs).toEqual([]);
+    // Agrippa's name links its page; Shelachel, whom nothing traces, has
+    // none. The notes' references are same-page links, which
+    // `expectEntityPage` holds to ids that exist; the markup is read below.
+    expect(intelligence.hrefs).toEqual([
+      "/astrology/intelligence/malcha-betharsisim",
+    ]);
     // The Hebrew stands alone, so it is set in Frank Ruhl Libre (plan 079),
     // as the `Hebrew` of every entity page is.
     expect(html).toMatch(

@@ -273,6 +273,25 @@ const pixels = (description: string) =>
 /** A verdict on a character against a name's trace: see the data file. */
 const characterVerdict = v.picklist(["match", "partial", "no"]);
 
+/** A point a reader recorded off a vertex: `[x, y]`, as a vertex's pixels. */
+const characterPoint = v.pipe(
+  v.tuple([
+    pixels("Pixels from the region's left edge."),
+    pixels("Pixels from the region's top edge."),
+  ]),
+  v.description("A point, [x, y], in pixels from the region's top left."),
+);
+
+/** The marks a reader may record. */
+const characterMark = v.picklist([
+  "circle",
+  "dot",
+  "bar",
+  "hook",
+  "none",
+  "other",
+]);
+
 /** One stroke of a character, as a blind reader recorded it. */
 const characterStroke = v.pipe(
   v.strictObject({
@@ -280,6 +299,14 @@ const characterStroke = v.pipe(
       v.boolean(),
       v.description(
         "Whether the stroke comes back to its own start, with no free end.",
+      ),
+    ),
+    rings: v.optional(
+      v.pipe(
+        v.array(characterPoint),
+        v.description(
+          "Rings drawn on the stroke between its ends, which the line runs through, where the reader recorded one: each ring's centre.",
+        ),
       ),
     ),
     vertices: v.pipe(
@@ -300,9 +327,33 @@ const characterStroke = v.pipe(
             ),
             mark: v.optional(
               v.pipe(
-                v.picklist(["circle", "dot", "bar", "hook", "none", "other"]),
+                characterMark,
                 v.description(
                   "At an end, the mark drawn there: a small `circle`, a `dot`, a `bar` across the line, a `hook` or curl, `none`, or some `other` mark.",
+                ),
+              ),
+            ),
+            via: v.optional(
+              v.pipe(
+                v.array(characterPoint),
+                v.description(
+                  "Where the line curves on its way to this vertex from the one before: points along the curve, in order, as the reader gave them.",
+                ),
+              ),
+            ),
+            hook: v.optional(
+              v.pipe(
+                v.array(v.array(characterPoint)),
+                v.description(
+                  "At an end marked `hook`: each curl's course from the end, point by point, to its tip (a double hook has two), where the reader recorded it.",
+                ),
+              ),
+            ),
+            bar: v.optional(
+              v.pipe(
+                v.tuple([characterPoint, characterPoint]),
+                v.description(
+                  "At an end marked `bar`: the bar's two ends, where the reader recorded them.",
                 ),
               ),
             ),

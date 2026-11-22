@@ -53,9 +53,13 @@ export default function KameaSigilsText() {
       <p>
         <UiRichText
           message={
-            /*i18n*/ "A kamea is a planet's magic square: the numbers from one up to the square of its order, set so that every row, column and diagonal adds up to the same sum. Agrippa printed the seven in <0>De occulta philosophia</0> (1533), from Saturn's three by three to the Moon's nine by nine, with the names of each planet's intelligence and spirit, whose letters add up to the square's numbers. The Golden Dawn traced those names on the squares to draw their sigils, and this generator traces any Hebrew name the same way."
+            /*i18n*/ "A kamea is a planet's magic square: the numbers from one up to the square of its order, set so that every row, column and diagonal adds up to the same sum. Agrippa printed the seven in <0>De occulta philosophia</0> (1533), from Saturn's three by three to the Moon's nine by nine, with the names of each planet's intelligence and spirit, whose letters add up to the square's numbers. Israel Regardie, in <1>The Golden Dawn</1> (volume 4, 1940), sets out a method of tracing those names on the squares to draw their sigils, which he writes the Order had lost by his day (<2>page 78</2>), and this generator traces any Hebrew name by it."
           }
-          components={{ 0: <i /> }}
+          components={{
+            0: <i />,
+            1: <i />,
+            2: <Outside href={regardiePage(72)} />,
+          }}
         />
       </p>
 
@@ -108,7 +112,7 @@ export default function KameaSigilsText() {
         <li>
           <UiRichText
             message={
-              /*i18n*/ "Final letters. Aiq Bekar puts the five final forms in the hundreds from 500 to 900, but neither of the Golden Dawn's worked examples has one. A final letter counts at its ordinary letter's number unless you choose the table's values, which some of Agrippa's printed sums need."
+              /*i18n*/ "Final letters. Aiq Bekar puts the five final forms in the hundreds from 500 to 900, but neither of Regardie's worked examples has one. A final letter counts at its ordinary letter's number unless you choose the table's values, which some of Agrippa's printed sums need."
             }
           />
         </li>
@@ -122,7 +126,7 @@ export default function KameaSigilsText() {
         <li>
           <UiRichText
             message={
-              /*i18n*/ "The marks. The crook, the loop and the end bar are the Rose Cross sigil's, at a size fixed against the square. Agrippa's own characters put a circle at both ends of most figures, and the Golden Dawn's redrawings mostly a circle at the start and a bar or nothing at the end."
+              /*i18n*/ "The marks. The crook, the loop and the end bar are the Rose Cross sigil's, at a size fixed against the square. Agrippa's own characters put a circle at both ends of most figures, and Regardie's plates mostly a circle at the start and a bar or nothing at the end."
             }
           />
         </li>

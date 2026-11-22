@@ -1,0 +1,103 @@
+/* A planet's names, by witness (plan 093, K4). */
+
+/* The table scrolls inside its own box if a long name will not wrap,
+   never the page. */
+.scroll {
+  overflow-x: auto;
+  margin: 0.5em 0 1.5em;
+}
+
+/* Fixed columns, so that a name's readings below it set the table's
+   width no wider than the page, and a long word wraps rather than
+   widening a column (the spirit of spirits is one word of fourteen
+   letters). */
+.names {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.names thead th:nth-child(1) {
+  width: 40%;
+}
+
+.names thead th:nth-child(2) {
+  width: 34%;
+}
+
+.names thead th {
+  text-align: start;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--mui-palette-text-secondary);
+  border-bottom: 1px solid var(--mui-palette-divider);
+  padding: 0.25em 0.5em 0.25em 0;
+}
+
+/* Each name is its own row group, ruled off from the next. */
+.names tbody {
+  border-bottom: 1px solid var(--mui-palette-divider);
+}
+
+.name th,
+.name td {
+  padding: 0.6em 0.75em 0.1em 0;
+  vertical-align: baseline;
+  text-align: start;
+}
+
+.name th {
+  font-weight: 600;
+}
+
+/* What the name is, on its own line above it. */
+.role {
+  display: block;
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--mui-palette-text-secondary);
+}
+
+.constant {
+  display: block;
+  font-size: 0.8rem;
+  white-space: normal;
+  color: var(--mui-palette-text-secondary);
+}
+
+.readings td {
+  padding: 0.1em 0 0.6em;
+  font-size: 0.875rem;
+}
+
+.witnesses {
+  margin: 0;
+  padding-inline-start: 1.1em;
+}
+
+.witnesses li {
+  margin: 0.15em 0;
+}
+
+.witness {
+  font-weight: 600;
+}
+
+.note {
+  color: var(--mui-palette-text-secondary);
+}
+
+.nameNote {
+  margin: 0 0 0.25em;
+  color: var(--mui-palette-text-secondary);
+}
+
+/* An exception: the printed number against the letters' sum. */
+.exception {
+  display: block;
+  margin-top: 0.15em;
+  padding-inline-start: 0.6em;
+  border-inline-start: 3px solid var(--mui-palette-warning-main);
+}

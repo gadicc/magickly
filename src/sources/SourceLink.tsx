@@ -2,7 +2,13 @@
 import MuiLink from "@mui/material/Link";
 import dynamic from "next/dynamic";
 import React from "react";
-import { MIRRORED_PAGES, type MirroredPageKey, pageUrl } from "./mirroredPages";
+import {
+  citedPage,
+  MIRRORED_PAGES,
+  type MirroredPageKey,
+  type MirroredRegionKey,
+  pageUrl,
+} from "./mirroredPages";
 
 // The dialog and its pan and zoom load on the first click.
 const SourceDialog = dynamic(() => import("./SourceDialog"), { ssr: false });
@@ -13,18 +19,23 @@ const SourceDialog = dynamic(() => import("./SourceDialog"), { ssr: false });
  * with a modifier key, or any other button, still follows the link, and so
  * does a reader without JavaScript. `plain` draws a bare `<a>`, for pages
  * whose other outside links are bare; otherwise it is MUI's link.
+ * `region` names one of the page's cited regions, which the dialog then
+ * outlines and names in place of the page's own (Agrippa's names leaf,
+ * one planet's names).
  */
-export default function SourceLink({
+export default function SourceLink<K extends MirroredPageKey>({
   page,
+  region,
   plain = false,
   children,
   ...rest
 }: {
-  page: MirroredPageKey;
+  page: K;
+  region?: MirroredRegionKey<K>;
   plain?: boolean;
   children: React.ReactNode;
 } & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href" | "color">) {
-  const mirrored = MIRRORED_PAGES[page];
+  const mirrored = citedPage(MIRRORED_PAGES[page], region);
   const [open, setOpen] = React.useState(false);
   // Mounted from the first opening on, so closing can play its transition.
   const [opened, setOpened] = React.useState(false);

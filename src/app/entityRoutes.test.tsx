@@ -1,6 +1,8 @@
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import Intelligence from "./(public)/astrology/intelligence/[id]/page";
 import Planet from "./(public)/astrology/planet/[id]/page";
+import Spirit from "./(public)/astrology/spirit/[id]/page";
 import Grade from "./(public)/gd/grade/[id]/page";
 import PathPage from "./(public)/kabbalah/path/[id]/page";
 import SephirahPage from "./(public)/kabbalah/sephirah/[id]/page";
@@ -11,7 +13,7 @@ vi.mock("magick-components/astrology/PlanetarySpirit", () => ({
 }));
 
 /**
- * The four routes that take an id out of the URL and read a row with it.
+ * The routes that take an id out of the URL and read a row with it.
  *
  * Each used to index its table with a cast — `planets[id as keyof typeof
  * planets]` — which `strict: false` made `any`, so an unknown id reached the
@@ -46,6 +48,33 @@ const routes = [
     shows: "Hod",
     trail: ["/", "/kabbalah", "/kabbalah/tree", "/kabbalah/sephirah/hod"],
   },
+  // A planetary name's trail runs through its planet's kamea (plan 093).
+  {
+    name: "intelligence",
+    Page: Intelligence,
+    id: "agiel",
+    shows: "The intelligence of Saturn.",
+    trail: [
+      "/",
+      "/astrology",
+      "/astrology/kamea",
+      "/astrology/kamea/saturn",
+      "/astrology/intelligence/agiel",
+    ],
+  },
+  {
+    name: "spirit",
+    Page: Spirit,
+    id: "schedbarschemoth-schartathan",
+    shows: "The spirit of spirits of the Moon.",
+    trail: [
+      "/",
+      "/astrology",
+      "/astrology/kamea",
+      "/astrology/kamea/luna",
+      "/astrology/spirit/schedbarschemoth-schartathan",
+    ],
+  },
   // Adjacent text nodes are split by comments, so each of these is one node.
   {
     name: "path",
@@ -62,6 +91,8 @@ function trailOf(html: string) {
     ...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs),
   ]
     .map(([, json]) => JSON.parse(json))
+    // A trail of its own, or one node of a page's graph (the names').
+    .flatMap((data) => data["@graph"] ?? [data])
     .filter((data) => data["@type"] === "BreadcrumbList");
   expect(lists).toHaveLength(1);
   return lists[0].itemListElement.map(({ item }: { item: string }) =>
@@ -78,7 +109,14 @@ describe("entity routes", () => {
     });
 
     it(`404s an unknown ${name} id`, async () => {
-      for (const unknown of ["missing", "constructor", "__proto__"])
+      // A name in the other namespace, or with no page, is no page here.
+      for (const unknown of [
+        "missing",
+        "constructor",
+        "__proto__",
+        ...(name === "intelligence" ? ["zazel", "shelachel", "saturn-ab"] : []),
+        ...(name === "spirit" ? ["agiel"] : []),
+      ])
         await expect(Page(props(unknown)), unknown).rejects.toMatchObject({
           digest: "NEXT_HTTP_ERROR_FALLBACK;404",
         });

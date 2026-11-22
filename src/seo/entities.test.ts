@@ -225,7 +225,9 @@ describe("entity pages", () => {
     const routes = ["planet", "gdGrade", "sephirah", "treeOfLifePath"] as const;
     expect(pages).toHaveLength(
       routes.reduce((sum, kind) => sum + entityIds(kind).length, 0) +
-        ANGEL_COUNT,
+        ANGEL_COUNT +
+        // The planetary intelligences and spirits (plan 093, decision 8).
+        16,
     );
     const publicTitles = Object.values(PUBLIC_PAGES).map((page) => page.title);
     const titles = new Set([

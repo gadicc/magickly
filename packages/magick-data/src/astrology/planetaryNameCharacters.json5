@@ -68,7 +68,16 @@
                   region's top left corner. `kind`: end; corner; hairpin,
                   a rounded U, at its far point; cusp, a notch, cap or
                   kink; curve, an end of an arc. `mark`, at an end only:
-                  circle, dot, bar, hook, none or other. Regardie's
+                  circle, dot, bar, hook, none or other. Where the
+                  reader recorded more, a vertex may have `via`, points
+                  along a curve on the way to it from the one before;
+                  `hook`, each curl's course from a hooked end to its
+                  tip; or `bar`, the two ends of a bar; and a stroke may
+                  have `rings`, the centres of rings on the line
+                  between its ends. These were in the readers' records from the
+                  first and were added here on 22 November 2026, so that
+                  the pages can draw the curves and marks as read
+                  (Claude, Opus 5.5, copying them unchanged). Regardie's
                   figures are in copyright, and their readings are not
                   here.
 
@@ -403,7 +412,15 @@
           closed: false,
           vertices: [
             { kind: "end", x: 105, y: 298, mark: "none" },
-            { kind: "end", x: 127, y: 286, mark: "none" },
+            {
+              kind: "end",
+              x: 127,
+              y: 286,
+              mark: "none",
+              via: [
+                [112, 297],
+              ],
+            },
           ],
         },
       ],
@@ -416,14 +433,34 @@
             { kind: "corner", x: 77, y: 245 },
             { kind: "hairpin", x: 68, y: 268 },
             { kind: "hairpin", x: 168, y: 171 },
-            { kind: "end", x: 92, y: 277, mark: "hook" },
+            {
+              kind: "end",
+              x: 92,
+              y: 277,
+              mark: "hook",
+              hook: [[
+                [90, 284],
+                [96, 291],
+                [106, 286],
+                [115, 276],
+              ]],
+            },
           ],
         },
         {
           closed: false,
           vertices: [
             { kind: "end", x: 104, y: 299, mark: "none" },
-            { kind: "end", x: 130, y: 286, mark: "none" },
+            {
+              kind: "end",
+              x: 130,
+              y: 286,
+              mark: "none",
+              via: [
+                [118, 300],
+                [127, 293],
+              ],
+            },
           ],
         },
       ],
@@ -532,7 +569,13 @@
         {
           closed: false,
           vertices: [
-            { kind: "end", x: 51, y: 44, mark: "hook" },
+            {
+              kind: "end",
+              x: 51,
+              y: 44,
+              mark: "hook",
+              hook: [[[41, 60]], [[71, 45]]],
+            },
             { kind: "corner", x: 252, y: 249 },
             { kind: "end", x: 186, y: 244, mark: "circle" },
           ],
@@ -715,7 +758,16 @@
         {
           closed: false,
           vertices: [
-            { kind: "end", x: 112, y: 93, mark: "bar" },
+            {
+              kind: "end",
+              x: 112,
+              y: 93,
+              mark: "bar",
+              bar: [
+                [106, 89],
+                [114, 98],
+              ],
+            },
             { kind: "corner", x: 172, y: 46 },
             { kind: "corner", x: 136, y: 238 },
             { kind: "corner", x: 291, y: 182 },
@@ -889,12 +941,30 @@
         {
           closed: false,
           vertices: [
-            { kind: "end", x: 134, y: 151, mark: "bar" },
+            {
+              kind: "end",
+              x: 134,
+              y: 151,
+              mark: "bar",
+              bar: [
+                [126, 145],
+                [141, 160],
+              ],
+            },
             { kind: "corner", x: 177, y: 46 },
             { kind: "corner", x: 70, y: 127 },
             { kind: "corner", x: 375, y: 369 },
             { kind: "corner", x: 245, y: 217 },
-            { kind: "end", x: 206, y: 264, mark: "bar" },
+            {
+              kind: "end",
+              x: 206,
+              y: 264,
+              mark: "bar",
+              bar: [
+                [200, 261],
+                [210, 271],
+              ],
+            },
           ],
         },
       ],
@@ -946,7 +1016,15 @@
           closed: false,
           vertices: [
             { kind: "end", x: 143, y: 68, mark: "circle" },
-            { kind: "curve", x: 193, y: 130 },
+            {
+              kind: "curve",
+              x: 193,
+              y: 130,
+              via: [
+                [160, 62],
+                [197, 111],
+              ],
+            },
             { kind: "corner", x: 184, y: 163 },
             { kind: "corner", x: 348, y: 245 },
             { kind: "corner", x: 234, y: 317 },
@@ -957,7 +1035,17 @@
           closed: false,
           vertices: [
             { kind: "end", x: 143, y: 68, mark: "circle" },
-            { kind: "end", x: 171, y: 150, mark: "other" },
+            {
+              kind: "end",
+              x: 171,
+              y: 150,
+              mark: "other",
+              via: [
+                [127, 90],
+                [140, 125],
+                [160, 145],
+              ],
+            },
           ],
         },
         {
@@ -981,9 +1069,25 @@
         },
         {
           closed: false,
+          rings: [[143, 68]],
           vertices: [
             { kind: "end", x: 170, y: 151, mark: "other" },
-            { kind: "curve", x: 194, y: 133 },
+            {
+              kind: "curve",
+              x: 194,
+              y: 133,
+              via: [
+                [159, 144],
+                [136, 114],
+                [129, 90],
+                [135, 72],
+                [143, 68],
+                [169, 67],
+                [188, 85],
+                [196, 103],
+                [197, 119],
+              ],
+            },
             { kind: "corner", x: 183, y: 162 },
             { kind: "corner", x: 350, y: 245 },
             { kind: "corner", x: 234, y: 318 },
@@ -1111,7 +1215,18 @@
             { kind: "end", x: 57, y: 217, mark: "other" },
             { kind: "corner", x: 14, y: 184 },
             { kind: "corner", x: 135, y: 364 },
-            { kind: "end", x: 166, y: 301, mark: "hook" },
+            {
+              kind: "end",
+              x: 166,
+              y: 301,
+              mark: "hook",
+              hook: [
+                [
+                  [172, 292],
+                  [178, 305],
+                ],
+              ],
+            },
           ],
         },
         {

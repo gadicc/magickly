@@ -3,10 +3,9 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import { renderComponentImage } from "@/render/componentImage";
-import type { CardArt } from "./cards";
+import { CARD_ART_BOX, type CardArt, cardArtRequest } from "./cards";
 
-/** The framed art area on the right of a card, in card pixels. */
-export const CARD_ART_BOX = { width: 440, height: 510 } as const;
+export { CARD_ART_BOX };
 
 const CONTAIN_MARGIN = 28;
 const transparent = { r: 0, g: 0, b: 0, alpha: 0 };
@@ -43,11 +42,7 @@ async function drawArt(art: CardArt): Promise<Buffer> {
     fit = art.fit;
     position = art.position;
   } else {
-    const params = new URLSearchParams(art.query);
-    params.set("fmt", "png");
-    if (art.raster !== "query")
-      params.set("height", String(CARD_ART_BOX.height * 2));
-    source = (await renderComponentImage(art.slug, params)).bytes;
+    source = (await renderComponentImage(art.slug, cardArtRequest(art))).bytes;
   }
   // Contained art keeps a margin inside the frame's rounded corners.
   const margin = fit === "contain" ? CONTAIN_MARGIN : 0;

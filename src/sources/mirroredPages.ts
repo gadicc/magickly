@@ -64,6 +64,14 @@ export interface CommonsScan {
 
 export type Scan = ArchiveScan | GoogleBooksScan | CommonsScan;
 
+/** A passage of a mirrored page that a link cites: what, and where. */
+export interface CitedRegion {
+  /** What on the page is cited, in lower case, as `MirroredPage.cited`. */
+  cited: string;
+  /** Where it is on the page. */
+  highlight: PageRegion;
+}
+
 export interface MirroredPage {
   /** The file's name in `public/sources/`, without `.webp`. */
   id: string;
@@ -77,6 +85,12 @@ export interface MirroredPage {
   cited: string;
   /** Where the cited text or figures are on the page. */
   highlight: PageRegion;
+  /**
+   * Other passages on the same page that pages cite on their own, each
+   * outlined instead of `highlight` when a link names it (`SourceLink`'s
+   * `region`): Agrippa's names leaf, one planet's names at a time.
+   */
+  regions?: Readonly<Record<string, CitedRegion>>;
   /** The original image the mirror is made from (see `originalOf`). */
   original: { sha256: string; width: number; height: number };
   /** The committed WebP, as `pnpm sources:mirror` writes it. */
@@ -211,6 +225,61 @@ export const MIRRORED_PAGES = {
         "995cc4f5d536b4f8cee09a6491e2ea911b4a74ae680d1f9168528d6eee2fa761",
     },
   },
+  // The names of the planets' squares (plan 093, decision 7): Saturn's
+  // to Mercury's on this leaf, the Moon's on the next. The regions were
+  // read off archive.org's 1800-pixel image of the leaf, one block of
+  // names under each planet's heading.
+  agrippa148: {
+    id: "agrippa-de-occulta-philosophia-1533-p148",
+    scan: {
+      site: "archive.org",
+      item: "DeOccultaPhilosophiaLoc1533",
+      leaf: 163,
+    },
+    label: "Agrippa, De occulta philosophia (1533), book II, p. CXLVIII",
+    copy: "the Library of Congress's copy",
+    cited: "the names of the squares of Saturn to Mercury, with their numbers",
+    highlight: { x: 0.31, y: 0.238, width: 0.64, height: 0.563 },
+    regions: {
+      saturn: {
+        cited: "the names of Saturn's square, with their numbers",
+        highlight: { x: 0.31, y: 0.238, width: 0.625, height: 0.118 },
+      },
+      jupiter: {
+        cited: "the names of Jupiter's square, with their numbers",
+        highlight: { x: 0.31, y: 0.357, width: 0.64, height: 0.1 },
+      },
+      mars: {
+        cited: "the names of Mars' square, with their numbers",
+        highlight: { x: 0.31, y: 0.455, width: 0.625, height: 0.09 },
+      },
+      sol: {
+        cited: "the names of the Sun's square, with their numbers",
+        highlight: { x: 0.31, y: 0.543, width: 0.625, height: 0.088 },
+      },
+      venus: {
+        cited: "the names of Venus' square, with their numbers",
+        highlight: { x: 0.31, y: 0.629, width: 0.64, height: 0.077 },
+      },
+      mercury: {
+        cited: "the names of Mercury's square, with their numbers",
+        highlight: { x: 0.31, y: 0.703, width: 0.64, height: 0.098 },
+      },
+    },
+    original: {
+      sha256:
+        "32f7f8289bed9242bcb4b4c16c3717f253bc96897a13902b332388f893288460",
+      width: 1800,
+      height: 2395,
+    },
+    output: {
+      width: 1600,
+      height: 2129,
+      bytes: 293488,
+      sha256:
+        "852534b7c0ad3dad40b575638129d475aabecb0e15037a69a712325375112c9c",
+    },
+  },
   agrippa149: {
     id: "agrippa-de-occulta-philosophia-1533-p149",
     scan: {
@@ -222,6 +291,43 @@ export const MIRRORED_PAGES = {
     copy: "the Library of Congress's copy",
     cited: "the Moon's intelligence of intelligences, numbered 3321",
     highlight: { x: 0.11, y: 0.139, width: 0.635, height: 0.032 },
+    // What the kameas' pages cite on the leaf (plan 093, decision 7).
+    regions: {
+      luna: {
+        cited: "the names of the Moon's square, with their numbers",
+        highlight: { x: 0.11, y: 0.065, width: 0.64, height: 0.107 },
+      },
+      saturnSquare: {
+        cited:
+          "Saturn's square, in numbers and in Hebrew letters, with its seal and the characters of its intelligence and spirit",
+        highlight: { x: 0.11, y: 0.178, width: 0.61, height: 0.32 },
+      },
+      jupiterSquare: {
+        cited:
+          "Jupiter's square, in numbers and in Hebrew letters, with its seal and the characters of its intelligence and spirit",
+        highlight: { x: 0.11, y: 0.506, width: 0.66, height: 0.35 },
+      },
+      // The four characters on the leaf, each the box K6 read it in
+      // (magick-data's planetaryNameCharacters, pixels of this 1800 by
+      // 2428 image) as a fraction of the page, widened to the next
+      // thousandth; a test holds the two equal.
+      agielCharacter: {
+        cited: "the character of Agiel, the intelligence of Saturn",
+        highlight: { x: 0.366, y: 0.401, width: 0.151, height: 0.081 },
+      },
+      zazelCharacter: {
+        cited: "the character of Zazel, the spirit of Saturn",
+        highlight: { x: 0.555, y: 0.395, width: 0.223, height: 0.096 },
+      },
+      iophielCharacter: {
+        cited: "the character of Iophiel, the intelligence of Jupiter",
+        highlight: { x: 0.383, y: 0.753, width: 0.179, height: 0.112 },
+      },
+      hismaelCharacter: {
+        cited: "the character of Hismael, the spirit of Jupiter",
+        highlight: { x: 0.575, y: 0.747, width: 0.15, height: 0.112 },
+      },
+    },
     original: {
       sha256:
         "a765a1d827da2319d93ae421683ed3ee946272bd634510a537af440c9505ec39",
@@ -447,3 +553,24 @@ export const MIRRORED_PAGES = {
 } as const satisfies Record<string, MirroredPage>;
 
 export type MirroredPageKey = keyof typeof MIRRORED_PAGES;
+
+/** The cited regions a mirrored page names, if it has any. */
+export type MirroredRegionKey<K extends MirroredPageKey> =
+  (typeof MIRRORED_PAGES)[K] extends { regions: infer R }
+    ? keyof R & string
+    : never;
+
+/**
+ * A mirrored page as a link to one of its regions shows it: the region's
+ * passage cited and outlined in place of the page's own. Without a region,
+ * or with one the page does not have, the page as it is.
+ */
+export function citedPage(page: MirroredPage, region?: string): MirroredPage {
+  const cited =
+    region !== undefined && page.regions && Object.hasOwn(page.regions, region)
+      ? page.regions[region]
+      : undefined;
+  return cited
+    ? { ...page, cited: cited.cited, highlight: cited.highlight }
+    : page;
+}

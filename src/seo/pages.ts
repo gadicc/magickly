@@ -42,11 +42,59 @@ export const PUBLIC_PAGES = {
       "Astrology tools for magical work: planetary hours for your location, " +
       "the planets with their Hebrew names, the zodiac signs and moon phases.",
   },
+  "/astrology/kamea": {
+    title: "Kamea: The Seven Planetary Magic Squares",
+    description:
+      "A kamea is a planet's magic square. The seven, from Saturn's 3×3 to " +
+      "the Moon's 9×9, as Agrippa printed each kamea bar two misprints, with its names and sigils.",
+  },
+  "/astrology/kamea/saturn": {
+    title: "Kamea of Saturn: The Magic Square of Saturn",
+    description:
+      "The kamea of Saturn, its 3×3 magic square of 1 to 9 with lines of 15, " +
+      "as Agrippa printed it, with the names Agiel and Zazel, their numbers and its seal.",
+  },
+  "/astrology/kamea/jupiter": {
+    title: "Kamea of Jupiter: The Magic Square of Jupiter",
+    description:
+      "The kamea of Jupiter, its 4×4 magic square of 1 to 16 with lines of 34, " +
+      "as Agrippa printed it, with Iophiel and Hismael, their numbers and its seal.",
+  },
+  "/astrology/kamea/mars": {
+    title: "Kamea of Mars: The Magic Square of Mars",
+    description:
+      "The kamea of Mars, its 5×5 magic square of 1 to 25 with lines of 65, " +
+      "as Agrippa printed it, with Graphiel and Bartzabel, their numbers and its seal.",
+  },
+  "/astrology/kamea/sol": {
+    title: "Kamea of the Sun: The Magic Square of Sol",
+    description:
+      "The kamea of the Sun, the 6×6 magic square of Sol: 1 to 36, lines of 111 " +
+      "and a sum of 666, as Agrippa printed it, with Nakhiel, Sorath and its seal.",
+  },
+  "/astrology/kamea/venus": {
+    title: "Kamea of Venus: The Magic Square of Venus",
+    description:
+      "The kamea of Venus, its 7×7 magic square of 1 to 49 with lines of 175, " +
+      "as Agrippa printed it bar one misprint, with Hagiel, Kedemel and the Bne Seraphim.",
+  },
+  "/astrology/kamea/mercury": {
+    title: "Kamea of Mercury: The Magic Square of Mercury",
+    description:
+      "The kamea of Mercury, its 8×8 magic square of 1 to 64 with lines of 260, " +
+      "as Agrippa printed it, with Tiriel, Taphthartharath and its seal.",
+  },
+  "/astrology/kamea/luna": {
+    title: "Kamea of the Moon: The Magic Square of Luna",
+    description:
+      "The kamea of the Moon, the 9×9 magic square of Luna: 1 to 81 with lines " +
+      "of 369, as Agrippa printed it bar one misprint, with Chasmodai and Malcha.",
+  },
   "/astrology/kamea/sigils": {
     title: "Kamea Sigil Generator: Magic Square Sigils",
     description:
       "Trace the sigil of a Hebrew name on the kamea of its planet by the " +
-      "Golden Dawn's Aiq Bekar reduction, from Saturn's square to the Moon's.",
+      "Aiq Bekar reduction Regardie sets out, from Saturn's square to the Moon's.",
   },
   "/astrology/moon": {
     title: "Moon Phases",

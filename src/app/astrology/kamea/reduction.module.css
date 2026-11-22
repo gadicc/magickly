@@ -1,0 +1,31 @@
+/* A traced name's reduction: letter, number, cell (plan 093). */
+
+.reduction {
+  margin: 8px auto 16px;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.reduction caption {
+  padding-bottom: 4px;
+  white-space: nowrap;
+  color: var(--mui-palette-text-secondary);
+}
+
+.reduction th,
+.reduction td {
+  padding: 2px 12px;
+  border-bottom: 1px solid var(--mui-palette-divider);
+}
+
+.word {
+  text-align: start;
+  font-weight: 500;
+}
+
+/* Hebrew that stands alone, letters and names: Frank Ruhl Libre (plan 079,
+   decision 6). */
+.hebrew {
+  font-family: "Frank Ruhl Libre", "Noto Sans Hebrew", serif;
+  font-size: 1.15em;
+}

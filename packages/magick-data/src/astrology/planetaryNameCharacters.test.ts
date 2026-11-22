@@ -178,4 +178,40 @@ describe("the blind readings", () => {
             } else expect(vertex.mark, where).toBeUndefined();
           }
   });
+
+  it("keep a curve's points, a hook's curls, a bar's ends and a ring on the line inside the region, on the marks they belong to", () => {
+    let kept = 0;
+    for (const row of rows)
+      for (const [reader, strokes] of Object.entries(row.readings ?? {}))
+        for (const stroke of strokes) {
+          const points: (readonly number[])[] = [
+            ...(("rings" in stroke && stroke.rings) || []),
+          ];
+          for (const vertex of stroke.vertices) {
+            const extra = vertex as {
+              mark?: string;
+              via?: readonly (readonly number[])[];
+              hook?: readonly (readonly (readonly number[])[])[];
+              bar?: readonly (readonly number[])[];
+            };
+            if (extra.hook) expect(extra.mark, row.id).toBe("hook");
+            if (extra.bar) expect(extra.mark, row.id).toBe("bar");
+            points.push(
+              ...(extra.via ?? []),
+              ...(extra.hook ?? []).flat(),
+              ...(extra.bar ?? []),
+            );
+          }
+          kept += points.length;
+          for (const [x, y] of points) {
+            const where = `${row.id} ${reader} (${x}, ${y})`;
+            expect(x, where).toBeLessThanOrEqual(row.region.width);
+            expect(y, where).toBeLessThanOrEqual(row.region.height);
+          }
+        }
+    // Fable's oval of the spirit of spirits, its ring, the curls of
+    // Bartzabel, Sorath and Malcha, Chasmodai's and the Bne Seraphim's
+    // bars, and Opus' arcs, given in words, as points.
+    expect(kept).toBe(9 + 1 + 4 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 3 + 1);
+  });
 });

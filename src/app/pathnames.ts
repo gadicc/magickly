@@ -22,6 +22,19 @@ const pathnames: Pathnames = {
   admin: /*i18n*/ "Admin",
   astrology: {
     "/": /*i18n*/ "Astrology",
+    // A section, so that each square's page has the others and the
+    // generator in its title's menu (plan 093, K4).
+    kamea: {
+      "/": /*i18n*/ "Kameas",
+      saturn: /*i18n*/ "Kamea of Saturn",
+      jupiter: /*i18n*/ "Kamea of Jupiter",
+      mars: /*i18n*/ "Kamea of Mars",
+      sol: /*i18n*/ "Kamea of the Sun",
+      venus: /*i18n*/ "Kamea of Venus",
+      mercury: /*i18n*/ "Kamea of Mercury",
+      luna: /*i18n*/ "Kamea of the Moon",
+      sigils: /*i18n*/ "Kamea Sigil Generator",
+    },
     moon: /*i18n*/ "Moon Phases",
     "planetary-hours": /*i18n*/ "Planetary Hours",
     planets: /*i18n*/ "Planets",

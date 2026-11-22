@@ -14,6 +14,9 @@ export const ENTITY_ROUTES = [
   "/kabbalah/angel/[slug]",
   "/books/la-science-cabalistique/[division]",
   "/astrology/planet/[id]",
+  // The planetary intelligences' and spirits' sigils (plan 093, decision 8).
+  "/astrology/intelligence/[id]",
+  "/astrology/spirit/[id]",
   "/doc/[_id]",
   "/gd/grade/[id]",
   "/gd/halls/[slug]",

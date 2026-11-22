@@ -58,7 +58,7 @@ describe("sitemap", () => {
   it("claims no change frequency, priority or modification date", () => {
     for (const entry of sitemap())
       expect(Object.keys(entry)).toEqual(
-        /\/gd\/halls\/(?!editor$)[^/]+$|\/kabbalah\/angel\/[^/]+$/.test(
+        /\/gd\/halls\/(?!editor$)[^/]+$|\/kabbalah\/angel\/[^/]+$|\/astrology\/kamea\/(?!sigils$)[^/]+$|\/astrology\/(?:intelligence|spirit)\/[^/]+$/.test(
           entry.url,
         )
           ? ["url", "images"]
@@ -112,7 +112,46 @@ describe("sitemap", () => {
           /^https:\/\/magick\.ly\/kabbalah\/angel\/[a-z0-9-]+\/[a-z0-9-]+\.(?:png|svg)$/,
         );
     }
-    expect(sitemap().filter((entry) => entry.images)).toHaveLength(14 + 72);
+    expect(sitemap().filter((entry) => entry.images)).toHaveLength(
+      14 + 72 + 7 + 16,
+    );
+  });
+
+  it("lists each kamea's square, the PNG then the SVG (plan 093, K4)", () => {
+    const kameas = sitemap().filter((entry) =>
+      /\/astrology\/kamea\/(?!sigils$)[^/]+$/.test(entry.url),
+    );
+    expect(kameas.map((entry) => entry.url)).toEqual(
+      ["saturn", "jupiter", "mars", "sol", "venus", "mercury", "luna"].map(
+        (planet) => `https://magick.ly/astrology/kamea/${planet}`,
+      ),
+    );
+    expect(kameas[3]).toEqual({
+      url: "https://magick.ly/astrology/kamea/sol",
+      images: [
+        "https://magick.ly/astrology/kamea/sol/kamea-of-the-sun-magic-square.png",
+        "https://magick.ly/astrology/kamea/sol/kamea-of-the-sun-magic-square.svg",
+      ],
+    });
+    // The hub and the generator have no image files of their own.
+    for (const path of ["/astrology/kamea", "/astrology/kamea/sigils"])
+      expect(
+        sitemap().find((entry) => entry.url === `https://magick.ly${path}`),
+      ).toEqual({ url: `https://magick.ly${path}` });
+  });
+
+  it("lists each planetary name's sigil, the PNG then the SVG (plan 093, K4)", () => {
+    const names = sitemap().filter((entry) =>
+      /\/astrology\/(?:intelligence|spirit)\//.test(entry.url),
+    );
+    expect(names).toHaveLength(16);
+    expect(names[1]).toEqual({
+      url: "https://magick.ly/astrology/spirit/zazel",
+      images: [
+        "https://magick.ly/astrology/spirit/zazel/sigil-of-zazel.png",
+        "https://magick.ly/astrology/spirit/zazel/sigil-of-zazel.svg",
+      ],
+    });
   });
 
   it("writes XML that parses, with the image namespace", () => {
@@ -126,12 +165,19 @@ describe("sitemap", () => {
       "http://www.google.com/schemas/sitemap-image/1.1",
       "loc",
     );
-    // The angels' come first, with the entity pages; then the halls'.
-    expect(images).toHaveLength(144 + 28);
+    // The kameas' come first, with the public pages; then the angels' and
+    // the planetary names', with the entity pages; then the halls'.
+    expect(images).toHaveLength(14 + 144 + 32 + 28);
     expect(images[0].textContent).toBe(
+      "https://magick.ly/astrology/kamea/saturn/kamea-of-saturn-magic-square.png",
+    );
+    expect(images[14].textContent).toBe(
       "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png",
     );
-    expect(images[144].textContent).toBe(
+    expect(images[14 + 144].textContent).toBe(
+      "https://magick.ly/astrology/intelligence/agiel/sigil-of-agiel.png",
+    );
+    expect(images[14 + 144 + 32].textContent).toBe(
       "https://magick.ly/gd/halls/neophyte/golden-dawn-neophyte-temple.png",
     );
   });

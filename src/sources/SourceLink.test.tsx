@@ -8,6 +8,7 @@ import {
 } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it } from "vitest";
+import { MIRRORED_PAGES } from "./mirroredPages";
 import SourceLink from "./SourceLink";
 
 afterEach(cleanup);
@@ -97,6 +98,39 @@ describe("SourceLink", () => {
       await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull(), {
         timeout: 5000,
       });
+    },
+    OPENS_DIALOG,
+  );
+
+  it(
+    "outlines and names the region a link cites (plan 093, K4)",
+    async () => {
+      render(
+        <SourceLink page="agrippa148" region="venus">
+          Venus' names
+        </SourceLink>,
+      );
+      const link = screen.getByRole("link", { name: "Venus' names" });
+      expect(link.getAttribute("href")).toBe(
+        "https://archive.org/details/DeOccultaPhilosophiaLoc1533/page/n163/mode/1up",
+      );
+      fireEvent.click(link);
+      const dialog = await screen.findByRole(
+        "dialog",
+        { name: "Agrippa, De occulta philosophia (1533), book II, p. CXLVIII" },
+        { timeout: 5000 },
+      );
+      expect(
+        screen.getByText(
+          /Outlined: the names of Venus' square, with their numbers\./,
+        ),
+      ).toBeTruthy();
+      expect(dialog.querySelector("[data-highlight]")).toBeTruthy();
+      expect(
+        screen.getByRole("img", {
+          name: `${MIRRORED_PAGES.agrippa148.label}, as printed; outlined: the names of Venus' square, with their numbers.`,
+        }),
+      ).toBeTruthy();
     },
     OPENS_DIALOG,
   );

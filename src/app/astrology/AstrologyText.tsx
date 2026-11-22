@@ -71,6 +71,13 @@ export default function AstrologyText() {
         <Link href="/astrology/planet/primum-mobile">Primum Mobile</Link>, as
         well as Uranus, Neptune and the Moon&apos;s nodes.
       </p>
+      <p>
+        <Link href="/astrology/kamea">The Kameas</Link> are the seven
+        planets&apos; magic squares as Agrippa printed them, bar a misprinted
+        number in Venus&apos; and the Moon&apos;s, with the names of their
+        intelligences and spirits, the numbers those names add up to, and the
+        planets&apos; seals.
+      </p>
       <H3>The zodiac</H3>
       <p>
         <Link href="/astrology/zodiac">The Zodiac</Link> gives the twelve signs,

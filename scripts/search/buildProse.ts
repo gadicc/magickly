@@ -7,6 +7,7 @@ import {
 } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { ADAPTED_PAGES } from "../../src/search/adaptedPages";
 import { VECTOR_ARTIFACT } from "../../src/search/embeddings/artifact";
 import { EMBEDDING_PROFILES } from "../../src/search/embeddings/profiles";
 import { assembleVectorArtifact } from "../../src/search/embeddings/rows";
@@ -21,8 +22,11 @@ function update(output: string, next: string | Buffer) {
     writeFileSync(output, next);
 }
 
+// A page whose document an adapter builds has no extracted prose.
 const prose = Object.fromEntries(
-  Object.keys(PUBLIC_PAGES).map((path) => [path, pageProse(root, path)]),
+  Object.keys(PUBLIC_PAGES)
+    .filter((path) => !ADAPTED_PAGES.has(path))
+    .map((path) => [path, pageProse(root, path)]),
 );
 mkdirSync(resolve(root, "src/search/generated"), { recursive: true });
 update(resolve(root, "src/search/generated/prose.json"), JSON.stringify(prose));

@@ -10,6 +10,7 @@ vi.mock("next/navigation", async (importActual) => ({
   useRouter: () => ({ push }),
 }));
 
+import { kameaOfStation, kameasInHall } from "@/app/astrology/kamea/halls";
 import { GD_HALLS, gdHall, gdHallTitle } from "@/render/contracts/gdHall";
 import { hallFiles, hallJsonLd, hallMetadata } from "@/seo/halls";
 import Hall, {
@@ -231,5 +232,28 @@ describe("a temple hall's page", () => {
       "/gd/halls/zelator-1/golden-dawn-zelator-1-temple.png",
     ]);
     expect(hallMetadata("nope")).toBeNull();
+  });
+});
+
+describe("a hall that draws a kamea", () => {
+  it("links the square's station to the kamea's page (plan 093, K4)", () => {
+    expect(kameasInHall(gdHall("theoricus-2") as never)).toEqual(["luna"]);
+    expect(
+      kameaOfStation(gdHall("philosophus-4") as never, "kamea of Venus"),
+    ).toBe("venus");
+    expect(
+      kameaOfStation(gdHall("philosophus-4") as never, "kamea of the Moon"),
+    ).toBeUndefined();
+    expect(html("theoricus-2")).toMatch(
+      /<a[^>]*href="\/astrology\/kamea\/luna"[^>]*>Kamea of the Moon<\/a>/,
+    );
+    expect(html("philosophus-4")).toMatch(
+      /<a[^>]*href="\/astrology\/kamea\/venus"[^>]*>Kamea of Venus<\/a>/,
+    );
+    for (const hall of GD_HALLS)
+      if (!["theoricus-2", "philosophus-4"].includes(hall.slug))
+        expect(html(hall.slug), hall.slug).not.toContain(
+          'href="/astrology/kamea',
+        );
   });
 });

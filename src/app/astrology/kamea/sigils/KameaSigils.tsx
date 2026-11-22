@@ -29,6 +29,8 @@ import {
   KAMEA_SIGIL_LETTERS,
   KAMEA_SIGIL_MAX_LETTERS,
 } from "@/render/contracts/kameaSigil";
+import { KAMEA_PLANET_LABELS, KAMEA_SQUARE_LABELS } from "../kameaPlanets";
+import ReductionTable from "../ReductionTable";
 import { type KameaSigilState, kameaSigilPagePath } from "./kameaSigilState";
 import styles from "./kameaSigils.module.css";
 import { kameaSigilNames, WITNESS_LABELS } from "./names";
@@ -36,15 +38,7 @@ import { reduceOnKamea } from "./reduction";
 import { useKameaSigil } from "./useKameaSigil";
 
 /** Each planet as the picker names it, in the Chaldean order. */
-const PLANET_LABELS: Record<KameaImagePlanet, string> = {
-  saturn: /*i18n*/ "Saturn",
-  jupiter: /*i18n*/ "Jupiter",
-  mars: /*i18n*/ "Mars",
-  sol: /*i18n*/ "The Sun",
-  venus: /*i18n*/ "Venus",
-  mercury: /*i18n*/ "Mercury",
-  luna: /*i18n*/ "The Moon",
-};
+const PLANET_LABELS = KAMEA_PLANET_LABELS;
 
 /** A sigil's accessible name, by its square's planet. */
 const SIGIL_LABELS: Record<KameaImagePlanet, string> = {
@@ -58,15 +52,7 @@ const SIGIL_LABELS: Record<KameaImagePlanet, string> = {
 };
 
 /** A bare square's accessible name. */
-const SQUARE_LABELS: Record<KameaImagePlanet, string> = {
-  saturn: /*i18n*/ "Kamea of Saturn",
-  jupiter: /*i18n*/ "Kamea of Jupiter",
-  mars: /*i18n*/ "Kamea of Mars",
-  sol: /*i18n*/ "Kamea of the Sun",
-  venus: /*i18n*/ "Kamea of Venus",
-  mercury: /*i18n*/ "Kamea of Mercury",
-  luna: /*i18n*/ "Kamea of the Moon",
-};
+const SQUARE_LABELS = KAMEA_SQUARE_LABELS;
 
 /** The name whose division into two words is ours (decision 10). */
 const DIVIDED_NAME = "schedbarschemoth-schartathan";
@@ -328,54 +314,7 @@ export default function KameaSigils({
         ) : null}
       </div>
 
-      {reduction.length > 0 && (
-        <table className={styles.reduction}>
-          <caption>
-            <UiText message={/*i18n*/ "Each letter, its number and its cell"} />
-          </caption>
-          <thead>
-            <tr>
-              <th scope="col">
-                <UiText message={/*i18n*/ "Letter"} />
-              </th>
-              <th scope="col">
-                <UiText message={/*i18n*/ "Number"} />
-              </th>
-              <th scope="col">
-                <UiText message={/*i18n*/ "Cell"} />
-              </th>
-            </tr>
-          </thead>
-          {reduction.map((word, w) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: words in reading order
-            <tbody key={w}>
-              {reduction.length > 1 && (
-                <tr>
-                  <th scope="rowgroup" colSpan={3} className={styles.word}>
-                    <UiText
-                      message={/*i18n*/ "Word {number}"}
-                      values={{ number: w + 1 }}
-                    />{" "}
-                    <span lang="he" dir="rtl" className={styles.hebrew}>
-                      {word.map((letter) => letter.letter).join("")}
-                    </span>
-                  </th>
-                </tr>
-              )}
-              {word.map((letter, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: letters in order
-                <tr key={i}>
-                  <td lang="he" dir="rtl" className={styles.hebrew}>
-                    {letter.letter}
-                  </td>
-                  <td>{letter.value}</td>
-                  <td>{letter.cell}</td>
-                </tr>
-              ))}
-            </tbody>
-          ))}
-        </table>
-      )}
+      <ReductionTable reduction={reduction} />
 
       {/* The one-row image the downloads draw, from the same figure. */}
       <div

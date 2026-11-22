@@ -1,14 +1,44 @@
 import MuiLink from "@mui/material/Link";
 import type { PlanetRow } from "magick-data/rows";
+import type { ReactNode } from "react";
+import { isKameaPlanet } from "@/app/astrology/kamea/kameaPlanets";
+import {
+  planetaryNamePath,
+  planetaryNamesOf,
+} from "@/app/astrology/kamea/planetaryNames";
 import SourceLink from "@/sources/SourceLink";
 import { Hebrew } from "@/ui/entity";
+import Link from "@/ui/Link";
 import styles from "./intelligence.module.css";
 
 /** What the two components read of a planet's row. */
 type WithIntelligence = Pick<
   PlanetRow,
-  "intelligence" | "intelligenceOfIntelligences"
+  "id" | "intelligence" | "intelligenceOfIntelligences"
 >;
+
+/**
+ * A name linked to its own page where it has one (plan 093, decision 8),
+ * otherwise the name alone: Shelachel, whom nothing traces, has none.
+ */
+function NameLink({
+  path,
+  children,
+}: {
+  path: string | null | undefined;
+  children: ReactNode;
+}) {
+  return path ? <Link href={path}>{children}</Link> : <>{children}</>;
+}
+
+/** The page of a planet's intelligence of intelligences, the Moon's. */
+function classicalPath(planetId: string) {
+  if (!isKameaPlanet(planetId)) return null;
+  const row = planetaryNamesOf(planetId).find(
+    (name) => name.role === "intelligenceOfIntelligences",
+  );
+  return row ? planetaryNamePath(row) : null;
+}
 
 /**
  * The anchors of the notes and of the references to them. A page shows the
@@ -48,14 +78,24 @@ function NoteRef({ n }: { n: 1 | 2 }) {
 export function Intelligence({
   planet,
   hebrew = false,
+  linked = false,
 }: {
   planet: WithIntelligence;
   hebrew?: boolean;
+  /**
+   * Link each name to its own page where it has one (plan 093, decision
+   * 8), as the planet page does; the geomancy reference's table does not.
+   */
+  linked?: boolean;
 }) {
   const name = planet.intelligence?.name.roman;
   const classical = planet.intelligenceOfIntelligences;
   if (!name) return null;
-  if (!classical) return <>{name}</>;
+  const path =
+    linked && planet.intelligence
+      ? planetaryNamePath(planet.intelligence)
+      : null;
+  if (!classical) return <NameLink path={path}>{name}</NameLink>;
   return (
     <>
       {hebrew ? (
@@ -63,8 +103,10 @@ export function Intelligence({
           <Hebrew>{classical.he}</Hebrew>{" "}
         </>
       ) : null}
-      <span lang="he-Latn">{classical.roman.agrippa1533}</span>
-      <NoteRef n={1} /> / {name}
+      <NameLink path={linked ? classicalPath(planet.id) : null}>
+        <span lang="he-Latn">{classical.roman.agrippa1533}</span>
+      </NameLink>
+      <NoteRef n={1} /> / <NameLink path={path}>{name}</NameLink>
       <NoteRef n={2} />
     </>
   );

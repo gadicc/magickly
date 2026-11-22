@@ -4,6 +4,8 @@ import {
   hallSourceText,
   hallSourceUrl,
 } from "magick-components/gd/hall/presets";
+import { kameaOfStation } from "@/app/astrology/kamea/halls";
+import { kameaPath } from "@/app/astrology/kamea/kameaPlanets";
 import {
   GD_HALL_LICENCE,
   GD_HALLS,
@@ -158,12 +160,27 @@ export default function HallPage({ hall }: { hall: GdHallEntry }) {
                   </Row>
                 ),
               )}
-              {stations.furniture.map((thing, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: as for the officers
-                <Row key={`f${i}`} label={capitalised(thing.name)}>
-                  {thing.where}
-                </Row>
-              ))}
+              {stations.furniture.map((thing, i) => {
+                // A planet's square links its own page (plan 093, K4).
+                const kamea = kameaOfStation(hall, thing.name);
+                return (
+                  <Row
+                    // biome-ignore lint/suspicious/noArrayIndexKey: as for the officers
+                    key={`f${i}`}
+                    label={
+                      kamea ? (
+                        <Link href={kameaPath(kamea)}>
+                          {capitalised(thing.name)}
+                        </Link>
+                      ) : (
+                        capitalised(thing.name)
+                      )
+                    }
+                  >
+                    {thing.where}
+                  </Row>
+                );
+              })}
             </EntityTable>
             <p className={styles.note}>
               East is at the top of the plan and North on the left; stations are

@@ -1,0 +1,70 @@
+/* A planetary intelligence's or spirit's page (plan 093, K4). */
+
+/* Under the frame's own h2, a step smaller (the entity pages' scale). */
+.subheading {
+  font-size: 0.95rem;
+  margin: 1.6em 0 0.5em;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The sigil's figures, a square a word, wrapping right to left, centred;
+   each at its square's least size, which is under a phone's width. */
+.sigil {
+  justify-content: center;
+  gap: 8px;
+  margin: 0.75em 0;
+}
+
+.figure {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1.4em;
+  margin: 0 0 1em;
+}
+
+/* Agrippa's character redrawn, in the text's colour, at most its box's
+   own size and never wider than the column. */
+.character {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0.5em auto;
+}
+
+.caption {
+  font-size: 0.85rem;
+  color: var(--mui-palette-text-secondary);
+  text-align: center;
+}
+
+.list {
+  padding-inline-start: 1.2em;
+}
+
+.list li {
+  margin-bottom: 0.4em;
+}
+
+.note {
+  font-size: 0.9rem;
+  color: var(--mui-palette-text-secondary);
+}
+
+/* Hebrew that stands alone, letters and names: Frank Ruhl Libre (plan 079,
+   decision 6). */
+.hebrew {
+  font-family: "Frank Ruhl Libre", "Noto Sans Hebrew", serif;
+  font-size: 1.15em;
+}

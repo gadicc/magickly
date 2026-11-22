@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { kameaSigilFromSearchParams } from "@/app/astrology/kamea/sigils/kameaSigilState";
 import { sigilFromSearchParams } from "@/app/gd/sigils/sigilState";
+import { parseComponentImageRequest } from "@/render/componentImageRequest";
 import { socialCards } from "./cardList";
-import { hallCardArt, socialCard, socialCardImage } from "./cards";
+import {
+  cardArtRequest,
+  hallCardArt,
+  socialCard,
+  socialCardImage,
+} from "./cards";
 import { entityPages } from "./entities";
 import { pageMetadata, seoMetadata } from "./metadata";
 import { PUBLIC_PAGES, type PublicPath } from "./pages";
@@ -17,6 +23,26 @@ function imageUrl(metadata: ReturnType<typeof pageMetadata>) {
 }
 
 describe("social cards", () => {
+  it("asks every diagram's contract for art it will draw", () => {
+    // The build draws each card's art through its contract; a request the
+    // contract refuses fails `next build` on that card (Malcha's sigil, a
+    // row of five squares, was too wide when asked for by height).
+    const diagrams = socialCards().filter(
+      (card) => card.art.kind === "diagram",
+    );
+    expect(diagrams.length).toBeGreaterThan(16 + 8);
+    const refused = diagrams.flatMap((card) => {
+      const art = card.art as Extract<typeof card.art, { kind: "diagram" }>;
+      try {
+        parseComponentImageRequest(art.slug, cardArtRequest(art));
+        return [];
+      } catch {
+        return [`${card.segments.join("/")}: ${art.slug}?${art.query ?? ""}`];
+      }
+    });
+    expect(refused).toEqual([]);
+  });
+
   it("names the home card after the site's purpose", () => {
     expect(socialCard("/", "Magick.ly: anything")).toEqual({
       segments: ["home.png"],
