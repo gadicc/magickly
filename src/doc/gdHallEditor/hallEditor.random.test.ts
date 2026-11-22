@@ -1,7 +1,8 @@
 import type { HallAttrSpec } from "magick-components/gd/hall";
 import { HALL_PRESETS } from "magick-components/gd/hall/presets";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { gdHallArt } from "@/app/gd/halls/art";
+import { LOADED_TEST_TIMEOUT } from "../../../tests/loadBudget";
 import { gdHallSource } from "../gdHallRows";
 import { isRitualNodeId } from "../ritualNodeIds";
 import { parseRitualPug, printRitualPug } from "../ritualPug";
@@ -28,6 +29,13 @@ import { type HallElement, normalizeHall } from "./hallModel";
 import { hallPalette, insertFromPalette } from "./hallPalette";
 import { reorderRowChild, rowPlace, spreadRowEvenly } from "./hallRows";
 import { sequentialIds } from "./hallTestFixtures";
+
+// Each preset takes 120 random edits through Pug: up to 2.3 s alone under
+// coverage and 6.6 s with two coverage runs at once (tests/loadBudget.ts).
+vi.setConfig({
+  testTimeout: LOADED_TEST_TIMEOUT,
+  hookTimeout: LOADED_TEST_TIMEOUT,
+});
 
 /**
  * Random editor operations on every preset (plan 061, decision 11): after

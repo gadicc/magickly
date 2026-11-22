@@ -15,6 +15,7 @@ import {
   glossOptions,
 } from "../../src/app/enochian/translate/lookup.ts";
 import { fold } from "../../src/app/enochian/translate/lookupData.ts";
+import { LOADED_TEST_TIMEOUT } from "../../tests/loadBudget.ts";
 import { readCache } from "./cache.ts";
 import {
   DENYLIST,
@@ -294,7 +295,12 @@ describe("the committed hint table", () => {
     expect(text).toBe(tableText(table));
   });
 
-  it("holds each word once, plain, a gap the lookup shows, at or above its cut-off's gloss", () => {
+  // Reads all 1,660 words through the lookup: 0.4 s alone, 2.8 s under
+  // coverage, up to 12.4 s with two coverage runs at once
+  // (tests/loadBudget.ts).
+  it("holds each word once, plain, a gap the lookup shows, at or above its cut-off's gloss", {
+    timeout: LOADED_TEST_TIMEOUT,
+  }, () => {
     const forms = new Map(glosses.map((one) => [one.shown, one.forms]));
     const words = table.hints.flatMap(([, , list]) => list.split(" "));
     expect(words).toHaveLength(table.rows);

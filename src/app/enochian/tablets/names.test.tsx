@@ -17,9 +17,18 @@ import {
   onTestFinished,
   vi,
 } from "vitest";
+import { LOADED_TEST_TIMEOUT } from "../../../../tests/loadBudget";
 import { tabletNameLinks } from "./nameLinks";
 import { differingSquares } from "./squareReadings";
 import Tablets from "./tablets";
+
+// Each test renders the tablets' page with every name: up to 0.9 s alone
+// under coverage and 6.9 s with two coverage runs at once
+// (tests/loadBudget.ts).
+vi.setConfig({
+  testTimeout: LOADED_TEST_TIMEOUT,
+  hookTimeout: LOADED_TEST_TIMEOUT,
+});
 
 // Imported on the server only; the tests read it directly.
 vi.mock("server-only", () => ({}));

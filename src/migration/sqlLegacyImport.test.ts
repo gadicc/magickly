@@ -15,6 +15,7 @@ import {
   importSecret,
   legacyImportFixture,
 } from "../../tests/legacyImportFixtures";
+import { LOADED_TEST_TIMEOUT } from "../../tests/loadBudget";
 import * as schema from "../db/schema";
 import { captureLegacyImportCatalog } from "./legacyImportCatalog";
 import { createLegacyImportCheckpoint } from "./legacyImportCheckpoint";
@@ -28,6 +29,13 @@ import {
   type SqlLegacyImportDatabase,
   SqlLegacyImportError,
 } from "./sqlLegacyImport";
+
+// Each test imports into PGlite: up to 3.9 s alone under coverage and
+// 15.5 s with two coverage runs at once (tests/loadBudget.ts).
+vi.setConfig({
+  testTimeout: LOADED_TEST_TIMEOUT,
+  hookTimeout: LOADED_TEST_TIMEOUT,
+});
 
 const harness = await createMemoryPgliteHarness({ schema });
 const { db, client } = harness;

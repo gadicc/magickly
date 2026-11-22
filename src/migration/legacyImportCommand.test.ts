@@ -33,9 +33,18 @@ import {
   importSecret,
   legacyImportFixture,
 } from "../../tests/legacyImportFixtures";
+import { LOADED_TEST_TIMEOUT } from "../../tests/loadBudget";
 import * as schema from "../db/schema";
 import { captureLegacyImportCatalog } from "./legacyImportCatalog";
 import { LEGACY_IMPORT_COLLECTIONS } from "./prepareLegacyImport";
+
+// Each test prepares and applies an import in PGlite: up to 1.8 s alone
+// under coverage and 5.4 s with two coverage runs at once
+// (tests/loadBudget.ts).
+vi.setConfig({
+  testTimeout: LOADED_TEST_TIMEOUT,
+  hookTimeout: LOADED_TEST_TIMEOUT,
+});
 
 // The command is exercised against real private files and the actual BSON and
 // checkpoint helpers. Only authenticated provider/SQL effects are replaced.

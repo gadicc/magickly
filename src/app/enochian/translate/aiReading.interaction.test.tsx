@@ -2,6 +2,7 @@
 import {
   act,
   cleanup,
+  configure,
   fireEvent,
   render,
   screen,
@@ -9,6 +10,10 @@ import {
   within,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  LOADED_TEST_TIMEOUT,
+  LOADED_WAIT_TIMEOUT,
+} from "../../../../tests/loadBudget";
 import { USES_URL } from "../dictionary/InTheKeys";
 import { buildKeysTable } from "./keysTable";
 import { TRANSLATOR_LIMITATIONS } from "./limitations";
@@ -20,6 +25,15 @@ import type { ReadingEvent } from "./reading/respond";
 import { READING_URL } from "./readingRequest";
 import { lookupRuleNotes } from "./ruleNotes.server";
 import Translator from "./translator";
+
+// Each test builds the translator afresh: up to 1.1 s alone under
+// coverage and 8 s with two coverage runs at once, when its waits also
+// outran Testing Library's 1 s (tests/loadBudget.ts).
+vi.setConfig({
+  testTimeout: LOADED_TEST_TIMEOUT,
+  hookTimeout: LOADED_TEST_TIMEOUT,
+});
+configure({ asyncUtilTimeout: LOADED_WAIT_TIMEOUT });
 
 /**
  * The AI reading on the translator page (plan 081, S2 and S7; step 2E),

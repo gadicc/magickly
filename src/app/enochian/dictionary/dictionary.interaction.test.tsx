@@ -2,6 +2,7 @@
 import {
   act,
   cleanup,
+  configure,
   fireEvent,
   render,
   screen,
@@ -9,9 +10,22 @@ import {
   within,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  LOADED_TEST_TIMEOUT,
+  LOADED_WAIT_TIMEOUT,
+} from "../../../../tests/loadBudget";
 import { GEMATRIA_NOTE } from "../gematria";
 import Dictionary from "./dictionary";
 import { USES_URL } from "./InTheKeys";
+
+// Each test renders the whole dictionary: up to 2.4 s alone under coverage
+// and 11.8 s with two coverage runs at once, when waits for its sheet also
+// outran Testing Library's 1 s (tests/loadBudget.ts).
+vi.setConfig({
+  testTimeout: LOADED_TEST_TIMEOUT,
+  hookTimeout: LOADED_TEST_TIMEOUT,
+});
+configure({ asyncUtilTimeout: LOADED_WAIT_TIMEOUT });
 
 const PATH = "/enochian/dictionary";
 

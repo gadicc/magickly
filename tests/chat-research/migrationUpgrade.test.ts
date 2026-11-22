@@ -21,6 +21,14 @@ import {
   guardSqlAuthHandler,
 } from "../../src/auth/cutoverReadiness";
 import * as schema from "../../src/db/schema";
+import { LOADED_TEST_TIMEOUT } from "../loadBudget";
+
+// Each test migrates a populated PGlite database: up to 3.1 s alone under
+// coverage and 9.4 s with two coverage runs at once (tests/loadBudget.ts).
+vi.setConfig({
+  testTimeout: LOADED_TEST_TIMEOUT,
+  hookTimeout: LOADED_TEST_TIMEOUT,
+});
 
 vi.mock("server-only", () => ({}));
 vi.mock("../../src/db/neonFull", () => ({ db: {} }));
