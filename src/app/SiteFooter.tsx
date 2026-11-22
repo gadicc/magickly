@@ -30,7 +30,7 @@ function FooterLink({
   const { t, locale } = useUiLanguage();
   const external = /^https?:/.test(link.url);
   return (
-    <Box component="li" sx={{ py: 0.25 }}>
+    <Box component="li">
       {external ? (
         <a href={link.url} style={linkStyle}>
           {t(link.title)}
@@ -114,6 +114,14 @@ export default function SiteFooter() {
             color: "primary.dark",
             textDecoration: "underline",
           },
+          // Each link a target of its own (AGENTS.md "Layout"): 24px with a
+          // mouse, 44px on a touch screen.
+          "& a": {
+            display: "inline-flex",
+            alignItems: "center",
+            minBlockSize: 24,
+          },
+          "@media (pointer: coarse)": { "& a": { minBlockSize: 44 } },
         },
         // A band on the dark page too, and links that brighten on hover:
         // the dark scheme's `primary.dark` is dimmer than the text.

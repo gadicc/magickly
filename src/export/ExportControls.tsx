@@ -152,8 +152,20 @@ export default function ExportControls({
   const personal = link ? CONTRACTS[link.slug].personal : false;
   const svgPath = link && componentImagePath(link);
   const pngPath = link && componentImagePath(link, { format: "png" });
-  const buttonSx = { minWidth: 0, px: 0.75, py: 0, fontSize: "inherit" };
-  const linkSx = { px: 0.5 };
+  // Targets of their own (AGENTS.md "Layout"): 24px with a mouse, 44px
+  // square at least on a touch screen.
+  const tapTarget = {
+    minBlockSize: 24,
+    "@media (pointer: coarse)": { minBlockSize: 44, minInlineSize: 44 },
+  };
+  const buttonSx = {
+    minWidth: 0,
+    px: 0.75,
+    py: 0,
+    fontSize: "inherit",
+    ...tapTarget,
+  };
+  const linkSx = { px: 0.5, ...tapTarget };
   return (
     <div style={{ textAlign: "center", fontSize: "90%" }}>
       <div>

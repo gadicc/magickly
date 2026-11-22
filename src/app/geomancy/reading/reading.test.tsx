@@ -61,12 +61,14 @@ describe("geomancy reading page", () => {
   // that, 80300 83f38421…, 80290 045035b8… and 80301 584de33d…), and when
   // the hints switch's label named the Key of Solomon in place of the
   // removed `magickTypes` (before that, 80804 a3969ba3…, 80794 95663f49…
-  // and 80805 c2462b01…); the bytes are otherwise those from before the
-  // rekey.
+  // and 80805 c2462b01…), and when the export buttons became tap-sized
+  // targets, which changed only their styles and class names (before that,
+  // 80837 910f4c74…, 80827 bd978df9… and 80838 88f4df44…); the bytes are
+  // otherwise those from before the rekey.
   it.each([
     [
       "1",
-      "80837 910f4c74cd3e79a5b2bbeeab85d5dd465dc2172f584a346d90cb30d757331854",
+      "81343 c55494a3f45a1090e291599ce535030e8fc14f289d50b18b9ad20589107f60ec",
       [
         "The querent: their life",
         "Good, except in war.",
@@ -76,7 +78,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "7",
-      "80827 bd978df9c9698da1e8de637e6eb291dc54988704bb9a96b023056f4b1483c309",
+      "81333 6aeda904c83978e50d1a378c8c35cfa8d80784190915b8d02486f71d7222223d",
       [
         "Marriage and other unions",
         "Indifferent.",
@@ -86,7 +88,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "12",
-      "80838 88f4df44095ff2fc8105ef0a4f6818067bdf97eb6d1aa56fa54e51b8b42afe64",
+      "81344 adb5051920a277015f2ba3508aac6645770834a73a8a12fc5603f71b29679231",
       [
         "Enemies; servants; imprisonment",
         "Unfavourable generally.",
