@@ -194,6 +194,12 @@ flip this during routine copy work. The final launch checklist lives in
 
 ## Site search embeddings
 
+Search reads a page's literal JSX children and never props
+(`scripts/search/prose.ts`), so pass prose to a layout component as children,
+not as a prop (`notes={…}`, `drawing={…}`): text in a prop drops out of the
+index without a failing test. `ToolLayout`'s slots and the Oration's notes
+are children for this reason.
+
 A commit that adds or changes indexed public text (a new public page, prose on
 an indexed page, a component entry) moves the search catalogue's digest, and
 `src/search/embeddings/manifest.test.ts` and `src/search/semantic.test.ts`
