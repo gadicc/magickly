@@ -20,6 +20,9 @@ export default defineConfig({
     environment: "node",
     // The data tables are generated; a test file run on its own builds them.
     globalSetup: ["./packages/magick-data/src/build.ts"],
+    // A Testing Library wait returns only after React has run the effects
+    // of the commit it saw (see the file).
+    setupFiles: ["./tests/settleEffects.ts"],
     // Agent sessions register git worktrees under .claude/, each a full
     // checkout whose test files this glob would otherwise collect and run.
     exclude: [
