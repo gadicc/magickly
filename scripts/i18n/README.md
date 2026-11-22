@@ -44,7 +44,7 @@ the page boundary before streaming or content lookup.
 
 ## Translation maintenance
 
-`translation.ts` reads/writes catalogs through the installed Lingui PO formatter.
+`translation.mts` reads/writes catalogs through the installed Lingui PO formatter.
 It selects only missing/fuzzy, non-obsolete messages and preserves existing
 translations and translator context. ICU compilation checks syntax; structural
 checks preserve variable names/types, select keys, exact-number plural selectors,
@@ -64,16 +64,52 @@ project's environment. Alternatively pass `--model <id>` to
 task uses `loom env`; framework dev/build still loads its own environment.
 The model is not silently selected or upgraded by this script.
 
-Translation runs in batches of 20, using the existing AI SDK's structured output.
+Translation uses `@gadicc/loom/i18n` with app-owned [context](context.ts): site
+purpose, glossary, preservation rules and file-to-section/page mappings. Source
+paths are relative to this project root. Both script requests and direct agent
+translation use this context; inspect all relevant source usages for ambiguity.
+Descriptions are locale-neutral facts, while rules preserve source works and the
+tools' working languages. Reviewed translations are never refreshed merely
+because context changes. Unknown origins receive site context and appear in the
+coverage report; maintain mappings as files move.
+
+`pnpm i18n:preview` prints the SDK input and response schema locally,
+without loading the provider SDK. This opt-in output contains source copy and
+catalog context; it is not the provider's wire payload. `--preview` takes
+precedence over `--write`. Request limits are 20 messages and 24,000 string code
+units including system/prompt inputs; context grouping or size can split batches.
+Technical Lingui markers are retained in PO files but omitted from requests.
+
 Any missing/duplicate result, malformed ICU, changed placeholder or failed batch
 aborts without writing. The complete locale is saved atomically after checking
-that the source catalog has not changed during the run. Errors omit provider
-request/credential details. Only committed first-party catalog messages and
-translator comments are sent; no database, stored document or runtime content is
-read. No AI calls run on page requests, builds, CI, or ordinary compilation.
+that the catalog has not changed during the run. Errors omit provider request and
+credential details. Only first-party catalog messages and translator context are
+read; no database or runtime content is read. No AI runs in builds, CI or ordinary
+compilation. `fixtures/messages.json` contains twenty offline transport examples;
+these tests do not establish linguistic improvement or provider cache savings.
 
 The coding agent can also translate the extracted delta directly in PO sources;
 `pnpm i18n:check` applies the same placeholder checks either way. It additionally
 uses Lingui's read-only extraction-sync check and strict compilation, so an
 unextracted source change or a missing translation fails CI. Unmarked copy still
 requires developer review; extraction cannot discover text it was never given.
+
+Source syntax/placeholder validation runs before provider initialization. Explicit
+message IDs resolve through the canonical English catalog; both catalogs are
+checked for concurrent edits before writing. Dry runs print compact coverage
+counts. Preview stdout is JSON; status goes to stderr. Local validation errors
+carry an inspectable catalog identity without putting source text or provider
+error details in their default message. Component identities/ancestry are retained
+inside plural choices; counts outside choices are checked exactly, while plural
+categories may repeat component placeholders.
+
+## Shared package and local development
+
+This integration uses the exact published Loom release pinned in `package.json`
+and `pnpm-lock.yaml`. A clean checkout installs it from the registry.
+
+For local Loom work, use its managed development commands. Before merging or
+releasing an app that used local Loom, run `loom dev published`, follow its
+printed install command, rerun `loom dev published` to verify the installed
+registry copy, and pass `loom check --production` plus the app checks. Keep the
+managed local state intact until that verification succeeds.

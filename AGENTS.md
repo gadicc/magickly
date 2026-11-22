@@ -169,6 +169,10 @@ font lives.
 
 When adding or changing interface text or site-authored public prose:
 
+Read `scripts/i18n/context.ts` and the Loom Lingui translation guidance first.
+Use site, section/page and message meaning for direct translation too; preserve
+all usages of shared messages. `--preview` prints the scripted SDK inputs locally.
+
 1. Mark complete messages for Lingui (`/*i18n*/` literals with `UiText`,
    `UiRichText`, or the scoped translator). Include labels, alt text and metadata.
    Keep whole sentences together and give interpolations meaningful names.

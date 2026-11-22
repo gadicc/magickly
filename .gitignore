@@ -61,3 +61,12 @@ tsconfig.tsbuildinfo
 # Public JSX prose extracted by search:build before tests/builds.
 /src/search/generated/
 src/locales/*/messages.js
+/.loom/generated/
+/.loom-write-*.tmp
+/.loom/.loom-write-*.tmp
+/.loom/generated-installs/
+/.loom/generated-install.json
+/.loom/generated-install-corrupt-*.json
+/.loom/generated-activation*.json
+/.loom/generated-activation-*.tmp
+.loom/dev-sync.lock*

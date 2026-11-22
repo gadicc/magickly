@@ -1,0 +1,108 @@
+[
+  {
+    "id": "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, traced on the Golden Dawn's rose of 22 letters",
+    "source": "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, traced on the Golden Dawn's rose of 22 letters",
+    "origins": ["src/seo/angelSigils.ts"]
+  },
+  {
+    "id": "Free, open source reference and tools for Western esoteric study: Kabbalah, the Golden Dawn, Enochian magick, astrology, geomancy and flashcards.",
+    "source": "Free, open source reference and tools for Western esoteric study: Kabbalah, the Golden Dawn, Enochian magick, astrology, geomancy and flashcards.",
+    "origins": ["src/i18n/publicMetadata.ts"]
+  },
+  {
+    "id": "About Magick.ly, an open source reference app for magickal study with MIT-licensed data and components. A reference, not an instruction app.",
+    "source": "About Magick.ly, an open source reference app for magickal study with MIT-licensed data and components. A reference, not an instruction app.",
+    "origins": ["src/i18n/publicMetadata.ts"]
+  },
+  {
+    "id": "This browser’s language was changed, but your account preference has not been saved. Retry when online.",
+    "source": "This browser’s language was changed, but your account preference has not been saved. Retry when online.",
+    "origins": ["src/i18n/AccountLocaleSync.tsx"]
+  },
+  {
+    "id": "Magick.ly is a free, open-source reference and set of tools for students of Hermetic magick, as the Golden Dawn taught it and as it grew from older sources. It is a reference, not a course: nothing here replaces a teacher or a good book.",
+    "source": "Magick.ly is a free, open-source reference and set of tools for students of Hermetic magick, as the Golden Dawn taught it and as it grew from older sources. It is a reference, not a course: nothing here replaces a teacher or a good book.",
+    "origins": ["src/app/HomeText.tsx"]
+  },
+  {
+    "id": "Cancel",
+    "source": "Cancel",
+    "origins": [
+      "src/app/(private)/temples/admin/[_id]/membership/[membershipId]/page.tsx",
+      "src/app/(private)/temples/join/[slug]/[pass]/page.tsx",
+      "src/app/doc/[_id]/edit/semantic/DeleteRitualDialog.tsx",
+      "src/app/temples/ConfirmAction.tsx",
+      "src/asyncConfirm.tsx"
+    ]
+  },
+  {
+    "id": "The Rose Cross sigil of {name}, {hebrew}, traced on the Golden Dawn's rose of 22 letters",
+    "source": "The Rose Cross sigil of {name}, {hebrew}, traced on the Golden Dawn's rose of 22 letters",
+    "origins": ["src/seo/angelSigils.ts"]
+  },
+  {
+    "id": "Search the site",
+    "source": "Search the site",
+    "origins": ["src/search/SearchButton.tsx"]
+  },
+  {
+    "id": "Search request rejected.",
+    "source": "Search request rejected.",
+    "origins": ["src/search/SearchDialog.tsx"]
+  },
+  {
+    "id": "Search by meaning is unavailable. Text results are still shown.",
+    "source": "Search by meaning is unavailable. Text results are still shown.",
+    "origins": ["src/search/SearchDialog.tsx"]
+  },
+  {
+    "id": "Search by meaning has reached today's limit. Text results are still shown.",
+    "source": "Search by meaning has reached today's limit. Text results are still shown.",
+    "origins": ["src/search/SearchDialog.tsx"]
+  },
+  {
+    "id": "Search by meaning could not finish. Text results are still shown.",
+    "source": "Search by meaning could not finish. Text results are still shown.",
+    "origins": ["src/search/SearchDialog.tsx"]
+  },
+  {
+    "id": "Search could not load. Connect to the internet and try again.",
+    "source": "Search could not load. Connect to the internet and try again.",
+    "origins": ["src/search/SearchDialog.tsx"]
+  },
+  {
+    "id": "Search Magick.ly",
+    "source": "Search Magick.ly",
+    "origins": ["src/search/SearchDialog.tsx"]
+  },
+  {
+    "id": "Close search",
+    "source": "Close search",
+    "origins": ["src/search/SearchDialog.tsx"]
+  },
+  {
+    "id": "Search currently covers English pages. Use English words; results keep their original language.",
+    "source": "Search currently covers English pages. Use English words; results keep their original language.",
+    "origins": ["src/search/SearchDialog.tsx"]
+  },
+  {
+    "id": "Search pages and content",
+    "source": "Search pages and content",
+    "origins": ["src/search/SearchDialog.tsx"]
+  },
+  {
+    "id": "Search by meaning",
+    "source": "Search by meaning",
+    "origins": ["src/search/SearchDialog.tsx"]
+  },
+  {
+    "id": "Searching…",
+    "source": "Searching…",
+    "origins": ["src/search/SearchDialog.tsx"]
+  },
+  {
+    "id": "Search results",
+    "source": "Search results",
+    "origins": ["src/search/SearchDialog.tsx"]
+  }
+]
