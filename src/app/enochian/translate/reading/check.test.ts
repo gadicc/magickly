@@ -661,12 +661,6 @@ describe("the reading's check (plan 081, S6)", () => {
       items,
       sentence: "first ".repeat(600),
     };
-    checkReading(translator, input);
-    const started = performance.now();
-    const { words: rows } = checkReading(translator, input);
-    const took = performance.now() - started;
-    expect(rows).toHaveLength(150);
-    expect(took).toBeLessThan(100);
     // And the slowest join: many items on one long word of one letter.
     const g = {
       passage: "G".repeat(53),
@@ -674,10 +668,32 @@ describe("the reading's check (plan 081, S6)", () => {
         item({ target: "first", ref: "G" }),
       ),
     };
+    expect(checkReading(translator, input).words).toHaveLength(150);
     checkReading(translator, g);
-    const again = performance.now();
-    checkReading(translator, g);
-    expect(performance.now() - again).toBeLessThan(100);
+    // The check costs about twice the lookup's own reading of the passage,
+    // which it includes (15 ms against 8 ms here, 22 against 14 under
+    // coverage), and the join a hundredth of it. A clock budget of 100 ms
+    // failed on a loaded machine (100.1 and 113.7 ms, 21-22 Nov 2026), so
+    // the measure is that ratio, which load moves for both sides alike: the
+    // quickest of five runs taken in turn, the runs load slowed least. A
+    // check that grew with items or refs, or a join that tried every split,
+    // would be many times the lookup.
+    const lookup: number[] = [];
+    const checked: number[] = [];
+    const joined: number[] = [];
+    const time = (run: () => unknown, into: number[]) => {
+      const started = performance.now();
+      run();
+      into.push(performance.now() - started);
+    };
+    for (let run = 0; run < 5; run++) {
+      time(() => translator.toEnglish(input.passage), lookup);
+      time(() => checkReading(translator, input), checked);
+      time(() => checkReading(translator, g), joined);
+    }
+    const quickest = (runs: number[]) => Math.min(...runs);
+    expect(quickest(checked)).toBeLessThan(4 * quickest(lookup));
+    expect(quickest(joined)).toBeLessThan(quickest(lookup));
   });
 
   it("never shows the model's source or ref text, only our data's names", () => {
