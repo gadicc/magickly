@@ -127,16 +127,24 @@ Extra width is used for what helps the reader, never just for longer lines.
    a hover to reach. A wide table or drawing scrolls or scales inside its
    own box, not the page.
 2. **A reading column.** Running text (prose, prayers, rituals, quoted
-   sources, a page's text below its tool) sits in a column of at most
-   46rem, about 70 characters a line, as the ritual reader's does (plan
-   089, decision 2). Text starts at the left (right in Hebrew) rather than
-   being justified, which leaves gaps on a phone.
+   sources, a page's text below its tool) sits in a column of about 70
+   characters a line: 32rem in the site's Roboto at 16 px, as the
+   Oration's prayer has it (the owner's choice, 22 November 2026: reader
+   comfort over width). Measured there, by counting the characters on
+   rendered lines: 32rem holds about 69, 36rem about 78, 46rem about 101.
+   A different font or size changes these, so measure a new column rather
+   than assume it. The ritual reader's 46rem (plan 089, decision 2) was
+   set before this was measured; plan 094 asks whether it narrows.
+   Prose starts at the left (right in Hebrew). A set text read as a whole,
+   such as a prayer, may be justified, with `hyphens: auto` (and
+   `-webkit-hyphens` for Safari) and the page's `lang` set, so the browser
+   can hyphenate instead of opening gaps on a phone.
 3. **Extra width goes beside the column.** On a wide screen, put the
    things a reader looks at alongside the text there: the contents, the
    controls, notes, sources, a translation or other version, a drawing.
-   Side rails start at about 1,200 px (the reader's 15rem | 46rem | 15rem);
-   a tool or drawing may use the full width, while its explanation stays in
-   the column.
+   Side rails start at about 1,200 px (15rem either side of the column, as
+   the reader and the Oration have them); a tool or drawing may use the
+   full width, while its explanation stays in the column.
 4. **One page, arranged by CSS.** Each piece is rendered once and placed
    by the grid at each width. Never render it twice and hide one copy, or
    choose between copies in JavaScript, which breaks search, prerendering
