@@ -2404,6 +2404,11 @@ it("the earliest packet retention end still bounds archive serialization after a
     originalStore = admissionModule.createSqlResearchAdmission;
   let now = 0;
   vi.spyOn(performance, "now").mockImplementation(() => now);
+  // The retention end on the test's clock, inside the 8 s operation bound
+  // so that it is what trips. The deadline helpers also wait this long on
+  // real timers; at 20 ms those fired on a loaded machine before the
+  // response was built, so nothing was left to cancel (22 Nov 2026).
+  const retentionEnd = 7_000;
   // Conservative test-only shortening: original immutable hashes and native TTLs
   // are unchanged; no caller can lengthen an actual store deadline this way.
   vi.spyOn(admissionModule, "createSqlResearchAdmission").mockImplementation(
@@ -2415,10 +2420,10 @@ it("the earliest packet retention end still bounds archive serialization after a
           const saved = await store.readOwnedCompletedAnswerSummaries(...input);
           return {
             ...saved,
-            retention_deadline: 20,
+            retention_deadline: retentionEnd,
             entries: saved.entries.map((e) => ({
               ...e,
-              retention_deadline: 20,
+              retention_deadline: retentionEnd,
             })),
           };
         },
@@ -2432,7 +2437,7 @@ it("the earliest packet retention end still bounds archive serialization after a
     vi.spyOn(response.body!, "cancel").mockImplementationOnce(async () => {
       cancel();
     });
-    now = 21;
+    now = retentionEnd + 1;
     return response;
   });
   const handler = archiveHttpModule.createSqlResearchArchiveHttpHandler(real),
