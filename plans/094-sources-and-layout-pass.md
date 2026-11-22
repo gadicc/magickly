@@ -1,8 +1,7 @@
 # Sources and layout pass: inventory — 21 November 2026
 
-Status: inventory; A2 (the Oration's layout) built 22 November 2026 and
-the reading column's width settled (below); the rest is not decided or
-built. One question for Gadi remains open, the built-in rituals. Read [current status](000-current-status.md)
+Status: inventory; A1, A2 and A4 built 22 November 2026 and the reading
+column's width settled (below); the rest is not decided or built. One question for Gadi remains open, the built-in rituals. Read [current status](000-current-status.md)
 first. Follows the Oration's pass (commit 74124e7e: the text re-based on
 Dee's manuscript, James kept as readings) and the layout rule in AGENTS.md
 ("Layout: phones first, wide screens used well", commit ed735ec1).
@@ -105,10 +104,10 @@ feasibility. Effort S/M/L.
 
 | # | Work | Reach | Effort |
 |---|---|---|---|
-| A1 | `PageText` to the 32rem reading column | 21 pages | S |
+| A1 | ~~`PageText` to the 32rem reading column~~ (built 22 November, a2afbdee) | 21 pages | S |
 | A2 | ~~The Oration's column and rails~~ (built 22 November) | 1 | S |
 | A3 | A reading column inside wide tool pages, notes and sources as a rail: one wrapper for the symbol, sigil and tablet "version" sections, then the halls editor, `/study`, geomancy notes, entity frames, the 72 angels' notes | 11 | M |
-| A4 | Footer link spacing; export buttons' size | every page | S |
+| A4 | ~~Footer link spacing; export buttons' size~~ (built 22 November: 44 px targets on touch screens, 24 px with a mouse) | every page | S |
 | A5 | Help pages, the reader's and book's measure | 5 | S |
 
 A1 changes the text width on pages the docs screenshots may show; check
@@ -161,7 +160,7 @@ on archive.org so far (Google Books and HathiTrust untried).
 ## Suggested order
 
 1. Gadi's questions 1 and 4.
-2. **Layout, serially, here**: A1, A4, then A3 with mock-ups. They
+2. **Layout, serially, here**: A3 with mock-ups (A1 and A4 done). They
    touch shared components, so one at a time; each a commit, checked at
    375, 768 and 1,440 px.
 3. **Quick source wins**: C1, C6, C10 (small, separate files, high

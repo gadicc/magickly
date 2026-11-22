@@ -123,8 +123,10 @@ Every page is built for a phone first and checked on a wide screen too.
 Extra width is used for what helps the reader, never just for longer lines.
 
 1. **Phones.** Every page works from 320 px: no sideways page scroll, a
-   16 px side gutter, controls large enough to tap, and nothing that needs
-   a hover to reach. A wide table or drawing scrolls or scales inside its
+   16 px side gutter, controls and links set apart as targets of their own
+   (at least 44 px on a touch screen, `pointer: coarse`, and 24 px with a
+   mouse, as the footer and the export buttons have them), and nothing that
+   needs a hover to reach. A wide table or drawing scrolls or scales inside its
    own box, not the page.
 2. **A reading column.** Running text (prose, prayers, rituals, quoted
    sources, a page's text below its tool) sits in a column of about 70
