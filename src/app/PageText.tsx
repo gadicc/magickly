@@ -4,7 +4,9 @@ import type { ReactNode } from "react";
 /**
  * A page's text below its tiles or its tool (plan 071, decisions 4 and 5):
  * a section named by its first heading. The bar's title is the page's h1,
- * so the text's headings start at h2.
+ * so the text's headings start at h2. Its text is the reading column of
+ * AGENTS.md's layout rule, 32rem (about 69 characters a line), with the
+ * Container's own gutters either side: 16px on a phone, 24px from 600px.
  */
 export function PageText({
   labelledBy,
@@ -16,10 +18,13 @@ export function PageText({
 }) {
   return (
     <Container
-      maxWidth="md"
+      maxWidth={false}
       component="section"
       aria-labelledby={labelledBy}
-      sx={{ my: 4 }}
+      sx={{
+        my: 4,
+        maxWidth: { xs: "calc(32rem + 32px)", sm: "calc(32rem + 48px)" },
+      }}
     >
       {children}
     </Container>
