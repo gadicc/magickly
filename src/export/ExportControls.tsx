@@ -167,7 +167,10 @@ export default function ExportControls({
   };
   const linkSx = { px: 0.5, ...tapTarget };
   return (
-    <div style={{ textAlign: "center", fontSize: "90%" }}>
+    <div
+      data-export-controls=""
+      style={{ textAlign: "center", fontSize: "90%" }}
+    >
       <div>
         Download:
         <Button

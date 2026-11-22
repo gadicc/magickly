@@ -4,7 +4,6 @@ import { Clear } from "@mui/icons-material";
 import {
   Box,
   Checkbox,
-  Container,
   FormControlLabel,
   FormGroup,
   IconButton,
@@ -28,6 +27,11 @@ import { sigilFigure } from "magick-components/sigil/SigilImage";
 import React from "react";
 import { VersionNote, VersionSelect } from "@/drawings/DrawingVersion";
 import Ink from "@/drawings/Ink";
+import ToolLayout, {
+  ToolControls,
+  ToolDrawing,
+  ToolPanel,
+} from "@/drawings/ToolLayout";
 import ExportControls from "@/export/ExportControls";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
 import UiRichText from "@/i18n/UiRichText";
@@ -120,8 +124,8 @@ export default function Sigils({
     : undefined;
 
   return (
-    <div>
-      <Container sx={{ py: 2 }}>
+    <ToolLayout>
+      <ToolControls>
         <Box
           sx={{
             display: "flex",
@@ -194,7 +198,7 @@ export default function Sigils({
           </div>
         )}
         <FormGroup>
-          <Stack direction="row">
+          <Stack direction="row" sx={{ flexWrap: "wrap" }}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -247,7 +251,8 @@ export default function Sigils({
             ))}
           </div>
         )}
-
+      </ToolControls>
+      <ToolDrawing>
         <Ink drawing="roseSigil">
           {debug ? (
             <DebugSigil
@@ -275,6 +280,8 @@ export default function Sigils({
             />
           </div>
         )}
+      </ToolDrawing>
+      <ToolPanel>
         <ExportControls
           target={ref}
           filename={`RoseSigil-${canonical.split(" ").join("-")}${version === DEFAULT_ROSE_VERSION ? "" : `-${version}`}`}
@@ -285,7 +292,7 @@ export default function Sigils({
           note={ROSE_VERSION_NOTES[version]}
           headingId="rose-version"
         />
-      </Container>
-    </div>
+      </ToolPanel>
+    </ToolLayout>
   );
 }

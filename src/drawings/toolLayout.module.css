@@ -1,0 +1,77 @@
+/* A drawing tool's page (AGENTS.md "Layout", plan 094's A3): on a narrow
+   screen the controls, the drawing and the panel (exports, the version's
+   note, anything else) in one column, the panel's text in the 32rem reading
+   column; from 1,200 px the drawing on the inline-start side, sized to the
+   window and sticky, and the controls and the panel in a 22rem column
+   beside it, so the drawing, what changes it and what explains it are in
+   view together. Each part is in the DOM once, in that order. */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "controls"
+    "drawing"
+    "panel";
+  max-inline-size: 1440px;
+  margin-inline: auto;
+  padding: 16px;
+  /* Where the drawing sticks: below the app bar, or the top while it hides. */
+  --rail-top: calc(var(--app-bar, 56px) + 16px);
+}
+:global(html[data-app-bar-hidden]) .layout {
+  --rail-top: 16px;
+}
+.controls {
+  grid-area: controls;
+  margin-block-end: 16px;
+}
+.drawing {
+  grid-area: drawing;
+  min-inline-size: 0;
+}
+.panel {
+  grid-area: panel;
+  inline-size: 100%;
+  max-inline-size: 32rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 1200px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    grid-template-areas:
+      "drawing controls"
+      "drawing panel";
+    /* The panel takes what the controls leave, not the gap between. */
+    grid-template-rows: auto 1fr;
+    column-gap: 32px;
+  }
+  .controls {
+    padding-block-start: 8px;
+  }
+  .drawing {
+    align-self: start;
+    position: sticky;
+    inset-block-start: var(--rail-top);
+    transition: inset-block-start 0.2s;
+  }
+  /* The drawing fits the window: its own <svg>, not one inside it. The
+     downloads clone the <svg> without the page's CSS, so they keep their
+     size. */
+  .drawing svg:not(svg svg) {
+    display: block;
+    inline-size: 100%;
+    max-block-size: calc(100vh - var(--rail-top) - 16px);
+    max-block-size: calc(100dvh - var(--rail-top) - 16px);
+  }
+  .panel {
+    max-inline-size: none;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  /* The export buttons line up with the panel's text; ExportControls
+     centres itself in an inline style, which only this can outrank. */
+  .panel [data-export-controls] {
+    text-align: start !important;
+  }
+}

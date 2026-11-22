@@ -1,6 +1,5 @@
 "use client";
 
-import { Box, Container } from "@mui/material";
 import SevenBranchedCandlestick, {
   CANDLESTICK_VERSION_NOTES,
   CANDLESTICK_VERSIONS,
@@ -10,6 +9,11 @@ import SevenBranchedCandlestick, {
 import React from "react";
 import { VersionNote, VersionSelect } from "@/drawings/DrawingVersion";
 import Ink from "@/drawings/Ink";
+import ToolLayout, {
+  ToolControls,
+  ToolDrawing,
+  ToolPanel,
+} from "@/drawings/ToolLayout";
 import ExportControls from "@/export/ExportControls";
 import OpenSource from "@/OpenSource";
 
@@ -20,8 +24,8 @@ export default function CandleStickPage() {
   );
 
   return (
-    <Container sx={{ p: 2 }}>
-      <Box sx={{ mb: 2 }}>
+    <ToolLayout>
+      <ToolControls>
         <VersionSelect
           id="candlestick-version-select"
           versions={CANDLESTICK_VERSIONS}
@@ -30,25 +34,29 @@ export default function CandleStickPage() {
           value={version}
           onChange={setVersion}
         />
-      </Box>
-      <Ink drawing="candlestick">
-        <SevenBranchedCandlestick ref={ref} version={version} />
-      </Ink>
-      <ExportControls
-        target={ref}
-        filename={`SevenBranchedCandleStick-${version === DEFAULT_CANDLESTICK_VERSION ? "magickly-export" : `${version}-magickly-export`}`}
-        link={{ slug: "seven-branched-candlestick", props: { version } }}
-      />
-      <VersionNote
-        note={CANDLESTICK_VERSION_NOTES[version]}
-        headingId="candlestick-version"
-      />
-      <OpenSource
-        files={[
-          "/src/app/gd/symbols/candlestick/candlestick.tsx",
-          "/packages/magick-components/src/gd/SevenBranchedCandlestick.tsx",
-        ]}
-      />
-    </Container>
+      </ToolControls>
+      <ToolDrawing>
+        <Ink drawing="candlestick">
+          <SevenBranchedCandlestick ref={ref} version={version} />
+        </Ink>
+      </ToolDrawing>
+      <ToolPanel>
+        <ExportControls
+          target={ref}
+          filename={`SevenBranchedCandleStick-${version === DEFAULT_CANDLESTICK_VERSION ? "magickly-export" : `${version}-magickly-export`}`}
+          link={{ slug: "seven-branched-candlestick", props: { version } }}
+        />
+        <VersionNote
+          note={CANDLESTICK_VERSION_NOTES[version]}
+          headingId="candlestick-version"
+        />
+        <OpenSource
+          files={[
+            "/src/app/gd/symbols/candlestick/candlestick.tsx",
+            "/packages/magick-components/src/gd/SevenBranchedCandlestick.tsx",
+          ]}
+        />
+      </ToolPanel>
+    </ToolLayout>
   );
 }

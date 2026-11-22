@@ -63,12 +63,15 @@ describe("geomancy reading page", () => {
   // removed `magickTypes` (before that, 80804 a3969ba3…, 80794 95663f49…
   // and 80805 c2462b01…), and when the export buttons became tap-sized
   // targets, which changed only their styles and class names (before that,
-  // 80837 910f4c74…, 80827 bd978df9… and 80838 88f4df44…); the bytes are
-  // otherwise those from before the rekey.
+  // 80837 910f4c74…, 80827 bd978df9… and 80838 88f4df44…), and when the
+  // export buttons' box gained `data-export-controls`, the drawing pages'
+  // hook to align them, and nothing else (before that, 81343 c55494a3…,
+  // 81333 6aeda904… and 81344 adb50519…); the bytes are otherwise those
+  // from before the rekey.
   it.each([
     [
       "1",
-      "81343 c55494a3f45a1090e291599ce535030e8fc14f289d50b18b9ad20589107f60ec",
+      "81367 90d5e50dc6a7aeabebc3b78cc2dff754feb693e21e644ef1218344f59e5e79a7",
       [
         "The querent: their life",
         "Good, except in war.",
@@ -78,7 +81,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "7",
-      "81333 6aeda904c83978e50d1a378c8c35cfa8d80784190915b8d02486f71d7222223d",
+      "81357 f3d03d65eb42dab83917003f1dcde5c4c1207711d55ebe249feac5291c2da7d1",
       [
         "Marriage and other unions",
         "Indifferent.",
@@ -88,7 +91,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "12",
-      "81344 adb5051920a277015f2ba3508aac6645770834a73a8a12fc5603f71b29679231",
+      "81368 42c28fb85270a82006f47efece17c99900470b162c540f1f240bd5a6e1a895a0",
       [
         "Enemies; servants; imprisonment",
         "Unfavourable generally.",
