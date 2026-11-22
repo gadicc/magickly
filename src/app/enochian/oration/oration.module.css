@@ -1,8 +1,9 @@
 /* The Oration's page (AGENTS.md "Layout"): the prayer in a 32rem reading
    column, about 69 characters a line, narrow for a long text read slowly;
    from 1,200 px, the version and its source in a rail on the inline-start
-   side and the notes on James's wording on the other, both sticky, the
-   ritual reader's rails (readerShell.module.css) in miniature. Each piece is
+   side and the notes on James's wording on the other, the source and the
+   notes sticky, the ritual reader's rails (readerShell.module.css) in
+   miniature. Each piece is
    in the DOM once, in reading order (version, heading, prayer, source,
    notes), and placed here. */
 .layout {
@@ -89,41 +90,29 @@
   .layout {
     grid-template-columns: 15rem minmax(0, 32rem) 15rem;
     grid-template-areas:
-      "start heading notes"
-      "start prayer notes";
+      "controls heading notes"
+      "source prayer notes";
     /* Rails taller than the prayer leave their room below it. */
     grid-template-rows: auto 1fr;
     column-gap: 32px;
   }
-  /* The version and its source share the inline-start rail, each sticky,
-     the source held below the version by --controls-block. */
-  .controls,
-  .source {
-    grid-area: start;
-  }
-  .layout {
-    --controls-block: 64px;
-  }
+  /* The version beside the heading; its source below it sticks while the
+     prayer is read. Only one of the two sticks: two sticky boxes in one
+     rail collide where the prayer ends. */
   .controls {
+    align-self: start;
     justify-self: stretch;
     padding-block-start: 8px;
   }
-  .controls :global(.MuiFormControl-root) {
-    inline-size: 100%;
-  }
   .source {
-    margin: var(--controls-block) 0 0;
+    margin: 0;
   }
-  .controls,
   .source,
   .notes {
     align-self: start;
     position: sticky;
     inset-block-start: var(--rail-top);
     transition: inset-block-start 0.2s;
-  }
-  .source {
-    inset-block-start: calc(var(--rail-top) + var(--controls-block));
   }
   /* The notes may be taller than the window: they scroll on their own. */
   .notes {
