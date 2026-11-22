@@ -247,13 +247,13 @@ Follow-ups are separate from the completed migration work:
   Golden Dawn's; Vaughan's two beads for a doubled letter on a straight
   pass.
 - Kameas and their sigils ([plan 093](093-kameas-and-their-sigils.md)):
-  stages K1, K6, K2, K5 and K3 built on `gate/kameas` (the planetary
-  names and their characters in magick-data, the kamea sigil engine,
-  the seven seals, `KameaSigil`, the generator at
-  `/astrology/kamea/sigils`), released as magick-data 0.4.0 and
-  magick-components 0.6.0. TODO: K4, the hub, seven kamea pages and a
-  page per name; Gadi's sign-off on the README rows dated 20 and 21
-  November.
+  every stage built on `gate/kameas`: the planetary names and their
+  characters in magick-data, the kamea sigil engine, the seven seals,
+  `KameaSigil`, the generator at `/astrology/kamea/sigils`, the hub
+  `/astrology/kamea`, seven kamea pages and 16 name pages, released as
+  magick-data 0.4.0 and magick-components 0.6.0. TODO: a long name's
+  card art in two rows; the Enochian hint-table test's timeout under
+  load ([plan 093](093-kameas-and-their-sigils.md#stages)).
 - TODO: rate limiting for the public component image routes
   (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through
   WASM on request, and `/api/render/rose-sigil` takes up to about 160 ms

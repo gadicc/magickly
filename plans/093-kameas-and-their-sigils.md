@@ -1,9 +1,10 @@
 # Kameas and their sigils — 19 November 2026
 
 Status: accepted 20 November 2026; the twelve decisions stand as
-recommended. K1, K6, K2, K5 and K3 built on `gate/kameas` (see
-Stages), released as magick-data 0.4.0 and magick-components 0.6.0; K4,
-the reference pages, next. The draft was
+recommended. Every stage is built (see Stages); K1 to K3, K5, K6 and the
+release of magick-data 0.4.0 and magick-components 0.6.0 are on `main`,
+and K4 follows on `gate/kameas`, its additions riding in the still
+unpublished 0.4.0. The draft was
 reviewed adversarially (Fable 5.2, high, 19 November); its three
 blockers and eight majors are answered below
 ([Review](#review-19-november-2026)).
@@ -56,7 +57,15 @@ them into data.
 | Crowley, *777 Revised* (1955), Celephaïs e-text | `aleister-crowley-liber-777` | Table III, p. 20 (n27) | In copyright; spellings and numbers taken as facts, as `planets.json5` already does. No scan of 1909 found |
 | Regardie, *The Golden Dawn* vol. 4, Chicago 1940 | `IsraelRegardie-TheGoldenDawn-Vol4-1940` | method pp. 78–80 (n72–n74), the Aiq Bekar table p. 79 (n73); squares, seals and characters pp. 81–86 (n75–n80); names in roman capitals only, no Hebrew | Facts only, nothing quoted ([plan 091](091-regardie-golden-dawn-copyright.md)) |
 
-### The Golden Dawn's method (vol. 4, n72–n74; facts, our words)
+### The method Regardie sets out (vol. 4, n72–n74; facts, our words)
+
+Called "the Golden Dawn's method" in this plan's first drafts. Regardie
+writes (pp. 78–79) that in his day the Order had lost the knowledge of
+forming sigils from the squares, its Chiefs having taken the squares
+and Aiq Bekar out of the knowledge lectures, and that the method and
+the right squares were in British Museum books and manuscripts; the
+plates (pp. 81–86) and the second worked example are his. The pages
+attribute the method and the plates to him (K4's review).
 
 - Letters are reduced by the Aiq Bekar table to tens or units, as the
   text says in general (n73), and only when the square lacks the number:
@@ -360,6 +369,8 @@ in each). Alternatives are kept for the record.
 6. **Which spelling is traced**: Agrippa 1533's Hebrew, and where
    another witness spells a name with a different trace (Jupiter's
    יופיל, Mars' ברצבאל, 777's Moon), that trace too, labelled.
+   (K4: only spellings no exception row calls a slip; an unsettled one
+   is drawn with its note.)
 7. **Agrippa's characters on the pages**: n164 is mirrored already
    (regions per citation added); mirror n163 too, the leaf six planets'
    names rest on (headroom about 719 KB under the 4.5 MB cap); link the
@@ -642,6 +653,59 @@ Left open: a failing word costs about 4 s of server CPU per distinct
 canonical URL per instance (plan 000's rate-limit TODO). For K4: the
 `kamea` contract becomes `indexed: false` once the pages publish the
 squares' static files, as the rose's did in plan 088 S4.
+
+**K4 built 22 November 2026** (`f05df3ce`). The hub `/astrology/kamea`,
+seven kamea pages and 16 name pages (`/astrology/intelligence/<id>`,
+`/astrology/spirit/<id>`, entity routes, since `pathnames` needs a page
+at every level), with their static PNG and SVG files, JSON-LD
+`ImageObject`s with `isBasedOn`, sitemap entries, cards and breadcrumbs.
+The `kamea` contract is now not indexed. Agrippa 1533's n163 is mirrored
+(the mirror is 4,073,992 bytes of its 4.5 MB cap), with a region per
+planet, and n164 gains regions for the Moon's names and the four
+characters. The planet pages gain a "Kamea" row and link their
+intelligence and spirit; the halls that draw a square link it.
+
+- **A kamea page:** the square and how it is built (checked against
+  magick-data), the printed variants and slips of 1533 and vol. 4, the
+  names with every witness's reading, number and leaf and every exception
+  row, the seal, the Moon's column, and the planet, hall and generator
+  links. Its search document is built per planet, not extracted.
+- **A name page:** the name by witness, its number (Kedemel leads with
+  175, the line, and says Agrippa prints 157), the sigil server-rendered
+  with its reduction, then Agrippa's character redrawn from Fable 5.2's
+  blind reading (curves, rings, hooks and bars as read; what is ours,
+  such as a hook's bend, said), and K6's verdicts on 1533 and on
+  Regardie's redrawing, which is linked, never shown. Other witnesses'
+  spellings follow, only where they are not slips.
+- **Data:** the character readings gain the readers' curve points, hooks,
+  bars and rings, and the captions are completed from the leaves (both
+  in magick-data 0.4.0, still unpublished).
+- **Checked on the leaves:** the metals (n161–n162: Saturn's on lead,
+  the Sun's on gold) and "the planets' sacred tables" (n160) hold; "kamea
+  is Hebrew for an amulet" is not in Agrippa and was removed.
+
+A Fable review (high) checked the pages against the leaves and found
+nothing critical. Gadi decided the two policy points: the method and
+the plates are Regardie's (above, in the method section), and slips
+are not traced. Also fixed: identical search text for the seven
+squares; the spirit of spirits' oval missing from its redrawing;
+"his printer" for slips whose author or printer is not settled;
+Venus' and the Moon's squares, corrected by one cell, described as
+"as Agrippa prints it"; and smaller wording, Hebrew and caption points.
+The production build then failed on Malcha's social card (a five-word
+row asked for by height came out over the contract's 4,096 px); cards
+now ask by width, and a test parses every card's request. The search
+embeddings were published under the pre-authorisation (estimate $0.74;
+116 of 3,204 passages embedded with a seeded cache). Gadi had merged the
+branch up to the release commit (`b789cf64`) while K4 was built, so K4
+was replayed onto `main` after it: its character fields ship in 0.4.0,
+which npm does not have yet. Main had published its own embeddings in
+the meantime; the manifest was rebuilt from both sides' committed rows
+with `pnpm search:assemble`, no paid call.
+
+Follow-ups: a long name's card art in two rows; the Enochian hint-table
+test times out under a loaded machine (three times this plan) and
+passes alone in about a second.
 
 K1 first; K6 needs K1; K2 needs K6 (decision 4 may move); K5 runs
 alongside; K3 needs K2; K4 needs K3 and K5.
