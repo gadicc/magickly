@@ -5,7 +5,7 @@ import { act, cleanup, render, renderHook } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it } from "vitest";
 import Oration from "./Oration";
-import OrationText from "./OrationText";
+import ReadingNotes from "./ReadingNotes";
 import {
   DEFAULT_ORATION_VERSION,
   ORATION_VERSIONS,
@@ -106,7 +106,7 @@ describe("the Oration's versions", () => {
       "d:urgent",
       "e:isagogically",
     ]);
-    const notes = renderToString(<OrationText />);
+    const notes = renderToString(<ReadingNotes />);
     const html = renderToString(<Oration />);
     for (const { id, letter } of WORDINGS) {
       expect(notes, id).toContain(`id="${readingAnchor(id)}"`);
@@ -116,6 +116,28 @@ describe("the Oration's versions", () => {
     expect(html.match(/href="#oration-reading-/g)).toHaveLength(
       WORDINGS.length,
     );
+  });
+
+  it("keeps reading order, the rails placed by CSS alone", () => {
+    // Version, heading, prayer, source, notes: a screen reader and a phone
+    // read them so; a wide screen moves them into the rails.
+    const html = renderToString(<Oration notes={<ReadingNotes />} />);
+    const at = (needle: string) => {
+      const i = html.indexOf(needle);
+      expect(i, needle).toBeGreaterThan(-1);
+      return i;
+    };
+    const order = [
+      'id="oration-version"',
+      'lang="la"',
+      "O Almighty",
+      "Amen, Amen, Amen",
+      "De Heptarchia Mystica</i>, chapter 5",
+      "<aside",
+      `id="${readingAnchor("who")}"`,
+    ].map(at);
+    expect(order).toEqual([...order].sort((a, b) => a - b));
+    expect(html.match(/<aside/g)).toHaveLength(1);
   });
 
   it("keeps no copy of James's text, only his readings", () => {
