@@ -27,7 +27,8 @@
   text-decoration: underline wavy;
 }
 
-/* The figures wrap from right to left; centred under the controls. */
+/* The figures wrap from right to left, centred in the drawing's box
+   (ToolLayout's ToolDrawing). */
 .stage {
   margin-top: 16px;
   display: flex;
@@ -38,6 +39,31 @@
   justify-content: center;
   gap: 8px;
   transition: opacity 0.15s;
+}
+
+/* From 1,200 px, where ToolLayout sets the drawing beside the controls:
+   the figures share the drawing's width, `--columns` of them a row (the
+   words, at most three), each square and no taller than the window, as
+   the Rose Cross sigil is. ToolLayout sizes a drawing's one <svg> to its
+   box; a kamea sigil is an <svg> a word, so this outranks that. */
+@media (min-width: 1200px) {
+  /* Level with the controls' top, as the Rose Cross sigil is. */
+  .stage {
+    margin-top: 0;
+  }
+  .stage .sigil {
+    inline-size: 100%;
+  }
+  .stage .sigil > svg {
+    flex: none;
+    inline-size: min(
+      calc((100% - (var(--columns, 1) - 1) * 8px) / var(--columns, 1)),
+      calc(100dvh - var(--rail-top, 72px) - 16px)
+    );
+    block-size: auto;
+    max-block-size: none;
+    aspect-ratio: 1;
+  }
 }
 
 /* The last figure, while the newest is placed. */

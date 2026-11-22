@@ -3,7 +3,6 @@ import { Clear } from "@mui/icons-material";
 import {
   Box,
   Checkbox,
-  Container,
   FormControlLabel,
   IconButton,
   InputAdornment,
@@ -16,6 +15,11 @@ import {
   KameaSigilImage,
 } from "magick-components/astrology/KameaSigil";
 import React from "react";
+import ToolLayout, {
+  ToolControls,
+  ToolDrawing,
+  ToolPanel,
+} from "@/drawings/ToolLayout";
 import ExportControls from "@/export/ExportControls";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
 import UiText from "@/i18n/UiText";
@@ -146,208 +150,226 @@ export default function KameaSigils({
   })();
 
   return (
-    <Container sx={{ py: 2 }}>
-      <Box
-        sx={{ display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center" }}
-      >
-        <TextField
-          select
-          size="small"
-          label={t(/*i18n*/ "Planet")}
-          value={planet}
-          onChange={(event) =>
-            setPlanet(event.target.value as KameaImagePlanet)
-          }
-          sx={{ minWidth: 140 }}
-        >
-          {KAMEA_IMAGE_PLANETS.map((id) => (
-            <MenuItem key={id} value={id}>
-              <UiText message={PLANET_LABELS[id]} />
-            </MenuItem>
-          ))}
-        </TextField>
-        <TextField
-          select
-          size="small"
-          label={t(/*i18n*/ "Names")}
-          value={chosen === -1 ? "" : String(chosen)}
-          onChange={(event) => {
-            const name = names[Number(event.target.value)];
-            if (name) setText(name.he);
+    <ToolLayout>
+      <ToolControls>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 1,
+            alignItems: "center",
           }}
-          sx={{ minWidth: 200, maxWidth: "100%" }}
         >
-          {names.map((name, i) => (
-            <MenuItem
-              // biome-ignore lint/suspicious/noArrayIndexKey: one name may be listed in two spellings
-              key={i}
-              value={String(i)}
-            >
-              {name.witness
-                ? `${name.roman} (${t(WITNESS_LABELS[name.witness])})`
-                : name.roman}{" "}
-              <span lang="he" dir="rtl" className={styles.hebrew}>
-                {name.he}
-              </span>
-            </MenuItem>
-          ))}
-        </TextField>
-        <TextField
-          placeholder={t(/*i18n*/ "Hebrew name")}
-          size="small"
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-          slotProps={{
-            htmlInput: {
-              dir: "rtl",
-              lang: "he",
-              className: styles.hebrewInput,
-              "aria-label": t(/*i18n*/ "Hebrew name"),
-            },
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label={t(/*i18n*/ "Clear")}
-                    onClick={() => setText("")}
-                  >
-                    <Clear />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox checked={finals} onChange={() => setFinals(!finals)} />
-          }
-          label={
-            <UiText message={/*i18n*/ "Count final letters at 500 to 900"} />
-          }
-        />
-      </Box>
-      <div>
-        <UiText
-          message={
-            /*i18n*/ "Separate words with spaces: each word is its own figure, on its own square, drawn right to left."
-          }
-        />
-      </div>
-      {names[chosen]?.id === DIVIDED_NAME && !names[chosen].witness && (
-        <div>
-          <UiText
-            message={
-              /*i18n*/ "Agrippa prints the spirit of spirits as one word of fourteen letters; it is divided here as its romanisation divides it, Schedbarschemoth Schartathan, and that division is ours."
+          <TextField
+            select
+            size="small"
+            label={t(/*i18n*/ "Planet")}
+            value={planet}
+            onChange={(event) =>
+              setPlanet(event.target.value as KameaImagePlanet)
             }
-          />
-        </div>
-      )}
-      {tooLong && (
-        <div>
-          <UiText
-            message={
-              /*i18n*/ "A sigil takes at most {max} letters; this text has {count}."
-            }
-            values={{ max: KAMEA_SIGIL_MAX_LETTERS, count: letterCount }}
-          />
-        </div>
-      )}
-      {charsValid.includes(false) && (
-        <div>
-          <UiText message={/*i18n*/ "Only Hebrew letters can be traced:"} />{" "}
-          <span lang="he" dir="rtl" className={styles.hebrew}>
-            {[...text].map((character, i) => (
-              <span
-                // biome-ignore lint/suspicious/noArrayIndexKey: characters in order
-                key={i}
-                className={charsValid[i] ? undefined : styles.invalid}
-              >
-                {character}
-              </span>
+            sx={{ minWidth: 140 }}
+          >
+            {KAMEA_IMAGE_PLANETS.map((id) => (
+              <MenuItem key={id} value={id}>
+                <UiText message={PLANET_LABELS[id]} />
+              </MenuItem>
             ))}
-          </span>
-        </div>
-      )}
-
-      <div className={styles.stage} aria-busy={placing}>
-        {shown ? (
-          <KameaSigil
-            planet={shown.planet}
-            text={shown.text}
-            finals={shown.finals}
-            sigil={shown}
-            label={labelOf(shown, shown.planet as KameaImagePlanet)}
-            className={`${styles.sigil} ${current ? "" : styles.stale}`}
+          </TextField>
+          <TextField
+            select
+            size="small"
+            label={t(/*i18n*/ "Names")}
+            value={chosen === -1 ? "" : String(chosen)}
+            onChange={(event) => {
+              const name = names[Number(event.target.value)];
+              if (name) setText(name.he);
+            }}
+            sx={{ minWidth: 200, maxWidth: "100%" }}
+          >
+            {names.map((name, i) => (
+              <MenuItem
+                // biome-ignore lint/suspicious/noArrayIndexKey: one name may be listed in two spellings
+                key={i}
+                value={String(i)}
+              >
+                {name.witness
+                  ? `${name.roman} (${t(WITNESS_LABELS[name.witness])})`
+                  : name.roman}{" "}
+                <span lang="he" dir="rtl" className={styles.hebrew}>
+                  {name.he}
+                </span>
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            placeholder={t(/*i18n*/ "Hebrew name")}
+            size="small"
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            slotProps={{
+              htmlInput: {
+                dir: "rtl",
+                lang: "he",
+                className: styles.hebrewInput,
+                "aria-label": t(/*i18n*/ "Hebrew name"),
+              },
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={t(/*i18n*/ "Clear")}
+                      onClick={() => setText("")}
+                    >
+                      <Clear />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
           />
-        ) : (
-          // Before the first figure: the square alone, which is no work,
-          // at full strength until a placement has actually begun.
-          <KameaSigil
-            planet={planet}
-            text=""
-            label={labelOf(null, planet)}
-            className={`${styles.sigil} ${placing ? styles.stale : ""}`}
-          />
-        )}
-      </div>
-      {/* Seen, not announced: typing would announce it at every pause. */}
-      <div className={styles.status} aria-hidden>
-        {placing && drawn ? (
-          <UiText message={/*i18n*/ "Placing the sigil…"} />
-        ) : null}
-      </div>
-      {/* Announced: what was drawn, or that it could not be drawn well. */}
-      <div role="status" className={styles.status}>
-        {pending ? null : error ? (
-          <UiText message={/*i18n*/ "This sigil could not be drawn."} />
-        ) : current?.failed ? (
-          <UiText
-            message={
-              /*i18n*/ "This sigil could not be drawn so that every mark stands clear of the others and of the square's lines; it is drawn as well as it can be, and may be hard to read."
+          <FormControlLabel
+            control={
+              <Checkbox checked={finals} onChange={() => setFinals(!finals)} />
+            }
+            label={
+              <UiText message={/*i18n*/ "Count final letters at 500 to 900"} />
             }
           />
-        ) : current?.text ? (
-          <span className={styles.visuallyHidden}>
-            {labelOf(current, current.planet as KameaImagePlanet)}
-          </span>
-        ) : null}
-      </div>
-
-      <ReductionTable reduction={reduction} />
-
-      {/* The one-row image the downloads draw, from the same figure. */}
-      <div
-        hidden
-        ref={(element) => {
-          ref.current = element?.querySelector("svg") ?? null;
-        }}
-      >
-        {current && current.text && (
-          <KameaSigilImage
-            planet={current.planet}
-            text={current.text}
-            finals={current.finals}
-            sigil={current}
-            label={labelOf(current, current.planet as KameaImagePlanet)}
+        </Box>
+        <div>
+          <UiText
+            message={
+              /*i18n*/ "Separate words with spaces: each word is its own figure, on its own square, drawn right to left."
+            }
           />
+        </div>
+        {names[chosen]?.id === DIVIDED_NAME && !names[chosen].witness && (
+          <div>
+            <UiText
+              message={
+                /*i18n*/ "Agrippa prints the spirit of spirits as one word of fourteen letters; it is divided here as its romanisation divides it, Schedbarschemoth Schartathan, and that division is ours."
+              }
+            />
+          </div>
         )}
-      </div>
-      <ExportControls
-        target={ref}
-        filename={
-          link
-            ? `KameaSigil-${planet}-${link.props.text.split(" ").join("-")}${finals ? "-finals" : ""}`
-            : `KameaSigil-${planet}`
-        }
-        link={link}
-        share={
-          link
-            ? () =>
-                kameaSigilPagePath({ planet, text: link.props.text, finals })
-            : undefined
-        }
-      />
-    </Container>
+        {tooLong && (
+          <div>
+            <UiText
+              message={
+                /*i18n*/ "A sigil takes at most {max} letters; this text has {count}."
+              }
+              values={{ max: KAMEA_SIGIL_MAX_LETTERS, count: letterCount }}
+            />
+          </div>
+        )}
+        {charsValid.includes(false) && (
+          <div>
+            <UiText message={/*i18n*/ "Only Hebrew letters can be traced:"} />{" "}
+            <span lang="he" dir="rtl" className={styles.hebrew}>
+              {[...text].map((character, i) => (
+                <span
+                  // biome-ignore lint/suspicious/noArrayIndexKey: characters in order
+                  key={i}
+                  className={charsValid[i] ? undefined : styles.invalid}
+                >
+                  {character}
+                </span>
+              ))}
+            </span>
+          </div>
+        )}
+      </ToolControls>
+      <ToolDrawing>
+        {/* Up to three figures a row, sized together from 1,200 px
+            (kameaSigils.module.css). */}
+        <div
+          className={styles.stage}
+          aria-busy={placing}
+          style={
+            {
+              "--columns": Math.min(3, Math.max(1, shown?.words.length ?? 1)),
+            } as React.CSSProperties
+          }
+        >
+          {shown ? (
+            <KameaSigil
+              planet={shown.planet}
+              text={shown.text}
+              finals={shown.finals}
+              sigil={shown}
+              label={labelOf(shown, shown.planet as KameaImagePlanet)}
+              className={`${styles.sigil} ${current ? "" : styles.stale}`}
+            />
+          ) : (
+            // Before the first figure: the square alone, which is no work,
+            // at full strength until a placement has actually begun.
+            <KameaSigil
+              planet={planet}
+              text=""
+              label={labelOf(null, planet)}
+              className={`${styles.sigil} ${placing ? styles.stale : ""}`}
+            />
+          )}
+        </div>
+        {/* Seen, not announced: typing would announce it at every pause. */}
+        <div className={styles.status} aria-hidden>
+          {placing && drawn ? (
+            <UiText message={/*i18n*/ "Placing the sigil…"} />
+          ) : null}
+        </div>
+        {/* Announced: what was drawn, or that it could not be drawn well. */}
+        <div role="status" className={styles.status}>
+          {pending ? null : error ? (
+            <UiText message={/*i18n*/ "This sigil could not be drawn."} />
+          ) : current?.failed ? (
+            <UiText
+              message={
+                /*i18n*/ "This sigil could not be drawn so that every mark stands clear of the others and of the square's lines; it is drawn as well as it can be, and may be hard to read."
+              }
+            />
+          ) : current?.text ? (
+            <span className={styles.visuallyHidden}>
+              {labelOf(current, current.planet as KameaImagePlanet)}
+            </span>
+          ) : null}
+        </div>
+      </ToolDrawing>
+      <ToolPanel>
+        {/* The one-row image the downloads draw, from the same figure. */}
+        <div
+          hidden
+          ref={(element) => {
+            ref.current = element?.querySelector("svg") ?? null;
+          }}
+        >
+          {current && current.text && (
+            <KameaSigilImage
+              planet={current.planet}
+              text={current.text}
+              finals={current.finals}
+              sigil={current}
+              label={labelOf(current, current.planet as KameaImagePlanet)}
+            />
+          )}
+        </div>
+        <ExportControls
+          target={ref}
+          filename={
+            link
+              ? `KameaSigil-${planet}-${link.props.text.split(" ").join("-")}${finals ? "-finals" : ""}`
+              : `KameaSigil-${planet}`
+          }
+          link={link}
+          share={
+            link
+              ? () =>
+                  kameaSigilPagePath({ planet, text: link.props.text, finals })
+              : undefined
+          }
+        />
+        <ReductionTable reduction={reduction} />
+      </ToolPanel>
+    </ToolLayout>
   );
 }
