@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import { formatDistanceToNowStrict } from "date-fns";
 import React from "react";
+import { ReadingColumn } from "@/app/PageText";
 import { useSession } from "@/auth/client";
 import {
   useRouter,
@@ -179,135 +180,138 @@ function StudySetsView({
 }) {
   return (
     <Container sx={{ py: 1 }}>
-      <Select size="small" value={gdGrade} onChange={onGdGrade}>
-        <MenuItem value="all">All Grades</MenuItem>
-        <MenuItem value="0=0">0=0</MenuItem>
-        <MenuItem value="1=10">1=10</MenuItem>
-      </Select>{" "}
-      <Select size="small" value={tags[0]} onChange={onTags}>
-        <MenuItem value="all">All Tags</MenuItem>
-        {sortedTags.map((tag) => (
-          <MenuItem key={tag} value={tag}>
-            {tag}
-          </MenuItem>
-        ))}
-      </Select>
-      {syncError && (
-        <Typography color="warning" sx={{ mt: 1 }}>
-          Progress is saved on this device. Sync will retry when available.
+      <ReadingColumn>
+        <Select size="small" value={gdGrade} onChange={onGdGrade}>
+          <MenuItem value="all">All Grades</MenuItem>
+          <MenuItem value="0=0">0=0</MenuItem>
+          <MenuItem value="1=10">1=10</MenuItem>
+        </Select>{" "}
+        <Select size="small" value={tags[0]} onChange={onTags}>
+          <MenuItem value="all">All Tags</MenuItem>
+          {sortedTags.map((tag) => (
+            <MenuItem key={tag} value={tag}>
+              {tag}
+            </MenuItem>
+          ))}
+        </Select>
+        {syncError && (
+          <Typography color="warning" sx={{ mt: 1 }}>
+            Progress is saved on this device. Sync will retry when available.
+          </Typography>
+        )}
+        <br />
+        <br />
+        <Typography variant="h5" sx={{ paddingBottom: 1 }}>
+          Current Sets
         </Typography>
-      )}
-      <br />
-      <br />
-      <Typography variant="h5" sx={{ paddingBottom: 1 }}>
-        Current Sets
-      </Typography>
-      <TableContainer component={Paper}>
-        <Table aria-label="Current study sets">
-          <TableHead>
-            <TableRow>
-              <TableCell>Set</TableCell>
-              <TableCell align="center" width="100px">
-                Due
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {!scope && <Initializing />}
-            {currentSets.map((set) => {
-              const dueCards = dueCount(set);
-              const attempts = set.correct + set.incorrect;
-              const score = attempts
-                ? `${Math.round((set.correct / attempts) * 100)}%`
-                : "(info)";
-              return (
-                <TableRow
-                  key={set.setId}
-                  sx={{
-                    opacity: dueCards ? 1 : 0.5,
-                    "&:last-child td, &:last-child th": { border: 0 },
-                  }}
-                >
-                  <TableCell>
-                    <div style={{ display: "inline-block", width: 55 }}>
-                      <Chip size="small" label={allSets[set.setId].gdGrade} />
-                    </div>
-                    <Link href={`/study/${set.setId}`}>{set.setId}</Link>
-                  </TableCell>
-                  <TableCell align="center">
-                    {dueCards
-                      ? `${dueCards} cards`
-                      : `in ${formatDistanceToNowStrict(set.dueDate)}`}
-                    <br />
-                    <Link href={`/study/info/${set.setId}`}>{score}</Link>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <br />
-      {!scope ? null : scope === "anonymous" ? (
-        <Typography variant="body2" sx={{ mb: 2 }}>
-          Anonymous progress is available offline on this device.{" "}
-          <Link href="/signin?callbackURL=/study">Sign in</Link> to keep
-          separate account progress in sync.
-        </Typography>
-      ) : (
-        <Typography variant="body2" sx={{ mb: 2 }}>
-          Account progress syncs when online. Existing anonymous device progress
-          remains separate and is available after sign-out.
-        </Typography>
-      )}
-      <Typography variant="h5" sx={{ paddingBottom: 1 }}>
-        Available Sets
-      </Typography>
-      <TableContainer component={Paper}>
-        <Table aria-label="Available study sets">
-          <TableHead>
-            <TableRow>
-              <TableCell />
-              <TableCell>Set</TableCell>
-              <TableCell align="right"># Cards</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {otherSets.map((set) => (
-              <TableRow
-                key={set.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                onClick={(event) => {
-                  // The set link navigates by itself, and modified clicks
-                  // on it open a new tab, so only clicks elsewhere on the
-                  // row navigate here.
-                  if ((event.target as Element).closest("a")) return;
-                  onOpenSet?.(set.id);
-                }}
-              >
-                <TableCell sx={{ padding: "16px 0 16px 10px" }}>
-                  <Chip size="small" label={set.gdGrade} />
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  <Link href={`/study/${set.id}`}>{set.id}</Link>
-                </TableCell>
-                <TableCell align="right">
-                  {Object.keys(set.data).length}
+        <TableContainer component={Paper}>
+          <Table aria-label="Current study sets">
+            <TableHead>
+              <TableRow>
+                <TableCell>Set</TableCell>
+                <TableCell align="center" width="100px">
+                  Due
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <br />
-      <Typography variant="h5">Requests</Typography>
-      <Typography variant="body2">
-        Happily taking requests for new sets, contact details on the{" "}
-        <Link href="/about">About</Link> page. NB: I can only add data from
-        public sources. Please don&apos;t send me any private Order documents.
-        However, the heads of your order are welcome to make contact to have
-        such data made available only to members of your order in a secure way.
-      </Typography>
+            </TableHead>
+            <TableBody>
+              {!scope && <Initializing />}
+              {currentSets.map((set) => {
+                const dueCards = dueCount(set);
+                const attempts = set.correct + set.incorrect;
+                const score = attempts
+                  ? `${Math.round((set.correct / attempts) * 100)}%`
+                  : "(info)";
+                return (
+                  <TableRow
+                    key={set.setId}
+                    sx={{
+                      opacity: dueCards ? 1 : 0.5,
+                      "&:last-child td, &:last-child th": { border: 0 },
+                    }}
+                  >
+                    <TableCell>
+                      <div style={{ display: "inline-block", width: 55 }}>
+                        <Chip size="small" label={allSets[set.setId].gdGrade} />
+                      </div>
+                      <Link href={`/study/${set.setId}`}>{set.setId}</Link>
+                    </TableCell>
+                    <TableCell align="center">
+                      {dueCards
+                        ? `${dueCards} cards`
+                        : `in ${formatDistanceToNowStrict(set.dueDate)}`}
+                      <br />
+                      <Link href={`/study/info/${set.setId}`}>{score}</Link>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <br />
+        {!scope ? null : scope === "anonymous" ? (
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Anonymous progress is available offline on this device.{" "}
+            <Link href="/signin?callbackURL=/study">Sign in</Link> to keep
+            separate account progress in sync.
+          </Typography>
+        ) : (
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Account progress syncs when online. Existing anonymous device
+            progress remains separate and is available after sign-out.
+          </Typography>
+        )}
+        <Typography variant="h5" sx={{ paddingBottom: 1 }}>
+          Available Sets
+        </Typography>
+        <TableContainer component={Paper}>
+          <Table aria-label="Available study sets">
+            <TableHead>
+              <TableRow>
+                <TableCell />
+                <TableCell>Set</TableCell>
+                <TableCell align="right"># Cards</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {otherSets.map((set) => (
+                <TableRow
+                  key={set.id}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  onClick={(event) => {
+                    // The set link navigates by itself, and modified clicks
+                    // on it open a new tab, so only clicks elsewhere on the
+                    // row navigate here.
+                    if ((event.target as Element).closest("a")) return;
+                    onOpenSet?.(set.id);
+                  }}
+                >
+                  <TableCell sx={{ padding: "16px 0 16px 10px" }}>
+                    <Chip size="small" label={set.gdGrade} />
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    <Link href={`/study/${set.id}`}>{set.id}</Link>
+                  </TableCell>
+                  <TableCell align="right">
+                    {Object.keys(set.data).length}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <br />
+        <Typography variant="h5">Requests</Typography>
+        <Typography variant="body2">
+          Happily taking requests for new sets, contact details on the{" "}
+          <Link href="/about">About</Link> page. NB: I can only add data from
+          public sources. Please don&apos;t send me any private Order documents.
+          However, the heads of your order are welcome to make contact to have
+          such data made available only to members of your order in a secure
+          way.
+        </Typography>
+      </ReadingColumn>
     </Container>
   );
 }

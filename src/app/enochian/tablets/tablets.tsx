@@ -39,6 +39,7 @@ import {
   type TabletVersionId,
 } from "magick-data/enochian/tablets";
 import React from "react";
+import { ReadingColumn } from "@/app/PageText";
 import { plateClass } from "@/drawings/plate";
 import { PLATE_X, PlateXCitation } from "@/drawings/sigilSources";
 import ExportControls from "@/export/ExportControls";
@@ -858,30 +859,32 @@ export default function Tablets({
         </div>
       </div>
 
-      <Box component="section" aria-labelledby="tablet-about" sx={{ mt: 3 }}>
-        <Typography variant="h5" component="h2" id="tablet-about">
-          {id === "union"
-            ? t(/*i18n*/ "The Tablet of Union")
-            : `The ${TABLET_NAMES[id]} tablet`}
-        </Typography>
-        <Typography variant="body1">{tabletNote.text}</Typography>
-        <Sources sources={tabletNote.sources} />
-      </Box>
+      <ReadingColumn>
+        <Box component="section" aria-labelledby="tablet-about" sx={{ mt: 3 }}>
+          <Typography variant="h5" component="h2" id="tablet-about">
+            {id === "union"
+              ? t(/*i18n*/ "The Tablet of Union")
+              : `The ${TABLET_NAMES[id]} tablet`}
+          </Typography>
+          <Typography variant="body1">{tabletNote.text}</Typography>
+          <Sources sources={tabletNote.sources} />
+        </Box>
 
-      {note && <VersionSection id={id} note={note} />}
+        {note && <VersionSection id={id} note={note} />}
 
-      <AboutTablets />
-      <br />
-      <OpenSource
-        files={[
-          "/src/app/enochian/tablets/tablets.tsx",
-          "/src/app/enochian/tablets/NamesPanel.tsx",
-          "/packages/magick-components/src/enochian/Tablet.tsx",
-          "/packages/magick-data/src/enochian/tablets.json5",
-          "/packages/magick-data/src/enochian/TabletNames.ts",
-          "/packages/magick-data/src/enochian/tabletNotes.json5",
-        ]}
-      />
+        <AboutTablets />
+        <br />
+        <OpenSource
+          files={[
+            "/src/app/enochian/tablets/tablets.tsx",
+            "/src/app/enochian/tablets/NamesPanel.tsx",
+            "/packages/magick-components/src/enochian/Tablet.tsx",
+            "/packages/magick-data/src/enochian/tablets.json5",
+            "/packages/magick-data/src/enochian/TabletNames.ts",
+            "/packages/magick-data/src/enochian/tabletNotes.json5",
+          ]}
+        />
+      </ReadingColumn>
     </Container>
   );
 }

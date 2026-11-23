@@ -3,7 +3,7 @@ import MuiLink from "@mui/material/Link";
 import type { Field } from "magick-data/fields";
 import type { TableName } from "magick-data/tables";
 import type { ReactNode } from "react";
-import { H2 } from "@/app/PageText";
+import { H2, ReadingColumn } from "@/app/PageText";
 import Link from "@/ui/Link";
 import { Code } from "../../PackageCard";
 import Described from "../Described";
@@ -264,16 +264,20 @@ export default function TablePage({ table }: { table: TableName }) {
       <Typography variant="h4" component="h1" sx={{ mb: 1 }}>
         <code>{table}</code>
       </Typography>
-      <p>
-        <Described text={meta.description} />
-      </p>
+      <ReadingColumn align="start">
+        <p>
+          <Described text={meta.description} />
+        </p>
+      </ReadingColumn>
       <Code>{importLine(table)}</Code>
-      <p>
-        {meta.rows} rows, each named by its{" "}
-        {keyField ? <code>{keyField.path}</code> : "key"}, and{" "}
-        {meta.fields.length} fields. As JSON: <code>{json}</code>.{" "}
-        <Link href="/open-source/data">All the tables</Link>
-      </p>
+      <ReadingColumn align="start">
+        <p>
+          {meta.rows} rows, each named by its{" "}
+          {keyField ? <code>{keyField.path}</code> : "key"}, and{" "}
+          {meta.fields.length} fields. As JSON: <code>{json}</code>.{" "}
+          <Link href="/open-source/data">All the tables</Link>
+        </p>
+      </ReadingColumn>
 
       <Box component="section" aria-labelledby="rows">
         <Box sx={{ display: "flex", alignItems: "baseline", gap: 2 }}>
@@ -321,23 +325,25 @@ export default function TablePage({ table }: { table: TableName }) {
         }}
       >
         <H2 id="fields">Fields</H2>
-        {meta.rules.length ? (
-          <>
-            <p>
-              Besides each field&apos;s type, every row must keep these rules:
-            </p>
-            <ul>
-              {meta.rules.map((rule) => (
-                <li key={rule}>{rule}</li>
-              ))}
-            </ul>
-          </>
-        ) : null}
-        <Box component="dl" sx={{ mt: 2 }}>
-          {meta.fields.map((field) => (
-            <FieldEntry key={field.path} field={field} />
-          ))}
-        </Box>
+        <ReadingColumn align="start">
+          {meta.rules.length ? (
+            <>
+              <p>
+                Besides each field&apos;s type, every row must keep these rules:
+              </p>
+              <ul>
+                {meta.rules.map((rule) => (
+                  <li key={rule}>{rule}</li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+          <Box component="dl" sx={{ mt: 2 }}>
+            {meta.fields.map((field) => (
+              <FieldEntry key={field.path} field={field} />
+            ))}
+          </Box>
+        </ReadingColumn>
       </Box>
     </Container>
   );

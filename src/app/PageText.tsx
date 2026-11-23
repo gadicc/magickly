@@ -61,3 +61,25 @@ export function List({
     </Box>
   );
 }
+
+/**
+ * Running text inside a wider page (AGENTS.md "Layout"): the 32rem reading
+ * column `PageText` gives its text, for prose that sits among a page's wide
+ * parts (a tool, a table, an explorer). Centred, as `PageText` is, or from
+ * the inline start where the page around it is set from there (a component
+ * or data page under its left-hand heading). Its text stays a child, where
+ * site search reads it.
+ */
+export function ReadingColumn({
+  align = "center",
+  children,
+}: {
+  align?: "center" | "start";
+  children: ReactNode;
+}) {
+  return (
+    <Box sx={{ maxWidth: "32rem", mx: align === "center" ? "auto" : 0 }}>
+      {children}
+    </Box>
+  );
+}

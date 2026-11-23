@@ -25,6 +25,7 @@ import {
   Intelligence,
   IntelligenceNotes,
 } from "@/app/astrology/planet/Intelligence";
+import { ReadingColumn } from "@/app/PageText";
 import Ink from "@/drawings/Ink";
 import {
   HEYDON_PAGES,
@@ -74,19 +75,21 @@ export default function Geomancy() {
   return (
     <>
       <Container sx={{ my: 1 }}>
-        <p>
-          The figures&apos; meanings, and their meanings in each house, are the
-          Golden Dawn&apos;s table as Crowley printed it in{" "}
-          <a href="https://archive.org/details/crowley-equinox_202110/The%20Equinox%20Vol.%201%2C%20No.%202/page/n158/mode/1up">
-            “A Handbook of Geomancy”
-          </a>
-          , <i>The Equinox</i> I(2), 1909, with its abbreviations spelled out
-          and “evil” read as “unfavourable”. What each house governs follows{" "}
-          <a href="https://archive.org/details/b20458563/page/n34/mode/1up">
-            Agrippa&apos;s Fourth Book
-          </a>{" "}
-          (Turner, 1655), in our own words.
-        </p>
+        <ReadingColumn>
+          <p>
+            The figures&apos; meanings, and their meanings in each house, are
+            the Golden Dawn&apos;s table as Crowley printed it in{" "}
+            <a href="https://archive.org/details/crowley-equinox_202110/The%20Equinox%20Vol.%201%2C%20No.%202/page/n158/mode/1up">
+              “A Handbook of Geomancy”
+            </a>
+            , <i>The Equinox</i> I(2), 1909, with its abbreviations spelled out
+            and “evil” read as “unfavourable”. What each house governs follows{" "}
+            <a href="https://archive.org/details/b20458563/page/n34/mode/1up">
+              Agrippa&apos;s Fourth Book
+            </a>{" "}
+            (Turner, 1655), in our own words.
+          </p>
+        </ReadingColumn>
 
         <div style={{ textAlign: "center" }}>
           <Typography variant="h4" component="h2" sx={{ my: 2 }}>
@@ -230,7 +233,9 @@ export default function Geomancy() {
           .
         </Typography>
         {/* The Moon's two intelligences have a note each. */}
-        <IntelligenceNotes planet={data.planet.luna} level={3} />
+        <ReadingColumn>
+          <IntelligenceNotes planet={data.planet.luna} level={3} />
+        </ReadingColumn>
         <br />
 
         <Typography
@@ -242,7 +247,7 @@ export default function Geomancy() {
           Geomantic Houses
         </Typography>
 
-        <div style={{ textAlign: "justify" }}>
+        <ReadingColumn>
           {Object.values(houses).map((house) => (
             <p key={house.id}>
               <b>
@@ -252,7 +257,7 @@ export default function Geomancy() {
               {house.meaning.en}
             </p>
           ))}
-        </div>
+        </ReadingColumn>
 
         <Typography
           variant="h4"
@@ -263,19 +268,23 @@ export default function Geomancy() {
           Meanings in the Houses
         </Typography>
 
-        {Object.values(tetragrams).map((tetragram) => (
-          <div key={tetragram.id}>
-            <b>{tetragram.title.en}</b>
-            <br />
-            <i> {tetragram.meaning.en}</i>
-            <br />
-            <ol>
-              {Object.entries(tetragram.meanings).map(([houseNo, meaning]) => (
-                <li key={houseNo}>{meaning.en}</li>
-              ))}
-            </ol>
-          </div>
-        ))}
+        <ReadingColumn>
+          {Object.values(tetragrams).map((tetragram) => (
+            <div key={tetragram.id}>
+              <b>{tetragram.title.en}</b>
+              <br />
+              <i> {tetragram.meaning.en}</i>
+              <br />
+              <ol>
+                {Object.entries(tetragram.meanings).map(
+                  ([houseNo, meaning]) => (
+                    <li key={houseNo}>{meaning.en}</li>
+                  ),
+                )}
+              </ol>
+            </div>
+          ))}
+        </ReadingColumn>
       </Container>
     </>
   );

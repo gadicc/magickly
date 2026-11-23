@@ -52,9 +52,13 @@ describe("geomancy reference page", () => {
     // are those before, 66554 c0f8d848…), and when those links and the
     // Moon's note's link to Agrippa came to open the mirrored page in a
     // dialog (13 November 2026; with their three aria-haspopup attributes
-    // removed the bytes are those before, 67214 6c1a18b3…).
+    // removed the bytes are those before, 67214 6c1a18b3…), and when the
+    // prose (the introduction, the Moon's notes, the houses and the meanings
+    // in the houses) went into the 32rem reading column and the houses lost
+    // their justified wrapper (23 November 2026; with the divs, styles and
+    // class names set aside the markup is that before, 67283 a3a296e8…).
     expect(digest(html)).toBe(
-      "67283 a3a296e89bf9601d810a9d0d0833035cb5ac5a4f00dfe1a9975fa1fa7fef9ccc",
+      "67518 3672e51e94399f9f914ee64b2ada49cfa48ac4a33c606aef25a47b4f87a3ed58",
     );
   });
 
