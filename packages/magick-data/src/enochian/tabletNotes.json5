@@ -1488,7 +1488,7 @@
       {
         "topic": "calvaryCross",
         "witness": "regardie1940",
-        "text": "Each lesser angle's Calvary cross holds the ten Sephiroth: Kether at the top of its column, Tiphareth where the bar crosses it, and Netzach, Hod, Yesod and Malkuth below; Chokmah, Binah, Chesed and Geburah are on the bar, in an order the witnesses dispute (the Calvary bar, below). Side 1 carries the tablet's element, side 2 Spirit, side 3 the lesser angle's element, and side 4 the Sephirah, with the card of its number in the lesser angle's suit, the Ace for Kether, and on the six from Kether to Tiphareth a planet with its trump: Jupiter, Mercury, the Moon, Venus, Mars and the Sun.",
+        "text": "Each lesser angle's Calvary cross holds the ten Sephiroth: Keter at the top of its column, Tiferet where the bar crosses it, and Netzach, Hod, Yesod and Malchut below; Chochmah, Binah, Chesed and Gevurah are on the bar, in an order the witnesses dispute (the reading on the Calvary bar gives each witness's order). Side 1 carries the tablet's element, side 2 Spirit, side 3 the lesser angle's element, and side 4 the Sephirah, with the card of its number in the lesser angle's suit, the Ace for Keter, and on the six from Keter to Tiferet a planet with its trump: Jupiter, Mercury, the Moon, Venus, Mars and the Sun.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1855,7 +1855,7 @@
           }
         ],
         "side": 4,
-        "text": "Vol. 4 works the O of OMEBB, the bar's leftmost square in the Water angle of the Water tablet, as Geburah, which is the Equinox's order of the bar; its own diagram of a lesser angle and the badge of the Ten Squares have Binah there. So vol. 4 disagrees with itself, and the Golden Dawn's and Regardie's versions, which follow the diagram and the badge, give Binah.",
+        "text": "Vol. 4 works the O of OMEBB, the bar's leftmost square in the Water angle of the Water tablet, as Gevurah, which is the Equinox's order of the bar; its own diagram of a lesser angle and the badge of the Ten Squares have Binah there. So vol. 4 disagrees with itself, and the Golden Dawn's and Regardie's versions, which follow the diagram and the badge, give Binah.",
         "sources": [
           {
             "work": "regardie1940",
@@ -1878,7 +1878,7 @@
     "readings": [
       {
         "id": "calvaryBar",
-        "text": "The order of the four Sephiroth on a Calvary cross's bar is disputed. Vol. 4's diagram of the Earth angle of the Water tablet and the Ten Squares badge of the 27th Path in vol. 1 have Binah, Geburah, Tiphareth, Chesed and Chokmah from the left, as the Order draws the Tree; the Equinox's plates have Geburah, Binah, Tiphareth, Chokmah and Chesed in every lesser angle, and vol. 4's worked O of OMEBB agrees with them. An Order manuscript of the Concourse of the Forces, or a painted tablet, would settle it. Each version here follows its own witnesses: the Golden Dawn's and Regardie's the diagram and the badge, the Equinox's its plates.",
+        "text": "Vol. 4's diagram of the Earth angle of the Water tablet and the Ten Squares badge of the 27th Path in vol. 1 have Binah, Gevurah, Tiferet, Chesed and Chochmah from the left, as the Order draws the Tree; the Equinox's plates have Gevurah, Binah, Tiferet, Chochmah and Chesed in every lesser angle, and vol. 4's worked O of OMEBB agrees with them. An Order manuscript of the Concourse of the Forces, or a painted tablet, would settle it.",
         "sources": [
           {
             "work": "regardie1940",

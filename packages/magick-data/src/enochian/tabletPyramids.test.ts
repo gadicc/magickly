@@ -858,6 +858,24 @@ describe("the notes", () => {
       expect(pyramidReading(id)?.sources.length, id).toBeGreaterThan(0);
   });
 
+  it("give in the Calvary bar's reading the two orders the versions take", () => {
+    // Built from the data, not read out of the prose: each order as the
+    // reading must write it, by the Sephiroth's names in the package.
+    const order = (bar: readonly SephirahId[] | null) => {
+      const names = (bar ?? []).map((id) => sephirot[id].name.roman);
+      return `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+    };
+    const text = pyramidReading("calvaryBar")?.text ?? "";
+    expect(order(CALVARY_BARS.gd)).toBe(
+      "Binah, Gevurah, Tiferet, Chesed and Chochmah",
+    );
+    expect(text).toContain(`have ${order(CALVARY_BARS.gd)} from the left`);
+    expect(CALVARY_BARS.regardie).toEqual(CALVARY_BARS.gd);
+    expect(text).toContain(
+      `the Equinox's plates have ${order(CALVARY_BARS.equinox)} in every lesser angle`,
+    );
+  });
+
   it("name the court cards and suits vol. 4 gives the Kerubic squares", () => {
     // The M of AISMT: Earth tablet, Fire angle, the Queen of Wands.
     const m = pyramid("earth", 7, 10);

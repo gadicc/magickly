@@ -9,7 +9,8 @@
 // page's text is copied. The book is treated as in copyright (plan 091).
 //
 // The Coptic was read by hand from the page image at 2648 px wide on 23
-// November 2026, letter by letter, and checked against the spellings of
+// November 2026, letter by letter (Sothis's first letter read again for
+// plan 095's stage 2, the same day), and checked against the spellings of
 // the same gods in the Z documents, vol. 3 (1939), pp.92-104 (leaves
 // n84-n96): Aeshoori for Osiris, Hoor, Ahathoor, Hoor-Po-Krat, Ahaphshi,
 // Ano-Oobi, Tharpesh. Each name is given in the letters as drawn, the
@@ -105,7 +106,7 @@
     st: false,
     station: { en: "An invisible station: the Kerub of the West" },
     copticNote: {
-      en: "Low confidence in the first letter: an omega whose right stroke rises above the line, with a hooked stroke from it running below, read as one letter, shai, the omega with a tail of Osiris and Ameshet; it could be omega followed by another letter (hori, or khei). The last letter is the r-shaped gamma. Vol. 3 does not name Sothis, so nothing checks it.",
+      en: "The first letter is read as shai, with medium confidence: an omega whose right stroke rises above the line and hooks below it, which is the capital of the small shai the table draws in Osiris, Apis, Pasht and Ameshet. No other name in the table begins with shai, so no capital shai checks it, and omega followed by another letter (hori, or khei) is not ruled out. The reading was checked twice on 23 November 2026, on archive.org's largest scan of the page (2648 by 4361 px, the JP2 of leaf n307), by two readers who knew the earlier reading, both Claude (Opus 5.5): the agent that built the page and, separately, the one that reviewed it. The last letter is the r-shaped gamma. Vol. 3 does not name Sothis, so nothing else checks it.",
     },
     vol3: [
       {
