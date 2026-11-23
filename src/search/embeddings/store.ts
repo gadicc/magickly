@@ -2,15 +2,17 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { buildSearchCatalogue } from "../catalogue";
 import { createSearchEngine } from "../engine";
-import { parseVectorArtifact, recordMatrix, VECTOR_ARTIFACT } from "./artifact";
+import type { SearchCatalogue } from "../types";
+import {
+  artifactCoverage,
+  parseVectorArtifact,
+  readVectorArtifactHeader,
+  VECTOR_ARTIFACT,
+} from "./artifact";
 import manifestData from "./manifest.json";
 import { EMBEDDING_PROFILES, type EmbeddingProfile } from "./profiles";
-import {
-  catalogueDigest,
-  digest,
-  type EmbeddingRecord,
-  embeddingRecords,
-} from "./records";
+import { type EmbeddingRecord, embeddingRecords } from "./records";
+import { decodeRow } from "./rowBytes";
 
 export interface SearchEmbeddingManifest {
   version: 1;
@@ -25,34 +27,13 @@ export interface SearchEmbeddingManifest {
 }
 
 /**
- * Every record's vector from the keyed artifact, in record order, or null
- * when the artifact is for another profile or lacks any record's row (as
- * on a catalogue mismatch, semantic search is then unavailable). Rows are
- * found by key, never by position. Until plan 087 S2 drops it, the matrix
- * rebuilt in record order must still hash to the manifest's `sha256`.
+ * The manifest's selected profile, or null when none is selected. Throws
+ * when the manifest's copy of it differs from the registered profile, since
+ * every row key hashes the whole profile.
  */
-export function artifactVectors(
-  bytes: Buffer,
-  profile: EmbeddingProfile,
-  records: readonly EmbeddingRecord[],
-  sha256: string,
-): Float32Array | null {
-  const matrix = recordMatrix(parseVectorArtifact(bytes), profile, records);
-  if (!matrix) return null;
-  if (digest(matrix) !== sha256)
-    throw new Error("Invalid search embedding artifact");
-  const vectors = new Float32Array(records.length * profile.dimensions);
-  for (let i = 0; i < vectors.length; i++) {
-    vectors[i] = matrix.readFloatLE(i * 4);
-    if (!Number.isFinite(vectors[i]))
-      throw new Error("Invalid search vector value");
-  }
-  return vectors;
-}
-
-let loading: ReturnType<typeof readIndex> | undefined;
-async function readIndex() {
-  const manifest = manifestData as SearchEmbeddingManifest;
+export function selectedProfile(
+  manifest: SearchEmbeddingManifest = manifestData as SearchEmbeddingManifest,
+): EmbeddingProfile | null {
   if (!manifest.selected) return null;
   const selected = manifest.profiles.find(
     (entry) => entry.profile.key === manifest.selected,
@@ -66,29 +47,98 @@ async function readIndex() {
     JSON.stringify(expected) !== JSON.stringify(selected.profile)
   )
     throw new Error("Invalid search embedding manifest");
-  const catalogue = await buildSearchCatalogue();
-  if (catalogueDigest(catalogue) !== manifest.catalogueSha256) return null;
-  const records = embeddingRecords(catalogue);
-  if (records.length !== selected.rows)
-    throw new Error("Invalid search embedding artifact");
-  // Assembled by `search:build` from the committed rows; see artifact.ts.
-  const vectors = artifactVectors(
-    readFileSync(join(process.cwd(), VECTOR_ARTIFACT)),
-    expected,
-    records,
-    selected.sha256,
-  );
-  if (!vectors) return null;
+  return expected;
+}
+
+/** The records meaning search ranks and their vectors, row i for record i. */
+export interface CoveredVectors {
+  /** The covered records, in catalogue record order. */
+  records: EmbeddingRecord[];
+  vectors: Float32Array;
+  /** How many of the catalogue's records there are in all. */
+  total: number;
+}
+
+/**
+ * The covered records and their vectors from the keyed artifact (plan 087,
+ * decision 2), or null when none is covered (another profile's artifact, or
+ * no record's row), so meaning search is unavailable. Records without a row
+ * are left out of dense ranking only; lexical search still has them. Each
+ * record and its vector are taken together, by key, so they cannot
+ * misalign. Every row used is validated: length, finite values and norm.
+ */
+export function coveredVectors(
+  bytes: Buffer,
+  profile: EmbeddingProfile,
+  records: readonly EmbeddingRecord[],
+): CoveredVectors | null {
+  const artifact = parseVectorArtifact(bytes);
+  const covered = artifactCoverage(artifact, profile, records);
+  if (!covered.length) return null;
+  const rowBytes = profile.dimensions * 4;
+  const vectors = new Float32Array(covered.length * profile.dimensions);
+  for (const [i, { row }] of covered.entries())
+    vectors.set(
+      decodeRow(
+        artifact.matrix.subarray(row * rowBytes, (row + 1) * rowBytes),
+        profile.dimensions,
+      ),
+      i * profile.dimensions,
+    );
   return {
-    profile: expected,
-    catalogue,
-    records,
+    records: covered.map(({ record }) => records[record]),
     vectors,
+    total: records.length,
+  };
+}
+
+// Assembled by `search:build` from the committed rows; see artifact.ts.
+const artifactPath = () => join(process.cwd(), VECTOR_ARTIFACT);
+
+/**
+ * Whether meaning search is available for `catalogue`: a profile is
+ * selected and the artifact covers at least one record. The rule
+ * `loadSemanticIndex` applies, read from the artifact's header alone, so
+ * `/search/index` never advertises what `/api/search` would refuse. A
+ * missing artifact throws, as loading does.
+ */
+export function semanticAvailable(catalogue: SearchCatalogue): boolean {
+  const profile = selectedProfile();
+  if (!profile) return false;
+  return (
+    artifactCoverage(
+      readVectorArtifactHeader(artifactPath()),
+      profile,
+      embeddingRecords(catalogue),
+    ).length > 0
+  );
+}
+
+let loading: ReturnType<typeof readIndex> | undefined;
+async function readIndex() {
+  const profile = selectedProfile();
+  if (!profile) return null;
+  const catalogue = await buildSearchCatalogue();
+  const covered = coveredVectors(
+    readFileSync(artifactPath()),
+    profile,
+    embeddingRecords(catalogue),
+  );
+  if (!covered) return null;
+  return {
+    profile,
+    catalogue,
+    ...covered,
     lexical: createSearchEngine(catalogue),
   };
 }
 
-/** A stale catalogue never uses old vectors; refreshing needs an explicit index job. */
+/**
+ * The semantic index, or null when meaning search is unavailable. A row
+ * is keyed by its record's exact input, so no stale vector is ever used: a
+ * record whose text changed since the last publish simply has no row until
+ * the next one (plan 087).
+ */
 export function loadSemanticIndex() {
   loading ??= readIndex().catch((error) => {
     loading = undefined;

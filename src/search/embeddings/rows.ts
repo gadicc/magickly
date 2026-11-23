@@ -10,6 +10,9 @@ import {
 import { join } from "node:path";
 import { encodeVectorArtifact } from "./artifact";
 import type { EmbeddingProfile } from "./profiles";
+import { decodeRow } from "./rowBytes";
+
+export { decodeRow, encodeRow } from "./rowBytes";
 
 /**
  * Committed embedding rows (plan 087, decision 1): one file per row,
@@ -23,8 +26,6 @@ export const ROWS_DIRECTORY = "search-vectors";
 
 const ROW_KEY = /^[0-9a-f]{64}$/;
 const PROFILE_KEY = /^[a-z0-9-]+$/;
-/** float32 rounding of a unit vector stays far inside this. */
-const NORM_TOLERANCE = 1e-3;
 
 function checkProfileKey(profileKey: string) {
   if (!PROFILE_KEY.test(profileKey))
@@ -49,39 +50,6 @@ export function rowPath(root: string, profileKey: string, key: string) {
     key.slice(0, 2),
     `${key}.f32`,
   );
-}
-
-/**
- * Decodes and validates one row: exactly `dimensions` float32 values, all
- * finite, with an L2 norm within a small tolerance of 1.
- */
-export function decodeRow(bytes: Uint8Array, dimensions: number) {
-  if (bytes.byteLength !== dimensions * 4)
-    throw new Error(
-      `Embedding row has ${bytes.byteLength} bytes, not ${dimensions * 4}`,
-    );
-  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  const values = new Float32Array(dimensions);
-  let sum = 0;
-  for (let i = 0; i < dimensions; i++) {
-    values[i] = view.getFloat32(i * 4, true);
-    if (!Number.isFinite(values[i]))
-      throw new Error("Embedding row has a non-finite value");
-    sum += values[i] * values[i];
-  }
-  if (Math.abs(Math.sqrt(sum) - 1) > NORM_TOLERANCE)
-    throw new Error("Embedding row is not unit length");
-  return values;
-}
-
-/** Encodes a unit vector as a row's bytes, validating it the same way. */
-export function encodeRow(vector: ArrayLike<number>, dimensions: number) {
-  const bytes = new Uint8Array(vector.length * 4);
-  const view = new DataView(bytes.buffer);
-  for (let i = 0; i < vector.length; i++)
-    view.setFloat32(i * 4, vector[i], true);
-  decodeRow(bytes, dimensions);
-  return bytes;
 }
 
 /** Reads and validates the row named `key`. */
@@ -168,26 +136,43 @@ export function pruneRows(
   return pruned;
 }
 
+/** The keyed artifact `search:build` assembles, and what it left out. */
+export interface AssembledVectors {
+  /** The artifact's bytes (artifact.ts). */
+  bytes: Buffer;
+  /** Rows in the artifact: the distinct referenced keys that have a row. */
+  rows: number;
+  /** How many of the keys given, counting repeats, have a row. */
+  covered: number;
+  /** Rows on disk that no key references, left out of the artifact. */
+  orphans: number;
+}
+
 /**
- * Every committed row of `profile`, validated, as a keyed artifact
- * (artifact.ts). Rows nothing references are included; lookups by key
- * simply never reach them.
+ * The committed rows of `profile` that `keys` reference, as a keyed
+ * artifact (artifact.ts). Every row on disk is validated, orphans too, so a
+ * malformed row fails even when nothing uses it; orphans are normal between
+ * a content commit and the next publish, so they are only counted and left
+ * out of the artifact and the function bundle (plan 087, S2).
  */
 export function assembleVectorArtifact(
   root: string,
   profile: EmbeddingProfile,
-) {
-  const keys = listRowKeys(root, profile.key);
+  keys: readonly string[],
+): AssembledVectors {
+  const wanted = new Set(keys);
+  const rows = new Map<string, Buffer>();
+  let orphans = 0;
+  for (const key of listRowKeys(root, profile.key)) {
+    const bytes = readRow(root, profile.key, key, profile.dimensions);
+    if (wanted.has(key)) rows.set(key, bytes);
+    else orphans++;
+  }
   return {
-    rows: keys.length,
-    bytes: encodeVectorArtifact(
-      profile.key,
-      profile.dimensions,
-      keys.map(
-        (key) =>
-          [key, readRow(root, profile.key, key, profile.dimensions)] as const,
-      ),
-    ),
+    bytes: encodeVectorArtifact(profile.key, profile.dimensions, rows),
+    rows: rows.size,
+    covered: keys.filter((key) => rows.has(key)).length,
+    orphans,
   };
 }
 

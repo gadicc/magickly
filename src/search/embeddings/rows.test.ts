@@ -10,7 +10,7 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { parseVectorArtifact, recordMatrix } from "./artifact";
+import { artifactCoverage, parseVectorArtifact } from "./artifact";
 import { EMBEDDING_PROFILES, type EmbeddingProfile } from "./profiles";
 import { type EmbeddingRecord, embeddingRowKey } from "./records";
 import {
@@ -138,7 +138,7 @@ describe("embedding row files", () => {
     ).toBe(true);
   });
 
-  it("assembles committed rows into an artifact that reproduces the matrix", () => {
+  it("assembles the referenced rows into an artifact that reproduces the matrix", () => {
     const record = (id: string, text: string): EmbeddingRecord => ({
       id,
       path: `/${id}`,
@@ -152,26 +152,72 @@ describe("embedding row files", () => {
       record("two", "second"),
       record("three", "third"),
     ];
+    const keys = records.map((entry) => embeddingRowKey(profile, entry));
     const matrix = Buffer.concat([
       row(1, 0, 0, 0),
       row(0, 0.6, 0.8, 0),
       row(0, 0, 0, 1),
     ]);
-    publishRows(
-      root,
-      profile,
-      records.map((entry) => embeddingRowKey(profile, entry)),
-      matrix,
-    );
-    const { rows, bytes } = assembleVectorArtifact(root, profile);
-    expect(rows).toBe(3);
-    const artifact = parseVectorArtifact(bytes);
+    publishRows(root, profile, keys, matrix);
+    const assembled = assembleVectorArtifact(root, profile, keys);
+    expect(assembled).toMatchObject({ rows: 3, covered: 3, orphans: 0 });
+    const artifact = parseVectorArtifact(assembled.bytes);
     expect(artifact.keys).toEqual(listRowKeys(root, profile.key));
-    expect(recordMatrix(artifact, profile, records)?.equals(matrix)).toBe(true);
-    writeFileSync(
-      rowPath(root, profile.key, artifact.keys[0]),
-      new Uint8Array(12),
+    const coverage = artifactCoverage(artifact, profile, records);
+    expect(coverage.map(({ record }) => record)).toEqual([0, 1, 2]);
+    expect(
+      Buffer.concat(
+        coverage.map(({ row }) =>
+          artifact.matrix.subarray(row * 16, row * 16 + 16),
+        ),
+      ).equals(matrix),
+    ).toBe(true);
+  });
+
+  it("leaves orphan rows out of the artifact without failing", () => {
+    writeRows(root, profile.key, 4, [
+      [key("aa"), row(1, 0, 0, 0)],
+      [key("bb"), row(0, 1, 0, 0)],
+      [key("cc"), row(0, 0, 1, 0)],
+    ]);
+    // dd has no row; aa is referenced twice, as identical records would be.
+    const assembled = assembleVectorArtifact(root, profile, [
+      key("aa"),
+      key("dd"),
+      key("aa"),
+      key("cc"),
+    ]);
+    expect(assembled).toMatchObject({ rows: 2, covered: 3, orphans: 1 });
+    expect(parseVectorArtifact(assembled.bytes).keys).toEqual([
+      key("aa"),
+      key("cc"),
+    ]);
+    expect(listRowKeys(root, profile.key)).toHaveLength(3);
+  });
+
+  it("fails on a malformed row, even one nothing references", () => {
+    writeRows(root, profile.key, 4, [
+      [key("aa"), row(1, 0, 0, 0)],
+      [key("bb"), row(0, 1, 0, 0)],
+    ]);
+    writeFileSync(rowPath(root, profile.key, key("bb")), new Uint8Array(12));
+    expect(() => assembleVectorArtifact(root, profile, [key("aa")])).toThrow(
+      /bytes/,
     );
-    expect(() => assembleVectorArtifact(root, profile)).toThrow(/bytes/);
+    const nan = new Float32Array([Number.NaN, 0, 0, 0]);
+    writeFileSync(
+      rowPath(root, profile.key, key("bb")),
+      new Uint8Array(nan.buffer),
+    );
+    expect(() => assembleVectorArtifact(root, profile, [key("aa")])).toThrow(
+      /non-finite/,
+    );
+    writeFileSync(
+      rowPath(root, profile.key, key("bb")),
+      new Uint8Array(new Float32Array([0.5, 0, 0, 0]).buffer),
+    );
+    expect(() => assembleVectorArtifact(root, profile, [key("aa")])).toThrow(
+      /unit length/,
+    );
   });
 });

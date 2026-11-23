@@ -1,6 +1,5 @@
 import { buildSearchCatalogue } from "@/search/catalogue";
-import manifest from "@/search/embeddings/manifest.json";
-import { catalogueDigest } from "@/search/embeddings/records";
+import { semanticAvailable } from "@/search/embeddings/store";
 
 // A build-time public artifact, deliberately outside the private /api cache.
 export const dynamic = "force-static";
@@ -10,9 +9,9 @@ export async function GET() {
   return Response.json(
     {
       ...catalogue,
-      semanticAvailable:
-        Boolean(manifest.selected) &&
-        manifest.catalogueSha256 === catalogueDigest(catalogue),
+      // The coverage rule /api/search applies (plan 087): some record has
+      // a row for the selected profile.
+      semanticAvailable: semanticAvailable(catalogue),
     },
     {
       headers: {

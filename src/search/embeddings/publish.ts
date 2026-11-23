@@ -115,7 +115,7 @@ export function publishMatrix(
   mkdirSync(join(root, VECTOR_ARTIFACT, ".."), { recursive: true });
   writeFileSync(
     join(root, VECTOR_ARTIFACT),
-    assembleVectorArtifact(root, profile).bytes,
+    assembleVectorArtifact(root, profile, keys).bytes,
   );
   return { file, sha256, written, pruned, removed };
 }
