@@ -193,13 +193,21 @@ export default function KameaSigils({
                 // biome-ignore lint/suspicious/noArrayIndexKey: one name may be listed in two spellings
                 key={i}
                 value={String(i)}
+                // A menu item is a flex box, which drops the space between its
+                // children; the gap stands in for it. The closed field shows
+                // the same children inline, where the space survives.
+                sx={{ gap: "0.5em" }}
               >
-                {name.witness
-                  ? `${name.roman} (${t(WITNESS_LABELS[name.witness])})`
-                  : name.roman}{" "}
-                <span lang="he" dir="rtl" className={styles.hebrew}>
+                {/* Each part isolated, so a witness's closing bracket next to
+                    the Hebrew is not mirrored by the bidi algorithm. */}
+                <bdi>
+                  {name.witness
+                    ? `${name.roman} (${t(WITNESS_LABELS[name.witness])})`
+                    : name.roman}
+                </bdi>{" "}
+                <bdi lang="he" dir="rtl" className={styles.hebrew}>
                   {name.he}
-                </span>
+                </bdi>
               </MenuItem>
             ))}
           </TextField>
