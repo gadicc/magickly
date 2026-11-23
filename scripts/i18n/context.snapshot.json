@@ -219,6 +219,7 @@
         "src/seo/JsonLd.tsx": "bd559ecf37863150f173704a2fb68fbe43eee2d6eacdd5ef0befa070875c23c8",
         "src/seo/angelSigilFileGuard.ts": "68777d6aba07fda491fe0b9cba4ecccaea7fd4d94a2792479f857e05bdd48a26",
         "src/seo/angelSigilFiles.ts": "c11b17b7a7bc92ffba5400c8513293c96389d678b60b6918e4b8c266f70e713c",
+        "src/seo/angelSigilRouting.ts": "ed811a2c4def49f1a44a198535ff01cad0afd4d2db2f075432edc69370d55a0b",
         "src/seo/angelSigils.ts": "fe69930149f01488cd04f0cbe7fd198f9477f891b7dc1324cc58daf4f9cc10ea",
         "src/seo/cardArt.ts": "220104d07c6e1445b67efa515158b72a6797fd07577456851c0346fb5375bcda",
         "src/seo/cardList.ts": "be039a91d040d5d4a92aa89562b4954743f95c6ca7b3840711dd63fd40da661b",
