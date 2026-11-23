@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { buildSearchCatalogue } from "../catalogue";
 import { createSearchEngine } from "../engine";
@@ -114,7 +114,6 @@ export function semanticAvailable(catalogue: SearchCatalogue): boolean {
   );
 }
 
-let loading: ReturnType<typeof readIndex> | undefined;
 async function readIndex() {
   const profile = selectedProfile();
   if (!profile) return null;
@@ -133,16 +132,34 @@ async function readIndex() {
   };
 }
 
+/** Changes whenever `search:build` rewrites or removes the artifact. */
+function artifactStamp() {
+  try {
+    const { mtimeMs, size } = statSync(artifactPath());
+    return `${mtimeMs}:${size}`;
+  } catch {
+    return "missing";
+  }
+}
+
+let loading: { stamp: string; index: ReturnType<typeof readIndex> } | undefined;
+
 /**
  * The semantic index, or null when meaning search is unavailable. A row
  * is keyed by its record's exact input, so no stale vector is ever used: a
  * record whose text changed since the last publish simply has no row until
- * the next one (plan 087).
+ * the next one (plan 087). Loaded once per artifact: when `search:build`
+ * rewrites it (the dev watcher after a pull, say), the next call reloads,
+ * so `/api/search` follows the same artifact `/search/index` reads.
  */
 export function loadSemanticIndex() {
-  loading ??= readIndex().catch((error) => {
-    loading = undefined;
-    throw error;
-  });
-  return loading;
+  const stamp = artifactStamp();
+  if (loading?.stamp !== stamp) {
+    const index = readIndex().catch((error) => {
+      if (loading?.index === index) loading = undefined;
+      throw error;
+    });
+    loading = { stamp, index };
+  }
+  return loading.index;
 }

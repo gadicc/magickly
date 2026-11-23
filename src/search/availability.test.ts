@@ -130,4 +130,17 @@ describe("meaning search availability", () => {
     expect(response.status).toBe(503);
     expect(mocks.reserve).not.toHaveBeenCalled();
   });
+
+  it("reloads when search:build rewrites the artifact, as after a pull in dev", async () => {
+    const artifact = join(root, VECTOR_ARTIFACT);
+    mkdirSync(join(artifact, ".."), { recursive: true });
+    writeFileSync(artifact, variants[2][1]());
+    const { loadSemanticIndex } = await import("./embeddings/store");
+    expect(await loadSemanticIndex()).toBe(null);
+    // The same module, so the same cache: a new artifact replaces it.
+    writeFileSync(artifact, variants[1][1]());
+    const index = await loadSemanticIndex();
+    expect(index?.records.length).toBe(Math.ceil(real.keys.length / 2));
+    expect(await loadSemanticIndex()).toBe(index);
+  });
 });
