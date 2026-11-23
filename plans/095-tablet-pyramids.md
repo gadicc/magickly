@@ -319,7 +319,7 @@ Settled after the review: the Calvary bar, per version (decision 2).
    the region rule off the grid, `vau` against the letters' `vav`, small
    API points) were fixed before the gate. The Sources rows for
    `gd/godForms.json5` and `enochian/tabletNotes.json5` are dated
-   2026-11-23 for Gadi to confirm before the release.
+   2026-11-23, which Gadi confirmed that day.
 2. **The square's detail.** The Squares tab, the picker, the large
    pyramid, the god and sphinx, URL, citations, i18n, the page's text and
    search.
