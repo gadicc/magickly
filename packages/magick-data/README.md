@@ -432,6 +432,23 @@ gone, which only code that reads those keys notices.
 `malcha-betharsisim` row, and stays until a major version. No existing
 value changed.
 
+0.5.0 holds the 72 genii's verses to the Vulgate and corrects nine of them
+(plan 096 in the repository), and gives the planetary names' readings more
+of what their readers recorded (plan 093). In `seventyTwoAngel`, `psalm.la`
+changes for the 2nd, 11th, 14th, 17th, 37th, 43rd, 54th and 64th genii and
+`psalm` for the 47th (104 to 103). Two of the ten fixes mend our
+misreadings of æ as œ (43, 54), five the reissue's misprints, which the
+1823 printing does not have (2, 17, 37's "ad", 47, 64), and three Lenain's
+own slips that are not Latin as they stand (11, 14, 37's "virtutem"), given
+the psalter's word as the 45th's "adjuvebat" always was. The entries'
+French keeps what the reissue prints where the slip is the printer's or
+Lenain's, and `lenain/apparatus` notes each, with the 1823 printing's
+reading in `lenain/witnesses`. In `planetaryNameCharacter`, a stroke may
+give `rings`, and a vertex `via`, `hook` and `bar`, points the reader
+recorded; `planetaryName` gives more of its witnesses' captions, read again
+from the leaves. No field or table is renamed or removed. The Vulgate's
+verses the corrections were checked against are not published yet.
+
 ## Romanised Hebrew
 
 A romanised Hebrew name writes its prefixes as Israel's official
