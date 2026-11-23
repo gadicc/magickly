@@ -1,6 +1,7 @@
 # The tablets' pyramids — 23 November 2026
 
-Status: drafted 23 November 2026; Gadi answered its first open questions
+Status: stage 0, the sources, done on 23 November 2026 (see
+[Stage 0](#stage-0-what-the-sources-show-23-november-2026)). Drafted 23 November 2026; Gadi answered its first open questions
 the same day; amended the same day after a Fable 5.2 review (see
 [Review](#review-23-november-2026)), which reversed one answer and found
 one question for Gadi, the Calvary bar, which he settled the same day:
@@ -327,6 +328,70 @@ policy (data Opus medium; detail and drawing Opus high), reviewed fresh.
   the page shows both.
 - **Our readings.** The sphinx's composition, the tendency on ties and
   the doublings of the Children of Horus are labelled as ours.
+
+## Stage 0: what the sources show (23 November 2026)
+
+Read blind: five readers, one per plate of the Equinox (Plates IV to
+VIII), each given the plate cut into labelled strips of six squares and
+a vocabulary of symbols, and nothing about what to expect; a sixth read
+vol. 4's tables, diagrams and worked squares, vol. 1's badge and vol. 3's
+gods. Each reading was then compared, by script, with this plan's rules
+written as a derivation. The readings are facts (a symbol per side), kept
+in the session's scratch for stage 1's fixture.
+
+- **The Equinox's plates agree with the rules on 2,571 of their 2,576
+  sides**, under the Equinox's Calvary layout. The five exceptions are
+  the printer's: two blank triangles in Plate V (the Water tablet, row 9,
+  squares 6 and 7, bottom, where the tablet's Water belongs) and three
+  Suns drawn without their dot (Plate VI, row 3 square 6 and row 12
+  square 6; Plate VII, row 6 square 6), each where the decan rule puts
+  the Sun (the third decan of Capricorn twice, the second of Aries once);
+  the plates' other seventeen Suns have the dot. Plates V and VII, which
+  the review read at thumbnail size or not at all, are now read in full.
+- **The Calvary bar.** Every one of the sixteen lesser angles on the
+  plates reads Geburah, Binah, Tiphareth, Chokmah, Chesed; under the
+  badge's layout 69 sides differ, all on the bars. Decision 2 stands.
+- **Vol. 4's diagrams.** The Earth angle of the Water tablet (p.290):
+  30 of 30 squares under the badge's layout. The Air tablet's Great Cross
+  (p.287): 35 of 36; the 3 of Swords (Libra, column 6, row 2) is drawn
+  with Jupiter's glyph, as is the 4 of Swords below it, where the decan
+  rule gives Saturn and the Equinox's Plate IV has Saturn: a slip in vol.
+  4's drawing, a named exception. The Kerubic ranks (p.284) and the Great
+  Cross's letters (p.283) as this plan states them; p.282's grids give
+  the lesser angles' corner letters, the same in every tablet.
+- **Vol. 4's worked squares**, ten of ten: ORO's three squares (p.294),
+  the Lovers and the Chariot squares (p.296), the A of EXARP, the H of
+  MPH, the O of OMEBB, the M of AISMT and the R of BRAP (pp.301–303). The
+  O of OMEBB is Geburah, which fits the Equinox's layout (decision 2).
+- **The gods.** The p.315 table's fifteen rows read; the three squares
+  vol. 4 works with their god follow it: the N of nhdD (Water tablet,
+  Air angle: Water, Air, Air, Fire) Ahephi, the C of CPao (Air tablet,
+  Water angle, a rotation of the second servient row: Air, Water, Water,
+  Air) Harpocrates, and the l of lSha (Air tablet, Earth angle, a rotation
+  of Shal: Air, Air, Earth, Earth) Anubis (pp.318–319, 321; leaves
+  n310–n311, n313). The Children of Horus at p.361 (leaf n353) list the
+  same three elements each as p.315. So the reading of decision 3 is the
+  sources', confirmed for a doubled element by nhdD.
+- **Where vol. 3 differs (the Z documents, pp.101–104, leaves
+  n93–n96).** The East's and the South's Kerubs agree with p.315 (Athor;
+  Pasht). Vol. 3 makes the Water Kerub a power of Thoomoo (Tum) and the
+  Earth Kerub of Ahaphshi, where p.315 gives Sothis for the West and Apis
+  for the North; Sothis is not in vol. 3 at all, and Apis only as "the
+  Bull" (p.129). Harpocrates stands between the Hegemon and the Altar in
+  vol. 4 p.315 and vol. 3 p.121, but between the Hegemon and the Evil
+  Triad at vol. 3 p.103. The pyramids' gods are p.315's (the table made
+  for them); the stations of West and North are shown with vol. 3's
+  reading beside them.
+- **The Coptic names** are transcribed with high confidence for six
+  rows, medium for seven, low for Osiris and Sothis; stage 1 reads those
+  by hand at a larger size before any is shown.
+- **The table of attributions (p.298)**: 22 rows, each column and rank
+  letter as the servient rule gives it; the He final in the Star's rank
+  is printed with its dot below the letter (read as He, which the rule
+  gives).
+- **The badge (vol. 1 p.157)**: the column Kether, Tiphareth, Netzach,
+  Hod, Yesod, Malkuth; the bar Binah, Geburah, Tiphareth, Chesed,
+  Chokmah. As the review read it.
 
 ## Review (23 November 2026)
 
