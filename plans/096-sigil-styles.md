@@ -3,8 +3,8 @@
 Status: accepted 23 November 2026. Y0 built (ac0f671c, 5c5f57a7) and the
 Y1 spike run, both 23 November ([What Y0 found](#what-y0-found),
 [What Y1 found](#what-y1-found)). Y2 built the same day
-([What Y2 built](#what-y2-built)), except magick-components 0.7.0,
-which waits for Gadi's sign-off. Y3 and Y4 not started. Revised the same day
+([What Y2 built](#what-y2-built)), and magick-components 0.7.0 after
+Gadi signed its row (31ae3e5a). Y3 and Y4 not started. Revised the same day
 after an adversarial review ([Review](#review-23-november-2026)). Gadi
 decided to offer four styles of an angel's rose sigil from the mock-up,
 not Vaughan's spaced letters, one at a time, with the name in the band
@@ -873,7 +873,8 @@ can be overridden), and two colour props, `ink` and `stroke`.
 The rose is unchanged: `roseDigest.mts` prints the same on `main` and
 the branch, and nothing under the rose's files moved.
 
-**Waiting for Gadi.** The package's tests refuse an unsigned Provenance
+**Signed.** Gadi dated the new Provenance row 23 November 2026, and
+0.7.0 is committed (31ae3e5a). Before that: the package's tests refuse an unsigned Provenance
 row above 0.0.0, so `gd/roseSigilStyles` cannot be a package entry
 until its row is dated. The 0.7.0 release (version, entry, README
 section and the row with an empty date) is a ready patch in the
@@ -892,7 +893,7 @@ Built on a gate branch, `gate/sigil-styles`, from `main` after
 | --- | --- | --- |
 | Y0 (built 23 Nov, ac0f671c, 5c5f57a7) | **Sources and the verse guard.** (a) Lenain 1823: the pages for the reissue's pp. 45 and 70, the title page, and #70's entry. (b) The sphère cabalistique: catalogue collations and other copies of 1823. (c) Mathers Pl. IV Figs. 18, 20 and 21 and their notes (pp. 61–62), with their leaves. (d) Regardie p. 58. (e) **The verses**, below. (f) `mathers1889` in `works.ts`, and Plate IV mirrored. (g) If a verse changed, `pnpm search:publish` | Gadi reviews the discrepancy table. The verse test is green and committed |
 | Y1 (run 23 Nov) | **Spike** (above) | The numbers recorded here; Gadi chooses from side-by-side renders at real sizes (decisions 9, 10, 13) |
-| Y2 (built 23 Nov, c9ab1d5c to c59ac1d3; 0.7.0 waits) | **Package:** `roseSigilStyles`, the bounds, the lettering, the notes. **Fonts:** the subset, metrics, README. magick-components 0.7.0, and magick-data's next minor if Y0 changed a verse | `roseDigest.mts` unchanged; the halls' pins unchanged; package tests (layout, glyph order, fit, bounds) |
+| Y2 (built 23 Nov, c9ab1d5c to 31ae3e5a) | **Package:** `roseSigilStyles`, the bounds, the lettering, the notes. **Fonts:** the subset, metrics, README. magick-components 0.7.0, and magick-data's next minor if Y0 changed a verse | `roseDigest.mts` unchanged; the halls' pins unchanged; package tests (layout, glyph order, fit, bounds) |
 | Y3 | **Contract and route.** First, on `main`'s bytes, the pin over the 72 outlined rose SVGs. Then `angel-sigil`, its registration, its inputs (`seventyTwoAngel` and the verse file in `DATA_INPUT_TABLES`), the coverage test, the pins and the drawing digest, and the redirects | Contract, registry, dataInputs and route tests; `ROSE_SIGIL_PINS`, the rose's drawing digest and the new 72-SVG pin unchanged; the 144 rose files' hash list unchanged |
 | Y4 | **Angel pages and the list:** the 432 new files, the dropdown, URL state, captions with `<Cite>`, alt texts, downloads, the "Every style" line, JSON-LD, sitemap, share image, `ListSigil`; Lingui and Hebrew; search publish for the list's caption | The full gate (below); the hydration test; the browser checks; the 144 rose files again |
 
