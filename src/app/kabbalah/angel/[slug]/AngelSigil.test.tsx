@@ -210,7 +210,7 @@ describe("an angel page's sigil section", () => {
         downloads: [talisman.png.path, talisman.svg.path],
         // The psalm only (decision for Gadi 12): Lenain's verse numbers
         // are often not the Vulgate's.
-        alt: "A talisman of Vehuiah, והויה: the Rose Cross sigil inside a ring lettered with a verse of Psalm 3 in Latin",
+        alt: "A talisman of Vehuiah, והויה: the Rose Cross sigil inside a ring lettered with a verse of Psalm 3 (Vulgate numbering) in Latin",
       });
       expect(now.caption).toMatch(/^A talisman as Lenain describes/);
       expect(now.caption).not.toContain("Genesis");

@@ -87,14 +87,14 @@ msgstr "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, draw
 #. Alt text of an angel's talisman (angel page): the sigil inside a ring lettered with the angel's psalm verse. {psalm} is the psalm's number in the Latin Bible's numbering
 #. js-lingui-explicit-id
 #: src/seo/angelSigilFiles.ts
-msgid "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} in Latin"
-msgstr "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} in Latin"
+msgid "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} (Vulgate numbering) in Latin"
+msgstr "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} (Vulgate numbering) in Latin"
 
 #. Alt text as above, for one of the two angels named Lauviah, told apart by {number}, their place among the 72
 #. js-lingui-explicit-id
 #: src/seo/angelSigilFiles.ts
-msgid "A talisman of {name}, angel {number} of the 72, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} in Latin"
-msgstr "A talisman of {name}, angel {number} of the 72, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} in Latin"
+msgid "A talisman of {name}, angel {number} of the 72, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} (Vulgate numbering) in Latin"
+msgstr "A talisman of {name}, angel {number} of the 72, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} (Vulgate numbering) in Latin"
 
 #. Alt text of the talisman of Jabamiah, the one angel whose verse is the Bible's first, not a psalm's
 #. js-lingui-explicit-id

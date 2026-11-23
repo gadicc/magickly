@@ -87,13 +87,13 @@ msgstr "סיגיל צלב הוורד של {name}, המלאך ה־{number} מתו
 #. Alt text of an angel's talisman (angel page): the sigil inside a ring lettered with the angel's psalm verse. {psalm} is the psalm's number in the Latin Bible's numbering
 #. js-lingui-explicit-id
 #: src/seo/angelSigilFiles.ts
-msgid "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} in Latin"
+msgid "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} (Vulgate numbering) in Latin"
 msgstr "טליסמן של {name}, {hebrew}: סיגיל צלב הוורד בתוך טבעת שכתוב בה פסוק ממזמור {psalm} בתהלים (במספור הוולגטה), בלטינית"
 
 #. Alt text as above, for one of the two angels named Lauviah, told apart by {number}, their place among the 72
 #. js-lingui-explicit-id
 #: src/seo/angelSigilFiles.ts
-msgid "A talisman of {name}, angel {number} of the 72, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} in Latin"
+msgid "A talisman of {name}, angel {number} of the 72, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} (Vulgate numbering) in Latin"
 msgstr "טליסמן של {name}, המלאך ה־{number} מתוך 72, {hebrew}: סיגיל צלב הוורד בתוך טבעת שכתוב בה פסוק ממזמור {psalm} בתהלים (במספור הוולגטה), בלטינית"
 
 #. Alt text of the talisman of Jabamiah, the one angel whose verse is the Bible's first, not a psalm's

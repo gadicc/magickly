@@ -187,12 +187,12 @@ const BARE_ALT_NUMBERED = /*i18n*/ {
     "Alt text as above, for one of the two angels named Lauviah, told apart by {number}, their place among the 72",
 };
 const TALISMAN_ALT = /*i18n*/ {
-  id: "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} in Latin",
+  id: "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} (Vulgate numbering) in Latin",
   comment:
     "Alt text of an angel's talisman (angel page): the sigil inside a ring lettered with the angel's psalm verse. {psalm} is the psalm's number in the Latin Bible's numbering",
 };
 const TALISMAN_ALT_NUMBERED = /*i18n*/ {
-  id: "A talisman of {name}, angel {number} of the 72, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} in Latin",
+  id: "A talisman of {name}, angel {number} of the 72, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} (Vulgate numbering) in Latin",
   comment:
     "Alt text as above, for one of the two angels named Lauviah, told apart by {number}, their place among the 72",
 };
