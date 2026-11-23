@@ -15,6 +15,7 @@ import {
   KameaSigilImage,
 } from "magick-components/astrology/KameaSigil";
 import React from "react";
+import { inkClass } from "@/drawings/Ink";
 import ToolLayout, {
   ToolControls,
   ToolDrawing,
@@ -282,9 +283,11 @@ export default function KameaSigils({
       </ToolControls>
       <ToolDrawing>
         {/* Up to three figures a row, sized together from 1,200 px
-            (kameaSigils.module.css). */}
+            (kameaSigils.module.css); re-inked in the dark scheme as the
+            rose sigil is, while the downloads' hidden image below stays
+            black on white. */}
         <div
-          className={styles.stage}
+          className={`${styles.stage} ${inkClass("kamea")}`}
           aria-busy={placing}
           style={
             {

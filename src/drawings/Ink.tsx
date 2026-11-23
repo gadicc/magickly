@@ -10,6 +10,7 @@ export type InkDrawing =
   | "candlestick"
   | "shewbread"
   | "roseSigil"
+  | "kamea"
   | "chakras"
   | "lamen"
   | "tree";
