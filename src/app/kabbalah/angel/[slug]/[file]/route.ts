@@ -22,8 +22,19 @@ import {
 export const dynamicParams = true;
 export const dynamic = "force-static";
 
-/** What browsers and the CDN may do with a sigil file: as the halls'. */
+/** What browsers and the CDN may do with a built sigil file: as the halls'. */
 const SIGIL_FILE_CACHE_CONTROL = "public, max-age=0, must-revalidate";
+
+/**
+ * A file drawn on its first request also tells the CDN to keep it. Vercel
+ * keeps a function's response fresh only for the `s-maxage` it is given, and
+ * strips that from what the browser sees; without one, the first preview
+ * (23 November 2026) answered every later request `STALE` and drew the file
+ * again in the background each time. A deployment starts with an empty
+ * cache, so a year here lasts until the next deploy (plan 096, decision 3).
+ */
+const DRAWN_SIGIL_FILE_CACHE_CONTROL =
+  "public, max-age=0, s-maxage=31536000, must-revalidate";
 
 export function generateStaticParams() {
   return allAngelSigilStyleFiles()
@@ -55,7 +66,9 @@ export async function GET(
       // drawing improves, so a browser revalidates against the ETag every
       // time rather than keeping a copy it cannot know is stale (plan 062,
       // decision 7).
-      "Cache-Control": SIGIL_FILE_CACHE_CONTROL,
+      "Cache-Control": ANGEL_SIGIL_BUILT_STYLES.includes(file.style)
+        ? SIGIL_FILE_CACHE_CONTROL
+        : DRAWN_SIGIL_FILE_CACHE_CONTROL,
       ETag: `"${image.sha256}"`,
     },
   });

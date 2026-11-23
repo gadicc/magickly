@@ -115,8 +115,13 @@ describe("/kabbalah/angel/[slug]/[file]", () => {
         expect(response.headers.get("content-disposition")).toBe(
           `inline; filename="${name}"`,
         );
+        // The built band's as the rose's; a file drawn on its first request
+        // also gives the CDN an s-maxage, without which Vercel redraws it in
+        // the background on every request.
         expect(response.headers.get("cache-control")).toBe(
-          "public, max-age=0, must-revalidate",
+          style === "band"
+            ? "public, max-age=0, must-revalidate"
+            : "public, max-age=0, s-maxage=31536000, must-revalidate",
         );
         // Indexable: no noindex on any style's file.
         expect(response.headers.get("x-robots-tag")).toBeNull();
