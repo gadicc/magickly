@@ -643,6 +643,35 @@ its five by four squares, counted from 0 as its rows are: a line
 (`{ row: 0, column }` for EXARP) or its first column. It has no
 regions, so `regions` draws nothing there.
 
+## A tablet as pyramids
+
+The Golden Dawn treats every square of the tablets as a truncated
+pyramid: four sides, each with an element, round a flat top that holds
+the letter. `pyramids` draws every square so, its sides in their
+elements' colours (Fire red, Water blue, Air yellow, Earth black,
+Spirit white, and white for a Calvary square's lowest side, which
+carries its Sephirah), from magick-data's `enochian/tabletPyramids`:
+
+```tsx
+import Tablet from "magick-components/enochian/Tablet";
+
+export const FireAsPyramids = () => <Tablet tablet="fire" pyramids />;
+
+// The Union's tops a quarter of the square, as the Equinox's plates draw them.
+export const UnionQuarterTops = () => (
+  <Tablet tablet="union" pyramids pyramidTop={0.25} />
+);
+```
+
+The top is half the square unless `pyramidTop` gives another share
+(from 0.2 to 0.8). Thin grey lines part the sides, so two black Earth
+sides never run together. The colours are exported as
+`PYRAMID_COLOURS` for a key beside the drawing. The symbols are not
+drawn, nor are second letters; the highlights, the regions' tints among
+them, are drawn over the pyramids as over the flat squares. Dee's and
+Raphael's tables carry no elements, so in their versions the tablet is
+drawn flat.
+
 ## What you supply
 
 - **An Enochian font.** `Tablet` draws the Latin transliteration unless you
@@ -797,6 +826,12 @@ style stays `gd/RoseSigilImage`'s. `astrology/KameaSigilImage` takes
 `columns`, setting a name of several words in rows. The rose sigil draws
 exactly as before. It depends on magick-data 0.5.0.
 
+0.8.0 adds `pyramids` and `pyramidTop` to `enochian/Tablet` (see
+[A tablet as pyramids](#a-tablet-as-pyramids), plan 095 in the
+repository) and exports `PYRAMID_COLOURS` and `PYRAMID_TOP`. Without
+`pyramids` a tablet draws exactly as before. It depends on magick-data
+0.5.0, the first with `enochian/tabletPyramids`.
+
 ## Requirements
 
 React 19 and an ES module environment: Node 22 or later (`engines`
@@ -815,7 +850,7 @@ package's entries.
 | Drawing | Source | Signed off |
 | --- | --- | --- |
 | The planetary spirits' sigils (`astrology/PlanetarySpirit`) | Our own drawings of 13 November 2026 after John Heydon, *Theomagia*, vol. 1 (London, 1663/4), book I, ch. V, pp. 13 and 15 (archive.org `theomagiaortempl00heyd`, leaves n124 and n126): a few strokes of one width placed by eye over the scan, not traced. They replace tracings of a 1994 printing in copyright, which the repository's history keeps and the package does not | 2026-11-14 |
-| The Enochian tablets' letters (`enochian/Tablet`) | magick-data's `enochian/tablets.json5`, in each tradition's reading, signed off in its Sources; the tablet draws them as text. The highlights drawn over the squares (a ring, a veil, a flag, order numbers, the regions' tints and hatching) are our own, drawn in code | 2026-11-20 |
+| The Enochian tablets' letters (`enochian/Tablet`) | magick-data's `enochian/tablets.json5`, in each tradition's reading, signed off in its Sources; the tablet draws them as text. The highlights drawn over the squares (a ring, a veil, a flag, order numbers, the regions' tints and hatching) are our own, drawn in code. The squares drawn as pyramids are our drawing after the Golden Dawn's rule for one square (Regardie, *The Golden Dawn*, vol. 4 (1940), pp.291–296): the sides' elements from magick-data's `enochian/tabletPyramids`, coloured as p.294 gives them, and the flat top's size, the grey lines and the white top ours | 2026-11-23 |
 | The Watchtowers' sigils (`enochian/Tablet`) | Drawn in code from lines, arcs and curves. The plain sigils, and the form of Air's in colour, after *The Equinox* I(7) (1912), Plate X (archive.org `crowley-equinox_202110`, "The Equinox Vol. 1, No. 7", leaf n256); the coloured Water and Fire sigils from Regardie's description, *The Golden Dawn*, vol. 4 (1940); Earth's a cross in four colours | 2026-11-14 |
 | The Air sigil's four Yods (`enochian/Tablet`) | Regardie, *The Golden Dawn*, vol. 4 (1940), p. 307 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaf n299) describes a Tau with four Yods above it; drawn as small flames after Plate X (above), hand-placed curves in code, not traced. That the Yods stand for the 4 over the T of Dee's Sigillum Dei Aemeth (*The Equinox* I(7), Plate II, leaf n238) is our inference, not a source's. They replace two fonts' glyphs, which the repository's history keeps | 2026-11-14 |
 | The planetary seals (`astrology/PlanetarySeal`) | Our own drawings, geometry in code, after the woodcuts of Agrippa, *De occulta philosophia* (Cologne, 1533), book II, ch. 22 (archive.org `DeOccultaPhilosophiaLoc1533`, the Library of Congress copy): Saturn and Jupiter p. CXLIX (leaf n164), Mars and the Sun p. CL (n165), Venus p. CLI (n166), Mercury p. CLII (n167), the Moon p. CLIII (n168). Each seal's lines, circles and arcs were measured on the leaf and made clean where the cutter's hand wandered, as the component's comments say seal by seal; nothing is traced and no image of the book is in the package. The silver plate is our reading of the chapter's text (leaf n162) | 2026-11-21 |

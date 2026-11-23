@@ -254,6 +254,18 @@ Follow-ups are separate from the completed migration work:
   magick-data 0.4.0 and magick-components 0.6.0. TODO: a long name's
   card art in two rows; the Enochian hint-table test's timeout under
   load ([plan 093](093-kameas-and-their-sigils.md#stages)).
+- The tablets' pyramids ([plan 095](095-tablet-pyramids.md)), 23
+  November 2026: stages 0 to 2 on `main`, 3 and 4 on
+  `gate/095-tablet-pyramids-drawing`. magick-data computes every
+  square's four sides from the Golden Dawn's rules, tested against the
+  Equinox's plates and vol. 4 (released in magick-data 0.5.0); the
+  tablets page's Squares tab shows one square's pyramid with its
+  attributions, god and sphinx; *Draw as pyramids* draws the whole
+  tablet so, with a colour key, released as magick-components 0.8.0
+  (`Tablet`'s `pyramids`), published by CI when `main` is pushed. TODO:
+  stage 5, the image route's own slug for pyramids (no image link until
+  then); the follow-ups (symbols on the sides, the tablets in image
+  search).
 - TODO: rate limiting for the public component image routes
   (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through
   WASM on request, and `/api/render/rose-sigil` takes up to about 160 ms
