@@ -38,7 +38,13 @@ import React from "react";
 import { Render } from "@/doc/blocks";
 
 import DocContext from "@/doc/context";
-import { currentSection, type NextLine, nextLine } from "@/doc/readerPosition";
+import {
+  currentSection,
+  jumpDistance,
+  type NextLine,
+  nextLine,
+} from "@/doc/readerPosition";
+import { READER_FONT_SIZE, READER_TEXT_SIZE_RANGE } from "@/doc/readerTextSize";
 import { focusHall, revealHall } from "@/doc/revealHall";
 import { roles } from "@/doc/ritualBlocks/roles";
 import {
@@ -47,6 +53,7 @@ import {
   ritualContents,
   ritualHalls,
 } from "@/doc/ritualHalls";
+import { useReaderTextSize } from "@/doc/useReaderTextSize";
 import { DocNode } from "@/schemas";
 import shell from "../readerShell.module.css";
 import {
@@ -236,6 +243,7 @@ function ZoomMenu({
       <Stack direction="row" spacing={0} sx={{ alignItems: "center" }}>
         <IconButton
           aria-label={translateUi(/*i18n*/ "decrease font size")}
+          disabled={fontSize <= READER_TEXT_SIZE_RANGE[0]}
           onClick={() => setFontSize(fontSize - 5)}
         >
           <RemoveIcon />
@@ -243,6 +251,7 @@ function ZoomMenu({
         <span>{fontSize}%</span>
         <IconButton
           aria-label={translateUi(/*i18n*/ "increase font size")}
+          disabled={fontSize >= READER_TEXT_SIZE_RANGE[1]}
           onClick={() => setFontSize(fontSize + 5)}
         >
           <AddIcon />
@@ -451,22 +460,28 @@ interface DocRenderProps {
    * The element the ritual scrolls in, when it is not the window: the
    * legacy ritual editor's preview pane. The next-line count then measures
    * against the pane's visible bottom and the current section below its
-   * top; Jump to Next scrolls the pane alone, and Jump Back returns it,
+   * top; the jump to the next line scrolls the pane alone, and Jump back returns it,
    * not the window, to where it was.
    */
   scrollPane?: React.RefObject<HTMLElement | null>;
 }
 
 /**
- * The part of a scrolling pane the reader sees, in the window's coordinates
- * as the tasks' boxes are: its client area, which leaves out a border and a
- * horizontal scrollbar, and no lower than the window's bottom edge, as the
- * editor around the pane may scroll it partly out of view.
+ * The part of the screen the ritual is read in, in the window's coordinates
+ * as the tasks' boxes are: below the app bar, and in a scrolling pane, its
+ * client area (which leaves out a border and a horizontal scrollbar), no
+ * lower than the window's bottom edge, as the editor around the pane may
+ * scroll it partly out of view.
  */
-function visibleEdges(pane: HTMLElement) {
+function readingArea(pane: HTMLElement | null | undefined) {
+  const appBar =
+    Number.parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--app-bar"),
+    ) || 56;
+  if (!pane) return { top: appBar, bottom: window.innerHeight };
   const top = pane.getBoundingClientRect().top + pane.clientTop;
   return {
-    top,
+    top: Math.max(top, appBar),
     bottom: Math.min(top + pane.clientHeight, window.innerHeight),
   };
 }
@@ -539,6 +554,7 @@ export function DocView({
     [doc.children],
   );
 
+  const { t: translateUi } = useUiLanguage();
   const [sdOpen, setSdOpen] = React.useState(false);
   const [tocAnchorEl, setTocAnchorEl] = React.useState<
     (EventTarget & HTMLDivElement) | null
@@ -547,7 +563,8 @@ export function DocView({
     (EventTarget & HTMLDivElement) | null
   >(null);
 
-  const [fontSize, setFontSize] = React.useState(100);
+  // Kept across reloads, the same in every ritual (plan 089, item 3).
+  const [fontSize, setFontSize] = useReaderTextSize();
 
   const context = { vars: {}, roles };
   for (const varDesc of vars) {
@@ -598,8 +615,7 @@ export function DocView({
   const measure = React.useCallback(() => {
     const body = bodyRef.current;
     if (!body) return;
-    const pane = scrollPane?.current;
-    const edges = pane ? visibleEdges(pane) : null;
+    const area = readingArea(scrollPane?.current);
     // Every drawn task, a footnote's inside its host's frame excepted; one
     // in a closed summary has no box and is not a line to read yet.
     const tasks = [
@@ -614,7 +630,7 @@ export function DocView({
         top: frame.getBoundingClientRect().top,
         mine: frame.dataset.audience === "self",
       })),
-      edges ? edges.bottom : window.innerHeight,
+      area.bottom,
     );
     nextTask.current = found ? tasks[found.index] : null;
     setNext((previous) =>
@@ -624,17 +640,11 @@ export function DocView({
           : found
         : found,
     );
-    const appBar =
-      Number.parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue(
-          "--app-bar",
-        ),
-      ) || 56;
-    // Below the app bar, and below the pane's top when that is lower.
+    // Just below the app bar, or the pane's top when that is lower.
     setSection(
       currentSection(
         ritualTitles(body).map((title) => title.getBoundingClientRect().top),
-        Math.max(edges?.top ?? 0, appBar) + 24,
+        area.top + 24,
       ),
     );
   }, [scrollPane]);
@@ -726,7 +736,8 @@ export function DocView({
     </div>
   );
   // The text-size control scales both areas alike, not the page's title.
-  const zoom = { fontSize: fontSize + "%" };
+  // The size the `<head>` script set before paint, or the one chosen since.
+  const zoom = { fontSize: READER_FONT_SIZE };
 
   const myRole = (context.vars as Record<string, { value: string }>).myRole
     ?.value;
@@ -737,6 +748,11 @@ export function DocView({
 
   // "Your next line" only for a reader who chooses a role (decision 2).
   const readingAs = vars.some((v) => v.name === "myRole" && !v.hidden);
+  // The variables panel's label in the rail, while the role is among its
+  // controls, not folded under More Variables (item 8).
+  const roleFirst = vars.some(
+    (v) => v.name === "myRole" && !v.hidden && !v.collapsable,
+  );
   // Where the ritual is scrolled to, for Jump Back: its pane, or the page.
   const scrolledTo = () => scrollPane?.current?.scrollTop ?? window.pageYOffset;
   const jumpToNext = () => {
@@ -744,13 +760,14 @@ export function DocView({
     if (!target) return;
     const pane = scrollPane?.current;
     setJumpedFrom(scrolledTo());
-    // In a pane, only the pane moves, the line to its visible bottom as
-    // `scrollIntoView(false)` would put it; that would also scroll the
-    // editor around the pane, which Jump Back could not undo.
-    if (pane)
-      pane.scrollTop +=
-        target.getBoundingClientRect().bottom - visibleEdges(pane).bottom;
-    else target.scrollIntoView(false);
+    const distance = jumpDistance(
+      target.getBoundingClientRect(),
+      readingArea(pane),
+    );
+    // In a pane, only the pane moves: `scrollIntoView` would also scroll
+    // the editor around it, which Jump Back could not undo.
+    if (pane) pane.scrollTop += distance;
+    else window.scrollBy(0, distance);
   };
   const jumpBack = () => {
     const pane = scrollPane?.current;
@@ -787,7 +804,10 @@ export function DocView({
           {/* Each control once: at the top of the column, and from 1,200 px
               the inline-end rail, with the panels only it shows. */}
           <div className={shell.controls} data-reader-area="controls">
-            <RailPanel railOnly={false}>
+            <RailPanel
+              railOnly={false}
+              label={roleFirst ? /*i18n*/ "Reading as" : undefined}
+            >
               <div style={zoom}>
                 {variables}
                 <br className={shell.columnOnly} />
@@ -819,7 +839,18 @@ export function DocView({
       )}
 
       <SpeedDial
-        ariaLabel="SpeedDial basic example"
+        // The count it shows, in digits as shown, said with what it
+        // counts (label in name); without a role it counts nothing.
+        ariaLabel={
+          !readingAs || next === undefined
+            ? translateUi(/*i18n*/ "Reader menu")
+            : next === null
+              ? translateUi(/*i18n*/ "Reader menu: no more lines")
+              : translateUi(
+                  /*i18n*/ "{count, plural, one {Reader menu: # line before yours} other {Reader menu: # lines before yours}}",
+                  { count: next.count },
+                )
+        }
         // From 1,200 px the reader's rails do its work.
         className={chrome ? shell.speedDial : undefined}
         sx={{ position: "fixed", bottom: 16, right: 16 }}
@@ -837,14 +868,18 @@ export function DocView({
         {jumpedFrom !== null ? (
           <SpeedDialAction
             icon=<ArrowUpwardIcon />
-            slotProps={{ tooltip: { title: "Jump Back" } }}
+            slotProps={{
+              tooltip: { title: translateUi(/*i18n*/ "Jump back") },
+            }}
             onClick={jumpBack}
           />
         ) : (
           <SpeedDialAction
             icon=<ArrowDownwardIcon />
             slotProps={{
-              tooltip: { title: "Jump to Next" },
+              tooltip: {
+                title: translateUi(/*i18n*/ "Jump to your next line"),
+              },
               // Nothing to jump to after the reader's last line.
               fab: { disabled: !next },
             }}
@@ -854,7 +889,7 @@ export function DocView({
         {halls && halls.length > 0 && (
           <SpeedDialAction
             icon=<GridOnIcon />
-            slotProps={{ tooltip: { title: "Halls" } }}
+            slotProps={{ tooltip: { title: translateUi(/*i18n*/ "Halls") } }}
             onClick={() => {
               if (halls.length === 1) setViewingHall(0);
               else setHallSheetOpen(true);
@@ -863,7 +898,7 @@ export function DocView({
         )}
         <SpeedDialAction
           icon=<ListIcon />
-          slotProps={{ tooltip: { title: "Table of Contents" } }}
+          slotProps={{ tooltip: { title: translateUi(/*i18n*/ "Contents") } }}
           onClick={(event) => {
             tocAnchorEl
               ? setTocAnchorEl(null)
@@ -872,7 +907,7 @@ export function DocView({
         />
         <SpeedDialAction
           icon=<ZoomInIcon />
-          slotProps={{ tooltip: { title: "Zoom In/Out" } }}
+          slotProps={{ tooltip: { title: translateUi(/*i18n*/ "Text size") } }}
           onClick={(event) => setZoomAnchorEl(event.currentTarget)}
         />
       </SpeedDial>
@@ -912,8 +947,8 @@ export function DocView({
               if (!hallSheetOpen) setSdOpen(false);
             }}
             onGoTo={(hall) => {
-              // Armed as Jump to Next arms it, before scrolling; the dialog
-              // closing renders the button as Jump Back.
+              // Armed as the jump to the next line arms it, before
+              // scrolling; the dialog closing renders the button as Jump back.
               setJumpedFrom(scrolledTo());
               setViewingHall(null);
               setHallSheetOpen(false);

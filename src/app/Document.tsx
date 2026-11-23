@@ -5,6 +5,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata, Viewport } from "next";
 import * as React from "react";
 import { THEME_COLOR } from "@/colorScheme";
+import { readerTextSizeScript } from "@/doc/readerTextSize";
 import { earlyPlaceLookupScript } from "@/geo/earlyPlaceLookup";
 import LocaleProvider, { type LocalePolicy } from "@/i18n/LocaleProvider";
 import { LOCALE_INFO, type UiLocale } from "@/i18n/locales";
@@ -108,6 +109,11 @@ export default function RootLayout(props: {
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: our own constant script, no input
           dangerouslySetInnerHTML={{ __html: earlyPlaceLookupScript }}
+        />
+        <script
+          // The ritual reader's chosen text size, before the first paint.
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: our own constant script, no input
+          dangerouslySetInnerHTML={{ __html: readerTextSizeScript }}
         />
         <link
           rel="apple-touch-icon"

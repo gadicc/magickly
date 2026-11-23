@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { currentSection, nextLine } from "./readerPosition";
+import {
+  currentSection,
+  JUMP_CLEARANCE,
+  jumpDistance,
+  nextLine,
+} from "./readerPosition";
 
 const task = (top: number, mine = false) => ({ top, mine });
 
@@ -45,5 +50,26 @@ describe("the current section", () => {
 
   it("is -1 without titles", () => {
     expect(currentSection([], 80)).toBe(-1);
+  });
+});
+
+describe("the jump to the reader's next line", () => {
+  const visible = { top: 56, bottom: 800 };
+
+  it("brings the line's end above the floating button, not to the edge", () => {
+    const line = { top: 1000, bottom: 1100 };
+    const distance = jumpDistance(line, visible);
+    expect(line.bottom - distance).toBe(800 - JUMP_CLEARANCE);
+  });
+
+  it("keeps the start in view in an area too short for the clearance", () => {
+    const line = { top: 300, bottom: 320 };
+    const short = { top: 200, bottom: 280 };
+    expect(line.top - jumpDistance(line, short)).toBe(200 + 24);
+  });
+
+  it("keeps a tall line's start in view, below the app bar", () => {
+    const line = { top: 1000, bottom: 2000 };
+    expect(line.top - jumpDistance(line, visible)).toBe(56 + 24);
   });
 });

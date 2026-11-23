@@ -74,9 +74,7 @@ afterEach(() => {
 });
 
 function openSpeedDial() {
-  fireEvent.click(
-    screen.getByRole("button", { name: "SpeedDial basic example" }),
-  );
+  fireEvent.click(screen.getByRole("button", { name: /^Reader menu/ }));
 }
 const action = (name: string) => screen.queryByRole("menuitem", { name });
 
@@ -84,7 +82,7 @@ describe("the Halls action", () => {
   it("is absent from a ritual with no halls", () => {
     render(<DocView doc={doc(title("Opening"))} searchParams={null} />);
     openSpeedDial();
-    expect(action("Table of Contents")).not.toBeNull();
+    expect(action("Contents")).not.toBeNull();
     expect(action("Halls")).toBeNull();
   });
 
@@ -93,21 +91,21 @@ describe("the Halls action", () => {
       <DocView doc={threeHalls()} searchParams={null} hallNavigation={false} />,
     );
     openSpeedDial();
-    expect(action("Table of Contents")).not.toBeNull();
+    expect(action("Contents")).not.toBeNull();
     expect(action("Halls")).toBeNull();
   });
 
-  it("sits between Jump to Next and Table of Contents", () => {
+  it("sits between the jump and Contents", () => {
     render(<DocView doc={threeHalls()} searchParams={null} />);
     openSpeedDial();
     const names = screen
       .getAllByRole("menuitem")
       .map((item) => item.getAttribute("aria-label"));
     expect(names).toEqual([
-      "Jump to Next",
+      "Jump to your next line",
       "Halls",
-      "Table of Contents",
-      "Zoom In/Out",
+      "Contents",
+      "Text size",
     ]);
   });
 
@@ -360,8 +358,8 @@ describe("the sheet and the viewer", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
 
     openSpeedDial();
-    const back = action("Jump Back") as HTMLElement;
-    expect(action("Jump to Next")).toBeNull();
+    const back = action("Jump back") as HTMLElement;
+    expect(action("Jump to your next line")).toBeNull();
     fireEvent.click(back);
     expect(scrollTo).toHaveBeenCalledWith(0, 321);
   });
@@ -380,10 +378,10 @@ describe("the sheet and the viewer", () => {
     await waitFor(() => expect(document.activeElement).toBe(figure));
     expect(figure.tabIndex).toBe(-1);
     openSpeedDial();
-    fireEvent.click(action("Jump Back") as HTMLElement);
+    fireEvent.click(action("Jump back") as HTMLElement);
     expect(scrollTo).toHaveBeenCalledWith(0, 0);
     openSpeedDial();
-    expect(action("Jump to Next")).not.toBeNull();
+    expect(action("Jump to your next line")).not.toBeNull();
   });
 });
 
@@ -753,7 +751,7 @@ describe("the Table of Contents", () => {
     const entries = history.length;
     render(<DocView doc={threeHalls()} searchParams={null} />);
     openSpeedDial();
-    fireEvent.click(action("Table of Contents") as HTMLElement);
+    fireEvent.click(action("Contents") as HTMLElement);
     const items = screen
       .getAllByRole("menuitem")
       .filter((item) => item.closest("#toc"))
@@ -789,7 +787,7 @@ describe("the Table of Contents", () => {
       const entries = history.length;
       render(<DocView doc={threeHalls()} searchParams={null} />);
       openSpeedDial();
-      fireEvent.click(action("Table of Contents") as HTMLElement);
+      fireEvent.click(action("Contents") as HTMLElement);
       fireEvent.click(screen.getByRole("menuitem", { name: "Advancement" }));
       expect(location.hash).toBe("#Advancement");
       expect(history.length).toBe(entries);
