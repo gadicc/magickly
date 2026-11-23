@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import angels from "magick-data/kabbalah/seventyTwoAngels";
-import { isHTTPAccessFallbackError } from "next/dist/client/components/http-access-fallback/http-access-fallback";
+import { notFound } from "next/navigation";
 import sharp from "sharp";
 import { describe, expect, it, vi } from "vitest";
 
@@ -141,6 +141,17 @@ describe("/kabbalah/angel/[slug]/[file]", () => {
     vi.mocked(renderComponentImage).mockClear();
     // `src/proxy.ts` keeps such names from the route (its test has the
     // list); this is the last guard, `notFound()`, before anything is drawn.
+    // What it throws, by the public API alone: the error `notFound()`
+    // throws, whose digest Next documents as `NEXT_HTTP_ERROR_FALLBACK;404`.
+    const thrownBy = (run: () => unknown) => {
+      try {
+        run();
+      } catch (thrown) {
+        return thrown;
+      }
+    };
+    const { digest } = thrownBy(notFound) as { digest: string };
+    expect(digest).toBe("NEXT_HTTP_ERROR_FALLBACK;404");
     for (const [slug, file] of [
       ["vehuiah", "jeliel-rose-cross-sigil.png"],
       ["vehuiah", "jeliel-rose-cross-sigil-band.png"],
@@ -155,7 +166,7 @@ describe("/kabbalah/angel/[slug]/[file]", () => {
       ["vehuiah", "vehuiah.png"],
     ]) {
       const error = await get(slug, file).catch((thrown: unknown) => thrown);
-      expect(isHTTPAccessFallbackError(error), `${slug}/${file}`).toBe(true);
+      expect(error, `${slug}/${file}`).toMatchObject({ digest });
     }
     expect(renderComponentImage).not.toHaveBeenCalled();
   });
