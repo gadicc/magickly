@@ -81,10 +81,12 @@
 //   Complutense copy, archive.org bub_gb_XjfzMnomDQoC. `at` is the leaf
 //   (https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n<at>), `page`
 //   the printed page, `reads` what Kircher prints at that place. Given for
-//   the notes on 11, 14, 33 and 37 from the reading of 23 November 2026
-//   recorded in vulgate/differences.json5 (plan 096, stage Y0); for 37
-//   Kircher gives the psalm's refrain in its last form (79:20, which he
-//   cites as 79:4), not Lenain's 79:8.
+//   the notes on 11, 14, 33 and 37. Read by Claude (Opus 5.5) by eye on
+//   the Complutense scan on 23 November 2026, knowing the value expected
+//   (Lenain's and the Vulgate's), for plan 096's stage Y0; first recorded
+//   in vulgate/differences.json5 at 5c5f57a7, and kept only here since
+//   c9ab1d5c. For 37 Kircher gives the psalm's refrain in its last form
+//   (79:20, which he cites as 79:4), not Lenain's 79:8, as the note says.
 {
   readings: [
     {"no": 1, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 46, "reads": "20 mars, 31 avril, 11 août, 22 octobre, 2 janvier"}, "ms5365": {"at": 54, "reads": "20 mars, 31 avril, 11 août, 22 octobre, 2 janvier"}},
