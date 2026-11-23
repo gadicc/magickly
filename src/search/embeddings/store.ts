@@ -37,6 +37,11 @@ export interface SearchEmbeddingManifest {
 export function selectedProfile(
   manifest: SearchEmbeddingManifest = manifestData as SearchEmbeddingManifest,
 ): EmbeddingProfile | null {
+  if ((manifest as { version?: unknown }).version !== 2)
+    throw new Error(
+      "Search embedding manifest is not version 2 (a pre-plan-087-S3 copy, " +
+        "say from a merge); run `pnpm search:assemble <profile>` to rewrite it",
+    );
   if (!manifest.selected) return null;
   const expected = EMBEDDING_PROFILES.find(
     (profile) => profile.key === manifest.selected,

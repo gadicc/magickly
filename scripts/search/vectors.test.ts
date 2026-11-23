@@ -105,7 +105,7 @@ describe("search:build's embedding artifact", () => {
     expect(vectorBuildReport(build)).toEqual({
       log: [
         `search: 10/10 records have embedding rows for ${profile.key}; assembled 10 rows, 0 orphan rows left on disk`,
-        `search: record-order matrix sha256 ${sha256} (10 rows)`,
+        `search: record-order matrix sha256 ${sha256} (10 records)`,
       ],
       warn: [],
     });

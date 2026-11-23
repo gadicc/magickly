@@ -25,9 +25,15 @@ console.log(
 // assembled for /api/search, with their coverage (plan 087). A function,
 // since this file is CommonJS under tsx, which has no top-level await.
 async function buildVectors() {
-  const { selected } = JSON.parse(
+  const { selected, version } = JSON.parse(
     readFileSync(resolve(root, "src/search/embeddings/manifest.json"), "utf8"),
-  ) as { selected: string | null };
+  ) as { selected: string | null; version?: unknown };
+  // Only a warning: search:assemble runs this first and then rewrites the
+  // manifest, so failing here would block the repair (plan 087, S3 review).
+  if (version !== 2)
+    console.warn(
+      "search: the embedding manifest is not version 2; run `pnpm search:assemble <profile>` to rewrite it",
+    );
   const { log, warn } = vectorBuildReport(
     await buildVectorArtifact(root, selected, async () => {
       // Imported only now: the catalogue reads the prose.json written above.

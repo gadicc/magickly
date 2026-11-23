@@ -1,5 +1,5 @@
-import { readdirSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readdirSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { expect, it } from "vitest";
 import manifest from "./manifest.json";
 import { EMBEDDING_PROFILES } from "./profiles";
@@ -55,4 +55,35 @@ it("commits rows for the selected profile only (plan 087, S2 decision 4)", () =>
   expect(
     readdirSync(directory).filter((name) => !name.startsWith(".")),
   ).toEqual([manifest.selected]);
+});
+
+it("refuses a version 1 manifest, naming search:assemble", () => {
+  const [profile] = EMBEDDING_PROFILES;
+  expect(() =>
+    selectedProfile({
+      version: 1,
+      selected: profile.key,
+      profiles: [{ profile }],
+    } as unknown as SearchEmbeddingManifest),
+  ).toThrow(/search:assemble/);
+});
+
+/** Every `.bin` under a directory, recursively. */
+function binaries(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) =>
+    entry.isDirectory()
+      ? binaries(join(directory, entry.name))
+      : entry.name.endsWith(".bin")
+        ? [join(directory, entry.name)]
+        : [],
+  );
+}
+
+it("publishes no matrix: the service worker precaches all of public/ (plan 087, S3)", () => {
+  // A merge from a branch that published before S3 can bring the 9.8 MB
+  // matrix back as a modify/delete conflict; keeping it would make every
+  // visitor download it again while every other test still passed.
+  const publicDirectory = resolve(import.meta.dirname, "../../../public");
+  expect(existsSync(join(publicDirectory, "search-vectors"))).toBe(false);
+  expect(binaries(publicDirectory)).toEqual([]);
 });

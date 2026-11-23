@@ -88,7 +88,7 @@ export function vectorBuildReport(build: VectorBuild) {
       `assembled ${rows} rows, ${orphans} orphan rows left on disk`,
     // The published vectors' digest, now that no matrix is committed: at
     // full coverage, what the manifest's `sha256` was (plan 087, S3).
-    `search: record-order matrix sha256 ${sha256} (${covered} rows)`,
+    `search: record-order matrix sha256 ${sha256} (${covered} records)`,
   ];
   const warn: string[] = [];
   if (covered < total * COVERAGE_WARNING)

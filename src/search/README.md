@@ -143,10 +143,16 @@ committed rows alone, copying their bytes: no provider, credentials or
 network, so it costs nothing. It prunes rows the merged catalogue no longer
 references and rewrites the manifest. It stops before writing anything if a
 record has no committed row, naming the page (text the merge combined from
-both sides, say); that text needs `search:publish`. Skipping it is safe:
-it only leaves orphans on disk until the next publish. If the manifest does
-conflict, resolve it to either side's valid JSON
-(`search:build` parses it) before running it.
+both sides, say); that text needs `search:publish`. Skipping it only leaves
+orphans on disk until the next publish, provided the merged manifest is
+version 2. If the manifest conflicts, take a version 2 side (`search:build`
+parses it), or run `search:assemble`, which rewrites it.
+
+A branch that published before plan 087's S3 still carries
+`public/search-vectors/` and a version 1 manifest. Merging it shows the
+matrix as a modify/delete conflict: delete the directory (the service worker
+would precache the 9.8 MB file again, and `manifest.test.ts` fails while it
+is there), keep this side's manifest or run `search:assemble`.
 
 Builds never silently re-embed. The server scores the covered rows
 exhaustively; no vector database or ANN index is needed. The browser
