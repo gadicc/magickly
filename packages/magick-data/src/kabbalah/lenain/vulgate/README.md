@@ -17,9 +17,9 @@ there is a picture, not a line in a table.
 - `../../lenainVulgate.test.ts` holds every `psalm.la` to its verse. A
   difference not listed, or a listed one that no longer differs, fails.
 
-The two files are built into `dist/` like the package's other data, but
-not yet published: `package.json`'s `files` leaves this directory out
-until the owner signs off their rows in the package README's Sources.
+The two files are built into `dist/` and published like the package's
+other data; the owner signed off their rows in the package README's
+Sources on 23 November 2026.
 
 ## Source
 

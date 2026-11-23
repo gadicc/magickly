@@ -838,9 +838,9 @@ by-eye readings made knowing what the psalter reads and labelled so.
     `witnesses.json5`.
   - **Not fixed:** Lenain's own departures stay in the field; Y2
     corrects #11, #14 and #37 (decision for Gadi 11).
-  - The two new data files are registered for coverage but kept out of
-    the npm tarball until Gadi signs their Sources row (decision for
-    Gadi 13).
+  - The two new data files are registered for coverage. They were kept
+    out of the npm tarball until Gadi signed their Sources rows on 23
+    November (decision for Gadi 13), with the three changed Lenain rows.
 - **Search:** one publish, $0.0265, 14 passages.
 - **Not done:** Ms 5365 was not read for the new notes, and only the
   differing verses were read in the 1823 printing.
@@ -883,7 +883,7 @@ worktree's `.private/`; with a date in the row, it applies and passes
 the components smoke test. Also to look at: whether the magick-data
 rows for `seventyTwoAngels.json5`, `lenain/apparatus.json5` and
 `lenain/witnesses.json5`, whose contents changed under unchanged text,
-need re-signing; and decision for Gadi 13.
+need re-signing; and decision for Gadi 13. All signed 23 November.
 
 ## What Y3 built
 
@@ -912,8 +912,8 @@ is pending.
   `DATA_INPUT_TABLES`; fonts `NotoSerif-Regular-latin1.ttf`, appended
   to `SERVER_FONT_FILES`, and `FrankRuhlLibre-Bold-letters.ttf`. The
   verse file is read from magick-data's build directory
-  (`lenainVulgateVerses.ts`), since it is not a package entry until its
-  Sources row is signed (decision for Gadi 13).
+  (`lenainVulgateVerses.ts`): it is published as JSON data, not as a
+  module entry.
 - **The pins**, reviewed as rasterised: Vehuiah band, #47 and #31
   talismans, #43 (æ) and #55 (Æ) talismans, Nith-Haiah bare, #70
   talisman; a drawing digest over the package component with the 72
@@ -1114,7 +1114,7 @@ for Gadi's date):
 12. **The talisman's alt text:** name the psalm only ("a verse of
     Psalm 3"), as now drafted; or give Lenain's reference, or the
     Vulgate's.
-13. **Sign-off for Y0's two data files** (`lenain/vulgate/verses.json5`
+13. **Sign-off for Y0's two data files** (signed 23 November 2026) (`lenain/vulgate/verses.json5`
     and `differences.json5`): their Sources row needs Gadi's date
     before they ship in magick-data's tarball.
 

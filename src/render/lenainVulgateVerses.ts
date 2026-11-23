@@ -1,8 +1,7 @@
 import "server-only";
-// Not a package entry yet: magick-data builds the file into dist/ but keeps
-// it out of the tarball until its Sources row is signed (plan 096, decision
-// for Gadi 13), so the app reads the workspace's build directly, as it reads
-// the components' manifest.
+// Not a module entry: magick-data publishes the file only as JSON data
+// (its Sources row signed 23 November 2026, plan 096), so the app reads the
+// workspace's build directly, as it reads the components' manifest.
 import verses from "../../packages/magick-data/dist/kabbalah/lenain/vulgate/verses.js";
 
 /**

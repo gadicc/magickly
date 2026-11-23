@@ -35,7 +35,6 @@
     "LICENSE-DATA.txt",
     "!dist/enochian/dictionary.*",
     "!dist/fields.*",
-    "!dist/kabbalah/lenain/vulgate/*",
     "!lib/enochian/Dictionary.*"
   ],
   "exports": {

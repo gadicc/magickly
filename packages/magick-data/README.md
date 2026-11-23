@@ -447,7 +447,8 @@ reading in `lenain/witnesses`. In `planetaryNameCharacter`, a stroke may
 give `rings`, and a vertex `via`, `hook` and `bar`, points the reader
 recorded; `planetaryName` gives more of its witnesses' captions, read again
 from the leaves. No field or table is renamed or removed. The Vulgate's
-verses the corrections were checked against are not published yet.
+verses the corrections were checked against are published beside them,
+in `lenain/vulgate/verses` and `lenain/vulgate/differences`.
 
 ## Romanised Hebrew
 
@@ -499,14 +500,16 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `kabbalah/fourWorlds.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `kabbalah/godNames.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `kabbalah/kerubim.json5` | [Correspondences](#correspondences) | 2026-11-12 |
-| `kabbalah/lenain/apparatus.json5` | [Lenain](#lenain) | 2026-11-12 |
+| `kabbalah/lenain/apparatus.json5` | [Lenain](#lenain) | 2026-11-23 |
 | `kabbalah/lenain/evidence.json5` | [Lenain](#lenain) | 2026-11-12 |
 | `kabbalah/lenain/kircherPlate.json5` | [Lenain](#lenain): Kircher's plate of the seventy-two names of God by nation (1653), the source of Lenain's first table's last two columns, read from the National Library of Poland's copy on Wikimedia Commons; and where Lenain's entries depart from it | 2026-11-19 |
 | `kabbalah/lenain/pages.json5` | [Lenain](#lenain) | 2026-11-12 |
-| `kabbalah/lenain/witnesses.json5` | [Lenain](#lenain): what the 1823 printing and the manuscript copy of it print where a note turns on a value, read from their page images | 2026-11-18 |
+| `kabbalah/lenain/vulgate/differences.json5` | [Lenain](#lenain): ours, every place Lenain's Latin verse differs from the Vulgate's, with what the 1823 printing and Kircher read and whose the difference is | 2026-11-23 |
+| `kabbalah/lenain/vulgate/verses.json5` | [Lenain](#lenain): the Clementine Vulgate's text of the 72 genii's verses, from the Clementine Vulgate Project (public domain), each with the page of Hetzenauer's Clementine (Innsbruck, 1914) that prints it | 2026-11-23 |
+| `kabbalah/lenain/witnesses.json5` | [Lenain](#lenain): what the 1823 printing and the manuscript copy of it print where a note turns on a value, read from their page images | 2026-11-23 |
 | `kabbalah/paths.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `kabbalah/sephirot.json5` | [Correspondences](#correspondences) | 2026-11-12 |
-| `kabbalah/seventyTwoAngels.json5` | [Lenain](#lenain) | 2026-11-12 |
+| `kabbalah/seventyTwoAngels.json5` | [Lenain](#lenain) | 2026-11-23 |
 | `kabbalah/seventyTwoAngelsText/en.json5` | [Lenain](#lenain) | 2026-11-12 |
 | `kabbalah/seventyTwoAngelsText/fr.json5` | [Lenain](#lenain) | 2026-11-12 |
 | `kabbalah/souls.json5` | [Correspondences](#correspondences) | 2026-11-12 |
@@ -557,6 +560,18 @@ marked public domain; SHA-256 of the image read in the file's header).
 Kircher died in 1680, the names are facts, and **no rights are asserted
 over them**. The file also records, as ours, where Lenain's entries depart
 from the plate.
+
+**`lenain/vulgate/verses.json5`** is the Vulgate's text of each genius's
+verse, the 71 psalm verses and the 70th's Genesis 1:1, from the Clementine
+Vulgate Project's plain-text files of the Sixto-Clementine Vulgate of 1592,
+which the project released into the public domain; each verse gives the
+page of Hetzenauer's printed Clementine (Innsbruck, 1914, archive.org
+`biblia_sacra_vulgatae_etitionis_1914`) that has it. The files read, their
+hashes and how to rebuild it are in `src/kabbalah/lenain/vulgate/README.md`
+in the repository. **No rights are asserted over the Latin.**
+**`lenain/vulgate/differences.json5`** is ours: every place Lenain's Latin
+differs from it, with what the 1823 printing and Kircher read and whose the
+difference is.
 
 What is offered under CC BY 4.0 is the work done on top: the English translated
 from that French, the choice and arrangement of fields, the editorial apparatus,
