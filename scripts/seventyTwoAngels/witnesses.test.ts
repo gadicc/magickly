@@ -275,6 +275,66 @@ describe("what a witnessed note says", () => {
     ]);
   });
 
+  it("links Kircher's table of the verses after the copies, by its leaf", () => {
+    const verse = reading({
+      no: 11,
+      field: "psalm.la",
+      verdict: "lenain",
+      print1823: { at: 53, reads: "et exultatur Deus salutis meæ" },
+      ms5365: undefined,
+      kircher: { at: 283, page: 276, reads: "& exaltetur Deus salutis meæ" },
+    });
+    expect(witnessesOf(verse).map((w) => w.source)).toEqual([
+      "print1823",
+      "kircherVerses",
+    ]);
+    expect(witnessesOf(verse)[1]).toEqual({
+      source: "kircherVerses",
+      label: "Kircher, p. 276",
+      at: "n283",
+      url: "https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n283/mode/1up",
+      reads: "& exaltetur Deus salutis meæ",
+    });
+  });
+
+  it("refuses a Kircher reading off his table, or on a field he does not give", () => {
+    const dir = mkdtempSync(join(tmpdir(), "witnesses-"));
+    const file = (kircher: unknown, field = "psalm.la") => {
+      const path = join(
+        dir,
+        `${field}-${JSON.stringify(kircher).length}.json5`,
+      );
+      writeFileSync(
+        path,
+        JSON5.stringify({
+          readings: [
+            {
+              no: 11,
+              field,
+              verdict: "lenain",
+              print1823: { at: 53, reads: "x" },
+              kircher,
+            },
+          ],
+          firstTable: { page: 25, rows: [] },
+        }),
+      );
+      return path;
+    };
+    expect(() =>
+      readWitnesses(file({ at: 283, page: 276, reads: "x" })),
+    ).not.toThrow();
+    expect(() =>
+      readWitnesses(file({ at: 283, page: 281, reads: "x" })),
+    ).toThrow(/not his table/);
+    expect(() => readWitnesses(file({ page: 276, reads: "x" }))).toThrow(
+      /no page or leaf/,
+    );
+    expect(() =>
+      readWitnesses(file({ at: 283, page: 276, reads: "x" }, "godName")),
+    ).toThrow(/only the verses/);
+  });
+
   it("never quotes an empty reading, in the committed file", () => {
     for (const each of readWitnesses().readings) {
       const { why } = witnessedWhy(

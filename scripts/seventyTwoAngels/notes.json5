@@ -63,7 +63,15 @@
     field: "psalm",
     printed: "104",
     used: "103",
-    why: "The page cites the 25th verse of Psalm 104; the verse it quotes is the Vulgate's Psalm 103:24 (104:24 in the Hebrew numbering). The verse number, 25 for 24, is in both printings and is kept, as Lenain's.",
+    why: "The page cites the 25th verse of Psalm 104; the verse it quotes is the Vulgate's Psalm 103:24 (104:24 in the Hebrew numbering). The verse number, 25 for 24, is kept as the page prints it; the 1823 reading given here is of the psalm's number only.",
+  },
+  {
+    no: 33,
+    kind: "reading",
+    field: "psalm",
+    printed: "33",
+    used: "",
+    why: "The page cites the 11th verse of Psalm 33; the verse it quotes, \"Dominus scit cogitationes hominum\", is the Vulgate's Psalm 93:11 (94:11 in the Hebrew numbering). Kircher's table, which Lenain cites for the verses, numbers it Psalm 83 (Oedipus Aegyptiacus II.1, p. 277), and Lenain's 33 may be a misreading of that, but nothing shows it. The field keeps Lenain's number.",
   },
   {
     no: 64,

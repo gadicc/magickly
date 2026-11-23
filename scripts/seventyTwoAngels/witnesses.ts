@@ -41,22 +41,37 @@ export interface WitnessRead {
   reads: string;
 }
 
+/** What Kircher's table of the 72 verses prints: `at` is its leaf. */
+export interface KircherRead extends WitnessRead {
+  /** The printed page, 275 to 280. */
+  page: number;
+}
+
 export interface WitnessReading {
   no: number;
   field: string;
   verdict: Verdict;
   print1823: WitnessRead;
   ms5365?: WitnessRead;
+  /**
+   * Kircher's table of the verses (Oedipus Aegyptiacus II.1, pp. 275–280),
+   * which Lenain cites for them, where a note on a verse turns on it.
+   */
+  kircher?: KircherRead;
   remark?: string;
 }
 
 /**
- * One witness as a note carries it, ready to link: a copy of Lenain, or
- * Kircher's plate of the names of God by nation, his source for two columns.
+ * One witness as a note carries it, ready to link: a copy of Lenain,
+ * Kircher's plate of the names of God by nation, his source for two
+ * columns, or Kircher's table of the verses, his source for the psalms.
  */
 export interface Witness {
-  source: "print1823" | "ms5365" | "kircherPlate";
-  /** "1823 printing, p. 57", "Ms 5365, leaf n66" or "Kircher's plate, ray 50". */
+  source: "print1823" | "ms5365" | "kircherPlate" | "kircherVerses";
+  /**
+   * "1823 printing, p. 57", "Ms 5365, leaf n66", "Kircher's plate, ray 50"
+   * or "Kircher, p. 276".
+   */
   label: string;
   /** The page ("57"), the archive.org leaf ("n66") or the ray ("ray 50"). */
   at: string;
@@ -113,6 +128,14 @@ export function readWitnesses(path = WITNESSES_PATH): WitnessFile {
     seen.add(key);
     checkRead(`${where}, 1823 printing`, reading.print1823);
     if (reading.ms5365) checkRead(`${where}, Ms 5365`, reading.ms5365);
+    if (reading.kircher) {
+      checkRead(`${where}, Kircher`, reading.kircher);
+      const { page } = reading.kircher;
+      if (!Number.isInteger(page) || page < 275 || page > 280)
+        throw new Error(`${where}, Kircher: p. ${page} is not his table`);
+      if (!reading.field.startsWith("psalm"))
+        throw new Error(`${where}: Kircher's table gives only the verses`);
+    }
   }
   let previous = 0;
   for (const row of file.firstTable?.rows ?? []) {
@@ -129,10 +152,12 @@ export function readWitnesses(path = WITNESSES_PATH): WitnessFile {
 
 const PRINT_1823 = "https://books.google.com/books?id=qt9SAAAAcAAJ";
 const MS_5365 = "https://archive.org/details/BIUSante_ms05365";
+/** Kircher's Oedipus Aegyptiacus vol. II, the Complutense copy. */
+const KIRCHER_1653 = "https://archive.org/details/bub_gb_XjfzMnomDQoC";
 
 /** The links a note carries, the printing first. */
 export function witnessesOf(reading: WitnessReading): Witness[] {
-  const { print1823, ms5365 } = reading;
+  const { print1823, ms5365, kircher } = reading;
   const witnesses: Witness[] = [
     {
       source: "print1823",
@@ -149,6 +174,14 @@ export function witnessesOf(reading: WitnessReading): Witness[] {
       at: `n${ms5365.at}`,
       url: `${MS_5365}/page/n${ms5365.at}/mode/1up`,
       reads: ms5365.reads,
+    });
+  if (kircher)
+    witnesses.push({
+      source: "kircherVerses",
+      label: `Kircher, p. ${kircher.page}`,
+      at: `n${kircher.at}`,
+      url: `${KIRCHER_1653}/page/n${kircher.at}/mode/1up`,
+      reads: kircher.reads,
     });
   return witnesses;
 }

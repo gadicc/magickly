@@ -18,11 +18,16 @@ import apparatus from "../../../dist/kabbalah/lenain/apparatus.js";
  * handwritten copy of it in Paris (Ms 5365). The edition transcribes a later
  * reissue, and these say whether a slip is the reissue's or Lenain's. Where
  * an entry departs from Kircher's plate of the names of God by nation, his
- * source for that column, the plate's ray is a witness too.
+ * source for that column, the plate's ray is a witness too, and where a note
+ * on a verse turns on Kircher's table of the 72 verses, his source for them,
+ * the table's leaf.
  */
 export interface NoteWitness {
-  source: "print1823" | "ms5365" | "kircherPlate";
-  /** "1823 printing, p. 57", "Ms 5365, leaf n66" or "Kircher's plate, ray 50". */
+  source: "print1823" | "ms5365" | "kircherPlate" | "kircherVerses";
+  /**
+   * "1823 printing, p. 57", "Ms 5365, leaf n66", "Kircher's plate, ray 50"
+   * or "Kircher, p. 276".
+   */
   label: string;
   /** The page ("57"), the archive.org leaf ("n66") or the ray ("ray 50"). */
   at: string;

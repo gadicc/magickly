@@ -68,7 +68,7 @@
     print1823: { at: 57, reads: "Expectans expectavi Dominum" },
     kircher: { leaf: 283, page: 276, reads: "Exspectans exspectavi Dominum" },
     whose: "spelling",
-    why: "\"expectare\" is a common spelling of \"exspectare\".",
+    why: "\"expectare\" is a common spelling of \"exspectare\". Hetzenauer's Clementine prints \"Expectans expectavi\" here, without the s, as Lenain does (leaf n529, p. 507, read in archive.org's OCR of the scan, which has \"Expeetans expeotavi\").",
   },
   {
     no: 23,
@@ -144,7 +144,7 @@
     vulgate: "et exsultate ei cum tremore.",
     print1823: { at: 89, reads: "et exultate ei cum tremore" },
     whose: "spelling",
-    why: "\"exultate\" for \"exsultate\", as at the thirteenth. Kircher's sixty-third is another verse, Psalm 99:2 (p. 280, leaf n287).",
+    why: "\"exultate\" for \"exsultate\", as at the thirteenth. Hetzenauer's Clementine prints \"exultate\" here too (leaf n508, p. 486, read in archive.org's OCR of the scan). Kircher's sixty-third is another verse, Psalm 99:2 (p. 280, leaf n287).",
   },
   {
     no: 65,
