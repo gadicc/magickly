@@ -66,7 +66,7 @@
     psalm: {
       psalm: 21,
       verse: 20,
-      la: "Tu autem Domine ne elongaveris auxilium tuum a me'ad defensionem meam conspice",
+      la: 'Tu autem Domine ne elongaveris auxilium tuum a me ad defensionem meam conspice',
     },
     invokedFor: {
       en: "To calm popular uprisings, and to obtain victory over those who attack you unjustly. The request must be spoken with the genius's name, and the 20th verse of Psalm 21 recited.",
@@ -631,7 +631,7 @@
     psalm: {
       psalm: 8,
       verse: 1,
-      la: 'Domine Deus noster, quam admirabile est nomen tuum in universâ terrâ!',
+      la: 'Domine Dominus noster, quam admirabile est nomen tuum in universâ terrâ!',
     },
     invokedFor: {
       en: 'It serves against torments of the spirit and sadness, and for resting well at night.',
@@ -1391,7 +1391,7 @@
     psalm: {
       psalm: 79,
       verse: 8,
-      la: 'Deus ad virtutem converte nos : et ostende faciem tuam et salvi erimus.',
+      la: 'Deus virtutem converte nos : et ostende faciem tuam et salvi erimus.',
     },
     invokedFor: {
       en: 'To obtain victory and to make an army lift the siege of a town.',
@@ -1622,7 +1622,7 @@
     psalm: {
       psalm: 87,
       verse: 14,
-      la: 'Et ego ad te Domine clamavi : et manè oratio mea prœveniet te.',
+      la: 'Et ego ad te Domine clamavi : et manè oratio mea præveniet te.',
     },
     invokedFor: {
       en: 'Used to destroy the enemy and to be delivered from slavery.',
@@ -1774,7 +1774,7 @@
     },
     godName: 'Hana',
     psalm: {
-      psalm: 104,
+      psalm: 103,
       verse: 25,
       la: 'Quàm magnificata sunt opera tua Domine! omnia in sapientia fecisti : impleta est terra possessione tua.',
     },
@@ -2043,7 +2043,7 @@
     psalm: {
       psalm: 102,
       verse: 19,
-      la: 'Dominus in cœlo paravit sedem suam : et regnum ipsius omnibus dominabitur.',
+      la: 'Dominus in cælo paravit sedem suam : et regnum ipsius omnibus dominabitur.',
     },
     invokedFor: {
       en: 'To obtain the mercy of God and to live a long life.',
@@ -2421,7 +2421,7 @@
     psalm: {
       psalm: 32,
       verse: 18,
-      la: 'Ecce oculi Domini super metuentes eum : et in eis, qui sperant super misericordiam ejus.',
+      la: 'Ecce oculi Domini super metuentes eum : et in eis, qui sperant super misericordia ejus.',
     },
     invokedFor: {
       en: '',

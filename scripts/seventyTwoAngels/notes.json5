@@ -28,6 +28,51 @@
     used: "adjuvabat",
     why: "The page prints \"adjuvebat\" in italic, plainly and not as scan damage, where the psalter reads \"adiuvabat\" at Psalm 93:18. The entry's French keeps his spelling; this field gives the verse as the psalter has it.",
   },
+  // The five below were found on 23 November 2026 by holding every verse to
+  // the Clementine Vulgate (plan 096, stage Y0; packages/magick-data/src/
+  // kabbalah/lenain/vulgate/README.md), and read on the reissue's and the
+  // 1823 printing's page images by eye, by Claude (Opus 5.5), knowing what
+  // the psalter reads.
+  {
+    no: 2,
+    kind: "reading",
+    field: "psalm.la",
+    printed: "auxilium tuum a me'ad defensionem",
+    used: "a me ad",
+    why: "The page sets a raised mark, like an acute accent, between \"me\" and \"ad\", where the psalter has two words, \"a me, ad defensionem\" (Psalm 21:20). It is no apostrophe: no Latin word is elided here.",
+  },
+  {
+    no: 17,
+    kind: "correction",
+    field: "psalm.la",
+    printed: "Domine Deus noster",
+    used: "Dominus",
+    why: "The page reads \"Deus\" where the psalter reads \"Domine, Dominus noster\" (Psalm 8:2).",
+  },
+  {
+    no: 37,
+    kind: "correction",
+    field: "psalm.la",
+    printed: "Deus ad virtutem converte nos",
+    used: "Deus virtutem",
+    why: "The page adds \"ad\", which the psalter does not have: \"Deus virtutum, converte nos\" (Psalm 79:8). \"virtutem\" for the psalter's \"virtutum\" is in both printings and is kept, as Lenain's.",
+  },
+  {
+    no: 47,
+    kind: "correction",
+    field: "psalm",
+    printed: "104",
+    used: "103",
+    why: "The page cites the 25th verse of Psalm 104; the verse it quotes is the Vulgate's Psalm 103:24 (104:24 in the Hebrew numbering). The verse number, 25 for 24, is in both printings and is kept, as Lenain's.",
+  },
+  {
+    no: 64,
+    kind: "correction",
+    field: "psalm.la",
+    printed: "super misericordiam ejus",
+    used: "misericordia",
+    why: "The page reads the accusative \"misericordiam\" where the psalter reads \"super misericordia ejus\" (Psalm 32:18).",
+  },
   {
     no: 0,
     kind: "reconstruction",

@@ -35,6 +35,9 @@ const CHECKED_ELSEWHERE: Record<string, string> = {
   // to the entries there.
   "kabbalah/lenain/kircherPlate.json5": "lenainEdition.test.ts",
   "kabbalah/seventyTwoAngelsText/fr.json5": "lenainQuotations.test.ts",
+  // The seventy-two verses held to the Vulgate, and the listed differences.
+  "kabbalah/lenain/vulgate/verses.json5": "lenainVulgate.test.ts",
+  "kabbalah/lenain/vulgate/differences.json5": "lenainVulgate.test.ts",
   // Not a table and never was, which tables.ts says in as many words; the
   // integrity check holds every entry to its schema instead.
   "enochian/dictionary.json5": "integrity.ts",

@@ -1,0 +1,187 @@
+// Where Lenain's verses differ from the Vulgate, each read on the page and
+// laid at someone's door (plan 096, stage Y0). lenainVulgate.test.ts holds
+// every genius's `psalm.la` to its verse in verses.json5, beside this file;
+// a verse that differs must be listed here with the field's exact value
+// (`ours`), and one listed here must still differ, so neither a new
+// difference nor a stale entry passes.
+//
+// Read on 23 November 2026, by eye, by Claude (Opus 5.5), knowing what the
+// psalter reads, so these are not blind readings:
+//
+//   print1823  the 1823 printing, Google Books qt9SAAAAcAAJ, `at` its page
+//              (https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA<at>);
+//   kircher    Kircher, Oedipus Aegyptiacus II.1 (Rome, 1653), pp. 275–280,
+//              the table of seventy-two verses "ex diversis Psalmis
+//              extracti" that Lenain cites for them (p. 45, note 1), in the
+//              Complutense copy, archive.org bub_gb_XjfzMnomDQoC, `leaf`
+//              its n (https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n<leaf>).
+//
+// The reissue the edition transcribes reads as `ours` in every one:
+// lenainQuotations.test.ts holds the field to its page, and the five
+// places where the reissue departed from the 1823 printing (2, 17, 37, 47
+// and 64) are corrected in the field and noted in the apparatus instead.
+//
+// `kind` is a "wording" (another word, or one more or fewer), a "spelling"
+// of the same word, or a "reference" (the psalm Lenain names). `whose`:
+//
+//   lenain    both printings have it and Kircher does not, so it is
+//             Lenain's (or his printer's);
+//   mixed     part Kircher's, which Lenain follows, part Lenain's: `why`
+//             says which;
+//   spelling  a spelling of the period that printed Clementine editions
+//             share, not a reading: the field is kept as Lenain prints it.
+[
+  {
+    no: 1,
+    field: "psalm.la",
+    kind: "wording",
+    ours: "Et tu Domine susceptor meus et gloria mea et exaltans caput meum",
+    vulgate: "Tu autem Domine, susceptor meus es, gloria mea, et exaltans caput meum.",
+    print1823: { at: 46, reads: "Et tu Domine susceptor meus et gloria mea et exaltans caput meum" },
+    kircher: { leaf: 282, page: 275, reads: "Et tu Domine susceptor meus es, gloria mea, & exaltans caput meum" },
+    whose: "mixed",
+    why: "\"Et tu\" for the Vulgate's \"Tu autem\" is Kircher's Latin, which renders the Hebrew's \"ואתה\", and Lenain follows it. Leaving out \"es\" and adding \"et\" before \"gloria\" are Lenain's.",
+  },
+  {
+    no: 11,
+    field: "psalm.la",
+    kind: "wording",
+    ours: "Vivit Dominus et benedictus Deus meus, et exultatur Deus salutis meæ.",
+    vulgate: "et exaltetur Deus salutis meæ.",
+    print1823: { at: 53, reads: "et exultatur Deus salutis meæ" },
+    kircher: { leaf: 283, page: 276, reads: "& exaltetur Deus salutis meæ" },
+    whose: "lenain",
+    why: "\"exultatur\" (he rejoices) for \"exaltetur\" (let him be exalted): another verb, and another mood.",
+  },
+  {
+    no: 13,
+    field: "psalm.la",
+    kind: "spelling",
+    ours: "Jubilate Deo omnis terra : cantate, et exultate, et psallite",
+    vulgate: "cantate, et exsultate, et psallite.",
+    print1823: { at: 54, reads: "cantate, et exultate, et psallite" },
+    kircher: { leaf: 283, page: 276, reads: "cantate, exultate, & psallite" },
+    whose: "spelling",
+    why: "\"exultate\" is the Clementine Vulgate Project's \"exsultate\" without the s. Hetzenauer's Clementine prints \"exultate\" here (leaf n560, p. 538), as Kircher does.",
+  },
+  {
+    no: 14,
+    field: "psalm.la",
+    kind: "wording",
+    ours: "Et factus est Dominus refugium pauperis : adjutor in opportunitatibus, in tribulatione.",
+    vulgate: "Et factus est Dominus refugium pauperi ;",
+    print1823: { at: 54, reads: "refugium pauperis" },
+    kircher: { leaf: 283, page: 276, reads: "refugium pauperi" },
+    whose: "lenain",
+    why: "The genitive \"pauperis\" (the refuge of the poor) for the dative \"pauperi\" (a refuge for the poor).",
+  },
+  {
+    no: 19,
+    field: "psalm.la",
+    kind: "spelling",
+    ours: "Expectans expectavi Dominum, et intendit mihi.",
+    vulgate: "Exspectans exspectavi Dominum,",
+    print1823: { at: 57, reads: "Expectans expectavi Dominum" },
+    kircher: { leaf: 283, page: 276, reads: "Exspectans exspectavi Dominum" },
+    whose: "spelling",
+    why: "\"expectare\" is a common spelling of \"exspectare\".",
+  },
+  {
+    no: 23,
+    field: "psalm.la",
+    kind: "wording",
+    ours: "Dominus custodiat introïtum tuum, et exitum tuum : et ex hoc nunc, et in sæculum.",
+    vulgate: "et exitum tuum, ex hoc nunc et usque in sæculum.",
+    print1823: { at: 60, reads: "et exitum tuum : et ex hoc nunc, et in sæculum" },
+    kircher: { leaf: 284, page: 277, reads: "& exitum tuum, ex hoc, nunc, & usque in seculum" },
+    whose: "lenain",
+    why: "Lenain adds \"et\" before \"ex hoc\" and leaves out \"usque\".",
+  },
+  {
+    no: 24,
+    field: "psalm.la",
+    kind: "wording",
+    ours: "Ecce oculi Domini super metuentes eum : et in eis, qui sperant in misericordia ejus.",
+    vulgate: "et in eis qui sperant super misericordia ejus :",
+    print1823: { at: 60, reads: "qui sperant in misericordia ejus" },
+    kircher: { leaf: 287, page: 280, reads: "qui sperant super misericordia eius" },
+    whose: "lenain",
+    why: "\"in\" for \"super\". Kircher gives this verse for the sixty-fourth genius (p. 280), not the twenty-fourth, whose verse in his table is another (p. 277, leaf n284); Lenain gives it to both, with \"super\" at the sixty-fourth.",
+  },
+  {
+    no: 33,
+    field: "psalm",
+    kind: "reference",
+    ours: "33",
+    vulgate: "93",
+    print1823: { at: 67, reads: "33" },
+    kircher: { leaf: 284, page: 277, reads: "83" },
+    whose: "lenain",
+    why: "Lenain names the 11th verse of Psalm 33; the verse he quotes, \"Dominus scit cogitationes hominum\", is Psalm 93:11. Kircher misnumbers it too, as Psalm 83, and Lenain's 33 may be a misreading of that, but nothing shows it. The field keeps Lenain's number.",
+  },
+  {
+    no: 37,
+    field: "psalm.la",
+    kind: "wording",
+    ours: "Deus virtutem converte nos : et ostende faciem tuam et salvi erimus.",
+    vulgate: "Deus virtutum, converte nos ;",
+    print1823: { at: 69, reads: "Deus virtutem converte nos" },
+    kircher: { leaf: 285, page: 278, reads: "Domine Deus virtutum, converte nos" },
+    whose: "lenain",
+    why: "The accusative \"virtutem\" for the genitive \"virtutum\" (God of hosts). Kircher gives the refrain's last form, \"Domine Deus virtutum\" (Psalm 79:20, which he cites as 79:4), with \"virtutum\". The reissue's added \"ad\" is noted in the apparatus.",
+  },
+  {
+    no: 39,
+    field: "psalm.la",
+    kind: "wording",
+    ours: "Audivit Dominus, et misertus est mei : Dominus factus est meus adjutor.",
+    vulgate: "Dominus factus est adjutor meus.",
+    print1823: { at: 72, reads: "Dominus factus est meus adjutor" },
+    kircher: { leaf: 285, page: 278, reads: "Dominus factus est adiutor meus" },
+    whose: "lenain",
+    why: "\"meus adjutor\" for \"adjutor meus\": the same words in another order.",
+  },
+  {
+    no: 50,
+    field: "psalm.la",
+    kind: "wording",
+    ours: "Miserator et misericors Dominus : longanimis et misericors.",
+    vulgate: "longanimis, et multum misericors.",
+    print1823: { at: 80, reads: "longanimis, et misericors" },
+    kircher: { leaf: 283, page: 276, reads: "longanimis, & multum misericors" },
+    whose: "lenain",
+    why: "Lenain leaves out \"multum\". He gives the same verse to the seventh genius with it (1823, p. 50). Kircher gives this verse for the seventh only (p. 276); his fiftieth is Psalm 85:15 (p. 279, leaf n286).",
+  },
+  {
+    no: 58,
+    field: "psalm.la",
+    kind: "wording",
+    ours: "Et anima turbata est valde; sed tu Domine usque quo ?",
+    vulgate: "Et anima mea turbata est valde ;",
+    print1823: { at: 86, reads: "Et anima turbata est valde" },
+    kircher: { leaf: 286, page: 279, reads: "Et anima mea turbata est valde" },
+    whose: "lenain",
+    why: "Lenain leaves out \"mea\".",
+  },
+  {
+    no: 63,
+    field: "psalm.la",
+    kind: "spelling",
+    ours: "Servite Domino in timore : et exultate ei cum tremore.",
+    vulgate: "et exsultate ei cum tremore.",
+    print1823: { at: 89, reads: "et exultate ei cum tremore" },
+    whose: "spelling",
+    why: "\"exultate\" for \"exsultate\", as at the thirteenth. Kircher's sixty-third is another verse, Psalm 99:2 (p. 280, leaf n287).",
+  },
+  {
+    no: 65,
+    field: "psalm.la",
+    kind: "wording",
+    ours: "Convertere Domine, et usque qua ? et deprecabilis esto super servos tuos.",
+    vulgate: "Convertere, Domine ; usquequo ?",
+    print1823: { at: 90, reads: "Convertere Domine, et usque qua ?" },
+    kircher: { leaf: 287, page: 280, reads: "Convertere Domine usquequo" },
+    whose: "lenain",
+    why: "\"et usque qua\" for \"usquequo\" (how long?): an added \"et\", and \"qua\" for \"quo\".",
+  },
+]

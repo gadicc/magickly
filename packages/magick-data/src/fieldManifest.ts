@@ -404,6 +404,18 @@ export const TEXTS: Readonly<Record<string, TextSpec>> = {
       "What each of Lenain's seventy-two entries says, as printed: the reading that the corrections to the seventy-two are checked against.",
     page: null,
   },
+  "./json/kabbalah/lenain/vulgate/verses.json": {
+    sources: ["kabbalah/lenain/vulgate/verses"],
+    description:
+      "The Clementine Vulgate's text of the verse Lenain prescribes for each of the seventy-two genii, with his reference and the Vulgate's.",
+    page: null,
+  },
+  "./json/kabbalah/lenain/vulgate/differences.json": {
+    sources: ["kabbalah/lenain/vulgate/differences"],
+    description:
+      "Where Lenain's Latin verses differ from the Vulgate: what the 1823 printing and Kircher read, and whose each difference is.",
+    page: null,
+  },
   "./astrology/kameas": {
     sources: [],
     description:
