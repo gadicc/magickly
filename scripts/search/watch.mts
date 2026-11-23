@@ -31,10 +31,14 @@ function rebuild() {
   running.once("exit", (code) => {
     running = undefined;
     if (stopped) return;
-    if (code !== 0) {
-      stop(code ?? 1);
-      return;
-    }
+    // dev.mts runs the first build itself and stops on its failure. A later
+    // rebuild loads the catalogue's modules, so a half-saved edit anywhere in
+    // them fails it; keep the last good output and try again on the next
+    // change rather than taking `next dev` down with us.
+    if (code !== 0)
+      console.error(
+        `search: rebuild failed (exit ${code ?? "signal"}); keeping the last build until the next change`,
+      );
     if (dirty) rebuild();
   });
 }

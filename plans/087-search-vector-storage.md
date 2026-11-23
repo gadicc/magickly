@@ -618,6 +618,33 @@ one session so the machine's load is the same: `37924292` (S1's assembly
 of every row) 0.48–0.58 s, `fb052382` 0.71–0.82 s. Through `pnpm
 search:build` at `fb052382`: 1.14–1.32 s.
 
+#### Landed (23 November 2026)
+
+Rebased once more onto `fc73ea03` (a plans-only commit, no conflict); the
+commits above became `e6fb8c3c`, `cadc8dbf`, `614342c3`, `e89966ec`,
+`55390fa4`, `89f75469` and this record's `beb81425`. Gate at `beb81425`,
+same script: install, check, typecheck, test (737 files, 14,291 tests
+passed; 3 files, 19 tests skipped) and build all 0, the trace listing the
+artifact. The full-coverage check gave `119768d57cf5…` again from the row
+files directly, with the recipe written out independently.
+
+#### S2 review
+
+An independent Opus 5.5 review (high) of `37924292..gate/search-vectors`
+found no critical or high defects, and confirmed the vector pairing under
+partial coverage, the plan 070 guarantee, both availability paths (no quota
+or provider call at zero coverage), the index cache and byte-exact publish
+reuse.
+
+| Finding | Outcome |
+| --- | --- |
+| `search:build` now loads ~180 modules, so a half-saved edit in any of them failed a watcher rebuild and stopped `pnpm dev` | Fixed: after the first build (`dev.mts`, still fatal) a failed rebuild is logged and the watcher carries on; checked by saving a syntax error into `catalogue.ts` under a running watcher and reverting it |
+| The rows watcher stops seeing events if the profile directory is deleted and recreated; only a manifest change re-arms it | Follow-up |
+| `/search/index` reads only the header, so a malformed used row could make it say available while `/api/search` answers 503 (before any quota) | Accepted: only reachable by editing the artifact or skipping `search:build`, which validates every row |
+| A malformed committed row blocks `search:publish` until deleted by hand | Accepted as "fail on malformed rows"; README to say so in S3 |
+| Publishing another profile leaves the old profile's rows, failing `manifest.test.ts` until removed | Accepted: the test is the guard for decision 4 of S2 |
+| No tests for `watch.mts`, the provider-only price filter, or a rejected load while the stamp changes | Follow-up |
+
 #### For S3
 
 - `selectedProfile` checks the manifest's copy of the profile in
