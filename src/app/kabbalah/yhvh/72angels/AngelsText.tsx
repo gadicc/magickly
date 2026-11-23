@@ -12,10 +12,10 @@ export default function AngelsText() {
         Open an angel to see its attribute, what it rules, its divine name, its
         choir, its five degrees of the zodiac with the days they govern, its
         presiding days, what it is invoked for and what it influences, who is
-        born under it, its contrary genius, and its psalm verse. Each angel also
-        has a full page of its own, with its Hebrew name. Under{" "}
-        <i>Original text</i>, choose <i>Français (Lenain)</i> to see what Lenain
-        printed.
+        born under it, its contrary genius, its psalm verse, and its Rose Cross
+        sigil. Each angel also has a full page of its own, with its Hebrew name.
+        Under <i>Original text</i>, choose <i>Français (Lenain)</i> to see what
+        Lenain printed.
       </p>
       <p>
         In Lenain&apos;s arithmetic each genius takes five degrees of the

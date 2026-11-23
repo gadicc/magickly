@@ -1,0 +1,35 @@
+/* The 72 angels' list. */
+
+/*
+ * An opened entry: its table, then its Rose Cross sigil. On a phone the
+ * sigil follows the table; from 768 px it sits beside it, at the table's
+ * top (inline-end, so a right-to-left page mirrors it).
+ */
+.entry {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .entry {
+    grid-template-columns: minmax(0, 1fr) 14rem;
+  }
+}
+
+.sigil {
+  margin: 0;
+  max-inline-size: 14rem;
+}
+
+/* The 1,024-pixel file, shown at the figure's width, square. */
+.sigil img {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+.sigil figcaption {
+  margin-block-start: 0.75em;
+  font-size: 0.875rem;
+}

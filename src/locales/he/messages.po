@@ -27,12 +27,12 @@ msgid "OK"
 msgstr "אישור"
 
 #. js-lingui-explicit-id
-#: src/seo/angelSigils.ts
+#: src/seo/angelSigilFiles.ts
 msgid "The Rose Cross sigil of {name}, {hebrew}, traced on the Golden Dawn's rose of 22 letters"
 msgstr "סיגיל צלב הוורד של {name}, {hebrew}, משורטט על ורד 22 האותיות של השחר הזהוב"
 
 #. js-lingui-explicit-id
-#: src/seo/angelSigils.ts
+#: src/seo/angelSigilFiles.ts
 msgid "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, traced on the Golden Dawn's rose of 22 letters"
 msgstr "סיגיל צלב הוורד של {name}, המלאך ה־{number} מתוך 72, {hebrew}, משורטט על ורד 22 האותיות של השחר הזהוב"
 
@@ -1366,6 +1366,16 @@ msgstr "מזרח נמצא בראש כל תרשים, וצפון משמאל."
 #: src/app/offline/ritual/OfflineRitualEntry.tsx
 msgid "Loading offline rituals"
 msgstr "טוענים טקסים לקריאה ללא חיבור"
+
+#. js-lingui-explicit-id
+#: src/app/kabbalah/yhvh/72angels/ListSigil.tsx
+msgid "{name}'s Rose Cross sigil. <0>Watch it drawn</0> in the sigil generator."
+msgstr "סיגיל צלב הוורד של {name}. <0>צפו בשרטוטו</0> במחולל הסיגילים."
+
+#. js-lingui-explicit-id
+#: src/app/kabbalah/yhvh/72angels/angels.tsx
+msgid "Open an angel to see its Rose Cross sigil."
+msgstr "פתחו מלאך כדי לראות את סיגיל צלב הוורד שלו."
 
 #. js-lingui-explicit-id
 #: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
