@@ -2,7 +2,9 @@
 
 Status: accepted 23 November 2026. Y0 built (ac0f671c, 5c5f57a7) and the
 Y1 spike run, both 23 November ([What Y0 found](#what-y0-found),
-[What Y1 found](#what-y1-found)); Y2 to Y4 not started. Revised the same day
+[What Y1 found](#what-y1-found)). Y2 built the same day
+([What Y2 built](#what-y2-built)), except magick-components 0.7.0,
+which waits for Gadi's sign-off. Y3 and Y4 not started. Revised the same day
 after an adversarial review ([Review](#review-23-november-2026)). Gadi
 decided to offer four styles of an angel's rose sigil from the mock-up,
 not Vaughan's spaced letters, one at a time, with the name in the band
@@ -817,7 +819,8 @@ by-eye readings made knowing what the psalter reads and labelled so.
   division), fails on an unlisted difference or a stale entry, and
   checks Lenain's references and #70. A deliberate one-letter mutation
   failed it.
-  - 58 of 71 psalm verses agree. The 13 others are in both printings:
+  - 58 of 71 psalm verses agreed (61 after Y2). The 13 others are in
+    both printings:
     ten of Lenain's wording (#1, whose "Et tu" is Kircher's; #11
     "exultatur"; #14 "pauperis"; #23; #24; #37 "virtutem"; #39; #50;
     #58; #65), and three spellings of the period (#13, #63 "exultate",
@@ -841,6 +844,45 @@ by-eye readings made knowing what the psalter reads and labelled so.
 - **Not done:** Ms 5365 was not read for the new notes, and only the
   differing verses were read in the 1823 printing.
 
+## What Y2 built
+
+Built 23 November 2026 by an Opus agent (high), four commits:
+
+- **c9ab1d5c, the verse fix** (decision for Gadi 11): #11 "exaltetur",
+  #14 "pauperi" and #37 "virtutum" in the field, Lenain's words kept in
+  the French, each with a note citing Kircher's reading and a 1823
+  witness. 61 of 71 verses now agree with the Vulgate; 10 differences
+  remain listed, and a test holds the four corrected slips (#11, #14,
+  #37, #45). One search publish, $0.021 (3 passages).
+- **ba976f62, the font:** `assets/fonts/NotoSerif-Regular-latin1.ttf`,
+  24,308 bytes, SHA-256 `1bc1b369…2322`, built by `build.py` from the
+  pinned google/fonts file, whose hash it now checks; a `roman` table
+  in `fontMetrics.json`. Every earlier font file rebuilt byte for byte.
+  The Hebrew is the halls' existing Frank Ruhl Libre Bold.
+- **44d191ee, the module** `gd/roseSigilStyles.tsx` and its tests
+  (layout, glyph order, fit with at least 2 units' clearance, bounds
+  against dense sampling, the legend, the floor), not yet a package
+  entry.
+- **c59ac1d3, magick-data 0.5.0** (also carrying K4's unreleased
+  fields).
+
+Departures from this plan: no `fontWeight` prop (the weights are fixed
+by the measured metrics and written into the markup; only the families
+can be overridden), and two colour props, `ink` and `stroke`.
+
+The rose is unchanged: `roseDigest.mts` prints the same on `main` and
+the branch, and nothing under the rose's files moved.
+
+**Waiting for Gadi.** The package's tests refuse an unsigned Provenance
+row above 0.0.0, so `gd/roseSigilStyles` cannot be a package entry
+until its row is dated. The 0.7.0 release (version, entry, README
+section and the row with an empty date) is a ready patch in the
+worktree's `.private/`; with a date in the row, it applies and passes
+the components smoke test. Also to look at: whether the magick-data
+rows for `seventyTwoAngels.json5`, `lenain/apparatus.json5` and
+`lenain/witnesses.json5`, whose contents changed under unchanged text,
+need re-signing; and decision for Gadi 13.
+
 ## Stages
 
 Built on a gate branch, `gate/sigil-styles`, from `main` after
@@ -850,7 +892,7 @@ Built on a gate branch, `gate/sigil-styles`, from `main` after
 | --- | --- | --- |
 | Y0 (built 23 Nov, ac0f671c, 5c5f57a7) | **Sources and the verse guard.** (a) Lenain 1823: the pages for the reissue's pp. 45 and 70, the title page, and #70's entry. (b) The sphère cabalistique: catalogue collations and other copies of 1823. (c) Mathers Pl. IV Figs. 18, 20 and 21 and their notes (pp. 61–62), with their leaves. (d) Regardie p. 58. (e) **The verses**, below. (f) `mathers1889` in `works.ts`, and Plate IV mirrored. (g) If a verse changed, `pnpm search:publish` | Gadi reviews the discrepancy table. The verse test is green and committed |
 | Y1 (run 23 Nov) | **Spike** (above) | The numbers recorded here; Gadi chooses from side-by-side renders at real sizes (decisions 9, 10, 13) |
-| Y2 | **Package:** `roseSigilStyles`, the bounds, the lettering, the notes. **Fonts:** the subset, metrics, README. magick-components 0.7.0, and magick-data's next minor if Y0 changed a verse | `roseDigest.mts` unchanged; the halls' pins unchanged; package tests (layout, glyph order, fit, bounds) |
+| Y2 (built 23 Nov, c9ab1d5c to c59ac1d3; 0.7.0 waits) | **Package:** `roseSigilStyles`, the bounds, the lettering, the notes. **Fonts:** the subset, metrics, README. magick-components 0.7.0, and magick-data's next minor if Y0 changed a verse | `roseDigest.mts` unchanged; the halls' pins unchanged; package tests (layout, glyph order, fit, bounds) |
 | Y3 | **Contract and route.** First, on `main`'s bytes, the pin over the 72 outlined rose SVGs. Then `angel-sigil`, its registration, its inputs (`seventyTwoAngel` and the verse file in `DATA_INPUT_TABLES`), the coverage test, the pins and the drawing digest, and the redirects | Contract, registry, dataInputs and route tests; `ROSE_SIGIL_PINS`, the rose's drawing digest and the new 72-SVG pin unchanged; the 144 rose files' hash list unchanged |
 | Y4 | **Angel pages and the list:** the 432 new files, the dropdown, URL state, captions with `<Cite>`, alt texts, downloads, the "Every style" line, JSON-LD, sitemap, share image, `ListSigil`; Lingui and Hebrew; search publish for the list's caption | The full gate (below); the hydration test; the browser checks; the 144 rose files again |
 
