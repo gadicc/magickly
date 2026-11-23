@@ -55,7 +55,7 @@
     field: "psalm.la",
     printed: "Deus ad virtutem converte nos",
     used: "Deus virtutum",
-    why: "The page adds \"ad\", which the psalter does not have, and reads the accusative \"virtutem\" where the psalter has the genitive: \"Deus virtutum, converte nos\" (Psalm 79:8), the God of hosts. Kircher's table, which Lenain cites for the verses, has \"virtutum\" (Oedipus Aegyptiacus II.1, p. 278). This field gives the verse as the psalter has it; the entry's French keeps what the page prints.",
+    why: "The page adds \"ad\", which the psalter does not have, and reads the accusative \"virtutem\" where the psalter has the genitive: \"Deus virtutum, converte nos\" (Psalm 79:8), the God of hosts. Kircher's table, which Lenain cites for the verses, has \"virtutum\" in another verse of the same psalm: it gives the refrain in its last form, \"Domine Deus virtutum, converte nos\" (79:20, which it cites as 79:4; Oedipus Aegyptiacus II.1, p. 278), so it witnesses the word, not Lenain's verse 8. This field gives the verse as the psalter has it; the entry's French keeps what the page prints.",
   },
   {
     no: 47,
