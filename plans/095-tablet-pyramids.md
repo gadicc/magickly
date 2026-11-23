@@ -420,7 +420,8 @@ Settled after the review: the Calvary bar, per version (decision 2).
    failed `imageParity.test.tsx`), a name's square links dropping
    `pyramids=1` in a new tab, the halls loading the pyramid rules, the
    white swatches reading as checkboxes and the translation context's
-   snapshot due; all fixed before the gate.
+   snapshot due; all fixed before the gate. `search:publish` embedded
+   9 passages, on Gadi's go-ahead.
    **Released** in the same branch, on Gadi's choice (23 November
    2026): `Tablet` now imports magick-data's `enochian/tabletPyramids`,
    which the published magick-data 0.4.0 lacks, so the components'
