@@ -407,3 +407,78 @@ it("a shortened config deadline cannot be renewed after private loading", async 
   ).toBe(503);
   expect(m.run).not.toHaveBeenCalled();
 });
+
+it("uses only the trusted own Production URL for explicitly adopted platform cron", async () => {
+  const f = managedCleanupEntryFixture(),
+    deployment = { ...f.deployment, authorization: "vercel-cron" };
+  const env = {
+    ...f.env,
+    VERCEL_URL: "cleanup-owned.vercel.app",
+    CRON_SECRET: f.token,
+    MAGICKLI_MANAGED_CLEANUP_DEPLOYMENT_JSON: JSON.stringify(deployment),
+  };
+  const response = await create(env)(
+    new Request(
+      "https://cleanup-owned.vercel.app" + RESEARCH_MANAGED_CLEANUP_PATH,
+      {
+        headers: {
+          host: "cleanup-owned.vercel.app",
+          authorization: "Bearer " + f.token,
+        },
+      },
+    ),
+  );
+  expect(response.status).toBe(200);
+  const adopted = m.run.mock.calls[0][0] as ResearchManagedCleanupOptions;
+  expect(adopted.independentlyAdoptedProfileSha256).toBe(
+    f.deployment.profileSha256,
+  );
+});
+it("dedicated bearer never reads a deployment host or trusts forwarded hosts", async () => {
+  const f = managedCleanupEntryFixture(),
+    env = { ...f.env };
+  Object.defineProperty(env, "VERCEL_URL", {
+    get() {
+      throw Error("No platform-host authority");
+    },
+  });
+  expect((await create(env)(request("Bearer " + f.token))).status).toBe(200);
+  const response = await create(env)(
+    new Request("https://other.vercel.app" + RESEARCH_MANAGED_CLEANUP_PATH, {
+      headers: {
+        host: "other.vercel.app",
+        "x-forwarded-host": "research.example.test",
+        authorization: "Bearer " + f.token,
+      },
+    }),
+  );
+  expect(response.status).toBe(404);
+  expect(m.run).toHaveBeenCalledOnce();
+});
+
+it("Preview cannot adopt its own deployment URL for cleanup", async () => {
+  const f = managedCleanupEntryFixture(),
+    env = {
+      ...f.env,
+      VERCEL_ENV: "preview",
+      VERCEL_URL: "cleanup-preview.vercel.app",
+      CRON_SECRET: f.token,
+      MAGICKLI_MANAGED_CLEANUP_DEPLOYMENT_JSON: JSON.stringify({
+        ...f.deployment,
+        authorization: "vercel-cron",
+      }),
+    };
+  const response = await create(env)(
+    new Request(
+      "https://cleanup-preview.vercel.app" + RESEARCH_MANAGED_CLEANUP_PATH,
+      {
+        headers: {
+          host: "cleanup-preview.vercel.app",
+          authorization: "Bearer " + f.token,
+        },
+      },
+    ),
+  );
+  expect(response.status).toBe(404);
+  expect(m.run).not.toHaveBeenCalled();
+});

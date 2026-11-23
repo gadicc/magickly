@@ -86,8 +86,15 @@ function createManagedResearchCleanupServerWithEnd(
           },
         );
       if (Number(process.versions.node.split(".")[0]) !== 24) fail();
+      const deploymentHost =
+        d.authorization === "vercel-cron" && env.VERCEL_ENV === "production"
+          ? env.VERCEL_URL
+          : undefined;
       const handler = createResearchManagedCleanupHttpHandler({
         origin: d.origin,
+        deploymentOrigin: deploymentHost
+          ? "https://" + deploymentHost
+          : undefined,
         tokenFormat:
           d.authorization === "vercel-cron" ? "vercel-cron" : "hex-256",
         secret: () =>

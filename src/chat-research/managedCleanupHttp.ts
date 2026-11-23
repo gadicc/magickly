@@ -10,6 +10,8 @@ export interface ResearchManagedCleanupHttpOptions {
   readonly origin: string;
   /** Explicitly adopted platform cron format; omission preserves dedicated 256-bit hex tokens. */
   readonly tokenFormat?: "hex-256" | "vercel-cron";
+  /** Optional exact own Production deployment origin from trusted server metadata; platform cron only. The adopted origin remains canonical. */
+  readonly deploymentOrigin?: string;
   /** A protected independently adopted server secret; never a browser or corpus credential. */
   readonly secret: () => string;
   /** Called only after a valid token. Must bind actual reviewed runtime/role/endpoint custody; matching input fields cannot attest it. */
@@ -34,6 +36,9 @@ export function createResearchManagedCleanupHttpHandler(
     expected = new URL(origin),
     secret = options.secret,
     tokenFormat = options.tokenFormat ?? "hex-256",
+    deploymentOrigin = options.deploymentOrigin,
+    deployment =
+      deploymentOrigin === undefined ? null : new URL(deploymentOrigin),
     load = options.loadOptions;
   if (secret instanceof Promise) void secret.catch(() => {});
   if (load instanceof Promise) void load.catch(() => {});
@@ -41,6 +46,13 @@ export function createResearchManagedCleanupHttpHandler(
     expected.origin !== origin ||
     expected.protocol !== "https:" ||
     !["hex-256", "vercel-cron"].includes(tokenFormat) ||
+    (deployment !== null &&
+      (tokenFormat !== "vercel-cron" ||
+        deployment.origin !== deploymentOrigin ||
+        deployment.protocol !== "https:" ||
+        !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.vercel\.app$/.test(
+          deployment.host,
+        ))) ||
     typeof secret !== "function" ||
     typeof load !== "function"
   )
@@ -66,14 +78,19 @@ export function createResearchManagedCleanupHttpHandler(
         performance.now() >= end
       )
         throw Error();
-      const u = new URL(request.url);
+      const u = new URL(request.url),
+        host = request.headers.get("host"),
+        sameTarget =
+          (u.origin === origin && host === expected.host) ||
+          (deployment !== null &&
+            u.origin === deployment.origin &&
+            host === deployment.host);
       if (
         request.method !== "GET" ||
-        u.origin !== origin ||
+        !sameTarget ||
         u.pathname !== RESEARCH_MANAGED_CLEANUP_PATH ||
         u.search ||
-        u.hash ||
-        request.headers.get("host") !== expected.host
+        u.hash
       )
         return reply(404, { error: "Private cleanup unavailable" });
       const offered = request.headers.get("authorization"),

@@ -334,3 +334,23 @@ Ordinary future releases intentionally omit deployment-only research opt-ins.
 That can interrupt operator availability; it never retires independent cleanup
 or its outstanding retention obligations. Expert labels, image delivery and the
 legacy-chat cutover remain separate.
+
+## Exact own-deployment Cron ingress
+
+23 November 2026. The inactive cleanup adapter can now accept its exact own
+Production deployment hostname when the independent descriptor explicitly adopts
+`vercel-cron`. The server derives this alternative only from its trusted
+`VERCEL_URL`; the canonical origin, Better Auth URL, profile and connection pins
+remain unchanged. The HTTP adapter requires a matching request-URL origin and
+Host pair, either canonical or exact own deployment. It rejects cross-pairs,
+other deployments, suffix tricks and forwarded-host claims. Dedicated bearer
+mode remains canonical-only; Preview does not adopt an alternative hostname.
+The bearer gate still precedes private configuration and credential loading.
+
+This accommodates a scheduler ingress shape observed by a separate data-free
+probe. It does not configure a project secret, enable Cron, adopt a private
+profile, publish sources or prove hosted cleanup. Vercel documents setting
+`CRON_SECRET` in project settings and checking its Bearer header in the handler:
+[securing Cron jobs](https://vercel.com/docs/schedules/cron-jobs/manage-cron-jobs#securing-cron-jobs).
+Private deployment ownership and actual provider/native correlation remain
+independent activation gates. No main-site setting or legacy chat changes here.
