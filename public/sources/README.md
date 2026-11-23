@@ -54,10 +54,13 @@ image.
 | kircher-oedipus-aegyptiacus-1653-plate-p287.webp | Kircher, *Oedipus Aegyptiacus*, vol. II part 1 (Rome: Mascardi, 1653), the fold-out plate after p. 287, "Iconismus inserendus tom. II Fol. 287": the wheel of seventy-two four-letter names of God, each with its nation, the source of Lenain's first table's last two columns; the National Library of Poland's copy, [Wikimedia Commons, "Kircher-Diagram of the names of God (22593924).jpg"](https://commons.wikimedia.org/wiki/File:Kircher-Diagram_of_the_names_of_God_(22593924).jpg), from [Polona](https://polona.pl/item/athanasii-kircheri-soc-iesu-oedipi-aegyptiaci-tomus-t-2-ps-1-gymnasium-siue,OTAyNjM5Ng/289/) | JPEG, 2926 × 4000, SHA-256 02d659c4e1326866bae618389de6baeef5ff9b121f4e57121faa116bc1ccbea6 | 779994 | 5c6a24a7756e9d219283f396de5e0ad9ee1f14a1c79fa53ecf657d38fff40125 |
 | agrippa-philosophie-occulte-1727-p109.webp | Agrippa, *La Philosophie occulte*, translated anonymously (The Hague, 1727), vol. II, book III, p. 109, the line introducing the seventy-two angels' table; [archive.org `per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22`, leaf n588](https://archive.org/details/per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22/page/n588/mode/1up), from a microfilm in the series *Witchcraft in Europe and America* | JPEG, 5560 × 9289, SHA-256 384e4aa44f17f10bd6621c040929673bd3f2486df774c91ea26f800f2cf89564 | 240202 | 5a69930290d512b0debc9c9cdc5a65bc581aca180b2dd4e02eef039971de030f |
 | agrippa-philosophie-occulte-1727-p110.webp | The same, p. 110, the table of the seventy-two angels' names in French spelling; [leaf n589](https://archive.org/details/per_witchcraft-in-europe-and-america_agrippa-von-nettesh_1727_12_22/page/n589/mode/1up) | JPEG, 5459 × 9247, SHA-256 9adfba99c5da26301bf4894d1d5efcb1da9de1f78cffac409588c57aa9dd2687 | 253674 | 616ed4befc67676ab210696fa470f7713e22fd687bf0f0d99f6a5fa8e913fc2b |
+| mathers-key-of-solomon-1889-plate-4.webp | S. Liddell MacGregor Mathers (translator and editor), *The Key of Solomon the King (Clavicula Salomonis)* (London: George Redway, 1889), Plate IV, the pentacles of Jupiter, Figs. 18 to 21: the angels' names round Fig. 18's band, and the verses round Figs. 20 and 21, which the 72 angels' band and talisman sigils follow (plan 096); [archive.org `b24884431`, leaf n79](https://archive.org/details/b24884431/page/n79/mode/1up), the Wellcome Library's copy | JPEG, 2419 × 3355, SHA-256 eaab1316f053933e36da72e77333f1a5be79ae10882e83b06560a53f9b246168 | 129214 | a2d6c119964b509a2adcb2b222a71c4ebf750da2fe5165874a0ce2aa5fb86aa7 |
 
-Total: 4073992 bytes (643838 for the sigils' three pages, 293488 for
+Total: 4203206 bytes (643838 for the sigils' three pages, 293488 for
 Agrippa's names leaf, which the kameas' pages added on 21 November 2026
-(plan 093, decision 7), and 3136666 for Lenain's nine). Each WebP is 1600 pixels wide except the 1823 Lenain page,
+(plan 093, decision 7), 3136666 for Lenain's nine, and 129214 for
+Mathers's Plate IV, added for the angels' sigil styles on 23 November 2026
+(plan 096, decision 15)). Each WebP is 1600 pixels wide except the 1823 Lenain page,
 which keeps its original's 1574. Kircher's plate is the heaviest at 779994:
 a whole fold-out engraving, fine lines throughout, at the same width as a
 page.
@@ -72,7 +75,12 @@ page.
   *Oedipus Aegyptiacus* was printed in Rome in 1653, and Kircher died in
   1680. The French *Philosophie occulte* was printed at The Hague in 1727;
   its translator is not named, and whoever it was worked before 1727.
-  Lenain printed *La Science cabalistique* in 1823 and died in 1877. The
+  Lenain printed *La Science cabalistique* in 1823 and died in 1877.
+  Mathers's *Key of Solomon the King* was published in London in 1889; its
+  title page names him alone, as its translator and editor, "with plates",
+  and the plates are unsigned. Mathers died in 1918. archive.org marks the
+  Wellcome Library's copy (`b24884431`) with the Public Domain Mark 1.0
+  (checked 23 November 2026). The
   reissue adds Papus's preface (Papus died in 1916) and is a resetting of
   Lenain's text, first recorded in 1909; the page mirrored is Lenain's
   table, reset, with no new authorship in it (the reissue's corrections

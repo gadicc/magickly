@@ -127,6 +127,12 @@ export const WORKS = {
     scan: { site: "archive.org", item: "BIUSante_ms05365" },
     rights: "public-domain",
   },
+  mathers1889: {
+    title:
+      "Mathers, The Key of Solomon the King (London, 1889), the Wellcome Library copy",
+    scan: { site: "archive.org", item: "b24884431" },
+    rights: "public-domain",
+  },
   regardie1937: {
     title: "Regardie, The Golden Dawn, vol. 1 (Aries Press, Chicago, 1937)",
     scan: {

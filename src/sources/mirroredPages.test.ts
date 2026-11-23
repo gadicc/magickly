@@ -64,10 +64,13 @@ describe("the mirrored source pages", () => {
   // page more; past that the mirror moves to the app's file storage (plan
   // 080), not here. That page was Agrippa's names leaf (1533, n163),
   // 293,488 bytes, on 21 November 2026 (plan 093, decision 7): the leaf six
-  // of the seven kameas' names rest on. 426,008 bytes remain.
+  // of the seven kameas' names rest on. Then Mathers's Plate IV (1889,
+  // n79), 129,214 bytes, on 23 November 2026 (plan 096, decision 15): the
+  // pentacles the angels' band and talisman sigils follow. 296,794 bytes
+  // remain.
   it("stay small: under 4.5 MB together", () => {
     const total = pages.reduce((sum, page) => sum + page.output.bytes, 0);
-    expect(total).toBe(4073992);
+    expect(total).toBe(4203206);
     expect(total).toBeLessThan(4.5e6);
   });
 

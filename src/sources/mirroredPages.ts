@@ -566,6 +566,56 @@ export const MIRRORED_PAGES = {
         "5c6a24a7756e9d219283f396de5e0ad9ee1f14a1c79fa53ecf657d38fff40125",
     },
   },
+  // The angels' rose sigil styles (plan 096, decision 15): the band
+  // follows Fig. 18, angels' names written round a pentacle, and the
+  // talisman Figs. 20 and 21, a verse round the ring and, in Fig. 21, an
+  // angel's name inside. The regions were read off archive.org's
+  // 1210-pixel image of the leaf: each figure's ring with Jupiter's sign
+  // above it and its caption below.
+  mathersPlate4: {
+    id: "mathers-key-of-solomon-1889-plate-4",
+    scan: { site: "archive.org", item: "b24884431", leaf: 79 },
+    label: "Mathers, The Key of Solomon the King (1889), Plate IV",
+    copy: "the Wellcome Library's copy",
+    cited:
+      "the First, Third and Fourth Pentacles of Jupiter (Figs. 18, 20 and 21)",
+    highlight: { x: 0.02, y: 0.06, width: 0.96, height: 0.925 },
+    regions: {
+      fig18: {
+        cited:
+          "the First Pentacle of Jupiter (Fig. 18), four angels' names round its band",
+        highlight: { x: 0.02, y: 0.06, width: 0.48, height: 0.43 },
+      },
+      fig20: {
+        cited:
+          "the Third Pentacle of Jupiter (Fig. 20), a verse of Psalm 125 round its band",
+        highlight: { x: 0.02, y: 0.545, width: 0.48, height: 0.44 },
+      },
+      fig21: {
+        cited:
+          "the Fourth Pentacle of Jupiter (Fig. 21), the angels Adoniel and Bariel inside a verse of Psalm 112",
+        highlight: { x: 0.5, y: 0.545, width: 0.48, height: 0.44 },
+      },
+      figs20and21: {
+        cited:
+          "the Third and Fourth Pentacles of Jupiter (Figs. 20 and 21), each with a verse round its band",
+        highlight: { x: 0.02, y: 0.545, width: 0.96, height: 0.44 },
+      },
+    },
+    original: {
+      sha256:
+        "eaab1316f053933e36da72e77333f1a5be79ae10882e83b06560a53f9b246168",
+      width: 2419,
+      height: 3355,
+    },
+    output: {
+      width: 1600,
+      height: 2219,
+      bytes: 129214,
+      sha256:
+        "a2d6c119964b509a2adcb2b222a71c4ebf750da2fe5165874a0ce2aa5fb86aa7",
+    },
+  },
 } as const satisfies Record<string, MirroredPage>;
 
 export type MirroredPageKey = keyof typeof MIRRORED_PAGES;
