@@ -203,8 +203,12 @@ const QUARTER_ORIGINS: Readonly<
   bottomRight: [7, 7],
 });
 
-/** The Golden Dawn's element of each quarter. */
-const QUARTER_ELEMENTS: Readonly<
+/**
+ * The Golden Dawn's element of each quarter, its lesser angle: Air at the
+ * top left, Water at the top right, Earth at the bottom left, Fire at the
+ * bottom right (Regardie 1940, vol. 4, p.278).
+ */
+export const TABLET_QUARTER_ELEMENTS: Readonly<
   Record<TabletQuarter, NonNullable<TabletNameAttribution["element"]>>
 > = Object.freeze({
   topLeft: "air",
@@ -372,7 +376,7 @@ const PATHS: readonly NamePath[] = (() => {
   for (const quarter of TABLET_QUARTERS) {
     const [top, left] = QUARTER_ORIGINS[quarter];
     const prefix = TABLET_QUARTER_ID_PREFIXES[quarter];
-    const attribution = { element: QUARTER_ELEMENTS[quarter] };
+    const attribution = { element: TABLET_QUARTER_ELEMENTS[quarter] };
     const outside = [0, 1, 3, 4].map((offset) => left + offset);
     paths.push({
       id: `${prefix}-cross-column` as TabletNameId,

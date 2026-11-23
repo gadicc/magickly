@@ -43,6 +43,7 @@ export interface GeomanticHouseRow extends Row<"*", "geomanticHouse"> {}
 // GOLDEN DAWN
 export interface GDGradeRow extends Row<"*", "gdGrade"> {}
 export interface GDDegreeRow extends Row<"*", "gdDegree"> {}
+export interface GDGodFormRow extends Row<"*", "gdGodForm"> {}
 
 // KABBALAH
 export interface ArchangelRow extends Row<"*", "archangel"> {}
@@ -95,6 +96,7 @@ export interface NamedRows {
 
   gdGrade: GDGradeRow;
   gdDegree: GDDegreeRow;
+  gdGodForm: GDGodFormRow;
 
   archangel: ArchangelRow;
   angelicOrder: AngelicOrderRow;

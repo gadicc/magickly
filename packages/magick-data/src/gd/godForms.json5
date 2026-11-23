@@ -1,0 +1,245 @@
+// The Egyptian gods of the Golden Dawn by the mix of elements on a
+// square's four sides, for the servient squares of the Enochian tablets'
+// pyramids (plan 095): the table in Regardie, The Golden Dawn, vol. 4
+// (Aries Press, Chicago, 1940), p.315 (archive.org
+// IsraelRegardie-TheGoldenDawn-Vol4-1940, leaf n307), fifteen rows, each
+// with its elements, the god, the god's name in Coptic letters and the
+// god's station in the Neophyte grade. The facts are the table's; the
+// wording of the stations and every note are ours, and nothing of the
+// page's text is copied. The book is treated as in copyright (plan 091).
+//
+// The Coptic was read by hand from the page image at 2648 px wide on 23
+// November 2026, letter by letter, and checked against the spellings of
+// the same gods in the Z documents, vol. 3 (1939), pp.92-104 (leaves
+// n84-n96): Aeshoori for Osiris, Hoor, Ahathoor, Hoor-Po-Krat, Ahaphshi,
+// Ano-Oobi, Tharpesh. Each name is given in the letters as drawn, the
+// first capital and the rest small, in Unicode's Coptic block (U+2C80-
+// U+2CFF) and, for the letters Coptic took from Demotic (shai, ti), in
+// U+03E2-U+03EF. Where a letter's shape and its sound part, the shape is
+// given and `copticNote` says so; a reading in doubt says so there too.
+// The sign the table prints after five names, which its footnote reads as
+// "st", is not part of the name: `st` records it.
+//
+// `vol3` gives the Z documents' readings where they differ from the table:
+// the Kerub of the West and Harpocrates' station (stage 0 of plan 095).
+{
+  osiris: {
+    id: "osiris",
+    no: 1,
+    mix: "each",
+    elementIds: ["spirit"],
+    name: { en: "Osiris" },
+    coptic: "Ⲏϣⲱⲱⲣⲓ",
+    st: true,
+    station: { en: "The Hierophant, on his throne" },
+    copticNote: {
+      en: "The second letter is drawn as an omega whose right stroke runs below the line: shai, sh, as in Ameshet. Read as vol. 3's Aeshoori(st).",
+    },
+  },
+  isis: {
+    id: "isis",
+    no: 2,
+    mix: "single",
+    elementIds: ["water"],
+    name: { en: "Isis" },
+    coptic: "Ⲏⲓⲥⲉ",
+    st: true,
+    station: { en: "The Praemonstrator" },
+  },
+  nephthys: {
+    id: "nephthys",
+    no: 3,
+    mix: "single",
+    elementIds: ["earth"],
+    name: { en: "Nephthys" },
+    coptic: "Ⲛⲉⲅⲫⲑⲉⲉ",
+    st: true,
+    station: { en: "The Imperator" },
+    copticNote: {
+      en: "The third letter is drawn like a small r, the shape of Coptic gamma, which the table uses where the other names have u (Anubis, Kabexnuv); read as gamma, with medium confidence. Vol. 3 gives no Coptic-style spelling to check it by.",
+    },
+  },
+  horus: {
+    id: "horus",
+    no: 4,
+    mix: "single",
+    elementIds: ["fire"],
+    name: { en: "Horus" },
+    coptic: "Ⲍⲱⲱⲣ",
+    st: false,
+    station: { en: "The Hiereus" },
+    copticNote: {
+      en: "The first letter is drawn as a Z, zeta, though vol. 3 has Hoor: the table writes h so in every name (Athor, Harpocrates, Apis, Ahephi), where Coptic writes h with hori. Given as drawn.",
+    },
+  },
+  aroueris: {
+    id: "aroueris",
+    no: 5,
+    mix: "single",
+    elementIds: ["air"],
+    name: { en: "Aroueris" },
+    coptic: "Ⲁⲣⲏⲱⲅⲉⲣⲓ",
+    st: true,
+    station: { en: "The Past Hierophant, the Hierophant off the throne" },
+    copticNote: {
+      en: "The fifth letter is the r-shaped gamma, for vol. 3's ou in Aroo-oueri(st).",
+    },
+  },
+  athor: {
+    id: "athor",
+    no: 6,
+    mix: "pair",
+    elementIds: ["water", "earth"],
+    name: { en: "Athor" },
+    coptic: "Ⲁⲍⲁⲑⲱⲱⲣ",
+    st: false,
+    station: { en: "An invisible station: the Kerub of the East" },
+  },
+  sothis: {
+    id: "sothis",
+    no: 7,
+    mix: "pair",
+    elementIds: ["fire", "water"],
+    name: { en: "Sothis" },
+    coptic: "Ϣⲏⲱⲉⲅ",
+    st: false,
+    station: { en: "An invisible station: the Kerub of the West" },
+    copticNote: {
+      en: "Low confidence in the first letter: an omega whose right stroke rises above the line, with a hooked stroke from it running below, read as one letter, shai, the omega with a tail of Osiris and Ameshet; it could be omega followed by another letter (hori, or khei). The last letter is the r-shaped gamma. Vol. 3 does not name Sothis, so nothing checks it.",
+    },
+    vol3: [
+      {
+        note: {
+          en: "The Z documents make the Kerub of Water, behind the Hiereus in the West, a power of Thoomoo (Tum), and do not name Sothis.",
+        },
+        page: 102,
+        leaf: 94,
+      },
+    ],
+  },
+  harpocrates: {
+    id: "harpocrates",
+    no: 8,
+    mix: "pair",
+    elementIds: ["air", "water"],
+    name: { en: "Harpocrates" },
+    coptic: "Ⲍⲱⲱⲣⲡⲟⲕⲣⲁⲧ",
+    st: true,
+    station: { en: "An invisible station between the Altar and the Hegemon" },
+    vol3: [
+      {
+        note: {
+          en: "One passage of the Z documents puts his invisible station in the path of Samekh, between the Hegemon and the Evil Triad.",
+        },
+        page: 103,
+        leaf: 95,
+      },
+      {
+        note: {
+          en: "Another puts Harparkrat in the centre of the hall, between the Hegemon and the Altar, as the table does.",
+        },
+        page: 121,
+        leaf: 113,
+      },
+    ],
+  },
+  apis: {
+    id: "apis",
+    no: 9,
+    mix: "pair",
+    elementIds: ["fire", "earth"],
+    name: { en: "Apis" },
+    coptic: "Ⲁⲍⲁⲡϣⲓ",
+    st: false,
+    station: { en: "An invisible station: the Kerub of the North" },
+    copticNote: {
+      en: "Read A-h-a-p-sh-i, the zeta for h and the omega with a tail for shai, as vol. 3's Ahaphshi.",
+    },
+    vol3: [
+      {
+        note: {
+          en: "The Z documents make the Kerub of Earth, behind the Stolistes in the North, a power of Ahaphshi, which is the name this table spells in Coptic for Apis.",
+        },
+        page: 102,
+        leaf: 94,
+      },
+      {
+        note: {
+          en: "They name Apis in English only once, as the Bull, without a station.",
+        },
+        page: 129,
+        leaf: 121,
+      },
+    ],
+  },
+  anubis: {
+    id: "anubis",
+    no: 10,
+    mix: "pair",
+    elementIds: ["air", "earth"],
+    name: { en: "Anubis" },
+    coptic: "Ⲁⲛⲱⲅⲃⲓ",
+    st: false,
+    station: { en: "The Kerux" },
+    copticNote: {
+      en: "The fourth letter is the r-shaped gamma, for the u of vol. 3's Ano-Oobi.",
+    },
+  },
+  pasht: {
+    id: "pasht",
+    no: 11,
+    mix: "pair",
+    elementIds: ["fire", "air"],
+    name: { en: "Pasht" },
+    coptic: "Ⲑⲁⲣⲫⲉϣ",
+    st: false,
+    station: { en: "An invisible station: the Kerub of the South" },
+    note: { en: "The table gives Sekhet beside Pasht." },
+  },
+  ameshet: {
+    id: "ameshet",
+    no: 12,
+    mix: "three",
+    elementIds: ["fire", "water", "earth"],
+    name: { en: "Ameshet" },
+    coptic: "Ⲁⲙⲉϣⲉⲧ",
+    st: false,
+    station: { en: "An invisible station in the north-east, a Child of Horus" },
+  },
+  ahephi: {
+    id: "ahephi",
+    no: 13,
+    mix: "three",
+    elementIds: ["fire", "water", "air"],
+    name: { en: "Ahephi" },
+    coptic: "Ⲁⲍⲉⲫⲓ",
+    st: false,
+    station: { en: "An invisible station in the south-west, a Child of Horus" },
+  },
+  tmoumathph: {
+    id: "tmoumathph",
+    no: 14,
+    mix: "three",
+    elementIds: ["earth", "water", "air"],
+    name: { en: "Tmoumathph" },
+    coptic: "Ϯⲙⲧⲙⲁⲑⲫ",
+    st: false,
+    station: { en: "An invisible station in the south-east, a Child of Horus" },
+    copticNote: {
+      en: "The first letter is ti, a cross with a bar, for T; the third is drawn as tau where the name in Latin letters has OU. Medium confidence that the drawing means tau.",
+    },
+  },
+  kabexnuv: {
+    id: "kabexnuv",
+    no: 15,
+    mix: "three",
+    elementIds: ["earth", "air", "fire"],
+    name: { en: "Kabexnuv" },
+    coptic: "Ⲕⲁⲃⲉⲝⲛⲅⲩ",
+    st: false,
+    station: { en: "An invisible station in the north-west, a Child of Horus" },
+    copticNote: {
+      en: "The seventh letter is the r-shaped gamma, for u, and the last is upsilon, for v.",
+    },
+  },
+}

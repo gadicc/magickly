@@ -359,6 +359,12 @@ export const TEXTS: Readonly<Record<string, TextSpec>> = {
       "The names read off each Watchtower, computed from a version's letters along fixed paths: the holy names, the King, the Seniors and each quarter's names, with the Kerubic and servient rotations and the Golden Dawn's attributions.",
     page: "/enochian/tablets",
   },
+  "./enochian/tabletPyramids": {
+    sources: [],
+    description:
+      "The Golden Dawn's truncated pyramids on the Enochian tablets, computed square by square: each square's region, its letters of the Name, and its four sides' elements and attributions (sign, decan, planet, Sephirah, Tarot card, geomantic figure, Hebrew letter), with a servient square's angels, god and sphinx.",
+    page: "/enochian/tablets",
+  },
   "./kabbalah/seventyTwoAngels/text": {
     sources: [
       "kabbalah/seventyTwoAngelsText/en",
@@ -408,6 +414,18 @@ export const TEXTS: Readonly<Record<string, TextSpec>> = {
     sources: [],
     description:
       "The planetary kameas, the magic squares from Saturn's 3 × 3 to the Moon's 9 × 9, computed rather than written out, and the constructions that make them.",
+    page: null,
+  },
+  "./astrology/decans": {
+    sources: [],
+    description:
+      "The 36 decans of the zodiac in the Golden Dawn's sequence, computed: each sign's three, their planets in the Chaldean order from Mars, and their small cards of the Tarot.",
+    page: null,
+  },
+  "./tarot/minorCards": {
+    sources: [],
+    description:
+      "The Tarot's 56 minor cards as the Golden Dawn names them, the court cards in the Order's ranks of King, Queen, Prince and Princess: ids and English names, with each suit's and court rank's element.",
     page: null,
   },
   "./astrology/aiqBekar": {

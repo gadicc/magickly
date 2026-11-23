@@ -59,14 +59,18 @@
     "./astrology/planetaryNameExceptions": "./src/astrology/PlanetaryNameExceptions.ts",
     "./astrology/planetaryNameCharacters": "./src/astrology/PlanetaryNameCharacters.ts",
     "./astrology/zodiac": "./src/astrology/Zodiac.ts",
+    "./astrology/decans": "./src/astrology/decans.ts",
     "./enochian/letters": "./src/enochian/Letters.ts",
     "./enochian/tablets": "./src/enochian/Tablets.ts",
     "./enochian/tabletNotes": "./src/enochian/TabletNotes.ts",
     "./enochian/tabletNames": "./src/enochian/TabletNames.ts",
+    "./enochian/tabletPyramids": "./src/enochian/TabletPyramids.ts",
     "./gd/grades": "./src/gd/Grades.ts",
+    "./gd/godForms": "./src/gd/GodForms.ts",
     "./geomancy/houses": "./src/geomancy/Houses.ts",
     "./geomancy/tetragrams": "./src/geomancy/Tetragrams.ts",
     "./hebrewLetters": "./src/HebrewLetters.ts",
+    "./tarot/minorCards": "./src/tarot/minorCards.ts",
     "./kabbalah/angelicOrders": "./src/kabbalah/AngelicOrders.ts",
     "./kabbalah/archangels": "./src/kabbalah/Archangels.ts",
     "./kabbalah/christianChoirs": "./src/kabbalah/ChristianChoirs.ts",
@@ -179,6 +183,10 @@
         "types": "./lib/astrology/Zodiac.d.ts",
         "default": "./lib/astrology/Zodiac.js"
       },
+      "./astrology/decans": {
+        "types": "./lib/astrology/decans.d.ts",
+        "default": "./lib/astrology/decans.js"
+      },
       "./enochian/letters": {
         "types": "./lib/enochian/Letters.d.ts",
         "default": "./lib/enochian/Letters.js"
@@ -195,9 +203,17 @@
         "types": "./lib/enochian/TabletNames.d.ts",
         "default": "./lib/enochian/TabletNames.js"
       },
+      "./enochian/tabletPyramids": {
+        "types": "./lib/enochian/TabletPyramids.d.ts",
+        "default": "./lib/enochian/TabletPyramids.js"
+      },
       "./gd/grades": {
         "types": "./lib/gd/Grades.d.ts",
         "default": "./lib/gd/Grades.js"
+      },
+      "./gd/godForms": {
+        "types": "./lib/gd/GodForms.d.ts",
+        "default": "./lib/gd/GodForms.js"
       },
       "./geomancy/houses": {
         "types": "./lib/geomancy/Houses.d.ts",
@@ -210,6 +226,10 @@
       "./hebrewLetters": {
         "types": "./lib/HebrewLetters.d.ts",
         "default": "./lib/HebrewLetters.js"
+      },
+      "./tarot/minorCards": {
+        "types": "./lib/tarot/minorCards.d.ts",
+        "default": "./lib/tarot/minorCards.js"
       },
       "./kabbalah/angelicOrders": {
         "types": "./lib/kabbalah/AngelicOrders.d.ts",

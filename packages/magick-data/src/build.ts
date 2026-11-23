@@ -102,6 +102,7 @@ export const TABLE_FILES = {
   geomanticHouse: "geomancy/houses",
   gdGrade: "gd/grades",
   gdDegree: "gd/degrees",
+  gdGodForm: "gd/godForms",
   archangel: "kabbalah/archangels",
   angelicOrder: "kabbalah/angelicOrders",
   christianChoir: "kabbalah/christianChoirs",

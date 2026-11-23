@@ -8,7 +8,7 @@ import data from "./data.ts";
  * mutation, and this is the delta, table by table.
  *
  * Two tables are new, `gdDegree` and `tribeOfIsrael`, both of them link
- * targets the barrel never held. The barrel is 29 of the 32 tables:
+ * targets the barrel never held. The barrel is 30 of the 33 tables:
  * `seventyTwoAngel`, `enochianTablet` and `christianChoir` declare no link in
  * either direction, so assembling them would add nothing to any row and only
  * put their JSON in every barrel route's chunk ([data.ts](./data.ts)).
@@ -68,6 +68,12 @@ import data from "./data.ts";
  * `planetaryNameCharacter`, Agrippa's characters with our verdicts, which
  * gives a name the back-link `characters`.
  *
+ * Plan 095 gave the signs and three of the elements their Hebrew letters,
+ * `hebrewLetterId`, which gives them `hebrewLetter` and the letter the
+ * back-links `zodiac` and `element`; and added `gdGodForm`, the gods of the
+ * tablets' servient squares, whose `elementIds` give it `elements` and the
+ * element the back-link `gdGodForms`.
+ *
  * The sampled row is each table's first, named so the sample is reproducible;
  * for the one array table left in the barrel that is index `0`.
  */
@@ -108,9 +114,11 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "quadruplicity",
       "tribeOfIsraelId",
       "tetragrammatonPermutation",
+      "hebrewLetterId",
       "planet",
       "element",
       "tribeOfIsrael",
+      "hebrewLetter",
     ],
   },
   astrologicalHouse: {
@@ -172,9 +180,11 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "index",
       "value",
       "meaning",
+      "element",
       "planet",
       "hermeticPath",
       "hebrewPath",
+      "zodiac",
     ],
   },
   enochianLetter: {
@@ -227,6 +237,21 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
     ],
   },
   gdDegree: { row: "1st", keys: ["id", "pillarId"] },
+  gdGodForm: {
+    row: "osiris",
+    keys: [
+      "id",
+      "no",
+      "mix",
+      "elementIds",
+      "name",
+      "coptic",
+      "st",
+      "station",
+      "copticNote",
+      "elements",
+    ],
+  },
   archangel: {
     row: "cassiel",
     keys: ["id", "name", "planetId", "planet", "sephirah"],
@@ -333,6 +358,8 @@ const SAMPLE: Record<string, { row: string; keys: string[] }> = {
       "name",
       "elementalId",
       "elemental",
+      "hebrewLetter",
+      "gdGodForms",
       "tetragrams",
       "zodiacs",
     ],

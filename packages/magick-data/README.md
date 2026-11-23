@@ -2,7 +2,7 @@
 
 Magickal correspondences and reference data — the sephirot, the planets, the
 zodiac, the Hebrew and Enochian letters, the Golden Dawn grades, the
-geomantic figures and the rest — as 32 tables of plain rows, a graph that
+geomantic figures and the rest — as 33 tables of plain rows, a graph that
 says how they link, and the code that joins them. It is the data layer of
 [magick.ly](https://magick.ly), which consumes it as anyone else would.
 
@@ -78,7 +78,7 @@ different. Two kinds of figure are given, and each says where it came from:
   (`pnpm --filter magick-data smoke`, which prints them): the packed
   tarball, read by a consumer compiled with TypeScript 6.0.3 under
   `bundler`, with `lib: ["es2022"]` and `skipLibCheck`. Each of its reads
-  loads the same 96 files, the lib's included.
+  loads the same 97 files, the lib's included.
 - **Measured on the prototype at `dc6f732`**: the bundle sizes, minified
   and gzipped by esbuild 0.28.2 (webpack 5.111.0 came within a few per
   cent), and the instantiations of a scoped `assemble()`, in a consumer
@@ -93,11 +93,11 @@ import data from "magick-data";
 data.sephirah.tiferet.planet?.symbol; // "☉"
 ```
 
-It holds 29 of the 32 tables: `enochianTablet`, `christianChoir` and
+It holds 30 of the 33 tables: `enochianTablet`, `christianChoir` and
 `seventyTwoAngel` link to nothing and nothing links to them, so they are
-left out and read through their own subpaths. Reading one field costs 8,336
-instantiations, and a four-hop read 19,002 (smoke test); the bundle is
-17,290 bytes gzipped (`dc6f732`). Whatever imports it carries all 29
+left out and read through their own subpaths. Reading one field costs 8,505
+instantiations, and a four-hop read 19,325 (smoke test); the bundle is
+17,290 bytes gzipped (`dc6f732`). Whatever imports it carries all 30
 tables.
 
 **One raw table**, by its subpath:
@@ -158,6 +158,7 @@ is what a link's `to` names.
 | `geomanticHouse` | 12 | `./geomancy/houses` |
 | `gdGrade` | 12 | `./gd/grades` |
 | `gdDegree` | 3 | `./gd/degrees` |
+| `gdGodForm` | 15 | `./gd/godForms` |
 | `archangel` | 15 | `./kabbalah/archangels` |
 | `angelicOrder` | 10 | `./kabbalah/angelicOrders` |
 | `christianChoir` | 9 | `./kabbalah/christianChoirs` |
@@ -187,7 +188,7 @@ as the row's name with `Id` (`SephirahId`). The exceptions are
 `LetterId` for `enochianLetter`; and `planet`, whose `PlanetKey` is every
 row's id while `PlanetId` names only the twelve whose `kind` is
 `"planet"`. The three array tables' modules export no id type.
-`magick-data/tables` exports all 32 raw, with the `Tables` and `TableName`
+`magick-data/tables` exports all 33 raw, with the `Tables` and `TableName`
 types, and `magick-data/types` and `magick-data/rows` the row types derived
 from the tables and the graph.
 
@@ -215,6 +216,24 @@ its planet's square (`traceHebrew`): `match`, `partial`, with the cells the
 figure reads and where it departs, or `no`. Each judge's verdict is kept
 beside ours, and the 1533 figures carry two blind readers' records of their
 strokes. A name's `characters` are its rows.
+
+`gdGodForm` holds the Golden Dawn's table of gods for the mixes of elements
+on a servient square's four sides (Regardie, *The Golden Dawn*, vol. 4,
+1940, p.315): a row a god, with the mix (`mix`: one side of each element,
+one element on three or four sides, two pairs, or three elements), its
+`elements`, the god's name in Coptic letters as the table draws them
+(`coptic`, read by hand from the page image, with `copticNote` where a
+letter's shape and its sound part or the reading is in doubt, and `st` for
+the sign the table adds to five names), its Neophyte station in our words,
+and `vol3` where the Z documents in vol. 3 differ. An element's
+`gdGodForms` are its rows. `enochian/tabletPyramids` gives each servient
+square its god from here.
+
+The signs and three of the elements carry the Hebrew letter the Golden Dawn
+gives them (`hebrewLetterId`, p.298 of the same volume), as the planets do:
+the twelve simple letters for the signs, and Aleph, Mem and Shin for Air,
+Water and Fire. Earth has none of its own: that table gives Earth Saturn's
+Tav. A letter's `zodiac` and `element` are the rows that name it.
 
 ## The graph
 
@@ -300,6 +319,22 @@ or `null`.
   is no JSON for them; `oddKamea(n)` and `doublyEvenKamea(n)` are the
   constructions, for an odd order from 3 or a multiple of 4, up to
   `MAX_KAMEA_ORDER` (100). Any other order is a `RangeError`.
+- `magick-data/astrology/decans`: the 36 decans of the zodiac in the
+  Golden Dawn's sequence, computed: `DECANS`, from the first of Aries,
+  each with its sign, its number within the sign, its planet (the Chaldean
+  order, `CHALDEAN_ORDER`, from Mars round to Mars) and its small card of
+  the Tarot, of the sign's suit, 2 to 4 cardinal, 5 to 7 kerubic and 8 to
+  10 mutable (Regardie, *The Golden Dawn*, vol. 4, 1940, pp.285–286;
+  *The Equinox* I(7), p.237). `decansOf(sign)` gives a sign's three and
+  `decanById(id)` one (`aries-1`). Lenain's decades take their planets
+  from here.
+- `magick-data/tarot/minorCards`: the Tarot's 56 minor cards as the
+  Golden Dawn names them, ids and English names only (`MINOR_CARDS`,
+  `minorCard(id)`, `minorCardId(suit, rank)`): the Aces, the small cards
+  and the court cards in the Order's ranks, King, Queen, Prince and
+  Princess (vol. 4, p.288), with each suit's and court rank's element
+  (`SUIT_ELEMENTS`, `COURT_ELEMENTS`). The Order's titles of the cards are
+  not here.
 - `magick-data/astrology/aiqBekar`: Aiq Bekar, the nine chambers of the
   Hebrew letters (`AIQ_BEKAR`), and the Golden Dawn's reduction of a
   letter to a cell of a kamea (Regardie, *The Golden Dawn*, vol. 4, 1940,
@@ -359,7 +394,40 @@ or `null`.
   or of u for v alone; and `tabletNameSpellings(tablet, id, version)`,
   every version's spelling, the given version's first, unfolded, to look
   a name up by. Where each path and attribution comes from, and the
-  spellings sources print that no path gives, are in `tabletNotes`.
+  spellings sources print that no path gives, are in `tabletNotes`. It
+  also exports `TABLET_QUARTER_ELEMENTS`, each quarter's element.
+- `magick-data/enochian/tabletPyramids`: the Golden Dawn's truncated
+  pyramids on the tablets, computed square by square from their
+  positions, as the names are from theirs. `tabletPyramids(view)` gives
+  every square of a tablet in one of the Golden Dawn's versions (`gd`,
+  `regardie`, `equinox`), a Watchtower's 156 and the Tablet of Union's 20,
+  and `tabletPyramid(view, square)` one, by row and column from 0; Dee's
+  and Raphael's versions have none, their tables carrying no elements. A
+  square (`TabletPyramid`) has its `region` (`greatCross`,
+  `calvaryCross`, `kerubic`, `servient` or `union`), its `quarter`, the
+  `letters` of the Name that govern it (its block on the Great Cross; its
+  column and rank in a lesser angle) and its four `sides`, numbered as
+  vol. 4 numbers them (1 left, 2 top, 3 right, 4 bottom), each with its
+  `elementId` (an element or Spirit; none on a Calvary square's fourth,
+  which carries its Sephirah) and its `attribution`, ids of the package's
+  tables and modules: a sign and decan, a planet, an element, a Sephirah,
+  a trump (as its path), a Hebrew letter, a minor card, a geomantic
+  figure, a Kerub. A servient square also has its `angel` and
+  `greatAngel`, the rotations of its servient row from that square that
+  `tabletNames` reads, its god (`godFormId`, of `gd/godForms`) and its
+  `sphinx`, the Kerub of each side. Ids, not colours or glyphs. The
+  constants the rules use are exported with their pages:
+  `TABLET_NAME_LETTERS`, `KERUBIC_RANKS`, `GREAT_CROSS_QUALITIES`,
+  `RANK_QUALITIES`, `PLANET_ELEMENTS`, `CALVARY_PLANETS`,
+  `CALVARY_COLUMN`, `CALVARY_BARS` (the bar, which the witnesses dispute,
+  per version), `COURT_BY_LETTER`, `UNION_COLUMNS`, `UNION_LINES` and
+  `GEOMANTIC_FIGURES`; so is the region rule, `tabletRegion(row, column)`
+  (nothing outside a Watchtower's 13 rows and 12 columns), which the
+  components' drawing is held to. The Name's letters are ids of their own,
+  `yod`, `he`, `vav` and `heFinal` (`NAME_LETTERS`), not Hebrew letters'
+  ids: the Name's two He's are told apart, and `NAME_LETTER_HEBREW` maps
+  each to its Hebrew letter, both He's to `he`. Where each rule comes from,
+  and where the witnesses depart from it, are in `tabletNotes`.
 - `magick-data/enochian/tabletNotes`: notes on the Enochian tablets: each
   version, where it comes from and how it differs from each of the others
   (`versionNote(id)`), how the versions differ in general, each tablet,
@@ -371,7 +439,12 @@ or `null`.
   print that no path gives (`citedSpellings(tablet, id)`), and the
   dictionary's own spellings of the Kerubic archangels, with a letter of
   the Union the Golden Dawn's rule does not give
-  (`dictionarySpellings(tablet, id)`). The prose is ours, under CC BY 4.0 like the tables;
+  (`dictionarySpellings(tablet, id)`). For the pyramids
+  (`tabletPyramids`), each rule as vol. 4 and the Equinox give it
+  (`pyramidRules(topic)`), where a witness departs from the rules and
+  whose slip it is (`pyramidExceptions(tablet)`), and the readings that
+  are ours, among them the Calvary bar per version
+  (`pyramidReading(id)`). The prose is ours, under CC BY 4.0 like the tables;
   the counts and squares where versions differ are the readings', never
   written into the prose.
 - `magick-data/enochian/dictionary`: for the app only, and not published
@@ -469,9 +542,10 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `chakras.json5` | [Correspondences](#correspondences) of the seven-chakra system, facts only: names, places, petals, colours, seed syllables and their elements, and one-to-five-word glosses of the Sanskrit names. The Wikipedia "Chakra" article the file cites is a reference; no share-alike text is copied | 2026-11-12 |
 | `enochian/keys.json5` | [The Enochian Keys](#the-enochian-keys) | 2026-11-12 |
 | `enochian/letters.json5` | [The Enochian letters](#the-enochian-letters) | 2026-11-12 |
-| `enochian/tabletNotes.json5` | Ours: notes on [the Enochian tablets](#the-enochian-tablets), citing their sources, with the rules by which `enochian/tabletNames` reads the names, the spellings the sources print that no path gives, and the dictionary's own spellings, each cited | 2026-11-20 |
+| `enochian/tabletNotes.json5` | Ours: notes on [the Enochian tablets](#the-enochian-tablets), citing their sources, with the rules by which `enochian/tabletNames` reads the names, the spellings the sources print that no path gives, and the dictionary's own spellings, and the rules by which `enochian/tabletPyramids` computes the pyramids, where the witnesses depart from them and our readings, each cited | 2026-11-23 |
 | `enochian/tablets.json5` | [The Enochian tablets](#the-enochian-tablets) | 2026-11-12 |
 | `gd/degrees.json5` | [Correspondences](#correspondences) | 2026-11-12 |
+| `gd/godForms.json5` | [The gods of the pyramids](#the-gods-of-the-pyramids): the table of gods in Regardie's vol. 4 (1940), p.315, taken as facts: each god's mix of elements, name, Coptic spelling and Neophyte station, the stations and every note in our words, the Coptic read by hand from archive.org's page image, with vol. 3's differing readings | 2026-11-23 |
 | `gd/grades.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `geomancy/houses.json5` | [Geomancy](#geomancy) | 2026-11-12 |
 | `geomancy/tetragrams.json5` | [Geomancy](#geomancy) | 2026-11-12 |
@@ -726,6 +800,24 @@ p. 73), which names all twenty-four. The letters are facts, and **no
 rights are asserted over them**, Greer's among them. See
 [plan 061](https://github.com/gadicc/magickly/blob/main/plans/061-gd-hall.md),
 "Tablet versions".
+
+### The gods of the pyramids
+
+**`gd/godForms.json5`** is the table of the Egyptian gods the Golden Dawn
+gives each mix of elements on a servient square of the Enochian tablets, in
+Israel Regardie, *The Golden Dawn*, vol. 4 (Aries Press, Chicago, 1940),
+p.315 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaf n307):
+the mix, the god, the god's name in Coptic letters and the god's station
+in the Neophyte grade. Those are facts, and no rights are asserted over
+them; the wording of the stations and every note are ours, under CC BY 4.0.
+Nothing of the page's text is copied, and the book is treated as in
+copyright ([plan 091](https://github.com/gadicc/magickly/blob/main/plans/091-regardie-golden-dawn-copyright.md)).
+The Coptic was read by hand from archive.org's page image on 23 November
+2026 and checked against the same gods' names in the Z documents, vol. 3
+(1939; `IsraelRegardie-TheGoldenDawn-Vol3-1939`, pp.92–104), whose
+differing readings `vol3` gives with their leaves. The file's header says
+how the letters are given. See
+[plan 095](https://github.com/gadicc/magickly/blob/main/plans/095-tablet-pyramids.md).
 
 ### Geomancy
 
