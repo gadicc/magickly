@@ -1,0 +1,68 @@
+{
+  "externalTranslation": "allowed",
+  "site": {
+    "name": "Magick.ly",
+    "description": "A magick and occult reference app with study tools and a ritual editor.",
+    "audience": "Practitioners and readers studying Western esoteric traditions.",
+    "tone": "Clear, precise and respectful; distinguish evidence from interpretation."
+  },
+  "rules": [
+    "Keep source titles, citations, author names, licence identifiers and machine-readable names intact.",
+    "Translate first-party interface and explanatory prose only. Source works, quotations and stored rituals retain their own languages.",
+    "The Enochian tools continue to work in English and Enochian; localizing controls does not change dictionary data or tool working languages."
+  ],
+  "glossaries": {
+    "he": {
+      "magick": "מאגיה",
+      "Golden Dawn": "השחר הזהוב",
+      "ritual": "טקס"
+    }
+  },
+  "scopes": [
+    {
+      "id": "enochian",
+      "paths": ["src/app/enochian/"],
+      "hierarchy": ["Enochian"],
+      "description": "Enochian reference material, dictionary, Keys and tablets."
+    },
+    {
+      "id": "enochian.translator",
+      "paths": ["src/app/enochian/translate/"],
+      "hierarchy": ["Enochian", "Translator"],
+      "title": "Enochian translator",
+      "description": "A dictionary-based tool looking up words in both directions between English and Enochian."
+    },
+    {
+      "id": "kabbalah",
+      "paths": ["src/app/kabbalah/"],
+      "hierarchy": ["Kabbalah"],
+      "description": "Kabbalistic reference material and correspondences."
+    },
+    {
+      "id": "shell",
+      "paths": [
+        "src/i18n/",
+        "src/search/",
+        "src/app/pathnames.ts",
+        "src/app/HomeTiles.tsx"
+      ],
+      "description": "Shared navigation, language settings, search and homepage links."
+    },
+    {
+      "id": "temples",
+      "paths": ["src/app/temples/", "src/app/(private)/temples/"],
+      "title": "Temples",
+      "description": "Group membership, invitations, access management and forum synchronization."
+    },
+    {
+      "id": "editor",
+      "paths": ["src/app/doc/", "src/app/offline/"],
+      "description": "Ritual editing, reading, recovery and offline controls; stored ritual text is separate content."
+    },
+    {
+      "id": "metadata",
+      "paths": ["src/seo/"],
+      "description": "Public page titles and descriptions; preserve source-work names and attribution."
+    }
+  ]
+}

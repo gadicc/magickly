@@ -169,7 +169,7 @@ font lives.
 
 When adding or changing interface text or site-authored public prose:
 
-Read `scripts/i18n/context.ts` and the Loom Lingui translation guidance first.
+Read `scripts/i18n/context.json` and the Loom Lingui translation guidance first.
 Use site, section/page and message meaning for direct translation too; preserve
 all usages of shared messages. `--preview` prints the scripted SDK inputs locally.
 
@@ -195,6 +195,11 @@ Hebrew SEO launch is intentionally deferred. Keep `LOCALIZED_SEO_ENABLED` false:
 localized routes stay usable but `noindex`, absent from sitemap/hreflang. Do not
 flip this during routine copy work. The final launch checklist lives in
 `src/i18n/README.md`.
+
+After changing context or scoped source files, run `pnpm i18n:context`.
+Inspect the reported diff before `pnpm exec loom i18n context snapshot`;
+acknowledgment never updates descriptions or retranslates catalog entries.
+The JSON is the editorial source; keep `context.mts` as a typed import only.
 
 ## Site search embeddings
 

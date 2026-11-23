@@ -64,7 +64,7 @@ project's environment. Alternatively pass `--model <id>` to
 task uses `loom env`; framework dev/build still loads its own environment.
 The model is not silently selected or upgraded by this script.
 
-Translation uses `@gadicc/loom/i18n` with app-owned [context](context.ts): site
+Translation uses `@gadicc/loom/i18n` with app-owned [context](context.json): site
 purpose, glossary, preservation rules and file-to-section/page mappings. Source
 paths are relative to this project root. Both script requests and direct agent
 translation use this context; inspect all relevant source usages for ambiguity.
@@ -113,3 +113,33 @@ releasing an app that used local Loom, run `loom dev published`, follow its
 printed install command, rerun `loom dev published` to verify the installed
 registry copy, and pass `loom check --production` plus the app checks. Keep the
 managed local state intact until that verification succeeds.
+
+## Offline context maintenance (Loom 2.7+)
+
+`context.json` stores the reviewed facts and mappings; `context.mts` only imports
+and types that data. The CLI reads JSON without evaluating application modules.
+`context.snapshot.json` is committed review evidence containing sorted relative
+paths and normalized source hashes, without timestamps or machine-specific paths.
+
+```sh
+pnpm i18n:context                         # strict offline check
+pnpm exec loom i18n context check --json  # complete path/hash inventory
+# After inspecting source/context changes and reviewing the descriptions:
+pnpm exec loom i18n context snapshot
+```
+
+A source change means review is needed; it does not prove a description is wrong.
+Edit the JSON if the source's meaning or placement changed, then acknowledge the
+review. Never run snapshot reflexively to clear a failed check. Both overlapping
+scopes apply, and bracketed filenames are literal. JSON key order and CRLF/LF do
+not create drift; rule/hierarchy order remains meaningful. Unscoped source files
+are advisory source inventory, not proof of missing translation context.
+
+Snapshots are explicit, atomic and idempotent. A failed/incomplete inventory keeps
+the previous baseline. A stopped writer may leave a `.snapshot.json.lock`; inspect
+its PID and confirm the writer is stopped before removing only that lock. These
+commands never call a provider or change translations. Normal `loom check`,
+including production mode, reports review drift as advisory; the dedicated
+`i18n:context` task opts into strict review checks. Standard Loom local-dev package
+refresh can still occur before CLI dispatch. Use the established published-package
+proof before release; older Loom CLIs do not provide these context commands.

@@ -79,7 +79,8 @@
     "i18n:preview": "node --import tsx scripts/i18n/translate.mts --preview",
     "i18n:translate": "loom env -- node --import tsx scripts/i18n/translate.mts",
     "i18n:update": "pnpm i18n:extract && pnpm i18n:translate --write && pnpm i18n:check",
-    "i18n:verify-app": "node --import tsx scripts/i18n/verify-app.mts"
+    "i18n:verify-app": "node --import tsx scripts/i18n/verify-app.mts",
+    "i18n:context": "loom i18n context check --strict"
   },
   "dependencies": {
     "@ai-sdk/react": "4.0.156",
@@ -93,7 +94,7 @@
     "@emotion/cache": "11.14.0",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
-    "@gadicc/loom": "2.6.0",
+    "@gadicc/loom": "2.7.0",
     "@hookform/resolvers": "^5.9.2",
     "@langchain/core": "^1.3.0",
     "@langchain/textsplitters": "^1.0.2",

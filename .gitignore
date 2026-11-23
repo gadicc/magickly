@@ -70,3 +70,6 @@ src/locales/*/messages.js
 /.loom/generated-activation*.json
 /.loom/generated-activation-*.tmp
 .loom/dev-sync.lock*
+
+# Transient translation review writer lock; diagnose before removing.
+scripts/i18n/context.snapshot.json.lock

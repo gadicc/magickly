@@ -14,7 +14,7 @@ import {
   TranslationValidationError,
 } from "@gadicc/loom/i18n";
 import { isUiLocale } from "../../src/i18n/locales.ts";
-import { translationContext } from "./context.ts";
+import { translationContext } from "./context.mts";
 import {
   catalogFormat,
   catalogMessages,

@@ -196,6 +196,19 @@
         "i18n:compile": "c1:1931ccc12a50db7301d21c4c97bad8d2201fbf5d297ea86616b9a1ff824c2b9c",
         "i18n:extract": "c1:f8f6ea40ad9b389f5fb66c9f57ba5bb460735be01a116f94766e9dc60d9ece53"
       }
+    },
+    "translation-context": {
+      "status": "active",
+      "activatedOn": "2026-11-23",
+      "config": {
+        "contextFile": "scripts/i18n/context.json",
+        "snapshotFile": "scripts/i18n/context.snapshot.json",
+        "sourceRoots": ["src"],
+        "exclude": ["src/locales/"]
+      },
+      "managedTasks": {
+        "i18n:context": "c1:41635768a285fbcd623a58e8927df965a5a6deed6844705d080790da106c42b1"
+      }
     }
   }
 }

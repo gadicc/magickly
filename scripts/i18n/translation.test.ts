@@ -100,7 +100,7 @@ it("retranslates only missing/fuzzy messages, atomically, preserving reviewed tr
 
 it("preserves real origin/context metadata and emits domain context for the provider", async () => {
   const { createTranslationPlan } = await import("@gadicc/loom/i18n");
-  const { translationContext } = await import("./context");
+  const { translationContext } = await import("./context.mts");
   const { catalogMessages } = await import("./translation.mts");
   const catalog = await catalogFormat.parse(
     `#. Button meaning\n#. js-lingui-explicit-id\n#: src/app/enochian/translate/page.tsx:12\nmsgctxt "button"\nmsgid "Order"\nmsgstr ""\n`,
@@ -125,7 +125,7 @@ it("leaves the original catalog unchanged when a later batch fails", async () =>
   const { catalogMessages, translateCatalog } = await import(
     "./translation.mts"
   );
-  const { translationContext } = await import("./context");
+  const { translationContext } = await import("./context.mts");
   const catalog = await catalogFormat.parse(
     'msgid "One"\nmsgstr ""\n\nmsgid "Two"\nmsgstr ""\n',
     { locale: "he", sourceLocale: "en", filename: "fixture.po" },
@@ -155,7 +155,7 @@ it("leaves the original catalog unchanged when a later batch fails", async () =>
 it("builds offline transport fixtures for twenty source messages with an unchanged stable prefix", async () => {
   const { default: messages } = await import("./fixtures/messages.json");
   const { createTranslationPlan } = await import("@gadicc/loom/i18n");
-  const { translationContext } = await import("./context");
+  const { translationContext } = await import("./context.mts");
   expect(messages).toHaveLength(20);
   const options = {
     sourceLanguage: "English",
@@ -198,4 +198,12 @@ it("uses canonical English source for explicit catalog identifiers", async () =>
     { locale: "he", sourceLocale: "en", filename: "he.po" },
   );
   expect(catalogMessages(target, source)[0].source).toBe("Magick reference");
+});
+
+it("keeps the runtime context identical to the reviewed JSON data", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const { translationContext } = await import("./context.mts");
+  expect(translationContext).toEqual(
+    JSON.parse(await readFile("scripts/i18n/context.json", "utf8")),
+  );
 });
