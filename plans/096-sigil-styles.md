@@ -602,10 +602,65 @@ the record. Gadi's four decisions of 23 November are not repeated.
    - `outputFileTracingIncludes` for the route's fonts and the resvg
      WASM, which a request-time draw needs and a build-time one does not;
    - a check against the 72 slugs and four styles before anything is
-     drawn, answering an unknown name with a plain 404 and no cache
+     drawn, answering an unknown name with the site's 404 and no cache
      entry: Next caches 404s too, so without it every made-up URL
      leaves one behind;
    - no `noindex` on these files (Y1: none is sent).
+
+   **How unknown names are kept out** (after the review, 23 November).
+   Y3 threw Next's internal `NoFallbackError` from the handler. In
+   Next 16.4.6's route template (`build/templates/app-route.js`) only
+   `next start`'s router turns that error into a 404: under ISR an
+   error from the handler is rethrown, and with `adapterPath` set, as
+   on Vercel, Next calls `render404()` itself only for `dynamicParams =
+   false`, so on Vercel a made-up name would likely end as a function
+   error; in `next dev` it was a 500. Nothing the handler can return
+   avoids the cache: a `Response` of any status, `notFound()` (an empty
+   404, `handleHandlerError` in `app-route/module.js`) and `redirect()`
+   are all kept as first responses under `force-static`. So unknown
+   names are kept from the route:
+   - **`src/proxy.ts`** (Next 16's proxy, the repository's first), with
+     the matcher `/kabbalah/angel/:slug/:file`, the route's own shape.
+     It admits exactly the 576 paths (72 slugs, four styles, PNG and
+     SVG, from the contract's written lists; case-sensitive; nothing
+     percent-encoded) and rewrites any other to a path no route
+     matches, which Next answers with the site's 404 page, `no-store`.
+     Its bundle reads no data (`.next/server/middleware.js`, 292 KB:
+     Next's runtime and the 72 slugs).
+   - **One config rewrite** (`ANGEL_SIGIL_RSC_REWRITE`, `beforeFiles`).
+     Next strips a final `.rsc` from the URL before any proxy sees it
+     (`normalizeRscURL` in `server/web/adapter.js`, even with
+     `skipProxyUrlNormalize`, which was tried and dropped), so
+     `<file>.png.rsc` passed the proxy and reached the route as an
+     unknown name, whose empty 404 was cached. The rewrite sends any
+     `…/<name>.rsc` to the 404.
+   - The handler keeps `notFound()` (public API) as its last guard, so
+     nothing unknown is ever drawn; behind the two above it is not
+     reached. The internal import is gone.
+   - *Alternatives:* a config rewrite alone, with a negative lookahead
+     over the 576 names: no function runs for any file, but Next
+     matches rewrites case-insensitively, so `/kabbalah/angel/VEHUIAH/…`
+     would pass it and reach the route. A proxy matcher with the same
+     lookahead (the proxy running only for unknown names) has the same
+     hole wherever matching is case-insensitive.
+   - **Checked** on a production build and `next start` (127.0.0.1, a
+     fresh port): the band's and the rose's files 200 from the build
+     (`HIT`); a bare PNG and a talisman PNG and SVG `MISS`, drawn, then
+     `HIT`; made-up names (another angel's file, an unknown style, the
+     slug or the file in capitals, `%2D`, `.rsc`, `.segments/…`,
+     `.json`, `/_next/data/…`, an unknown slug, `x`) 404 with the site's
+     404 page (its RSC payload for `.rsc`), `no-store`, and no entry
+     under `.next/server/route-cache`; a known name with `?_rsc=` the
+     file itself, under its own entry. The angel page, the 72 list, `/`,
+     `/gd/halls`, the book, `/api/render/angel-sigil` (308) and
+     `rose-sigil` (200) answer as before, and the 144 rose files are
+     identical to `main`'s.
+   - **Still to check on a Vercel preview** (not done): that a made-up
+     name gets the 404 page with no function error and nothing cached;
+     that `.rsc` names do too; and the cost, since the proxy runs for
+     every request to these files, the built ones included. If that
+     cost matters, the lookahead matcher above is the cheaper choice,
+     once the preview shows how Vercel matches case.
    The band's 144 files add about 6 s to the build (73 s against 67 s,
    the spike's build with and without them).
    *Alternatives:* every style static (the review's recommendation;
@@ -943,7 +998,8 @@ is pending.
 
 Departures:
 
-- **An unknown name throws Next's `NoFallbackError`** instead of
+- **An unknown name threw Next's `NoFallbackError`** (replaced after
+  the review by a proxy; decision 3 has why) instead of
   returning a plain 404. Y1's own run shows that a 404 returned from a
   `force-static` handler is cached like any first response (`404 MISS
   s-maxage=31536000`). The error is what `dynamicParams = false` throws:

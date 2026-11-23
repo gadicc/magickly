@@ -9,6 +9,7 @@ import {
 import { COMPONENT_REDIRECTS } from "./src/explorer/redirects";
 import { legacyStaticImageAliases } from "./src/files/legacyStaticImages";
 import { RITUAL_PUBLICATION_STATIC_PATHS } from "./src/files/ritualPublicationStaticPaths";
+import { ANGEL_SIGIL_RSC_REWRITE } from "./src/seo/angelSigilFileGuard";
 import {
   HALL_REDIRECTS,
   RETIRED_DRAWING_REDIRECTS,
@@ -97,6 +98,13 @@ export default async function (phase: string): Promise<NextConfig> {
         headers: [{ key: "X-Robots-Tag", value: "noindex" }],
       },
     ],
+    rewrites: async () => ({
+      // The angels' sigil files: `src/proxy.ts` admits only the 576 names,
+      // and this closes the one way round it (plan 096, decision 3).
+      beforeFiles: [ANGEL_SIGIL_RSC_REWRITE],
+      afterFiles: [],
+      fallback: [],
+    }),
     redirects: () => [
       {
         source: "/help/ritual-text",

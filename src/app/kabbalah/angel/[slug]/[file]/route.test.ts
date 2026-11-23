@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import angels from "magick-data/kabbalah/seventyTwoAngels";
-import { NoFallbackError } from "next/dist/shared/lib/no-fallback-error.external";
+import { isHTTPAccessFallbackError } from "next/dist/client/components/http-access-fallback/http-access-fallback";
 import sharp from "sharp";
 import { describe, expect, it, vi } from "vitest";
 
@@ -137,12 +137,10 @@ describe("/kabbalah/angel/[slug]/[file]", () => {
     60_000,
   );
 
-  it("answers any other name with the site's 404 before drawing anything", async () => {
+  it("draws nothing for any other name", async () => {
     vi.mocked(renderComponentImage).mockClear();
-    // What `dynamicParams = false` throws for a name the build did not
-    // list: Next answers it with the 404 page and keeps nothing, where a
-    // 404 returned from a `force-static` handler is kept like any first
-    // response.
+    // `src/proxy.ts` keeps such names from the route (its test has the
+    // list); this is the last guard, `notFound()`, before anything is drawn.
     for (const [slug, file] of [
       ["vehuiah", "jeliel-rose-cross-sigil.png"],
       ["vehuiah", "jeliel-rose-cross-sigil-band.png"],
@@ -155,10 +153,10 @@ describe("/kabbalah/angel/[slug]/[file]", () => {
       ["lauviah", "lauviah-rose-cross-sigil-talisman.png"],
       ["constructor", "constructor-rose-cross-sigil-band.png"],
       ["vehuiah", "vehuiah.png"],
-    ])
-      await expect(get(slug, file), `${slug}/${file}`).rejects.toBeInstanceOf(
-        NoFallbackError,
-      );
+    ]) {
+      const error = await get(slug, file).catch((thrown: unknown) => thrown);
+      expect(isHTTPAccessFallbackError(error), `${slug}/${file}`).toBe(true);
+    }
     expect(renderComponentImage).not.toHaveBeenCalled();
   });
 });

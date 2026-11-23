@@ -1,4 +1,4 @@
-import { NoFallbackError } from "next/dist/shared/lib/no-fallback-error.external";
+import { notFound } from "next/navigation";
 import { renderComponentImage } from "@/render/componentImage";
 import { contentDisposition } from "@/render/componentImageUrl";
 import {
@@ -37,11 +37,12 @@ export async function GET(
 ) {
   const { slug, file: name } = await params;
   const found = angelSigilRouteFile(slug, name);
-  // Any other name is the site's 404, as `dynamicParams = false` answers
-  // one, before anything is drawn: a 404 returned from here would be kept
-  // like any first response, one cache entry for every name a crawler or a
-  // typo makes up (plan 096, Y1).
-  if (!found) throw new NoFallbackError();
+  // Never reached for any other name: `src/proxy.ts` sends every path that
+  // is not one of the 576 to the site's 404 before it gets here. A 404 from
+  // here would be kept like any first response, one cache entry for every
+  // name a crawler or a typo makes up (plan 096, decision 3), so this is
+  // only the last guard that nothing unknown is drawn.
+  if (!found) notFound();
   const { angel, file } = found;
   const request = angelSigilRequest(angel, file);
   const image = await renderComponentImage(request.slug, request.query);
