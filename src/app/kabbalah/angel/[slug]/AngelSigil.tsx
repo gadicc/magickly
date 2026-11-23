@@ -1,4 +1,8 @@
 "use client";
+// MUI's link alone renders a plain <a>: the sigil files are not pages, and
+// a click on Next's <Link> would fetch one as an RSC payload (`RSC: 1`)
+// before falling back to loading it (plan 096, decision 3).
+import FileLink from "@mui/material/Link";
 import React from "react";
 import { plateClass } from "@/drawings/plate";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
@@ -226,13 +230,14 @@ export default function AngelSigil({
         />
       </p>
       <p className={styles.downloads}>
-        {/* Files, not pages: nothing to prefetch. */}
-        <Link href={png.path} download={png.name} prefetch={false}>
+        {/* Files, not pages: plain links, which Next's router never
+            fetches (plan 096, decision 3). */}
+        <FileLink href={png.path} download={png.name}>
           <UiText message={/*i18n*/ "Download PNG"} />
-        </Link>
-        <Link href={svg.path} download={svg.name} prefetch={false}>
+        </FileLink>
+        <FileLink href={svg.path} download={svg.name}>
           <UiText message={/*i18n*/ "Download SVG"} />
-        </Link>
+        </FileLink>
       </p>
       <div className={styles.every}>
         <p id={`${id}-every`}>
@@ -243,13 +248,9 @@ export default function AngelSigil({
             <li key={entry.style}>
               <UiText message={ANGEL_SIGIL_STYLE_LABELS[entry.style]} />
               {": "}
-              <Link href={entry.png.path} prefetch={false}>
-                PNG
-              </Link>
+              <FileLink href={entry.png.path}>PNG</FileLink>
               {" · "}
-              <Link href={entry.svg.path} prefetch={false}>
-                SVG
-              </Link>
+              <FileLink href={entry.svg.path}>SVG</FileLink>
             </li>
           ))}
         </ul>

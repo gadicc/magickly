@@ -195,7 +195,7 @@
       "files": {
         "src/app/kabbalah/KabbalahText.tsx": "17290a9a4ca444e9715a8828e609c109d4fa898ff87d2a2f6c349e933b7dca2a",
         "src/app/kabbalah/angel/[slug]/Angel.tsx": "80b3113e103d499b10dd335d56f76e6dfe1037b81f971260b0f6705c89f23b56",
-        "src/app/kabbalah/angel/[slug]/AngelSigil.tsx": "175026c7126149549d3f0b9632fd6663bf7da6b124a829b94c294e53b35968f4",
+        "src/app/kabbalah/angel/[slug]/AngelSigil.tsx": "3aacdc5b1060e9571d17627470c33db4abb8f89e08d50fe0eef3ae7119f07f5b",
         "src/app/kabbalah/angel/[slug]/[file]/route.ts": "88c9abea9c428311e84e539a0710dd79cefe02305ad0942ded8fdb4b9937435e",
         "src/app/kabbalah/angel/[slug]/fields.ts": "10750035b0e463afb9b1149c04c9e81baa8268d3f78d13c5c44655c5a2312cae",
         "src/app/kabbalah/angel/[slug]/urlState.ts": "cd634843a1bfcba66b216b4c165c69703b093c0404ef16493bf123f8cb4edd3e",
@@ -217,7 +217,7 @@
       "files": {
         "src/seo/Breadcrumbs.tsx": "5e72076059c6e47d1bbc47ca3f3e1804c3a19c8979aa6e3a4f09254c0aedd2ac",
         "src/seo/JsonLd.tsx": "bd559ecf37863150f173704a2fb68fbe43eee2d6eacdd5ef0befa070875c23c8",
-        "src/seo/angelSigilFileGuard.ts": "4d8532d10f44c4a727f699a95c895a23e26c154fd44f54071e080613a13ec9ef",
+        "src/seo/angelSigilFileGuard.ts": "68777d6aba07fda491fe0b9cba4ecccaea7fd4d94a2792479f857e05bdd48a26",
         "src/seo/angelSigilFiles.ts": "c11b17b7a7bc92ffba5400c8513293c96389d678b60b6918e4b8c266f70e713c",
         "src/seo/angelSigils.ts": "fe69930149f01488cd04f0cbe7fd198f9477f891b7dc1324cc58daf4f9cc10ea",
         "src/seo/cardArt.ts": "220104d07c6e1445b67efa515158b72a6797fd07577456851c0346fb5375bcda",

@@ -98,9 +98,14 @@ export default async function (phase: string): Promise<NextConfig> {
         headers: [{ key: "X-Robots-Tag", value: "noindex" }],
       },
     ],
+    // `src/proxy.ts` sees Next's router headers (`RSC`), so that it can
+    // answer a sigil file asked for as an RSC payload itself (plan 096,
+    // decision 3). It is the only proxy, and runs only on the angels' files.
+    skipProxyUrlNormalize: true,
     rewrites: async () => ({
       // The angels' sigil files: `src/proxy.ts` admits only the 576 names,
-      // and this closes the one way round it (plan 096, decision 3).
+      // but sees `<name>.rsc` as `<name>`; this sends those to the 404
+      // (plan 096, decision 3).
       beforeFiles: [ANGEL_SIGIL_RSC_REWRITE],
       afterFiles: [],
       fallback: [],

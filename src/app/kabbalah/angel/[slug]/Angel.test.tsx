@@ -133,11 +133,13 @@ describe("the angel page", () => {
     expect(html).toContain(
       `href="/gd/sigils?text=${encodeURIComponent("והויה")}"`,
     );
+    // Plain anchors (MUI's link, not Next's), so the attributes come in
+    // the order MUI writes them.
     expect(html).toMatch(
-      /<a [^>]*download="vehuiah-rose-cross-sigil-band\.png" href="\/kabbalah\/angel\/vehuiah\/vehuiah-rose-cross-sigil-band\.png"[^>]*>Download PNG<\/a>/,
+      /<a [^>]*href="\/kabbalah\/angel\/vehuiah\/vehuiah-rose-cross-sigil-band\.png" download="vehuiah-rose-cross-sigil-band\.png"[^>]*>Download PNG<\/a>/,
     );
     expect(html).toMatch(
-      /<a [^>]*download="vehuiah-rose-cross-sigil-band\.svg" href="\/kabbalah\/angel\/vehuiah\/vehuiah-rose-cross-sigil-band\.svg"[^>]*>Download SVG<\/a>/,
+      /<a [^>]*href="\/kabbalah\/angel\/vehuiah\/vehuiah-rose-cross-sigil-band\.svg" download="vehuiah-rose-cross-sigil-band\.svg"[^>]*>Download SVG<\/a>/,
     );
     // Every style's files, as plain links, for a reader without
     // JavaScript and for image search.

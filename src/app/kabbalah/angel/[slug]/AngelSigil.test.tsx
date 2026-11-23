@@ -22,6 +22,16 @@ import AngelSigil from "./AngelSigil";
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: () => {} }),
 }));
+// Next's <Link>, marked, so that a link the router would fetch is seen.
+vi.mock("next/link", async () => {
+  const { createElement, forwardRef } = await import("react");
+  return {
+    default: forwardRef<HTMLAnchorElement, Record<string, unknown>>(
+      ({ prefetch: _prefetch, ...props }, ref) =>
+        createElement("a", { ...props, ref, "data-next-link": "" }),
+    ),
+  };
+});
 
 const angel = (no: number) => angels[no - 1];
 const pageOf = (no: number) => `/kabbalah/angel/${angelSlug(no)}`;
@@ -111,6 +121,22 @@ describe("an angel page's sigil section", () => {
         tapped: png.path,
       });
     }
+  });
+
+  it("links the files as plain anchors, which Next's router never fetches", () => {
+    // A click on Next's <Link> asks for the file with `RSC: 1` first, which
+    // on Vercel may reach the route as `<name>.rsc` (plan 096, decision 3).
+    const box = parsed(serverHtml(1));
+    const files = [...box.querySelectorAll("a")].filter((a) =>
+      /\.(png|svg)$/.test(a.getAttribute("href") ?? ""),
+    );
+    expect(files).toHaveLength(2 + 1 + 2 * ANGEL_SIGIL_STYLES.length);
+    for (const a of files)
+      expect(a.hasAttribute("data-next-link"), a.outerHTML).toBe(false);
+    // The mark is seen where Next's <Link> is used: the generator's link.
+    expect(box.querySelector('a[data-next-link][href^="/gd/sigils"]')).not.toBe(
+      null,
+    );
   });
 
   it("translates the menu, the captions and the alt text, keeping the links", () => {

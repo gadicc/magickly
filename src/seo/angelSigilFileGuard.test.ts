@@ -1,17 +1,28 @@
 import { readFileSync } from "node:fs";
-import { tryToParsePath } from "next/dist/lib/try-to-parse-path";
 import { getPathMatch } from "next/dist/shared/lib/router/utils/path-match";
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 import { config, proxy } from "@/proxy";
+import { ANGEL_SIGIL_SLUGS } from "../render/contracts/angelSigil";
 import {
+  ANGEL_PAGE_SEGMENTS,
   ANGEL_SIGIL_NOT_FOUND_PATH,
   ANGEL_SIGIL_RSC_REWRITE,
+  angelSigilFilePaths,
+  isAngelPageSegmentPath,
   isAngelSigilFilePath,
 } from "./angelSigilFileGuard";
 import { allAngelSigilStyleFiles } from "./angelSigils";
 
 const KNOWN = allAngelSigilStyleFiles().map(({ file }) => file.path);
+
+/** The angel page's prerendered segments, by path, as a build writes them. */
+const SEGMENTS = ANGEL_SIGIL_SLUGS.flatMap((slug) => [
+  ...ANGEL_PAGE_SEGMENTS.map(
+    (segment) => `/kabbalah/angel/${slug}.segments/${segment}.segment.rsc`,
+  ),
+  `/kabbalah/angel/${slug}.segments/!KHB1YmxpYyk/kabbalah/angel/$d$slug/__PAGE__.segment.rsc`,
+]);
 
 /** Paths the `[file]` route would take, none of them one of the 576. */
 const UNKNOWN = [
@@ -39,6 +50,7 @@ describe("the angels' sigil files' guard (plan 096, decision 3)", () => {
   it("admits exactly the 576 files the route serves", () => {
     expect(KNOWN).toHaveLength(576);
     expect(new Set(KNOWN).size).toBe(576);
+    expect(angelSigilFilePaths()).toEqual(KNOWN);
     for (const path of KNOWN)
       expect(isAngelSigilFilePath(path), path).toBe(true);
   });
@@ -60,8 +72,8 @@ describe("the angels' sigil files' guard (plan 096, decision 3)", () => {
 });
 
 describe("src/proxy.ts", () => {
-  const run = (path: string) =>
-    proxy(new NextRequest(new URL(path, "https://magick.ly")));
+  const run = (path: string, headers?: Record<string, string>) =>
+    proxy(new NextRequest(new URL(path, "https://magick.ly"), { headers }));
 
   it("lets the 576 through untouched", () => {
     for (const path of KNOWN) {
@@ -79,23 +91,54 @@ describe("src/proxy.ts", () => {
     );
   });
 
-  it("runs on every path the [file] route can match, and only those", () => {
-    // As Next compiles a matcher (`getMiddlewareMatchers`, then
-    // `new RegExp` with no flags at run time). The route's own pattern is the
-    // same two segments under an angel's page, so nothing reaches the route
-    // without passing the proxy.
-    const matcher = new RegExp(tryToParsePath(config.matcher).regexStr ?? "^$");
-    for (const path of [...KNOWN, ...UNKNOWN.filter((p) => !p.includes("%"))])
-      expect(matcher.test(path), path).toBe(true);
+  it.each<Record<string, string>>([
+    { rsc: "1" },
+    { rsc: "1", "next-router-prefetch": "1" },
+    { rsc: "1", "next-router-segment-prefetch": "/_tree" },
+    { "next-router-prefetch": "1" },
+  ])(
+    "answers a file asked for as an RSC payload itself, uncached: %o",
+    (headers) => {
+      // On Vercel `.rsc` is appended to such a request after the proxy has
+      // run, and the route would take `<name>.png.rsc` as unknown. Any answer
+      // that is not an RSC payload sends Next's router to load the URL.
+      for (const path of KNOWN.slice(0, 8)) {
+        const response = run(path, headers);
+        expect(response.status, path).toBe(406);
+        expect(response.headers.get("cache-control")).toBe("private, no-store");
+        expect(response.headers.get("x-middleware-next")).toBeNull();
+        expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+      }
+      // A made-up name still gets the 404 page, here its RSC payload.
+      expect(run(UNKNOWN[0], headers).headers.get("x-middleware-rewrite")).toBe(
+        `https://magick.ly${ANGEL_SIGIL_NOT_FOUND_PATH}`,
+      );
+    },
+  );
+
+  it("lets the angel page's own segments through, and only those", () => {
+    // As the proxy is given them: `.rsc` stripped. The deeper `__PAGE__`
+    // segment is three segments down, where the proxy never runs.
+    const segments = SEGMENTS.filter((path) => !path.includes("__PAGE__")).map(
+      (path) => path.replace(/\.rsc$/, ""),
+    );
+    expect(segments).toHaveLength(72 * 3);
+    for (const path of segments) {
+      expect(isAngelPageSegmentPath(path), path).toBe(true);
+      expect(run(path).headers.get("x-middleware-next"), path).toBe("1");
+    }
     for (const path of [
-      "/kabbalah/angel/vehuiah",
-      "/kabbalah/angel",
-      "/kabbalah/yhvh/72angels",
-      "/api/render/angel-sigil",
-      "/gd/halls/neophyte/neophyte.png",
-      ANGEL_SIGIL_NOT_FOUND_PATH,
-    ])
-      expect(matcher.test(path), path).toBe(false);
+      "/kabbalah/angel/nobody.segments/_tree.segment",
+      "/kabbalah/angel/vehuiah.segments/_made-up.segment",
+      "/kabbalah/angel/vehuiah.segments/_tree.segment.rsc",
+      "/kabbalah/angel/vehuiah.segments/_tree",
+      "/kabbalah/angel/VEHUIAH.segments/_tree.segment",
+    ]) {
+      expect(isAngelPageSegmentPath(path), path).toBe(false);
+      expect(run(path).headers.get("x-middleware-rewrite"), path).toBe(
+        `https://magick.ly${ANGEL_SIGIL_NOT_FOUND_PATH}`,
+      );
+    }
   });
 
   it("imports no data, so its bundle stays small", () => {
@@ -126,7 +169,8 @@ describe("src/proxy.ts", () => {
   });
 
   it("is backed by a rewrite of the names Next strips `.rsc` from first", () => {
-    // As Next compiles a rewrite's source (`getPathMatch`, case-insensitive).
+    // As `next start` compiles a rewrite's source (`getPathMatch`, without
+    // case); src/proxyRegistration.test.ts has it as Vercel's manifest does.
     const rewrite = getPathMatch(ANGEL_SIGIL_RSC_REWRITE.source, {
       removeUnnamedParams: true,
     });
@@ -139,5 +183,8 @@ describe("src/proxy.ts", () => {
       expect(rewrite(`${path}.RSC`), `${path}.RSC`).not.toBe(false);
     }
     expect(rewrite("/kabbalah/angel/vehuiah.rsc")).toBe(false);
+    // Nor the angel page's own segments, nor anything deeper.
+    for (const path of SEGMENTS) expect(rewrite(path), path).toBe(false);
+    expect(rewrite(`${KNOWN[0]}/x.rsc`)).toBe(false);
   });
 });
