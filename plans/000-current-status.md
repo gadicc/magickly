@@ -266,6 +266,16 @@ Follow-ups are separate from the completed migration work:
   stage 5, the image route's own slug for pyramids (no image link until
   then); the follow-ups (symbols on the sides, the tablets in image
   search).
+- The export controls ([plan 097](097-export-controls.md)), 23 November
+  2026, on `gate/export-controls`: one row per format under every
+  drawing (SVG and PNG, each with Save, Copy and Link), image links
+  copied with Open in the confirmation, nothing under the box, and
+  "Copy page link" replaced by the app bar's Share, which the rose
+  sigils, kamea sigils and geomancy reading hand their link (personal
+  pages never write typed text into the URL, plan 027). TODO: PDF as a
+  third row; the candlestick's version in its URL; Share by hand on
+  Android, Firefox desktop and Safari
+  ([plan 097](097-export-controls.md#follow-ups-not-in-this-plan)).
 - TODO: rate limiting for the public component image routes
   (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through
   WASM on request, and `/api/render/rose-sigil` takes up to about 160 ms

@@ -1,14 +1,14 @@
 # The export controls — 23 November 2026
 
-Status: drafted 23 November 2026, after two rounds of mock-ups on which
-Gadi chose the layout (decision 1) the same day, and answered the
-question of what Share sends on the personal pages (decision 3) and
-moved the notes under the box into the confirmations (decision 2). No
-code. The mock-ups
-are in [097-export-controls-mockups.html](097-export-controls-mockups.html),
-a self-contained page to open in a browser. The number was free on every
-branch and worktree when drafted (096 is the sigil styles, on
-`magickli-gate-styles`); claim it again when committing.
+Status: stages 1 and 2 built on 23 November 2026 on
+`gate/export-controls`, each reviewed and checked in the browser (see
+[As built](#as-built-23-november-2026)). Drafted the same day, after two
+rounds of mock-ups on which Gadi chose the layout (decision 1), answered
+the question of what Share sends on the personal pages (decision 3) and
+moved the notes under the box into the confirmations (decision 2). The
+mock-ups are in [097-export-controls-mockups.html](097-export-controls-mockups.html),
+a self-contained page to open in a browser. 096 is the sigil styles, on
+`magickli-gate-styles`.
 
 Gadi's request (23 November 2026): the export block under the drawings
 "got a little bit crowded"; improve it, perhaps with file icons carrying
@@ -233,8 +233,7 @@ main checkout, as gated commits that Gadi fast-forwards.
 
 ## Follow-ups (not in this plan)
 
-Add these to [plan 000](000-current-status.md)'s follow-ups when this
-lands.
+Listed in [plan 000](000-current-status.md).
 
 - **PDF export.** A third row. Needs a client-side SVG-to-PDF path (for
   example svg2pdf.js with jsPDF) with the drawing's fonts embedded
@@ -245,3 +244,54 @@ lands.
   row may show Save and Link only.
 - **The candlestick's version in its URL**, so Share and the image link
   agree there too.
+- **Share by hand where it could not be tested here:** the share sheet
+  (and dismissing it) on Android, the copy fallback on Firefox desktop,
+  and Safari (no device).
+- **Two confirmations at once:** the export box's and Share's snackbars
+  both sit bottom-centre and can overlap.
+
+## As built (23 November 2026)
+
+| Commit | What |
+| --- | --- |
+| `d0ca031c` | This plan and its mock-ups |
+| `e15d221d` | Stage 1: the rows (`src/export/formats.ts`, `FileIcon.tsx`, `ExportControls.tsx`), the notes moved into the confirmations, translations |
+| `7c0f4de4` | Stage 2: `src/app/pageShare.tsx` and `ShareButton.tsx`; the three personal pages register their link; `share` and "Copy page link" removed; the tablets, Tree and geomancy texts point to the share button; search rows republished |
+
+Rebased once onto `a1576fe1` (the pyramid drawing); the SHAs above are
+after that rebase. Each stage was built by Opus 5.5 at high effort,
+reviewed by a fresh-context Opus 5.5 at high effort (nine findings on
+stage 1, one medium and four low on stage 2, all fixed or recorded
+below), and checked by hand in a headless Chromium on the dev server:
+the tablets, Tree, rose sigils, geomancy reading, shewbread and hall
+editor at 375, 768 and 1,440 px, light and dark; touch targets 48 × 52
+px, 44 × 40 px with a mouse; no sideways scroll; and real clipboard
+reads of Share and Link on four pages, including a cleared sigil
+sharing only the bare page.
+
+Where the build departs from the decisions above, or adds to them:
+
+- **Accessible names** are "Save SVG" rather than "Download SVG", so
+  each contains its visible label (WCAG 2.5.3), in English and Hebrew;
+  a test checks both catalogs.
+- **A failed link copy** still offers Open, with "Could not copy the
+  link. Open it instead."
+- **Link stays greyed with a note** on the rose and kamea sigils too
+  when there is no sigil yet ("No image link until a sigil is drawn.").
+- **The page link's personal wording** reached stage 1 as well, so
+  that stage was safe on `main` without stage 2.
+- **Whether a page is personal** comes from its image contract
+  (`CONTRACTS[slug].personal`), in the export box and in Share alike.
+- **With no sigil**, the rose and kamea pages hand Share their bare
+  page, so a reader who arrived with `?text=` and cleared it never
+  sends the old text.
+- **Share sends the whole address** on pages that register nothing
+  (the tablets and Tree among them), as the app bar always did:
+  unrelated parameters and a `#section` go with it, where "Copy page
+  link" sent only the page's own choices.
+- **A second tap while the sheet is open** (`InvalidStateError`) is
+  silent, like a dismissed sheet. Copying after any other failed sheet
+  runs outside the tap, which Safari and Firefox usually refuse; the
+  snackbar then says it could not copy.
+- **Search:** 6 and then 10 records re-embedded (ledger, 23 November:
+  $0.0229 and $0.0248 estimated).
