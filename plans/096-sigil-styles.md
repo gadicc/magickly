@@ -629,11 +629,45 @@ the record. Gadi's four decisions of 23 November are not repeated.
      Next's runtime and the 72 slugs).
    - **One config rewrite** (`ANGEL_SIGIL_RSC_REWRITE`, `beforeFiles`).
      Next strips a final `.rsc` from the URL before any proxy sees it
-     (`normalizeRscURL` in `server/web/adapter.js`, even with
-     `skipProxyUrlNormalize`, which was tried and dropped), so
-     `<file>.png.rsc` passed the proxy and reached the route as an
-     unknown name, whose empty 404 was cached. The rewrite sends any
-     `…/<name>.rsc` to the 404.
+     (`normalizeRscURL` in `server/web/adapter.js`, whatever
+     `skipProxyUrlNormalize` says), so `<file>.png.rsc` passed the proxy
+     and reached the route as an unknown name, whose empty 404 was
+     cached. The rewrite sends `…/<slug>/<name>.rsc` to the 404: a slug
+     without a dot and one segment (`:slug([^/.]+)/:file([^/]+\.rsc)`),
+     so that the angel page's own prerendered segments
+     (`<slug>.segments/_tree.segment.rsc` and the deeper `__PAGE__` one)
+     are never taken (second review, 23 November).
+   - **`RSC: 1` on a known name** (second review). On Vercel, by
+     `@vercel/next`'s route order, a request with `RSC: 1` gets `.rsc`
+     appended after the proxy and the rewrites have run, so a known name
+     may reach the route as `<name>.png.rsc` and leave a cached 404 (at
+     most one for each of the 576). Next hides its router's headers from
+     a proxy unless `skipProxyUrlNormalize` is set; it now is (the only
+     proxy runs only on these paths), and the proxy answers a known name
+     asked for with `RSC`, `Next-Router-Prefetch` or
+     `Next-Router-Segment-Prefetch` itself: an empty 406, `private,
+     no-store`. Next's router takes any answer that is not an RSC payload
+     as its cue to load the URL as a browser would
+     (`fetch-server-response.js`), and the site's own links to the files
+     are now plain `<a>`, which the router never fetches. Not checked on
+     Vercel.
+   - **The angel page's own segments** (second review). The proxy's
+     compiled matcher adds `.rsc`, `.json`, `.segments/…` and
+     `/_next/data/…` forms, so it runs on
+     `/kabbalah/angel/<slug>.segments/_tree.segment.rsc`, a real
+     prerender output, which it sent to the 404. It now lets the three
+     two-segment ones (`_tree`, `_full`, `!KHB1YmxpYyk`; for the 72
+     slugs exactly) through. The matcher keeps the route's shape, any two
+     segments, rather than a slug without a dot as the review proposed:
+     the route takes `/kabbalah/angel/a.b/<name>` too, and a proxy that
+     skipped it would let every such made-up name leave a cached 404. Next
+     never asks for a segment by its path (nothing in `next/dist/client`
+     names `.segments`), so these are hand-made requests; under `next
+     start`, which cannot serve them, the ones passed reach the route and
+     leave a 404 entry each, at most 432 (the three, with and without
+     `.rsc`, for 72 slugs; seen for Vehuiah's four), and on Vercel those
+     without `.rsc` may too (216). If even that bound is unwanted, the
+     proxy can send them to the 404 again, as before this round.
    - The handler keeps `notFound()` (public API) as its last guard, so
      nothing unknown is ever drawn; behind the two above it is not
      reached. The internal import is gone.
@@ -655,12 +689,45 @@ the record. Gadi's four decisions of 23 November are not repeated.
      `/gd/halls`, the book, `/api/render/angel-sigil` (308) and
      `rose-sigil` (200) answer as before, and the 144 rose files are
      identical to `main`'s.
+   - **Checked again** after the second review, on a production build
+     and `next start` (127.0.0.1:39733): the reviewer's probes answer as
+     before, except that a known name with `RSC: 1` (with or without
+     `Next-Router-Prefetch`, `Next-Router-Segment-Prefetch` or `?_rsc=`)
+     is a 406, `private, no-store`, with no entry; the angel page's
+     document, its RSC payload and its `/_tree` segment prefetch (each
+     after Next's own 307 to `?_rsc=`) 200; made-up `.segments/…` names
+     and a slug with a dot 404 with no entry; `/`, the 72 list,
+     `/gd/halls`, the book and `rose-sigil` 200 and
+     `/api/render/angel-sigil` 400 without a query; the only route-cache
+     entries not one of the 576 are Vehuiah's four segment paths above;
+     and the 144 rose files are identical to `main`'s.
+   - **What fails if Next stops registering the proxy** (second review).
+     Nothing did: a proxy file moved, a `config` Next cannot read (Next
+     then runs the proxy on every path, which would send the whole site
+     to the 404) or the rewrite dropped would all leave the site
+     working. `src/proxyRegistration.test.ts` now reads them as `next
+     build` does, in the normal suite: that `src/proxy.ts` is the one
+     proxy file beside `app`, that Next's own `getPageStaticInfo` finds
+     the `proxy` export and compiles `config.matcher` to the regular
+     expression the build writes, and that `next.config.ts` sets
+     `skipProxyUrlNormalize` and the rewrite. With Next's compiled matcher
+     and `buildCustomRoute`'s rewrite, `angelSigilRoutingProblems`
+     (`src/seo/angelSigilRouting.ts`) checks every file, every file's
+     `.rsc` and `.RSC`, the page's segments, made-up names (a dotted slug
+     among them) and paths outside. `pnpm build` then runs
+     `scripts/checkProxyBuild.mts`, which makes the same checks against
+     `functions-config-manifest.json`, `routes-manifest.json` and the
+     segments the build wrote, and fails the build (and so CI, the gate
+     and a release build) if any fails. Run against the previous build
+     it failed, listing the rewrite taking all 288 segment paths.
    - **Still to check on a Vercel preview** (not done): that a made-up
      name gets the 404 page with no function error and nothing cached;
-     that `.rsc` names do too; and the cost, since the proxy runs for
-     every request to these files, the built ones included. If that
-     cost matters, the lookahead matcher above is the cheaper choice,
-     once the preview shows how Vercel matches case.
+     that `.rsc` names do too; that `RSC: 1` on a known name gets the
+     406 and a click on an old `<Link>` still opens the file; that the
+     page's segments by path are served; and the cost, since the proxy
+     runs for every request to these files, the built ones included. If
+     that cost matters, the lookahead matcher above is the cheaper
+     choice, once the preview shows how Vercel matches case.
    The band's 144 files add about 6 s to the build (73 s against 67 s,
    the spike's build with and without them).
    *Alternatives:* every style static (the review's recommendation;
@@ -1346,3 +1413,57 @@ and ten minors; an Opus agent (high) fixed them in eight commits,
   verses as `magick-data/json/…`.
 - **Not changed:** the captions' wording on Hebrew names (Gadi's call)
   and one-letter-word scaling (not reachable).
+
+### Second review fixes (23 November 2026)
+
+A re-review of the fixes (1c3c1041) found no blockers and nine minors;
+an Opus agent (high) fixed them in nine commits, 2fed54ff to the one
+that adds this section. 2df50aa0 mends the angel page's test, which
+2fed54ff broke (MUI writes `href` before `download`); 2fed54ff alone
+fails it.
+
+- **`RSC: 1` on a known file, the matcher and the rewrite, and what
+  fails if Next drops the proxy:** decision 3 has what changed, why the
+  matcher keeps the route's shape rather than a slug without a dot, and
+  the `next start` check. The angel page's file links are plain `<a>`
+  (the 72 list links no file); the halls' and kamea's download links
+  stay Next's `<Link download>`, which the router never fetches, and
+  their files are all built.
+- **#37's Kircher witness.** Kircher's table has "virtutum" in the
+  psalm's refrain at 79:20 (which it cites as 79:4), not at Lenain's
+  79:8; the note's `why` now says so, through
+  `scripts/seventyTwoAngels/notes.json5`, `apparatus.ts` and
+  `renderPages.ts`, so the book's page and its Markdown say it too.
+- **The Kircher readings' provenance** is stated in `witnesses.json5`
+  itself: read by Claude (Opus 5.5) by eye on the Complutense scan on
+  23 November 2026, knowing the value expected, first recorded in
+  `vulgate/differences.json5` at 5c5f57a7 and kept only in
+  `witnesses.json5` since c9ab1d5c.
+- **The book's source list** names Kircher's table of the verses
+  (pp. 275–280) in the Complutense copy and says the notes link its
+  leaves n283 to n287. Its search record was re-keyed and published
+  ($0.0205 estimated, 296 tokens; 3210 of 3210 records).
+- **The context snapshot in 1c73a163** took eleven hashes from `main`:
+  eight files under `src/app/enochian/tablets/` (28a14de6, the squares'
+  pyramids: a new tab and its messages) and `publish.ts`, `rows.ts` and
+  `store.ts` under `src/search/embeddings/` (e21a1ecf, 5741d4f3,
+  c53b066b: publishing rows only, no messages). Inspected: the
+  `enochian` scope's description ("Enochian reference material,
+  dictionary, Keys and tablets") covers the pyramids, and the `shell`
+  scope's covers search; neither needed a change.
+- **The talisman's English alt text** says the psalm's number is the
+  Vulgate's ("a verse of Psalm 3 (Vulgate numbering) in Latin"), as the
+  Hebrew did.
+- **`route.test.ts`** asserts the error by the public API: the digest
+  `notFound()` itself throws, which Next documents as
+  `NEXT_HTTP_ERROR_FALLBACK;404`. Next 16.4.6 exports no public
+  `isHTTPAccessFallbackError`. `src/proxyRegistration.test.ts` and the
+  guard's test still import Next internals, on purpose: they check
+  Next's own compilation of the matcher and the rewrite.
+- **Not changed:** `scripts/seventyTwoAngels/vulgate.test.ts`'s rebuild
+  test runs only with `VULGATE_SOURCE_DIR` set to a directory holding
+  the pinned `Ps.lat` and `Gn.lat` (the README beside `verses.json5`
+  says where that pair can be had), so CI does not rebuild the verses;
+  it checks the committed file's SHA-256. To rebuild:
+  `VULGATE_SOURCE_DIR=<dir> pnpm test scripts/seventyTwoAngels/vulgate.test.ts`,
+  or `node --import tsx scripts/seventyTwoAngels/vulgate.ts <dir>`.
