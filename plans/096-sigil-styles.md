@@ -4,7 +4,8 @@ Status: accepted 23 November 2026. Y0 built (ac0f671c, 5c5f57a7) and the
 Y1 spike run, both 23 November ([What Y0 found](#what-y0-found),
 [What Y1 found](#what-y1-found)). Y2 built the same day
 ([What Y2 built](#what-y2-built)), and magick-components 0.7.0 after
-Gadi signed its row (31ae3e5a). Y3 and Y4 not started. Revised the same day
+Gadi signed its row (31ae3e5a). Y3 built the same day
+([What Y3 built](#what-y3-built)); Y4 not started. Revised the same day
 after an adversarial review ([Review](#review-23-november-2026)). Gadi
 decided to offer four styles of an angel's rose sigil from the mock-up,
 not Vaughan's spaced letters, one at a time, with the name in the band
@@ -884,6 +885,80 @@ rows for `seventyTwoAngels.json5`, `lenain/apparatus.json5` and
 `lenain/witnesses.json5`, whose contents changed under unchanged text,
 need re-signing; and decision for Gadi 13.
 
+## What Y3 built
+
+Built 23 November 2026 by an Opus agent (high): 9011e06d (the pin) and
+609bdeb2 (the contract, the registration and the route). The full gate
+is pending.
+
+- **The pin over the 72 rose files** (`roseFiles.test.ts`, first, on
+  `main`'s bytes): SHA-256 `89dac30f…3d2e` over every angel's outlined
+  rose SVG as the `[file]` route serves it. Taken in a detached worktree
+  of `main` (92b325f0) with its own install, where the test passes, and
+  passing unchanged on the branch since. The 144 rose files of a `main`
+  build and of the branch's build have identical SHA-256 lists (and
+  identical `.meta`), and `roseDigest.mts` prints Y2's three digests.
+- **`angel-sigil`** (`contracts/angelSigil.ts`): `angel` (the 72 slugs,
+  written out as `ANGEL_SIGIL_SLUGS`), `style` (`ANGEL_SIGIL_STYLES`,
+  `band` the default), width and height; `ANGEL_SIGIL_GENESIS_VERSE`
+  (`jabamiah`). Tests hold the slugs to `angelSlug`, the styles to the
+  package's `SIGIL_STYLES` and the Genesis list to the angels without a
+  psalm.
+- **The registration** (`angelSigilImage.tsx`): profile
+  `magickli-angel-sigil-image-v1`; the Hebrew (`angelSigilText`), the
+  roman `name.en` and the legend (`psalm.la`, or #70's Vulgate text);
+  inputs `seventyTwoAngel` (`name.he`, `name.en`, `psalm`, every row)
+  and `lenainVulgateVerse` (#70's `text` only), both in
+  `DATA_INPUT_TABLES`; fonts `NotoSerif-Regular-latin1.ttf`, appended
+  to `SERVER_FONT_FILES`, and `FrankRuhlLibre-Bold-letters.ttf`. The
+  verse file is read from magick-data's build directory
+  (`lenainVulgateVerses.ts`), since it is not a package entry until its
+  Sources row is signed (decision for Gadi 13).
+- **The pins**, reviewed as rasterised: Vehuiah band, #47 and #31
+  talismans, #43 (æ) and #55 (Æ) talismans, Nith-Haiah bare, #70
+  talisman; a drawing digest over the package component with the 72
+  names, romans and legends written out; the inputs hash `25d38e34…`.
+  Tests also hold every lettered character to the metrics and to each
+  subset's `cmap`, and each run's face at resvg level: the real
+  markup's run, outlined with the registration's fonts, draws exactly
+  what its subset alone draws, and not what the base set draws.
+- **The files** (`angelSigilFiles.ts`, `angelSigils.ts`):
+  `AngelSigilFile` has a `style`; `angelSigilStyleFiles(angel, style)`
+  and `angelSigilEveryStyle(angel)` name any style's PNG and SVG;
+  `angelSigilFiles` and `allAngelSigilFiles` still name only the rose's,
+  so the pages, JSON-LD and sitemap are as they were.
+- **The route:** `force-static`, `dynamicParams`, no `revalidate`;
+  `generateStaticParams` lists the rose's and the band's 288 files;
+  `outputFileTracingIncludes` adds the base fonts, the two subsets and
+  the WASM. `/api/render/angel-sigil` answers every request with a 308
+  to its file (`style=rose` to the rose's), dropping `download`, width
+  and height, as the files have one size.
+- **Measured** on a local production build (Next 16.4.6, not Vercel):
+  the build took 130 s against `main`'s 118 s, separate runs on a
+  shared machine; the band's 144 files are 6,043,202 bytes. First
+  request, median (largest) over the 72: talisman PNG 36.6 ms (77),
+  SVG 8.1 ms; bare PNG 15.6 ms, SVG 4.5 ms; every second request a
+  cache hit in about 2.3 ms; no `noindex` on any file.
+
+Departures:
+
+- **An unknown name throws Next's `NoFallbackError`** instead of
+  returning a plain 404. Y1's own run shows that a 404 returned from a
+  `force-static` handler is cached like any first response (`404 MISS
+  s-maxage=31536000`). The error is what `dynamicParams = false` throws:
+  Next answers with the site's 404 page (`no-store`) and writes no
+  cache entry, which the local run confirmed. Two costs: it imports
+  Next's internal `next/dist/shared/lib/no-fallback-error.external`, so
+  a Next upgrade must recheck it (the route test holds the throw, the
+  build run the 404); and `next start` logs one error line for each
+  such request, from the rejected revalidation Next hands `waitUntil`.
+- **The contract's file name for the rose** is the rose's own file,
+  `<slug>-rose-cross-sigil`, which the redirect sends it to.
+
+Not done: the whole-data sweep (`RENDER_INPUT_SWEEP=1`), which now
+draws 144 angel images a change; the mutation test covers a verse,
+#70's Genesis, another Vulgate verse (no move) and a roman name.
+
 ## Stages
 
 Built on a gate branch, `gate/sigil-styles`, from `main` after
@@ -894,7 +969,7 @@ Built on a gate branch, `gate/sigil-styles`, from `main` after
 | Y0 (built 23 Nov, ac0f671c, 5c5f57a7) | **Sources and the verse guard.** (a) Lenain 1823: the pages for the reissue's pp. 45 and 70, the title page, and #70's entry. (b) The sphère cabalistique: catalogue collations and other copies of 1823. (c) Mathers Pl. IV Figs. 18, 20 and 21 and their notes (pp. 61–62), with their leaves. (d) Regardie p. 58. (e) **The verses**, below. (f) `mathers1889` in `works.ts`, and Plate IV mirrored. (g) If a verse changed, `pnpm search:publish` | Gadi reviews the discrepancy table. The verse test is green and committed |
 | Y1 (run 23 Nov) | **Spike** (above) | The numbers recorded here; Gadi chooses from side-by-side renders at real sizes (decisions 9, 10, 13) |
 | Y2 (built 23 Nov, c9ab1d5c to 31ae3e5a) | **Package:** `roseSigilStyles`, the bounds, the lettering, the notes. **Fonts:** the subset, metrics, README. magick-components 0.7.0, and magick-data's next minor if Y0 changed a verse | `roseDigest.mts` unchanged; the halls' pins unchanged; package tests (layout, glyph order, fit, bounds) |
-| Y3 | **Contract and route.** First, on `main`'s bytes, the pin over the 72 outlined rose SVGs. Then `angel-sigil`, its registration, its inputs (`seventyTwoAngel` and the verse file in `DATA_INPUT_TABLES`), the coverage test, the pins and the drawing digest, and the redirects | Contract, registry, dataInputs and route tests; `ROSE_SIGIL_PINS`, the rose's drawing digest and the new 72-SVG pin unchanged; the 144 rose files' hash list unchanged |
+| Y3 (built 23 Nov, 9011e06d, 609bdeb2) | **Contract and route.** First, on `main`'s bytes, the pin over the 72 outlined rose SVGs. Then `angel-sigil`, its registration, its inputs (`seventyTwoAngel` and the verse file in `DATA_INPUT_TABLES`), the coverage test, the pins and the drawing digest, and the redirects | Contract, registry, dataInputs and route tests; `ROSE_SIGIL_PINS`, the rose's drawing digest and the new 72-SVG pin unchanged; the 144 rose files' hash list unchanged |
 | Y4 | **Angel pages and the list:** the 432 new files, the dropdown, URL state, captions with `<Cite>`, alt texts, downloads, the "Every style" line, JSON-LD, sitemap, share image, `ListSigil`; Lingui and Hebrew; search publish for the list's caption | The full gate (below); the hydration test; the browser checks; the 144 rose files again |
 
 Y0's verse guard, committed in magick-data beside the apparatus:
