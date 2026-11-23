@@ -257,22 +257,24 @@ const CAPITALS = new Map([...LOWER].map((ch, i) => [ch, [...UPPER][i]]));
 /**
  * `text` in capitals by a fixed table, accents and ligatures kept ("quàm"
  * QUÀM, "cælo" CÆLO, "Sitaël" SITAËL); every other character as it is.
- * Throws on a lower-case letter the table has no capital for, and on a
- * character the upright subset has no glyph for, which a renderer would
+ * Throws on a lower-case letter the table has no capital for, and on any
+ * character it would letter, a mapped capital included, that the upright
+ * subset's measured metrics have no glyph for, which a renderer would
  * otherwise draw from another font.
  */
 export function sigilStyleCapitals(text: string): string {
   return [...text]
     .map((ch) => {
       const capital = CAPITALS.get(ch);
-      if (capital) return capital;
-      if (ch !== ch.toUpperCase())
+      if (!capital && ch !== ch.toUpperCase())
         throw new Error(`No capital for “${ch}” in ${JSON.stringify(text)}`);
-      if (!romanCodepoints.has(ch.codePointAt(0) as number))
+      const lettered = capital ?? ch;
+      const code = lettered.codePointAt(0) as number;
+      if (!romanCodepoints.has(code))
         throw new Error(
-          `“${ch}” (U+${(ch.codePointAt(0) as number).toString(16).toUpperCase().padStart(4, "0")}) is not in the roman subset: ${JSON.stringify(text)}`,
+          `“${lettered}” (U+${code.toString(16).toUpperCase().padStart(4, "0")}${capital ? `, the capital of “${ch}”` : ""}) is not in the roman subset: ${JSON.stringify(text)}`,
         );
-      return ch;
+      return lettered;
     })
     .join("");
 }

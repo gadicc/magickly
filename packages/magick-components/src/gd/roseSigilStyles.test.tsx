@@ -210,6 +210,15 @@ describe("the talisman's legend", () => {
     expect(sigilStyleLegend("A. b.")).toBe("A. B");
   });
 
+  it("letters every capital of its table from the subset's measured glyphs", () => {
+    // Each mapped capital is checked against the metrics as it is lettered,
+    // so the whole table at once proves that none is missing.
+    const lower = "abcdefghijklmnopqrstuvwxyzàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþ";
+    expect(sigilStyleCapitals(lower)).toBe(
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞ",
+    );
+  });
+
   it("refuses a letter it has no capital for, or a character the subset lacks", () => {
     // Œ and œ left the verses in Y0, and the subset is Latin-1.
     expect(() => sigilStyleCapitals("cœlo")).toThrow(/No capital/);
@@ -221,14 +230,17 @@ describe("the talisman's legend", () => {
 
   it("adds and drops nothing in any genius's verse but spaces and the final stop", () => {
     expect(GENESIS).toBe("In principio creavit Deus cælum et terram.");
+    // Character by character against an independent capital: Unicode's
+    // upper case, which agrees with the table for every letter the
+    // verses use (ß and ÿ, where they part, are refused above).
     for (const angel of ANGELS) {
+      const where = `genius ${angel.no}`;
       const legend = sigilStyleLegend(angel.verse);
-      const bare = angel.verse.replace(/\s+/g, "").replace(/\.$/, "");
-      expect(legend.replace(/ /g, "").length, `genius ${angel.no}`).toBe(
-        [...bare].length,
-      );
-      expect(legend, `genius ${angel.no}`).not.toMatch(/\.$|\s{2}|^\s|\s$/);
-      expect(legend, `genius ${angel.no}`).toBe(legend.toUpperCase());
+      const expected = [
+        ...angel.verse.trim().replace(/\s+/g, " ").replace(/ ?\.$/, ""),
+      ].map((ch) => ch.toUpperCase());
+      expect([...legend], where).toEqual(expected);
+      expect(legend, where).not.toMatch(/\.$|\s{2}|^\s|\s$/);
     }
   });
 });

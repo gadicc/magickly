@@ -501,14 +501,30 @@ at the largest size up to a cap at which it fills the ring.
 `SIGIL_STYLE_NOTES` says where each style comes from and what is ours.
 
 The letters are measured in two faces, and the markup asks for each by
-its own family name, weight and style (`SIGIL_STYLE_FONTS`): Noto Serif
-Regular (400) and Frank Ruhl Libre Bold (700), as the repository's
+its own family name, weight and style (`SIGIL_STYLE_FONTS`): upright Noto
+Serif Regular (400) and Frank Ruhl Libre Bold (700), as the repository's
 `scripts/gd-hall-fonts/build.py` subsets them from google/fonts at the
-commit [fonts/SOURCES.md](./fonts/SOURCES.md) names. The package does not
-ship them: supply both, to the page or to your renderer, or name your own
-with `latinFamily` and `hebrewFamily`; another build of either may set
-the letters differently. A character outside the subsets (Latin-1, and
-the 22 Hebrew letters with their final forms) is refused.
+commit [fonts/SOURCES.md](./fonts/SOURCES.md) names.
+
+- **The Hebrew** is the hall's own subset, which the package ships:
+  `fonts/FrankRuhlLibre-Bold-letters.woff2`, declared in
+  [fonts/gd-hall.css](./fonts/gd-hall.css) under the family name
+  "GdHall Frank Ruhl Libre". With that stylesheet on the page, pass
+  `hebrewFamily="GdHall Frank Ruhl Libre"`.
+- **The roman letters and the verse** need upright Noto Serif Regular,
+  which the package does **not** ship. The hall's Noto Serif in
+  `gd-hall.css` is italic, under "GdHall Noto Serif", and is no
+  substitute: the letters are placed by the upright face's advances, so
+  an italic or another serif draws them at the wrong widths. Supply the
+  upright face yourself, to the page (an `@font-face` for "Noto Serif",
+  weight 400, `font-style: normal`) or to your renderer, or name it with
+  `latinFamily`. The repository's server-side images use its TrueType
+  subset, `assets/fonts/NotoSerif-Regular-latin1.ttf`, built by the
+  same script from the same commit.
+
+Another build of either face may set the letters differently. A character
+outside the subsets (Latin-1, and the 22 Hebrew letters with their final
+forms) is refused.
 
 ### A sigil on your own layout
 
@@ -774,7 +790,9 @@ magick-data 0.4.0.
 0.7.0 adds the rose sigil's styles (plan 096 in the repository):
 `gd/roseSigilStyles` draws a one-word sigil in a ring with its name,
 alone with its name, or as a talisman with its verse (see [The sigil's
-styles](#the-sigils-styles)), with no hooks, for the server. The rose
+styles](#the-sigils-styles)), with no hooks, for the server. Its Hebrew
+can use the shipped hall subset; its upright Noto Serif is not shipped,
+and a browser must be given it. The rose
 style stays `gd/RoseSigilImage`'s. `astrology/KameaSigilImage` takes
 `columns`, setting a name of several words in rows. The rose sigil draws
 exactly as before. It depends on magick-data 0.5.0.
