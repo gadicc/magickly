@@ -30,6 +30,11 @@ export type VectorBuild =
       rows: number;
       /** Rows on disk no record references, left out of the artifact. */
       orphans: number;
+      /**
+       * SHA-256 of the covered records' rows in catalogue record order,
+       * the matrix the store ranks (rows.ts); comparable across history.
+       */
+      sha256: string;
     };
 
 /** Writes only on change, so watchers and incremental builds stay quiet. */
@@ -69,6 +74,7 @@ export async function buildVectorArtifact(
     total: keys.length,
     rows: assembled.rows,
     orphans: assembled.orphans,
+    sha256: assembled.sha256,
   };
 }
 
@@ -76,10 +82,13 @@ export async function buildVectorArtifact(
 export function vectorBuildReport(build: VectorBuild) {
   if (!build.profile)
     return { log: ["search: no embedding profile selected"], warn: [] };
-  const { profile, covered, total, rows, orphans } = build;
+  const { profile, covered, total, rows, orphans, sha256 } = build;
   const log = [
     `search: ${covered}/${total} records have embedding rows for ${profile}; ` +
       `assembled ${rows} rows, ${orphans} orphan rows left on disk`,
+    // The published vectors' digest, now that no matrix is committed: at
+    // full coverage, what the manifest's `sha256` was (plan 087, S3).
+    `search: record-order matrix sha256 ${sha256} (${covered} rows)`,
   ];
   const warn: string[] = [];
   if (covered < total * COVERAGE_WARNING)

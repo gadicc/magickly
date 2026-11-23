@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   existsSync,
   mkdirSync,
@@ -88,17 +89,23 @@ describe("search:build's embedding artifact", () => {
       profile.key,
       async () => records,
     );
+    // The record-order digest: each record's row, in catalogue order.
+    const sha256 = createHash("sha256")
+      .update(Buffer.concat(records.map((_, i) => unit(i))))
+      .digest("hex");
     expect(build).toEqual({
       profile: profile.key,
       covered: 10,
       total: 10,
       rows: 10,
       orphans: 0,
+      sha256,
     });
     expect(parseVectorArtifact(readFileSync(artifact())).keys).toHaveLength(10);
     expect(vectorBuildReport(build)).toEqual({
       log: [
         `search: 10/10 records have embedding rows for ${profile.key}; assembled 10 rows, 0 orphan rows left on disk`,
+        `search: record-order matrix sha256 ${sha256} (10 rows)`,
       ],
       warn: [],
     });

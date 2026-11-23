@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   existsSync,
   mkdirSync,
@@ -146,6 +147,13 @@ export interface AssembledVectors {
   covered: number;
   /** Rows on disk that no key references, left out of the artifact. */
   orphans: number;
+  /**
+   * SHA-256 (hex) of the covered keys' rows concatenated in the order of
+   * `keys`, repeats included: the matrix the store builds for the catalogue
+   * (store.ts). At full coverage it is the matrix a publish used to write,
+   * so it compares with the manifest's former `sha256` (plan 087, S3).
+   */
+  sha256: string;
 }
 
 /**
@@ -168,11 +176,20 @@ export function assembleVectorArtifact(
     if (wanted.has(key)) rows.set(key, bytes);
     else orphans++;
   }
+  const hash = createHash("sha256");
+  let covered = 0;
+  for (const key of keys) {
+    const bytes = rows.get(key);
+    if (!bytes) continue;
+    hash.update(bytes);
+    covered++;
+  }
   return {
     bytes: encodeVectorArtifact(profile.key, profile.dimensions, rows),
     rows: rows.size,
-    covered: keys.filter((key) => rows.has(key)).length,
+    covered,
     orphans,
+    sha256: hash.digest("hex"),
   };
 }
 

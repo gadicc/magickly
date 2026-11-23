@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   existsSync,
   mkdirSync,
@@ -24,6 +25,8 @@ import {
   writeRows,
 } from "./rows";
 
+const sha256 = (bytes: Uint8Array) =>
+  createHash("sha256").update(bytes).digest("hex");
 const profile: EmbeddingProfile = {
   ...EMBEDDING_PROFILES[0],
   key: "test-profile",
@@ -172,6 +175,8 @@ describe("embedding row files", () => {
         ),
       ).equals(matrix),
     ).toBe(true);
+    // The digest search:build prints: the covered rows in record order.
+    expect(assembled.sha256).toBe(sha256(matrix));
   });
 
   it("leaves orphan rows out of the artifact without failing", () => {
@@ -193,6 +198,12 @@ describe("embedding row files", () => {
       key("cc"),
     ]);
     expect(listRowKeys(root, profile.key)).toHaveLength(3);
+    // In the keys' order, repeats included, the missing dd skipped.
+    expect(assembled.sha256).toBe(
+      sha256(
+        Buffer.concat([row(1, 0, 0, 0), row(1, 0, 0, 0), row(0, 0, 1, 0)]),
+      ),
+    );
   });
 
   it("fails on a malformed row, even one nothing references", () => {
