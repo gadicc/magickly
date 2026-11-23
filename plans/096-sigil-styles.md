@@ -504,7 +504,7 @@ Draft alt texts:
   inside a ring lettered with {verse} in Latin", where {verse} is "a
   verse of Psalm 3" or "Genesis 1:1". The alt text names the psalm
   only: Lenain's verse numbers are often not the Vulgate's (Y0), and the
-  page beside it gives both references. (Open: decision for Gadi 12.)
+  page beside it gives both references (decision for Gadi 12, decided).
 
 ### Search
 
@@ -832,8 +832,8 @@ by-eye readings made knowing what the psalter reads and labelled so.
     103 (not 104), #64 "misericordiam". The French keeps the reissue's
     print, as #12 does; each has a note and a 1823 reading in
     `witnesses.json5`.
-  - **Not fixed:** Lenain's own departures stay in the field (decision
-    for Gadi 11).
+  - **Not fixed:** Lenain's own departures stay in the field; Y2
+    corrects #11, #14 and #37 (decision for Gadi 11).
   - The two new data files are registered for coverage but kept out of
     the npm tarball until Gadi signs their Sources row (decision for
     Gadi 13).
@@ -872,7 +872,8 @@ Y0's verse guard, committed in magick-data beside the apparatus:
   the French and gets an apparatus note, and the field carries the
   corrected verse, as #45's does. Y0 applied this to our slips and
   the reissue's, but not to Lenain's own departures, which its brief
-  left out; whether the field corrects them is decision for Gadi 11.
+  left out. Decided (decision for Gadi 11): Y2 corrects #11, #14 and
+  #37 in the field; Lenain's other departures stay, each noted.
 
 Each stage is reviewed fresh before it merges (Opus, high), and the
 whole by Fable 5.2 (high) on the exact tree, as the project's commit
@@ -980,7 +981,8 @@ Also for Gadi, from the revision:
 Decided after Y1 (23 November): one ring at 18rem, as recommended
 (decision 9), and the hybrid confirmed (decision 3).
 
-Open after Y0:
+Open after Y0 (11 and 12 decided 23 November as recommended; 13 waits
+for Gadi's date):
 
 11. **Lenain's own departures in the field.** The plan's Fixes rule
     (correct Lenain's slip in the field, keep it in the French, as #45)
