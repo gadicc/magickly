@@ -201,3 +201,50 @@ describe("the tablets page's tab and square in its URL", () => {
       }
   });
 });
+
+describe("the tablets page's pyramids in its URL (plan 095, decision 4)", () => {
+  it("reads pyramids=1 in the Golden Dawn's versions only", () => {
+    expect(parseTabletQuery("?pyramids=1")).toEqual({
+      ...DEFAULT_CHOICE,
+      pyramids: true,
+    });
+    expect(
+      parseTabletQuery("?tablet=union&version=equinox&pyramids=1"),
+    ).toEqual({ tablet: "union", version: "equinox", pyramids: true });
+    for (const value of ["0", "true", "", "yes"])
+      expect(parseTabletQuery(`?pyramids=${value}`)).toEqual(DEFAULT_CHOICE);
+    for (const version of ["dee", "raphael"])
+      expect(parseTabletQuery(`?version=${version}&pyramids=1`)).toEqual({
+        tablet: "earth",
+        version,
+      });
+  });
+
+  it("writes it with the other choices, and drops it under Dee's and Raphael's", () => {
+    expect(tabletQuery({ ...DEFAULT_CHOICE, pyramids: true })).toBe(
+      "?pyramids=1",
+    );
+    expect(
+      tabletQuery({
+        tablet: "fire",
+        version: "regardie",
+        tab: "squares",
+        square: { row: 6, column: 5 },
+        pyramids: true,
+      }),
+    ).toBe("?tablet=fire&version=regardie&tab=squares&square=7,6&pyramids=1");
+    expect(tabletQuery({ ...DEFAULT_CHOICE, pyramids: false })).toBe("");
+    expect(tabletQuery({ tablet: "air", version: "dee", pyramids: true })).toBe(
+      "?tablet=air&version=dee",
+    );
+  });
+
+  it("reads back what it writes, in every version", () => {
+    for (const tablet of TABLET_IDS)
+      for (const version of TABLET_VERSIONS)
+        expect(
+          parseTabletQuery(tabletQuery({ tablet, version, pyramids: true }))
+            .pyramids,
+        ).toBe(version === "dee" || version === "raphael" ? undefined : true);
+  });
+});

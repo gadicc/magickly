@@ -4,7 +4,8 @@
  * pure contracts are imported. The contracts' query names are not the
  * components' props (`id` for `tablet`), so each component maps its
  * own, and a drawing the image cannot show (second letters on a tablet,
- * highlighted squares, the Tablet of Union in a version without one) has
+ * highlighted squares, a tablet drawn as pyramids until the image route
+ * has a slug for them, the Tablet of Union in a version without one) has
  * no image.
  */
 import { componentImagePath } from "@/render/componentImageUrl";
@@ -83,6 +84,8 @@ export function componentImage(name: string, props: Props): string | null {
       if (
         props.mirrorReversed === false ||
         props.showSecondLetters === true ||
+        // Pyramids wait for a slug of their own (plan 095, decision 5).
+        props.pyramids === true ||
         props.highlights
       )
         return null;

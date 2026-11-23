@@ -438,7 +438,7 @@
     ]
   },
   "Tablet": {
-    "description": "An Enochian tablet in a version (`version`, the Golden Dawn's by\ndefault): a Watchtower's sigil above its grid on a 210 × 297 page, or\nthe Tablet of Union's grid on a page of its own (`tabletViewBox`). The\nversion's reversed letters are mirrored unless `mirrorReversed` is\nfalse, and a Watchtower's second letters drawn small in each square's\ncorner when `showSecondLetters` is true. A key the data does not have\ndraws an empty page; a tablet the version does not have, its page\nsaying so. It is an image named by `tabletName` (an `aria-label`, which\nshows no tooltip over the squares as a `<title>` would) unless `label`\nnames it otherwise or is false, as for a tablet drawn inside a larger\ndrawing that names itself.",
+    "description": "An Enochian tablet in a version (`version`, the Golden Dawn's by\ndefault): a Watchtower's sigil above its grid on a 210 × 297 page, or\nthe Tablet of Union's grid on a page of its own (`tabletViewBox`). The\nversion's reversed letters are mirrored unless `mirrorReversed` is\nfalse, and a Watchtower's second letters drawn small in each square's\ncorner when `showSecondLetters` is true. With `pyramids`, the Golden\nDawn's versions draw every square as a truncated pyramid in its sides'\nelemental colours instead (plan 095), its letter on a flat top the size\n`pyramidTop` gives, and no second letters. A key the data does not have\ndraws an empty page; a tablet the version does not have, its page\nsaying so. It is an image named by `tabletName` (an `aria-label`, which\nshows no tooltip over the squares as a `<title>` would) unless `label`\nnames it otherwise or is false, as for a tablet drawn inside a larger\ndrawing that names itself.",
     "props": [
       {
         "name": "tablet",
@@ -487,6 +487,21 @@
         "required": false,
         "default": "true",
         "description": "Mirror the letters the version reverses (default true).",
+        "control": { "kind": "switch" }
+      },
+      {
+        "name": "pyramidTop",
+        "type": "number",
+        "required": false,
+        "description": "The flat top's side as a share of a square's, from 0.2 to 0.8\n(default `PYRAMID_TOP`, a half). With `pyramids` only.",
+        "control": { "kind": "number" }
+      },
+      {
+        "name": "pyramids",
+        "type": "boolean",
+        "required": false,
+        "default": "false",
+        "description": "Draw every square as the Golden Dawn's truncated pyramid (default\nfalse): four sides in their elements' colours round a white flat top\nthat holds the letter, from magick-data's `enochian/tabletPyramids`.\nThe Golden Dawn's versions only: Dee's and Raphael's tables carry no\nelements, so they are drawn flat. No second letters are drawn on\npyramids; the regions are tinted over them as over the flat squares.",
         "control": { "kind": "switch" }
       },
       {

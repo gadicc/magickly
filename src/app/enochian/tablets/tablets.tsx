@@ -50,6 +50,7 @@ import { TABLET_IDS } from "@/render/contracts/enochianTablet";
 import useEnochianFont, { EnochianFont } from "../useEnochianFont";
 import type { TabletNameLinks } from "./dictionaryLinks";
 import NamesPanel, { namesToChoose } from "./NamesPanel";
+import PyramidKey from "./PyramidKey";
 import { Sources, versionTitle } from "./Sources";
 import SquaresPanel from "./SquaresPanel";
 import {
@@ -96,16 +97,20 @@ export interface DrawnState {
   regions?: boolean;
   /** A chosen square, drawn outlined. */
   square?: TabletSquare;
+  /** Every square drawn as a pyramid. */
+  pyramids?: boolean;
 }
 
 /**
  * A download's name, for what is drawn: the image's own name, and what
  * the page adds to it or leaves out ("enochian-fire-tablet-dee-plain",
- * "enochian-earth-tablet-senior-row-left-regions").
+ * "enochian-earth-tablet-senior-row-left-regions",
+ * "enochian-air-tablet-pyramids").
  */
 export function downloadName(image: string, shown: DrawnState): string {
   return [
     image,
+    shown.pyramids ? "-pyramids" : "",
     shown.alt ? "-second-letters" : "",
     shown.reversed ? "" : "-plain",
     shown.differences ? "-differences" : "",
@@ -475,12 +480,22 @@ export default function Tablets({
 } = {}) {
   const { t } = useUiLanguage();
   const [
-    { tablet: id, version, tab: tabInUrl, square: squareInUrl },
+    {
+      tablet: id,
+      version,
+      tab: tabInUrl,
+      square: squareInUrl,
+      pyramids: pyramidsInUrl = false,
+    },
     setChoice,
     pushChoice,
   ] = useTabletUrl();
   const [reversed, setReversed] = React.useState(true);
   const [alt, setAlt] = React.useState(false);
+  // The tablet drawn as pyramids (plan 095, decision 4): the URL's in a
+  // version that has them, and remembered across Dee's and Raphael's,
+  // whose URL drops it, so that it returns with the Golden Dawn's.
+  const [pyramidsWanted, setPyramidsWanted] = React.useState(false);
   // Names by default, with nothing highlighted (plan 090, decision 2).
   const [tab, setTabShown] = React.useState<PanelTab>("names");
   const [selected, setSelected] = React.useState<TabletSquare>();
@@ -504,13 +519,19 @@ export default function Tablets({
   // The tab and the square a URL names: a shared link once hydrated (the
   // prerendered page has neither), a URL changed under the page, or Back
   // to an entry that records the tab it was left from. A URL that names
-  // neither leaves them as they are.
-  const urlKey = `${tabInUrl ?? ""} ${squareInUrl ? `${squareInUrl.row},${squareInUrl.column}` : ""}`;
-  const [urlSeen, setUrlSeen] = React.useState(" ");
+  // neither leaves them as they are. Whether the tablet is drawn as
+  // pyramids is the URL's wherever the version has them, and is kept
+  // across a version without. The first key seen is the default URL's.
+  const urlKey = `${tabInUrl ?? ""} ${squareInUrl ? `${squareInUrl.row},${squareInUrl.column}` : ""} ${version} ${pyramidsInUrl}`;
+  const [urlSeen, setUrlSeen] = React.useState(
+    `  ${DEFAULT_TABLET_VERSION} false`,
+  );
   if (urlSeen !== urlKey) {
     setUrlSeen(urlKey);
     if (tabInUrl) setTabShown(tabInUrl);
     if (squareInUrl) setPyramidSquare(squareInUrl);
+    // Where the version has pyramids the URL says whether they are drawn.
+    if (hasPyramids(version)) setPyramidsWanted(pyramidsInUrl);
   }
   /**
    * A change of the URL's choices, keeping the tab shown and the Squares
@@ -519,6 +540,7 @@ export default function Tablets({
   const choose = (change: Partial<TabletChoice>) =>
     setChoice({
       tab,
+      pyramids: pyramidsWanted,
       ...(change.tablet && change.tablet !== id
         ? {}
         : { square: pyramidSquare }),
@@ -558,6 +580,8 @@ export default function Tablets({
   const ref = React.useRef<SVGSVGElement>(null);
   const union = id === "union";
   const view = viewOf(id, version);
+  const pyramidsOffered = hasPyramids(version) && view !== undefined;
+  const pyramids = pyramidsWanted && pyramidsOffered;
   // Measured again when a drawing replaces the note of a version with no
   // Tablet of Union.
   const squarePixels = useSquarePixels(ref, view ? squareShare(id) : 0);
@@ -603,23 +627,26 @@ export default function Tablets({
   // or plain letters where the view has none, the Differences tab where
   // no square differs, as on the Tablet of Union) neither withholds the
   // image link nor renames a download.
-  const altShown = alt && seconds.length > 0;
+  // No second letters on pyramids: no room on their sides.
+  const altShown = alt && seconds.length > 0 && !pyramids;
   const plainShown =
     !reversed && (view?.marks ?? []).some((mark) => mark.reversed);
   const differencesShown = tab === "differences" && marked.length > 0;
   // The image link draws the tablet as published: its reversed letters
   // mirrored, and nothing drawn over it.
-  const linkNote = differencesShown
-    ? "No image link while differences are shown."
-    : onNames && (chosenName || regionsShown || nameSquare)
-      ? t(
-          /*i18n*/ "No image link while a name, a square or the regions are shown.",
-        )
-      : pyramidsShown && pyramidSquare
-        ? t(/*i18n*/ "No image link while a square is shown.")
-        : altShown || plainShown
-          ? "No image link with second letters shown or reversed letters plain."
-          : undefined;
+  const linkNote = pyramids
+    ? t(/*i18n*/ "No image link while the tablet is drawn as pyramids.")
+    : differencesShown
+      ? "No image link while differences are shown."
+      : onNames && (chosenName || regionsShown || nameSquare)
+        ? t(
+            /*i18n*/ "No image link while a name, a square or the regions are shown.",
+          )
+        : pyramidsShown && pyramidSquare
+          ? t(/*i18n*/ "No image link while a square is shown.")
+          : altShown || plainShown
+            ? "No image link with second letters shown or reversed letters plain."
+            : undefined;
   const tabletNote = tabletNotes.tablets[id];
   const note = versionNote(version);
   const [, , viewWidth, viewHeight] = tabletViewBox(id);
@@ -742,6 +769,7 @@ export default function Tablets({
       key="export"
       target={ref}
       filename={downloadName(componentImageFilename(link), {
+        pyramids,
         alt: altShown,
         reversed: !plainShown,
         differences: differencesShown,
@@ -760,7 +788,13 @@ export default function Tablets({
       linkNote={linkNote}
       share={() =>
         window.location.pathname +
-        tabletQuery({ tablet: id, version, tab, square: pyramidSquare })
+        tabletQuery({
+          tablet: id,
+          version,
+          tab,
+          square: pyramidSquare,
+          pyramids,
+        })
       }
     />
   );
@@ -835,6 +869,8 @@ export default function Tablets({
               label="Reversed letters"
             />
             <FormControlLabel
+              // None on pyramids, so the switch rests while they are drawn.
+              disabled={pyramids}
               control={
                 <Switch
                   checked={alt}
@@ -843,7 +879,22 @@ export default function Tablets({
               }
               label="Second letters"
             />
+            {pyramidsOffered && (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={pyramids}
+                    onChange={(event) => {
+                      setPyramidsWanted(event.target.checked);
+                      setChoice({ pyramids: event.target.checked });
+                    }}
+                  />
+                }
+                label={t(/*i18n*/ "Draw as pyramids")}
+              />
+            )}
           </Box>
+          {pyramids && <PyramidKey />}
         </div>
 
         <Box
@@ -869,6 +920,7 @@ export default function Tablets({
               version={version}
               mirrorReversed={reversed}
               showSecondLetters={alt}
+              pyramids={pyramids}
               frame
               enochianStyle={enochianFont ? EnochianFont.style : undefined}
               ref={ref}
@@ -929,6 +981,7 @@ export default function Tablets({
                   clearSquare={() => setNameSquare(undefined)}
                   links={links}
                   revealed={revealed}
+                  pyramids={pyramids}
                   openSquare={
                     hasPyramids(version)
                       ? (square) => choosePyramid(square, true, "names")

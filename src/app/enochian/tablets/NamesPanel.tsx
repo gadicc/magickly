@@ -134,6 +134,7 @@ export default function NamesPanel({
   links,
   revealed,
   openSquare,
+  pyramids = false,
 }: {
   tablet: EnochianTabletID;
   version: TabletVersionId;
@@ -157,6 +158,8 @@ export default function NamesPanel({
    * (plan 095, decision 3); none in Dee's and Raphael's.
    */
   openSquare?: (square: TabletSquare) => void;
+  /** The tablet drawn as pyramids, which a square's link keeps. */
+  pyramids?: boolean;
 }) {
   const { t } = useUiLanguage();
   const [expanded, setExpanded] = React.useState<ReadonlySet<GroupKey>>(
@@ -376,6 +379,7 @@ export default function NamesPanel({
                           links={links}
                           pick={pick}
                           openSquare={openSquare}
+                          pyramids={pyramids}
                           t={t}
                         />
                       )}
@@ -510,6 +514,7 @@ function NameDetail({
   links,
   pick,
   openSquare,
+  pyramids,
   t,
 }: {
   name: TabletName;
@@ -520,6 +525,7 @@ function NameDetail({
   links: TabletNameLinks | undefined;
   pick: (id: TabletNameId) => void;
   openSquare?: (square: TabletSquare) => void;
+  pyramids: boolean;
   t: Translate;
 }) {
   const variants = tabletNameVariants(tablets[tablet], name.id, version);
@@ -655,6 +661,7 @@ function NameDetail({
                     version,
                     tab: "squares",
                     square,
+                    pyramids,
                   })}
                   onClick={(event: React.MouseEvent) => {
                     if (event.metaKey || event.ctrlKey || event.shiftKey)

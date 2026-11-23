@@ -12,25 +12,28 @@ export default function TabletsText() {
       <p>
         Choose a tablet and a version. Switch between Latin and Enochian
         letters, and show the reversed letters and the second letters some
-        squares carry. Beside the tablet, or under it on a phone, are three
-        tabs. <i>Names</i> lists the names read off the tablet, grouped as it is
-        built: the three holy names, the King and the six Seniors on the Great
-        Cross, then each quarter&apos;s names, and in the Golden Dawn&apos;s
-        versions its Kerubic archangel and servient angels, which put a letter
-        of the Tablet of Union before their names. The Tablet of Union is a
-        tablet of its own here, with its four lines and its first column; Dee
-        and Raphael have none. Choose a name to see its squares on the tablet,
-        from its first, with how the other versions and the sources spell it,
-        where it is read and its dictionary entry; tap a square to find the
-        names through it, or turn on <i>Show the regions</i> to tint the crosses
-        and the top rows. <i>Differences</i> marks every square where the
-        versions disagree: tap one to see what each version and source has
-        there, and why. <i>Squares</i> shows a square as the Golden Dawn&apos;s
-        truncated pyramid: tap a square, or choose its row and square, or follow
-        a square from a name&apos;s detail. Each version comes with its sources
-        and page references, and with how it differs from the others. Download
-        the tablet as SVG or PNG as it is shown, and use <i>Copy page link</i>{" "}
-        to share the page with the tablet, version, tab and square you chose.
+        squares carry. In the Golden Dawn&apos;s versions,{" "}
+        <i>Draw as pyramids</i> draws every square as its pyramid, each side in
+        its element&apos;s colour, with a key to the colours. Beside the tablet,
+        or under it on a phone, are three tabs. <i>Names</i> lists the names
+        read off the tablet, grouped as it is built: the three holy names, the
+        King and the six Seniors on the Great Cross, then each quarter&apos;s
+        names, and in the Golden Dawn&apos;s versions its Kerubic archangel and
+        servient angels, which put a letter of the Tablet of Union before their
+        names. The Tablet of Union is a tablet of its own here, with its four
+        lines and its first column; Dee and Raphael have none. Choose a name to
+        see its squares on the tablet, from its first, with how the other
+        versions and the sources spell it, where it is read and its dictionary
+        entry; tap a square to find the names through it, or turn on{" "}
+        <i>Show the regions</i> to tint the crosses and the top rows.{" "}
+        <i>Differences</i> marks every square where the versions disagree: tap
+        one to see what each version and source has there, and why.{" "}
+        <i>Squares</i> shows a square as the Golden Dawn&apos;s truncated
+        pyramid: tap a square, or choose its row and square, or follow a square
+        from a name&apos;s detail. Each version comes with its sources and page
+        references, and with how it differs from the others. Download the tablet
+        as SVG or PNG as it is shown, and use <i>Copy page link</i> to share the
+        page with the tablet, version, tab and square you chose.
       </p>
       <H2 id="tablets-pyramids">The squares as pyramids</H2>
       <p>
@@ -59,14 +62,19 @@ export default function TabletsText() {
         is shown with the pages it comes from. The drawing is ours: the Order
         painted the tablets flat and made a pyramid of card for one square at a
         time, and it painted the symbols facing outward, where ours stand
-        upright unless you turn them. Some readings are ours too, and labelled
-        so: where the sources do not say which of a sphinx&apos;s left and right
-        sides gives which part, the Kerubs are listed by side rather than drawn
-        as one figure; where a sphinx has two active sides and two passive, no
-        tendency is given; and the Children of Horus are given by the three
-        elements present, as the gods&apos; table and its one worked example of
-        the kind have them. Dee&apos;s and Raphael&apos;s tables carry no
-        elements, so their versions have no pyramids.
+        upright unless you turn them. So is a whole tablet drawn in pyramids,
+        after the Order&apos;s rule for one square: the sides in their
+        elements&apos; colours without their symbols, and the letter on a flat
+        top half as wide as the square, where the Equinox&apos;s plates draw the
+        top about a quarter of the square to leave the sides room for the
+        symbols. Some readings are ours too, and labelled so: where the sources
+        do not say which of a sphinx&apos;s left and right sides gives which
+        part, the Kerubs are listed by side rather than drawn as one figure;
+        where a sphinx has two active sides and two passive, no tendency is
+        given; and the Children of Horus are given by the three elements
+        present, as the gods&apos; table and its one worked example of the kind
+        have them. Dee&apos;s and Raphael&apos;s tables carry no elements, so
+        their versions have no pyramids.
       </p>
       <p>
         One thing is disputed: the order of the four Sephiroth on a Calvary

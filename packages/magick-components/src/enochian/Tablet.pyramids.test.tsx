@@ -1,0 +1,246 @@
+// @vitest-environment jsdom
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { tabletPyramids } from "magick-data/enochian/tabletPyramids";
+import tablets, {
+  TABLET_VERSIONS,
+  tabletVersion,
+} from "magick-data/enochian/tablets";
+import { act } from "react";
+import { createRoot } from "react-dom/client";
+import { renderToStaticMarkup } from "react-dom/server";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import Tablet, {
+  PYRAMID_COLOURS,
+  PYRAMID_TOP,
+  type TabletProps,
+  type TabletSquare,
+} from "./Tablet.tsx";
+
+/** The drawing's markup, parsed. */
+function drawn(props: TabletProps) {
+  const markup = renderToStaticMarkup(<Tablet {...props} />);
+  const page = document.createElement("div");
+  page.innerHTML = markup;
+  return { markup, page };
+}
+
+/** The letters drawn, in order, outside the sigils and the corner marks. */
+const letters = (page: Element) =>
+  [
+    ...page.querySelectorAll(
+      "svg[viewBox='0 0 244 264'] text, svg > text, svg > [data-pyramids] > text",
+    ),
+  ]
+    .filter(
+      (text) => !text.closest("[data-order]") && !text.hasAttribute("data-alt"),
+    )
+    .map((text) => text.textContent);
+
+const PYRAMID_VERSIONS = ["gd", "regardie", "equinox"] as const;
+const WATCHTOWERS = ["earth", "air", "water", "fire"] as const;
+
+describe("Tablet's pyramids (plan 095, decision 4)", () => {
+  it("is off by default", () => {
+    for (const tablet of [...WATCHTOWERS, "union"]) {
+      const plain = drawn({ tablet }).markup;
+      expect(plain).not.toContain("data-pyramid");
+      expect(drawn({ tablet, pyramids: false }).markup).toBe(plain);
+      // A top size alone draws nothing different.
+      expect(drawn({ tablet, pyramidTop: 0.3 }).markup).toBe(plain);
+    }
+  });
+
+  it("colours every side of every square by its element, in each version that has them", () => {
+    for (const version of PYRAMID_VERSIONS)
+      for (const tablet of [...WATCHTOWERS, "union"] as const) {
+        const view = tabletVersion(tablets[tablet], version);
+        if (!view) throw new Error(`${tablet} ${version}`);
+        const { page } = drawn({ tablet, version, pyramids: true });
+        const squares = page.querySelectorAll("[data-pyramid]");
+        // One lookup by square, rather than a selector each.
+        const byKey = new Map(
+          [...squares].map((square) => [
+            square.getAttribute("data-pyramid"),
+            square,
+          ]),
+        );
+        const expected = tabletPyramids(view);
+        expect(squares.length, `${tablet} ${version}`).toBe(
+          tablet === "union" ? 20 : 156,
+        );
+        for (const pyramid of expected) {
+          const square = byKey.get(`${pyramid.row},${pyramid.column}`);
+          const sides = [...(square?.children ?? [])].filter(
+            (child) => child.tagName === "polygon",
+          );
+          expect(sides.map((side) => side.getAttribute("data-side"))).toEqual([
+            "1",
+            "2",
+            "3",
+            "4",
+          ]);
+          sides.forEach((polygon, index) => {
+            const element = pyramid.sides[index]?.elementId ?? "none";
+            expect(polygon.getAttribute("data-element")).toBe(element);
+            expect(polygon.getAttribute("style")).toContain(
+              `fill:${PYRAMID_COLOURS[element as keyof typeof PYRAMID_COLOURS]}`,
+            );
+          });
+        }
+      }
+  });
+
+  it("draws the same letters, mirrored where the flat drawing mirrors them", () => {
+    for (const tablet of [...WATCHTOWERS, "union"]) {
+      const flat = drawn({ tablet }).page;
+      const pyramids = drawn({ tablet, pyramids: true }).page;
+      expect(letters(pyramids)).toEqual(letters(flat));
+      const mirrored = (page: Element) =>
+        [...page.querySelectorAll("text[transform]")].map(
+          (text) => text.textContent,
+        );
+      expect(mirrored(pyramids)).toEqual(mirrored(flat));
+      // The Tablet of Union reverses none.
+      if (tablet !== "union") expect(mirrored(flat).length).toBeGreaterThan(0);
+    }
+  });
+
+  it("draws Dee's and Raphael's tables flat, which carry no elements", () => {
+    for (const version of TABLET_VERSIONS.filter(
+      (each) => !(PYRAMID_VERSIONS as readonly string[]).includes(each),
+    ))
+      for (const tablet of [...WATCHTOWERS, "union"])
+        expect(drawn({ tablet, version, pyramids: true }).markup).toBe(
+          drawn({ tablet, version }).markup,
+        );
+  });
+
+  it("draws no second letters on pyramids", () => {
+    const flat = drawn({ tablet: "water", showSecondLetters: true }).markup;
+    expect(flat).toContain("data-alt");
+    expect(
+      drawn({ tablet: "water", showSecondLetters: true, pyramids: true })
+        .markup,
+    ).not.toContain("data-alt");
+  });
+
+  it("sizes the flat top by pyramidTop, a half by default, within its range", () => {
+    const topOf = (pyramidTop?: number) =>
+      Number(
+        drawn({ tablet: "air", pyramids: true, pyramidTop })
+          .page.querySelector("[data-top]")
+          ?.getAttribute("width"),
+      );
+    expect(PYRAMID_TOP).toBe(0.5);
+    expect(topOf()).toBe(10);
+    expect(topOf(0.25)).toBe(5);
+    expect(topOf(0.05)).toBe(4);
+    expect(topOf(2)).toBe(16);
+    expect(topOf(Number.NaN)).toBe(10);
+  });
+
+  it("rings a previewed name and outlines squares over pyramids", () => {
+    const { page } = drawn({
+      tablet: "air",
+      pyramids: true,
+      highlights: {
+        squares: [{ row: 2, column: 3 }],
+        selected: { row: 2, column: 3 },
+        preview: { squares: [{ row: 0, column: 0 }] },
+      },
+    });
+    expect(page.querySelector('[data-highlight="preview"]')).not.toBeNull();
+    expect(page.querySelector('[data-square="2,3"]')).not.toBeNull();
+  });
+
+  it("leaves the rules out of the drawing the halls' art shares", () => {
+    // The entry passes `tabletPyramids` in; the drawing imports only its
+    // type, so the halls, which draw no pyramids, load none of it.
+    const drawing = readFileSync(
+      // From the repository's root, as the import boundary's test reads.
+      path.resolve("packages/magick-components/src/enochian/tabletSvg.tsx"),
+      "utf8",
+    );
+    const imports = [
+      ...drawing.matchAll(/^import (type )?[^;]*?from "([^"]+)";/gms),
+    ].filter(([, , from]) => from === "magick-data/enochian/tabletPyramids");
+    expect(imports.map(([, type]) => type)).toEqual(["type "]);
+  });
+
+  it("tints the regions over pyramids, and keeps a chosen name's marks", () => {
+    const { page } = drawn({
+      tablet: "fire",
+      pyramids: true,
+      highlights: {
+        squares: [],
+        regions: true,
+        name: { squares: [{ row: 6, column: 0 }], numbers: [1] },
+      },
+    });
+    expect(page.querySelector('[data-region="greatCross"]')).not.toBeNull();
+    expect(page.querySelector('[data-region="topRow"]')).not.toBeNull();
+    expect(page.querySelector('[data-highlight="name"]')).not.toBeNull();
+    expect(page.querySelector("[data-start]")).not.toBeNull();
+    expect(page.querySelector('[data-order="1"]')).not.toBeNull();
+  });
+});
+
+let container: HTMLDivElement | undefined;
+let root: ReturnType<typeof createRoot> | undefined;
+afterEach(() => {
+  act(() => root?.unmount());
+  container?.remove();
+});
+
+function mount(element: React.ReactElement) {
+  (
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true;
+  container = document.createElement("div");
+  document.body.appendChild(container);
+  const created = createRoot(container);
+  root = created;
+  act(() => created.render(element));
+  return container;
+}
+
+const click = (element: Element | null | undefined) =>
+  act(() => {
+    element?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+
+describe("Tablet's pyramids chosen by pointer", () => {
+  it("calls onSelect from a square's border or its top", () => {
+    for (const tablet of ["earth", "union"]) {
+      const onSelect = vi.fn<(square: TabletSquare) => void>();
+      const page = mount(
+        <Tablet
+          tablet={tablet}
+          pyramids
+          highlights={{ squares: [], anySquare: true, onSelect }}
+        />,
+      );
+      const square = page.querySelector('[data-pyramid="2,3"]');
+      expect(square, tablet).not.toBeNull();
+      // The sides take no click of their own: the border drawn over them
+      // takes it for the whole square.
+      const border = [...page.querySelectorAll('rect[width="20"]')].find(
+        (rect) => (rect as SVGElement).style.pointerEvents === "all",
+      );
+      const top =
+        page.querySelectorAll("[data-top]")[
+          2 * (tablet === "union" ? 5 : 12) + 3
+        ];
+      click(border);
+      click(top);
+      expect(onSelect.mock.calls.map(([each]) => each)).toEqual([
+        { row: 0, column: 0 },
+        { row: 2, column: 3 },
+      ]);
+      act(() => root?.unmount());
+      container?.remove();
+      root = undefined;
+    }
+  });
+});

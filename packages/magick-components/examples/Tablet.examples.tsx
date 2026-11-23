@@ -26,6 +26,19 @@ export const Tablet: ComponentExamples<ComponentProps<typeof TabletComponent>> =
       },
       { title: "The Tablet of Union", props: { tablet: "union", frame: true } },
       {
+        title: "Fire as pyramids",
+        props: { tablet: "fire", pyramids: true, frame: true },
+      },
+      {
+        title: "The Tablet of Union as pyramids, a quarter top",
+        props: {
+          tablet: "union",
+          pyramids: true,
+          pyramidTop: 0.25,
+          frame: true,
+        },
+      },
+      {
         title: "Earth, a square outlined",
         props: {
           tablet: "earth",

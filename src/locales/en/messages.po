@@ -2445,6 +2445,16 @@ msgid "Where a witness departs from it here"
 msgstr "Where a witness departs from it here"
 
 #. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidKey.tsx
+msgid "The pyramids' colours"
+msgstr "The pyramids' colours"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidKey.tsx
+msgid "White, with no element: a Calvary square's lowest side, which carries its Sephirah"
+msgstr "White, with no element: a Calvary square's lowest side, which carries its Sephirah"
+
+#. js-lingui-explicit-id
 #: src/app/enochian/tablets/SquaresPanel.tsx
 msgid "Squares as pyramids"
 msgstr "Squares as pyramids"
@@ -2502,6 +2512,11 @@ msgstr "In the Tablet of Union, {squares} differ: {kinds}."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
+msgid "No image link while the tablet is drawn as pyramids."
+msgstr "No image link while the tablet is drawn as pyramids."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
 msgid "No image link while a name, a square or the regions are shown."
 msgstr "No image link while a name, a square or the regions are shown."
 
@@ -2514,6 +2529,11 @@ msgstr "No image link while a square is shown."
 #: src/app/enochian/tablets/tablets.tsx
 msgid "Tablet of Union"
 msgstr "Tablet of Union"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "Draw as pyramids"
+msgstr "Draw as pyramids"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx

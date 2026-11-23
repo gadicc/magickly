@@ -2445,6 +2445,16 @@ msgid "Where a witness departs from it here"
 msgstr "היכן שעד סוטה ממנו כאן"
 
 #. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidKey.tsx
+msgid "The pyramids' colours"
+msgstr "צבעי הפירמידות"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidKey.tsx
+msgid "White, with no element: a Calvary square's lowest side, which carries its Sephirah"
+msgstr "לבן, בלי יסוד: הצלע התחתונה של משבצת בצלב הגולגולתא, הנושאת את הספירה שלה"
+
+#. js-lingui-explicit-id
 #: src/app/enochian/tablets/SquaresPanel.tsx
 msgid "Squares as pyramids"
 msgstr "משבצות כפירמידות"
@@ -2502,6 +2512,11 @@ msgstr "בלוח האיחוד יש הבדל ב־{squares}: {kinds}."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
+msgid "No image link while the tablet is drawn as pyramids."
+msgstr "אין קישור לתמונה כשהלוח מצויר כפירמידות."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
 msgid "No image link while a name, a square or the regions are shown."
 msgstr "אין קישור לתמונה כשמוצגים שם, משבצת או האזורים."
 
@@ -2514,6 +2529,11 @@ msgstr "אין קישור לתמונה כשמוצגת משבצת."
 #: src/app/enochian/tablets/tablets.tsx
 msgid "Tablet of Union"
 msgstr "לוח האיחוד"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "Draw as pyramids"
+msgstr "ציור כפירמידות"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx

@@ -3,6 +3,8 @@
  * `enochian/Tablet`, names it and re-exports what is public, and the
  * hall's art draws it unnamed.
  */
+
+import type { TabletPyramid } from "magick-data/enochian/tabletPyramids";
 import enochianTablets, {
   DEFAULT_TABLET_VERSION,
   type EnochianTablet,
@@ -755,12 +757,218 @@ function OutlinedSquares({
   });
 }
 
+/**
+ * The flat top's side as a share of a square's, by default: half, which
+ * keeps the letter legible on a phone (plan 095, decision 4, Gadi's choice
+ * of 23 November 2026). No source gives a size; the Equinox's plates draw
+ * the top about a quarter of the square, to leave the sides room for
+ * their symbols, which this drawing does not carry.
+ */
+export const PYRAMID_TOP = 0.5;
+
+/** The flat top's least and greatest share of a square. */
+const PYRAMID_TOP_RANGE = [0.2, 0.8] as const;
+
+/**
+ * Each side's colour by its element (Regardie, The Golden Dawn, vol. 4
+ * (1940), p.294): Fire red, Water blue, Air yellow, Earth black, Spirit
+ * white; `none` is a Calvary square's fourth side, which carries its
+ * Sephirah and no element, painted white (p.296).
+ */
+export const PYRAMID_COLOURS = Object.freeze({
+  fire: "#ff3333",
+  water: "#5599ff",
+  air: "#fff100",
+  earth: "#000000",
+  spirit: "#ffffff",
+  none: "#ffffff",
+});
+
+/**
+ * The thin grey lines between a pyramid's sides, round its top and round
+ * every square, which keep two black Earth sides apart.
+ */
+const PYRAMID_LINE = "#888";
+
+/** A top share the drawing can hold: the default where none is given. */
+function pyramidTopOf(top: number | undefined): number {
+  if (top === undefined || !Number.isFinite(top)) return PYRAMID_TOP;
+  return Math.min(PYRAMID_TOP_RANGE[1], Math.max(PYRAMID_TOP_RANGE[0], top));
+}
+
+const unit = (value: number) => Math.round(value * 1000) / 1000;
+
+/**
+ * A square's four sides round its flat top, in their elements' colours,
+ * with a thin line where two sides meet: side 1 on the left, 2 at the
+ * top, 3 on the right, 4 at the bottom (vol. 4, p.293).
+ */
+function PyramidSides({
+  pyramid,
+  left,
+  top,
+  inset,
+}: {
+  pyramid: TabletPyramid;
+  left: number;
+  top: number;
+  /** The distance from the square's edge to its flat top's. */
+  inset: number;
+}) {
+  const near = inset;
+  const far = SQUARE - inset;
+  const at = (x: number, y: number) => `${unit(left + x)},${unit(top + y)}`;
+  const outlines = [
+    [at(0, 0), at(near, near), at(near, far), at(0, SQUARE)],
+    [at(0, 0), at(SQUARE, 0), at(far, near), at(near, near)],
+    [at(SQUARE, 0), at(SQUARE, SQUARE), at(far, far), at(far, near)],
+    [at(0, SQUARE), at(near, far), at(far, far), at(SQUARE, SQUARE)],
+  ];
+  return (
+    <g data-pyramid={`${pyramid.row},${pyramid.column}`}>
+      {pyramid.sides.map((side, index) => {
+        const fill =
+          PYRAMID_COLOURS[
+            (side.elementId as keyof typeof PYRAMID_COLOURS | undefined) ??
+              "none"
+          ];
+        return (
+          <polygon
+            key={side.side}
+            data-side={side.side}
+            data-element={side.elementId ?? "none"}
+            points={outlines[index]?.join(" ")}
+            // Its own colour round its edge, so that no seam of the page
+            // shows between two sides.
+            style={{ fill, stroke: fill, strokeWidth: 0.3 }}
+          />
+        );
+      })}
+      <path
+        d={`M${at(0, 0)}L${at(near, near)}M${at(SQUARE, 0)}L${at(far, near)}M${at(SQUARE, SQUARE)}L${at(far, far)}M${at(0, SQUARE)}L${at(near, far)}`}
+        style={{ fill: "none", stroke: PYRAMID_LINE, strokeWidth: 0.5 }}
+      />
+    </g>
+  );
+}
+
+/**
+ * A grid's squares drawn as the Golden Dawn's truncated pyramids (plan
+ * 095, decision 4): every square's sides, then the white tops, then a
+ * grey border round each square, which takes a click on it, then the
+ * regions' tints where asked (a Watchtower's), then the letters in black
+ * on the tops. No second letters: there is no room for them on a side.
+ */
+function PyramidSquares({
+  tablet,
+  pyramids,
+  grid,
+  options,
+  enochianStyle,
+  top: share,
+  regions = false,
+}: {
+  tablet: TabletView;
+  pyramids: readonly TabletPyramid[];
+  grid: GridPlace;
+  options: LetterOptions;
+  enochianStyle?: CSSProperties;
+  /** The flat top's share of a square. */
+  top: number;
+  regions?: boolean;
+}) {
+  const byKey = new Map(pyramids.map((each) => [squareKey(each), each]));
+  const reversed = reversedSquares(tablet, options);
+  const enochianFont = enochianStyle !== undefined;
+  const side = unit(SQUARE * share);
+  const inset = (SQUARE - side) / 2;
+  // The flat drawing's letter, scaled to the top.
+  const fontSize = unit((SQUARE - 2 - (enochianFont ? 4 : 0)) * share);
+  const cells = tablet.grid.flatMap((row, y) =>
+    row.map((letter, x) => ({ letter, x, y })),
+  );
+  return (
+    <g data-pyramids="">
+      {cells.map(({ x, y }) => {
+        const pyramid = byKey.get(`${y},${x}`);
+        return (
+          pyramid && (
+            <PyramidSides
+              key={`p-${y}-${x}`}
+              pyramid={pyramid}
+              left={squareX(x, grid)}
+              top={squareY(y, grid)}
+              inset={inset}
+            />
+          )
+        );
+      })}
+      {cells.map(({ x, y }) => (
+        <rect
+          key={`top-${y}-${x}`}
+          data-top=""
+          x={unit(squareX(x, grid) + inset)}
+          y={unit(squareY(y, grid) + inset)}
+          width={side}
+          height={side}
+          style={{ fill: "white", stroke: PYRAMID_LINE, strokeWidth: 0.5 }}
+        />
+      ))}
+      {cells.map(({ x, y }) => (
+        <rect
+          key={`b-${y}-${x}`}
+          x={squareX(x, grid)}
+          y={squareY(y, grid)}
+          width={SQUARE}
+          height={SQUARE}
+          // The whole square takes a click, as its ground does when flat.
+          style={{
+            fill: "none",
+            pointerEvents: "all",
+            stroke: PYRAMID_LINE,
+            strokeWidth: 0.8,
+          }}
+        />
+      ))}
+      {regions && <RegionTints />}
+      {cells.map(({ letter, x, y }) => {
+        if (letter === null) return null;
+        const cx = squareX(x, grid) + SQUARE / 2;
+        return (
+          <text
+            key={`t-${y}-${x}`}
+            x={cx}
+            y={unit(squareY(y, grid) + SQUARE / 2 + fontSize / 3)}
+            transform={reversed.has(`${y},${x}`) ? mirrorAt(cx) : undefined}
+            style={{
+              fontWeight: enochianFont ? "bold" : undefined,
+              fontSize,
+              textAnchor: "middle",
+              fill: "black",
+              ...enochianStyle,
+            }}
+          >
+            {letter}
+          </text>
+        );
+      })}
+    </g>
+  );
+}
+
+/** A grid's pyramids and the share of a square their tops take. */
+interface PyramidPlan {
+  pyramids: readonly TabletPyramid[];
+  top: number;
+}
+
 function Grid({
   id,
   tablet,
   options,
   enochianStyle,
   highlights,
+  pyramids,
 }: {
   /** The tablet's key, which picks its colours. */
   id: string;
@@ -768,6 +976,8 @@ function Grid({
   options: LetterOptions;
   enochianStyle?: CSSProperties;
   highlights?: TabletHighlights;
+  /** Every square drawn as a pyramid, when given. */
+  pyramids?: PyramidPlan;
 }) {
   const enochianFont = enochianStyle !== undefined;
   const reversed = reversedSquares(tablet, options);
@@ -845,7 +1055,17 @@ function Grid({
       // the page shows one.
       onClick={pickAny}
     >
-      {regions ? (
+      {pyramids ? (
+        <PyramidSquares
+          tablet={tablet}
+          pyramids={pyramids.pyramids}
+          grid={WATCHTOWER_GRID}
+          options={options}
+          enochianStyle={enochianStyle}
+          top={pyramids.top}
+          regions={regions}
+        />
+      ) : regions ? (
         // The tints go under the letters: every ground first, then the
         // tints, then every letter.
         <>
@@ -918,11 +1138,14 @@ function UnionGrid({
   options,
   enochianStyle,
   highlights,
+  pyramids,
 }: {
   tablet: TabletView;
   options: LetterOptions;
   enochianStyle?: CSSProperties;
   highlights?: TabletHighlights;
+  /** Every square drawn as a pyramid, when given. */
+  pyramids?: PyramidPlan;
 }) {
   const enochianFont = enochianStyle !== undefined;
   const reversed = reversedSquares(tablet, options);
@@ -931,36 +1154,49 @@ function UnionGrid({
   const { left, top, columns } = grid;
   return (
     <>
-      {tablet.grid
-        .flatMap((row, y) => row.map((letter, x) => ({ letter, x, y })))
-        .map(({ letter, x, y }) => {
-          const cx = left + x * size + size / 2;
-          return (
-            <React.Fragment key={`grid-${x},${y}`}>
-              <rect
-                x={left + x * size}
-                y={top + y * size}
-                width={size}
-                height={size}
-                style={{ strokeWidth: 1.2, stroke: "black", fill: "white" }}
-              />
-              <text
-                x={cx}
-                y={top + y * size + size / 2 + 6}
-                transform={reversed.has(`${y},${x}`) ? mirrorAt(cx) : undefined}
-                style={{
-                  fontWeight: enochianFont ? "bold" : undefined,
-                  fontSize: size - 2 - (enochianFont ? 4 : 0),
-                  textAnchor: "middle",
-                  fill: UNION_LINE_COLORS[y] ?? "black",
-                  ...enochianStyle,
-                }}
-              >
-                {letter}
-              </text>
-            </React.Fragment>
-          );
-        })}
+      {pyramids ? (
+        <PyramidSquares
+          tablet={tablet}
+          pyramids={pyramids.pyramids}
+          grid={grid}
+          options={options}
+          enochianStyle={enochianStyle}
+          top={pyramids.top}
+        />
+      ) : (
+        tablet.grid
+          .flatMap((row, y) => row.map((letter, x) => ({ letter, x, y })))
+          .map(({ letter, x, y }) => {
+            const cx = left + x * size + size / 2;
+            return (
+              <React.Fragment key={`grid-${x},${y}`}>
+                <rect
+                  x={left + x * size}
+                  y={top + y * size}
+                  width={size}
+                  height={size}
+                  style={{ strokeWidth: 1.2, stroke: "black", fill: "white" }}
+                />
+                <text
+                  x={cx}
+                  y={top + y * size + size / 2 + 6}
+                  transform={
+                    reversed.has(`${y},${x}`) ? mirrorAt(cx) : undefined
+                  }
+                  style={{
+                    fontWeight: enochianFont ? "bold" : undefined,
+                    fontSize: size - 2 - (enochianFont ? 4 : 0),
+                    textAnchor: "middle",
+                    fill: UNION_LINE_COLORS[y] ?? "black",
+                    ...enochianStyle,
+                  }}
+                >
+                  {letter}
+                </text>
+              </React.Fragment>
+            );
+          })
+      )}
       <NameLayers highlights={highlights} grid={grid} />
       <OutlinedSquares highlights={highlights} grid={grid} />
       <rect
@@ -1091,6 +1327,20 @@ export interface TabletProps {
   height?: string | number;
   /** The `<svg>`, for exporting the drawing. */
   ref?: React.Ref<SVGSVGElement>;
+  /**
+   * Draw every square as the Golden Dawn's truncated pyramid (default
+   * false): four sides in their elements' colours round a white flat top
+   * that holds the letter, from magick-data's `enochian/tabletPyramids`.
+   * The Golden Dawn's versions only: Dee's and Raphael's tables carry no
+   * elements, so they are drawn flat. No second letters are drawn on
+   * pyramids; the regions are tinted over them as over the flat squares.
+   */
+  pyramids?: boolean;
+  /**
+   * The flat top's side as a share of a square's, from 0.2 to 0.8
+   * (default `PYRAMID_TOP`, a half). With `pyramids` only.
+   */
+  pyramidTop?: number;
 }
 
 /**
@@ -1109,10 +1359,17 @@ export function TabletSvg({
   height,
   highlights,
   ref,
+  pyramidsOf,
+  pyramidTop,
   role,
   "aria-label": ariaLabel,
   "aria-hidden": ariaHidden,
-}: Omit<TabletProps, "label"> & {
+}: Omit<TabletProps, "label" | "pyramids"> & {
+  /**
+   * A tablet's pyramids, for `pyramids`: given by the entry, so that the
+   * hall's art, which draws none, does not load the rules behind them.
+   */
+  pyramidsOf?: (view: TabletView) => readonly TabletPyramid[];
   role?: "img";
   "aria-label"?: string;
   "aria-hidden"?: true;
@@ -1126,7 +1383,16 @@ export function TabletSvg({
     sigils && Object.hasOwn(sigils, id)
       ? sigils[id as keyof typeof sigils]
       : undefined;
-  const options = { reversed: mirrorReversed, alt: showSecondLetters };
+  const drawn = pyramidsOf && tablet ? pyramidsOf(tablet) : [];
+  // None in Dee's and Raphael's versions, which are then drawn flat.
+  const pyramids: PyramidPlan | undefined = drawn.length
+    ? { pyramids: drawn, top: pyramidTopOf(pyramidTop) }
+    : undefined;
+  const options = {
+    reversed: mirrorReversed,
+    // No room for second letters on a pyramid's sides.
+    alt: showSecondLetters && !pyramids,
+  };
   // The Tablet of Union draws in the root itself, so its clicks are taken
   // here; a Watchtower's grid takes its own.
   const pickUnion =
@@ -1159,6 +1425,7 @@ export function TabletSvg({
           options={options}
           enochianStyle={enochianStyle}
           highlights={highlights}
+          pyramids={pyramids}
         />
       ) : (
         tablet && (
@@ -1177,6 +1444,7 @@ export function TabletSvg({
                 options={options}
                 enochianStyle={enochianStyle}
                 highlights={highlights}
+                pyramids={pyramids}
               />
             </g>
           </>

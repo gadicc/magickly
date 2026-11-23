@@ -1,6 +1,9 @@
+import { tabletPyramids } from "magick-data/enochian/tabletPyramids";
 import { type TabletProps, TabletSvg, tabletName } from "./tabletSvg.tsx";
 
 export {
+  PYRAMID_COLOURS,
+  PYRAMID_TOP,
   REGION_HATCH,
   REGION_TINTS,
   regionFromPosition,
@@ -22,7 +25,10 @@ export {
  * the Tablet of Union's grid on a page of its own (`tabletViewBox`). The
  * version's reversed letters are mirrored unless `mirrorReversed` is
  * false, and a Watchtower's second letters drawn small in each square's
- * corner when `showSecondLetters` is true. A key the data does not have
+ * corner when `showSecondLetters` is true. With `pyramids`, the Golden
+ * Dawn's versions draw every square as a truncated pyramid in its sides'
+ * elemental colours instead (plan 095), its letter on a flat top the size
+ * `pyramidTop` gives, and no second letters. A key the data does not have
  * draws an empty page; a tablet the version does not have, its page
  * saying so. It is an image named by `tabletName` (an `aria-label`, which
  * shows no tooltip over the squares as a `<title>` would) unless `label`
@@ -34,13 +40,22 @@ export function Tablet({
   mirrorReversed = true,
   showSecondLetters = false,
   frame = false,
+  pyramids = false,
   ...props
 }: TabletProps) {
   const name =
     label === undefined
       ? tabletName(props.tablet, props.version)
       : label || undefined;
-  const drawn = { ...props, mirrorReversed, showSecondLetters, frame };
+  const drawn = {
+    ...props,
+    mirrorReversed,
+    showSecondLetters,
+    frame,
+    // The rules behind the pyramids load with the entry, not with the
+    // drawing the hall's art shares.
+    pyramidsOf: pyramids ? tabletPyramids : undefined,
+  };
   return name ? (
     <TabletSvg {...drawn} role="img" aria-label={name} />
   ) : (

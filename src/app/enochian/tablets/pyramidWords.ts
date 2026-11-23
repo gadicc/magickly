@@ -1,3 +1,4 @@
+import { PYRAMID_COLOURS } from "magick-components/enochian/Tablet";
 import planets, { type PlanetId } from "magick-data/astrology/planets";
 import zodiac from "magick-data/astrology/zodiac";
 import type {
@@ -36,12 +37,13 @@ export const SIDE_ELEMENT_WORDS: Readonly<Record<SideElement, string>> = {
  * Each element's colour on a side, and the colour of a symbol painted on
  * it, its complement (Regardie, vol. 4, pp.294–295): Fire red with green,
  * Water blue with orange, Air yellow with violet, Earth black with white,
- * Spirit white with black. The reds, blues and yellows are the tablets'
- * own (`tabletSvg.tsx`), as are the green and orange their angles are
- * lettered in. A complement can be close to its ground in lightness (the
- * green on red, the orange on blue), so every symbol is drawn with a thin
- * `outline`, dark on a light ground and light on a dark one, which stands
- * out from the ground by at least 3:1 (`pyramidColours.test.ts`).
+ * Spirit white with black. The sides' colours are the tablet's own
+ * pyramids' (`PYRAMID_COLOURS`, magick-components), the green and orange
+ * those the tablets' angles are lettered in. A complement can be close
+ * to its ground in lightness (the green on red, the orange on blue), so
+ * every symbol is drawn with a thin `outline`, dark on a light ground
+ * and light on a dark one, which stands out from the ground by at least
+ * 3:1 (`pyramidColours.test.ts`).
  */
 export const SIDE_COLOURS: Readonly<
   Record<
@@ -49,14 +51,18 @@ export const SIDE_COLOURS: Readonly<
     { fill: string; symbol: string; outline: string }
   >
 > = {
-  fire: { fill: "#ff3333", symbol: "#22bb22", outline: "#000000" },
-  water: { fill: "#5599ff", symbol: "#ff8800", outline: "#000000" },
-  air: { fill: "#fff100", symbol: "#7b1fa2", outline: "#000000" },
-  earth: { fill: "#000000", symbol: "#ffffff", outline: "#ffffff" },
-  spirit: { fill: "#ffffff", symbol: "#000000", outline: "#000000" },
+  fire: { fill: PYRAMID_COLOURS.fire, symbol: "#22bb22", outline: "#000000" },
+  water: { fill: PYRAMID_COLOURS.water, symbol: "#ff8800", outline: "#000000" },
+  air: { fill: PYRAMID_COLOURS.air, symbol: "#7b1fa2", outline: "#000000" },
+  earth: { fill: PYRAMID_COLOURS.earth, symbol: "#ffffff", outline: "#ffffff" },
+  spirit: {
+    fill: PYRAMID_COLOURS.spirit,
+    symbol: "#000000",
+    outline: "#000000",
+  },
   // A Calvary square's fourth side, which carries its Sephirah and no
   // element: white, as the source allows (or the Sephirah's colour).
-  white: { fill: "#ffffff", symbol: "#000000", outline: "#000000" },
+  white: { fill: PYRAMID_COLOURS.none, symbol: "#000000", outline: "#000000" },
 };
 
 /**
