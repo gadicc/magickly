@@ -1,11 +1,15 @@
 # The tablets' pyramids — 23 November 2026
 
-Status: stage 0, the sources, done on 23 November 2026 (see
-[Stage 0](#stage-0-what-the-sources-show-23-november-2026)). Drafted 23 November 2026; Gadi answered its first open questions
-the same day; amended the same day after a Fable 5.2 review (see
-[Review](#review-23-november-2026)), which reversed one answer and found
-one question for Gadi, the Calvary bar, which he settled the same day:
-the layout per version (decision 2). No code.
+Status: stages 0 to 4 done on 23 November 2026: the sources (see
+[Stage 0](#stage-0-what-the-sources-show-23-november-2026)), the data,
+the square's detail, the mock-up and the whole tablet drawn as
+pyramids, released as magick-components 0.8.0 on magick-data 0.5.0;
+stage 5, the image route, is next. Drafted
+23 November 2026, before any code; Gadi answered its first open
+questions the same day; amended the same day after a Fable 5.2 review
+(see [Review](#review-23-november-2026)), which reversed one answer and
+found one question for Gadi, the Calvary bar, which he settled the same
+day: the layout per version (decision 2).
 Read [current status](000-current-status.md) and
 [plan 090](090-tablet-layout-and-names.md) (the page, the names and the
 Tablet of Union this builds on) first. The number was free on every
@@ -354,11 +358,83 @@ Settled after the review: the Calvary bar, per version (decision 2).
    squares; all fixed before the gate. `search:publish` embedded 18
    passages.
 3. **Mock-up** of the pyramid drawing for Gadi (decision 4).
+   **Done 23 November 2026.** Six sheets rendered from the real data by
+   a prototype of `Tablet`'s pyramids, each drawing at the width the page
+   gives it (squares about 21 px at 320, 25 at 375, 54 at 768 and 42 at
+   1,440 × 900), at 320 and 375 (shown at 2×) and 768 and 1,440, light
+   and dark: the flat top and its ground, the lines, the other tablets
+   and the Union, a name over pyramids, the regions and second letters,
+   and the key. Gadi chose:
+   - **The top:** half the square, white, the letter black (option B, of
+     a third, half, three fifths, and half in the flat tablet's colours).
+     No source gives a size: vol. 4 says none in words, and the
+     Equinox's plates draw the top about a quarter of the square (27%,
+     measured on Plate IV, leaf n242), leaving the sides room for their
+     symbols, which the whole tablet does not draw. The page says the
+     size is ours.
+   - **The top as a number:** `Tablet` computes the top from one share
+     of the square (`pyramidTop`, default ½); the page draws ½ and
+     offers no picker for now (see Follow-ups).
+   - **Lines:** thin grey diagonals, a grey edge round the top and grey
+     square borders (L2), so two black Earth sides never run together.
+   - **Highlights:** the chosen name, the preview ring and the chosen
+     square as they are drawn today. The regions stay off by default,
+     with *Show the regions* tinting the whole squares over the pyramids
+     as over the flat tablet (R1, not the tops only). No second letters
+     on pyramids, ever.
+   - **The key:** in the page, translated and read by screen readers,
+     not in the download (K1). Built under the switches rather than
+     under the drawing, as the mock-up had it: on a wide screen the
+     drawing fills the screen's height, so a key below it would fall
+     off the screen.
 4. **The drawing.** `Tablet`'s `pyramids`, the Union's, the switch, the
    key; default bytes unmoved.
-5. **Image route and release.** The pyramid slug and profile; magick-data
-   and magick-components minors, with the Provenance rows (the
-   `enochian/Tablet` row names the pyramid drawing) signed by Gadi.
+   **Built 23 November 2026** (`9f4a5389`, released in `a4a42550`).
+   `Tablet` takes `pyramids` (default off) and `pyramidTop` (the top's
+   share of the square, ½ by default, held between 0.2 and 0.8), and
+   exports `PYRAMID_COLOURS` and `PYRAMID_TOP`. Every square of a
+   Watchtower and of the Tablet of Union is four sides in their
+   elements' colours round a white top with the letter in black, grey
+   lines between the sides, round the top and round each square; a grey
+   border over each square takes its click. No symbols and no second
+   letters; the highlights, the regions' tints among them, are drawn
+   over the pyramids. Dee's and Raphael's versions, which have no
+   pyramids, draw flat, byte for byte. The rules load with the entry
+   (`Tablet.tsx` passes `tabletPyramids` in), so the halls' art, which
+   shares the drawing, loads none of them. The page: *Draw as pyramids*
+   beside the other two switches in the Golden Dawn's versions,
+   `pyramids=1` in the URL (dropped under Dee's and Raphael's, and back
+   with a Golden Dawn version), in a name's links to its squares and in
+   the share link; `-pyramids` in the downloads' names; no image link
+   while pyramids are drawn, here and in the component explorer, until
+   decision 5's slug; *Second letters* rests while they are drawn. The
+   key (`PyramidKey.tsx`) is drawn as a pyramid's lower side, not a
+   square, which read as an empty checkbox in white. The Squares tab's
+   large pyramid takes its colours from `PYRAMID_COLOURS`. The page's
+   text says the whole-tablet drawing and its top's size are ours.
+   Checked in headless Chromium against the dev server at 320, 375, 768
+   and 1,440 px, light and dark: no sideways scroll, the key under the
+   switches, a click on a side choosing the square on a Watchtower and
+   on the Union. A fresh Opus review found the component explorer
+   offering a flat image under the pyramid examples (a blocker, which
+   failed `imageParity.test.tsx`), a name's square links dropping
+   `pyramids=1` in a new tab, the halls loading the pyramid rules, the
+   white swatches reading as checkboxes and the translation context's
+   snapshot due; all fixed before the gate.
+   **Released** in the same branch, on Gadi's choice (23 November
+   2026): `Tablet` now imports magick-data's `enochian/tabletPyramids`,
+   which the published magick-data 0.4.0 lacks, so the components'
+   smoke failed against the registry until magick-data's version moved,
+   as plan 090's release did. First released here as magick-data 0.5.0
+   and magick-components 0.7.0, which plan 096's release on `main` took
+   first; rebased onto `main` (75adebf6), whose magick-data 0.5.0
+   already ships the pyramids (stage 1's data), so only
+   magick-components is released: 0.8.0 (`Tablet`'s `pyramids`, on
+   magick-data ^0.5.0), published by CI when `main` is pushed. Its
+   Provenance row, `enochian/Tablet`, now names the pyramid drawing and
+   is dated 2026-11-23, as the release option Gadi chose named it.
+5. **Image route.** The pyramid slug and profile (decision 5). The
+   release moved into stage 4 (above).
 
 Each stage a gated commit on a gate branch, by subagents per the model
 policy (data Opus medium; detail and drawing Opus high), reviewed fresh.
@@ -487,8 +563,33 @@ table and by rule), and read the Equinox's plates and vol. 1's badge.
   `regionFromPosition` still says `topRow` (and draws
   `data-region="topRow"`), held to magick-data's `kerubic` by a test;
   renaming it is a breaking change for the component (stage 1).
-- Symbols on the tablet at large image-route sizes, as the Equinox's
-  plates print them.
+- **Symbols on the sides (Gadi, 23 November 2026).** A *Symbols on the
+  sides* switch beside *Draw as pyramids*, drawing each side's symbol
+  as the Squares tab does (its marks moved into magick-components, so
+  both drawings share them) and the top at a quarter, the Equinox's
+  plates' own proportion, so that the reader never sets the size: at a
+  quarter a symbol is about 11 px at 1,440, 14 px at 768 and 5 px on a
+  320 phone (legible pinch-zoomed; the drawing is vector). A mock-up at
+  real sizes first. Also the image route's large sizes, as the plates
+  print them.
+- **The top's size as a choice.** Gadi asked whether readers should
+  pick it, perhaps among advanced options. Recommended on 23 November
+  2026, and held there: no picker yet. The page has seven controls with
+  the switches, and every free choice multiplies the URL's states, the
+  downloads' names and the image route's profiles; `pyramidTop` keeps
+  the door open. Revisit if a reader or the image route wants another
+  size.
+- **The tablets in image search (Gadi, 23 November 2026).** Publish the
+  images worth finding as files on stable paths, as the kameas, the
+  angels' and planetary sigils and the halls are (plans 062, 088, 093),
+  listed under their page in the image sitemap (`src/app/sitemap.ts`)
+  with alt text, a caption and a descriptive name: each Watchtower and
+  the Union in each version, and the Golden Dawn's versions as pyramids
+  once decision 5's slug exists; not every combination of the page's
+  choices, which would be thin near-duplicates. Per-tablet pages
+  (`/enochian/tablets/fire`), carrying plan 090's notes and names, would
+  rank better than the one hub whose variants are query parameters. A
+  plan of its own after stage 5.
 - The angels' telesmatic images (the name's letters as head, body and
   limbs, with AL added, p.311), from the Order's telesmatic attributions.
 - The Golden Dawn's pronunciation of the names (vol. 4 pp.297–298).
