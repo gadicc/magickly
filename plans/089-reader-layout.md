@@ -212,11 +212,42 @@ depend on `Paper`.
    Candidate `#fcf`, Dadouchos `#cc5` on white), and the same colours
    as rules on the beige surface: darker light variants.~~ Done on
    19 November 2026: see "Officer colours".
-2. Floating button: accessible name ("SpeedDial basic example") and
+2. ~~Floating button: accessible name ("SpeedDial basic example") and
    untranslated tooltips; Jump to Next aims the cue at the screen's
    bottom edge. (Its stray `))` child went in stage C: it was also
-   indexed as the built-in rituals' search prose.)
-3. Text size not saved across reloads.
+   indexed as the built-in rituals' search prose.)~~ Done on
+   23 November 2026. The button is named for what it shows, "Reader
+   menu: 2 lines before yours", in digits in every count and language,
+   "0 lines" too, so its visible count is in its name ("your line is
+   next" and the Hebrew one/two words, which the rail's count keeps,
+   would have left it out). It is "Reader menu: no more lines" after the
+   last, and plain "Reader menu" before the first measure and without a
+   role to read as. Its actions take the rails' own translated words: "Jump
+   to your next line", "Jump back", "Halls", "Contents", "Text size".
+   Jump to Next no longer uses `scrollIntoView(false)`, which parked the
+   line flush on the bottom edge, its end under the floating button and,
+   for a long speech, its start above the screen: `jumpDistance`
+   (`src/doc/readerPosition.ts`) brings its end 88 px above the visible
+   bottom, clear of the button (56 px, 16 px from the edge) and a phone's
+   toolbar, unless that would take its start above the app bar, when its
+   start stops 24 px below it instead. The window scrolls by that, or the
+   editor's preview pane alone; the count and the jump share one
+   `readingArea`. A line of the reader's own that starts in the 88 px
+   left under the jump's target counts as reached, as before: it is on
+   the screen, and the button covers at most its end.
+3. ~~Text size not saved across reloads.~~ Done on 23 November 2026:
+   `useReaderTextSize` keeps it in `localStorage`
+   (`magickli:reader-text-size:v1`), as the ritual editor keeps its
+   layout: one size for every ritual and the editor's preview, nothing
+   kept at the default, held to 50–300% (the − and + buttons disable at
+   the ends), and a blocked storage API only loses the memory. The
+   reader's font size is a custom property on `<html>`
+   (`--reader-text-size`), which a script in the document's `<head>`
+   sets from storage before the first paint, as `earlyPlaceLookupScript`
+   starts its lookup: the server-rendered ritual is painted at the
+   reader's size, so hydration reflows nothing and a reload's scroll
+   position, or a `#hall-N`, is found against the right layout. Another
+   tab keeps its size until reloaded.
 4. A pinned "Reading as …" chip below 1,200 px.
 5. Rehearsal mode (hide my lines; my lines plus their cues).
 6. Screen wake lock while reading; linkable line numbers.
@@ -238,12 +269,24 @@ depend on `Paper`.
    (each fails without the change), not in a browser: the screenshot
    seed has no legacy ritual, and the legacy editor reports the seeded
    ones' source unavailable.
-8. The variables panel in the rail has no "Reading as" label; the
-   "My role" select's own label stands in.
-9. The public `/doc/*` search prose is extracted from `DocRender.tsx`'s
+8. ~~The variables panel in the rail has no "Reading as" label; the
+   "My role" select's own label stands in.~~ Done on 23 November 2026:
+   "Reading as" heads it in the rail while the role is a visible, unfolded
+   variable. A panel the column shows too keeps its label to the rail,
+   where the panels are cards; at the top of the column the select's own
+   label says enough. The help's `reader-desktop.webp` is regenerated.
+9. ~~The public `/doc/*` search prose is extracted from `DocRender.tsx`'s
    JSX text ("Ritual not found", "More Variables"), so any wording
    change in the reader needs a `search:publish`; the reader's interface
-   text probably should not be indexed at all.
+   text probably should not be indexed at all.~~ Done on 23 November
+   2026: `INTERFACE_PAGES` (`src/search/adaptedPages.ts`) leaves the
+   public rituals out of prose extraction, as the kamea pages are for
+   their adapter, so their documents are their titles and descriptions,
+   as the search README already said. Their one prose passage each was
+   the reader's interface, "Ritual not found. % More Variables %"; the
+   catalogue test now fails if any comes back. The catalogue changed, so
+   the embeddings were published again once; rewording the reader needs
+   no publish from now on.
 
 ## Officer colours (19 November 2026)
 
