@@ -236,12 +236,30 @@ export function angelSigilStyleAltMessage(
   }
 }
 
+/**
+ * Where the psalm Lenain names is not the one the verse is from, by the
+ * genius's number: the 33rd's verse is the Vulgate's 93:11, which he cites
+ * as Psalm 33 (`lenain/vulgate/differences.json5`). Written out, so that
+ * the client pages need no verse file; a test holds every angel's psalm
+ * to the Vulgate's reference in `verses.json5`, so a new mismatch fails.
+ */
+const VULGATE_PSALM: Readonly<Record<number, number>> = { 33: 93 };
+
+/**
+ * The psalm an angel's verse is from, in the Vulgate's numbering, as the
+ * talisman's alt text and caption name it (plan 096, decision for Gadi
+ * 12): Lenain's number except where his is wrong. 0 for Jabamiah, whose
+ * verse is Genesis 1:1.
+ */
+export const angelSigilPsalm = (angel: Angel): number =>
+  VULGATE_PSALM[angel.no] ?? angel.psalm.psalm;
+
 /** The values every style's alt text may name. */
 export const angelSigilStyleAltValues = (angel: Angel) => ({
   name: angel.name.en,
   number: angel.no,
   hebrew: angelSigilText(angel),
-  psalm: angel.psalm.psalm,
+  psalm: angelSigilPsalm(angel),
 });
 
 /** One style as the angel page offers it: its files and its alt text. */
@@ -263,7 +281,10 @@ export interface AngelSigilSection {
   number: number;
   /** The text the sigil traces: "והויה". */
   hebrew: string;
-  /** The psalm the talisman's verse is from, 0 for Jabamiah's Genesis. */
+  /**
+   * The psalm the talisman's verse is from, in the Vulgate's numbering, 0
+   * for Jabamiah's Genesis.
+   */
   psalm: number;
   /** Whether the talisman letters Genesis 1:1 (Jabamiah). */
   genesis: boolean;
@@ -278,7 +299,7 @@ export function angelSigilSection(angel: Angel): AngelSigilSection {
     name: angel.name.en,
     number: angel.no,
     hebrew: angelSigilText(angel),
-    psalm: angel.psalm.psalm,
+    psalm: angelSigilPsalm(angel),
     genesis: angelSigilGenesis(angel),
     generatorHref: angelSigilGeneratorHref(angel),
     styles: ANGEL_SIGIL_STYLES.map((style) => ({

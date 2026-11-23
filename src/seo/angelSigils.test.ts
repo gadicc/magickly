@@ -1,6 +1,10 @@
 import angels from "magick-data/kabbalah/seventyTwoAngels";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("server-only", () => ({}));
+
 import { canonicalSigilText } from "@/render/contracts/roseSigil";
+import { LENAIN_VULGATE_VERSES } from "@/render/lenainVulgateVerses";
 import {
   ANGEL_SIGIL_BUILT_STYLES,
   allAngelSigilStyleFiles,
@@ -174,14 +178,35 @@ describe("an angel page's sigil section", () => {
         "A talisman of Vehuiah, והויה: the Rose Cross sigil inside a ring lettered with a verse of Psalm 3 in Latin",
     });
     // The talisman names the psalm only, never a verse number (decision
-    // for Gadi 12): Lenain's are often not the Vulgate's.
+    // for Gadi 12): Lenain's are often not the Vulgate's. The psalm is the
+    // one the verse is from, as the Vulgate numbers it (verses.json5), not
+    // always the one Lenain names: a new mismatch fails here.
     for (const angel of angels) {
       const alt = angelSigilStyleAlt(angel, "talisman");
+      const { vulgate } = LENAIN_VULGATE_VERSES[String(angel.no)];
       if (angel.psalm.psalm > 0) {
-        expect(alt).toContain(`a verse of Psalm ${angel.psalm.psalm} in Latin`);
+        const psalm = Number(vulgate.match(/^Psalm (\d+):/)?.[1]);
+        expect(angelSigilSection(angel).psalm, `angel ${angel.no}`).toBe(psalm);
+        expect(alt).toContain(`a verse of Psalm ${psalm} in Latin`);
         expect(alt).not.toMatch(/\d+:\d+/);
-      } else expect(alt).toContain("Genesis 1:1");
+      } else {
+        expect(vulgate).toBe("Genesis 1:1");
+        expect(alt).toContain("Genesis 1:1");
+      }
     }
+  });
+
+  it("names the psalm the 33rd genius's verse is from, not Lenain's", () => {
+    // He cites Psalm 33 for the Vulgate's 93:11 (differences.json5).
+    const iehuiah = angels[32];
+    expect(iehuiah.psalm.psalm).toBe(33);
+    expect(angelSigilStyleAlt(iehuiah, "talisman")).toBe(
+      "A talisman of Iehuiah, יהויה: the Rose Cross sigil inside a ring lettered with a verse of Psalm 93 in Latin",
+    );
+    const talisman = angelJsonLd(iehuiah)["@graph"].find((node) =>
+      (node as { "@id"?: string })["@id"]?.endsWith("#sigil-talisman-png"),
+    ) as { caption: string };
+    expect(talisman.caption).toContain("a verse of Psalm 93 in Latin");
   });
 });
 
