@@ -14,6 +14,10 @@ and writes:
   and FrankRuhlLibre-Bold-letters.ttf, the same subsets as TrueType for
   the server's image renderer (resvg reads no WOFF2; plan 062), outside
   public/ so no URL serves them and the service worker never caches them
+- assets/fonts/NotoSerif-Regular-latin1.ttf, upright Noto Serif for the
+  sigil styles' roman lettering (plan 096, decision 13): the talismans'
+  verses and the angels' roman names, drawn only by the server's
+  renderer, so as TrueType alone
 - public/fonts/NotoSerif-OFL.txt, FrankRuhlLibre-OFL.txt (upstream notices)
 - packages/magick-components/fonts/, the same three WOFF2 subsets and two
   notices, which the package ships (plan 080)
@@ -21,8 +25,8 @@ and writes:
   existing NotoSans-Regular.ttf and NotoSansHebrew-Regular.ttf lacked: their
   own copyright line (name ID 0) above the OFL 1.1 text
 - packages/magick-components/src/gd/hall/fontMetrics.json, the advances and GPOS kern pairs
-  that label wrapping and the Pantacle's ring measure with (no DOM
-  measurement)
+  that label wrapping, the Pantacle's ring and the sigil styles' lettering
+  measure with (no DOM measurement)
 
 Run from the repository root:
 
@@ -60,6 +64,11 @@ SOURCES = {
     "NotoSerif-Italic[wdth,wght].ttf": (
         "ofl/notoserif/NotoSerif-Italic%5Bwdth,wght%5D.ttf",
         "e87acbc6c0efd0d9a20d6a8cbbda2b266c14be3a3a6f5af8ec9d7b2460570ad1",
+    ),
+    # The upright twin, for the sigil styles (plan 096, decision 13).
+    "NotoSerif[wdth,wght].ttf": (
+        "ofl/notoserif/NotoSerif%5Bwdth,wght%5D.ttf",
+        "4d8e6761424656867019081a1a01336f3cb086982682698714054fc33f782713",
     ),
     # Frank Ruhl Libre (SIL OFL 1.1, no Reserved Font Name), which replaced
     # Noto Serif Hebrew on 11 November 2026: weight axis only.
@@ -274,6 +283,7 @@ def main() -> None:
     args.cache.mkdir(parents=True, exist_ok=True)
 
     italic_vf = fetch(args.cache, "NotoSerif-Italic[wdth,wght].ttf")
+    upright_vf = fetch(args.cache, "NotoSerif[wdth,wght].ttf")
     hebrew_vf = fetch(args.cache, "FrankRuhlLibre[wght].ttf")
 
     italic = subset_font(static_instance(italic_vf, 400), LATIN1)
@@ -283,6 +293,10 @@ def main() -> None:
     bold_ttf = to_bytes(bold)
     hebrew = subset_font(static_instance(hebrew_vf, 700), HEBREW)
     hebrew_ttf = to_bytes(hebrew)
+    # Latin-1 covers every verse and roman name since plan 096's Y0, which
+    # left no Œ or œ in them; add them here only if a legend needs them.
+    roman = subset_font(static_instance(upright_vf, 400), LATIN1)
+    roman_ttf = to_bytes(roman)
 
     outputs = {
         PUBLIC_FONTS / "NotoSerif-Italic-latin1.woff2": to_bytes(italic, "woff2"),
@@ -292,6 +306,7 @@ def main() -> None:
         ASSET_FONTS / "NotoSerif-Italic-latin1.ttf": italic_ttf,
         ASSET_FONTS / "NotoSerif-BoldItalic-compass.ttf": bold_ttf,
         ASSET_FONTS / "FrankRuhlLibre-Bold-letters.ttf": hebrew_ttf,
+        ASSET_FONTS / "NotoSerif-Regular-latin1.ttf": roman_ttf,
         PUBLIC_FONTS / "NotoSerif-OFL.txt": ofl_notice(
             fetch(args.cache, "notoserif-OFL.txt")),
         PUBLIC_FONTS / "FrankRuhlLibre-OFL.txt": ofl_notice(
@@ -316,6 +331,14 @@ def main() -> None:
     ])
     compass, compass_shaped, _ = metrics(bold_ttf, sorted({ord(c) for c in COMPASS_TEXT}))
     check_pairs(compass, compass_shaped, COMPASS_TEXT.split(" "))
+    roman_metrics, roman_shaped, roman_pairs = metrics(roman_ttf, LATIN1)
+    # The sigil styles' lettering, set glyph by glyph: verses in Lenain's
+    # capitals and the roman names.
+    check_pairs(roman_metrics, roman_shaped, [
+        "QUÀM MAGNIFICATA SUNT OPERA TUA DOMINE!", "LONGÈ", "ÆTERNUM",
+        "CÆLO", "MEÆ", "SITAËL", "SÉHEIAH", "EÏAEL", "NITH-HAIAH",
+        "IAH-HEL", "VEHUIAH", "NOS : ET OSTENDE", "AVATAR Wave Ty Yo",
+    ])
     hebrew_metrics, hebrew_shaped, _ = metrics(hebrew_ttf, HEBREW)
     # The Earth's names on the Pantacle's ring, set glyph by glyph.
     check_pairs(hebrew_metrics, hebrew_shaped, [
@@ -335,6 +358,7 @@ def main() -> None:
         "source": f"google/fonts@{GOOGLE_FONTS_COMMIT}",
         "label": label,
         "compass": compass,
+        "roman": roman_metrics,
         "hebrew": {
             **hebrew_metrics,
             "upem": hebrew_glyphs["head"].unitsPerEm,
@@ -358,6 +382,8 @@ def main() -> None:
           f"uharfbuzz {hb.__version__} (HarfBuzz {hb.version_string()})")
     print(f"label: {len(label['advances']) // 2} advances, "
           f"{label_pairs} kern pairs in {len(label['kern']) // 3} class pairs")
+    print(f"roman: {len(roman_metrics['advances']) // 2} advances, "
+          f"{roman_pairs} kern pairs in {len(roman_metrics['kern']) // 3} class pairs")
     print("| File | Bytes | SHA-256 |\n| --- | --- | --- |")
     for path in outputs:
         data = path.read_bytes()

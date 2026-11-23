@@ -13,6 +13,7 @@ worker never precaches them. The renderer's shared base fonts stay in
 | NotoSerif-Italic-latin1.ttf | `gd-hall` (labels and captions) | `scripts/gd-hall-fonts/build.py`; see below | b17042575847967023a24dba5b9b4b16aa9fe9a627005acfed7b18ca2c48c6b9 |
 | NotoSerif-BoldItalic-compass.ttf | `gd-hall` (the compass labels) | `scripts/gd-hall-fonts/build.py`; see below | d443ee9985cdaf7c3aa1120bfb3971b8f4f1b42896bf2c07cec5833b3336f475 |
 | FrankRuhlLibre-Bold-letters.ttf | `gd-hall` (Hebrew letters: banners, Tarot keys, the Pantacle's ring) | `scripts/gd-hall-fonts/build.py`; see below | 84304f1b7ce5fcce319b52946a714205d158f5a4ebc6050511090c50b41753ae |
+| NotoSerif-Regular-latin1.ttf | the angels' sigil styles (plan 096: the talismans' verses, the roman names) | `scripts/gd-hall-fonts/build.py` from [`ofl/notoserif/NotoSerif[wdth,wght].ttf`](https://raw.githubusercontent.com/google/fonts/8b0a1d0f5983c89bc2b93f1b5fb55f9e252744b5/ofl/notoserif/NotoSerif%5Bwdth,wght%5D.ttf) (SHA-256 `4d8e6761424656867019081a1a01336f3cb086982682698714054fc33f782713`), weight 400, width 100, the halls' Latin-1 subset; see below | 1bc1b369b8ada528cc4f20800fc8de34d0b7c27a4dc7a635651c796cc8802322 |
 
 Noto Emoji is the monochrome emoji family, variable weight 300–700 with the
 Regular (400) default that the renderer uses. `NotoEmoji-OFL.txt` is its
@@ -20,11 +21,15 @@ upstream SIL Open Font License 1.1 notice (Copyright 2013 Google LLC, no
 reserved font names). Add a font here only through the `SERVER_FONT_FILES`
 list and a registry entry; the loader refuses any other name.
 
-The two Noto Serif files and the Frank Ruhl Libre file are the temple
-halls' subsets as TrueType (plan 062): resvg reads no WOFF2.
+The two Noto Serif Italic files and the Frank Ruhl Libre file are the
+temple halls' subsets as TrueType (plan 062): resvg reads no WOFF2. The
+upright Noto Serif Regular (24,308 bytes; name "Noto Serif", subfamily
+Regular, weight 400) letters the angels' sigil styles beside the halls'
+Frank Ruhl Libre Bold (plan 096, decision 13); it is drawn only here, so it
+has no WOFF2 twin.
 `scripts/gd-hall-fonts/build.py` writes them in the same run, from the same
 static instances and subsets, as their WOFF2 twins in `public/fonts`, whose
 sources, versions and hashes
 `public/fonts/hall-font-sources.md` records; `fontMetrics.json` measures
-both. Their licence is the SIL Open Font License 1.1 in
+both (the upright subset under `roman`). Their licence is the SIL Open Font License 1.1 in
 `public/fonts/NotoSerif-OFL.txt` and `FrankRuhlLibre-OFL.txt`.
