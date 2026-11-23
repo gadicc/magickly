@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Export controls mock-ups</title>
+<!-- Plan 097. A throwaway design reference, not app code: open it in a
+     browser. Fonts come from Google Fonts and fall back to the system's. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Noto+Sans+Hebrew&family=Frank+Ruhl+Libre:wght@400;500&display=swap">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; padding: 24px; background: #e9ebef; font-family: Roboto, system-ui, sans-serif; color: #222; }
+h1 { font-size: 22px; font-weight: 500; margin: 0 0 4px; }
+section { margin-bottom: 40px; }
+section > h2 { font-size: 18px; font-weight: 500; margin: 0 0 4px; }
+.sub { font-size: 13px; color: #555; margin: 0 0 18px; max-width: 70em; }
+.grid { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+.col { width: 375px; }
+.col h3 { font-size: 15px; font-weight: 500; margin: 0 0 4px; }
+.col p.note { font-size: 12.5px; color: #444; margin: 0 0 10px; line-height: 1.4; min-height: 52px; }
+.frame {
+  --fg: rgba(0,0,0,.87); --fg2: rgba(0,0,0,.6); --pri: #1976d2; --pri-t: rgba(25,118,210,.1);
+  --pri-b: rgba(25,118,210,.5); --bg: #fff; --line: rgba(0,0,0,.18); --paper: #fff; --off: rgba(0,0,0,.3);
+  --band-text: #fff; --svg: #c25e00; --png: #2e7d32; --pdf: #c62828; --shadow: 0 5px 18px rgba(0,0,0,.22);
+  width: 375px; padding: 16px; background: var(--bg); color: var(--fg); border-radius: 6px;
+  font-size: 16px; margin-bottom: 18px;
+}
+.frame.dark {
+  --fg: #e4e8ef; --fg2: #a9b2c1; --pri: #8ab4f8; --pri-t: rgba(138,180,248,.14);
+  --pri-b: rgba(138,180,248,.5); --bg: #0f141d; --line: rgba(170,190,220,.26); --paper: #1d2533; --off: rgba(228,232,239,.3);
+  --band-text: #0f141d; --svg: #f5a25d; --png: #81c995; --pdf: #f28b82; --shadow: 0 5px 18px rgba(0,0,0,.6);
+}
+.frame[dir="rtl"] { font-family: "Noto Sans Hebrew", Arial, sans-serif; }
+.frame[dir="rtl"] button { font-family: "Frank Ruhl Libre", Arial, sans-serif; }
+.drawing { height: 90px; border-radius: 4px; background: repeating-linear-gradient(45deg, var(--line) 0 1px, transparent 1px 12px); border: 1px solid var(--line); display: grid; place-items: center; color: var(--fg2); font-size: 13px; margin-bottom: 8px; }
+.ctl { font-size: 90%; }
+svg.i { width: 20px; height: 20px; fill: currentColor; flex: none; }
+.btn { font: inherit; font-weight: 500; text-transform: uppercase; letter-spacing: .02857em; color: var(--pri); background: none; border: 0; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; min-width: 44px; padding: 0 8px; border-radius: 4px; }
+.btn.out { border: 1px solid var(--pri-b); padding: 0 12px; font-size: 13px; }
+.small { font-size: 12.5px; color: var(--fg2); text-align: center; margin-top: 8px; line-height: 1.4; }
+.label { font-size: 11px; color: var(--fg2); text-align: center; margin-top: 10px; font-style: italic; }
+
+/* The chosen design: one row per format */
+.frows { border: 1px solid var(--line); border-radius: 12px; max-width: 24rem; margin-inline: auto; }
+.frow { display: flex; align-items: center; gap: 10px; padding-block: 4px; padding-inline: 12px 4px; }
+.frow + .frow { border-top: 1px solid var(--line); }
+.frow .name { flex: 1; min-width: 0; line-height: 1.25; }
+.frow .name b { font-weight: 500; font-size: 14px; display: block; }
+.frow .name small { font-size: 12px; color: var(--fg2); }
+.acts { display: flex; }
+.ib { font: inherit; background: none; border: 0; color: var(--pri); min-width: 48px; min-height: 52px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11.5px; font-weight: var(--w, 400); border-radius: 8px; }
+.ib:disabled { color: var(--off); }
+.muted .ib span { color: var(--fg2); }
+.mouse .ib { min-height: 40px; min-width: 44px; }
+.mouse .frow { padding-block: 2px; }
+.toast { margin: 14px auto 0; width: fit-content; background: #2e7d32; color: #fff; border-radius: 4px; padding: 6px 8px 6px 14px; font-size: 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 3px 8px rgba(0,0,0,.25); }
+.toast b { font-weight: 500; text-transform: uppercase; font-size: 13px; padding: 6px 8px; letter-spacing: .03em; }
+
+/* Options considered */
+.now { text-align: center; }
+.now .btn { padding: 0 6px; }
+.rows { display: grid; grid-template-columns: max-content max-content max-content; justify-content: center; align-items: center; gap: 6px 8px; }
+.rows .act { display: inline-flex; align-items: center; gap: 8px; padding-inline-end: 6px; }
+.rows .act svg { fill: var(--fg2); }
+.chip { font: inherit; font-weight: 500; font-size: 14px; color: var(--fg); background: none; border: 1px solid var(--line); border-radius: 8px; min-height: 44px; padding: 0 12px 0 9px; display: inline-flex; align-items: center; gap: 7px; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.card { border: 1px solid var(--line); border-radius: 12px; padding: 10px 4px 4px; text-align: center; }
+.card .cap { font-size: 12px; color: var(--fg2); margin: 4px 0 2px; line-height: 1.3; }
+.card .acts { justify-content: space-around; }
+.menuwrap { text-align: center; }
+.menu { text-align: start; margin: 6px auto 0; width: 250px; background: var(--paper); border-radius: 4px; box-shadow: var(--shadow); padding: 6px 0; }
+.menu .sh { font-size: 12px; color: var(--fg2); padding: 8px 16px 2px; text-transform: uppercase; letter-spacing: .06em; }
+.menu .it { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 16px; font-size: 15px; }
+.menu .it .hint { margin-inline-start: auto; font-size: 12px; color: var(--fg2); }
+.seg { display: flex; justify-content: center; margin-bottom: 8px; }
+.seg button { font: inherit; font-weight: 500; font-size: 14px; color: var(--fg); background: none; border: 1px solid var(--line); min-height: 44px; padding: 0 16px 0 12px; display: inline-flex; align-items: center; gap: 7px; }
+.seg button:first-child { border-radius: 22px 0 0 22px; border-inline-end-width: 0; }
+.seg button:last-child { border-radius: 0 22px 22px 0; }
+.seg button.on { background: var(--pri-t); border-color: var(--pri-b); color: var(--pri); }
+.dacts { display: flex; justify-content: center; gap: 8px; }
+</style>
+</head>
+<body>
+<h1>Export controls — mock-ups (plan 097)</h1>
+<p class="sub">Each frame is a 375 px phone (16 px gutters, 44 px touch targets) unless it says otherwise; the block's text is at 90%, as today. The drawing is a placeholder.</p>
+
+<section id="chosen">
+  <h2>Chosen: one row per format</h2>
+  <p class="sub">Decided 23 November 2026. Regular-weight labels in the link colour; a file icon with its extension, the format's name and a one-line hint; Save, Copy and Link. A Link copies the image link, and its confirmation offers Open. Nothing sits under the box: the notes that did appear in the confirmation. Hebrew labels are drafts.</p>
+  <div class="grid" id="chosen-grid"></div>
+</section>
+
+<section id="weights">
+  <h2>Label weight (option B, as cards)</h2>
+  <p class="sub">Asked for on 23 November 2026, before the rows were chosen: medium, regular, and regular with grey labels.</p>
+  <div class="grid" id="weights-grid"></div>
+</section>
+
+<section id="options">
+  <h2>Options considered</h2>
+  <p class="sub">The first round, against the block as it was. Image links are copied, and the confirmation offers Open; "Copy page link" is gone from A–D.</p>
+  <div class="grid" id="options-grid"></div>
+</section>
+
+<script>
+const P = {
+  dl: "M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3zm-1-4-1.41-1.41L13 12.17V4h-2v8.17L8.41 9.59 7 11l5 5z",
+  copy: "M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z",
+  link: "M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5",
+  caret: "M7 10l5 5 5-5z",
+};
+const icon = (k) => `<svg class="i" viewBox="0 0 24 24"><path d="${P[k]}"/></svg>`;
+// A page with a folded corner; with `ext`, the extension sits in a coloured band.
+const file = (fmt, h, ext = true) => {
+  const c = `var(--${fmt})`;
+  const band = ext ? `<rect x="0.5" y="12" width="17" height="9" rx="1.5" fill="${c}"/><text x="9" y="19" text-anchor="middle" font-family="Roboto, sans-serif" font-weight="700" font-size="6.6" fill="#fff" letter-spacing=".2" direction="ltr" style="fill:var(--band-text)">${fmt.toUpperCase()}</text>` : "";
+  return `<svg viewBox="0 0 22 26" style="height:${h}px;width:${h*22/26}px;flex:none;overflow:visible">
+    <path d="M3 1h10.5L20 7.5V24a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z" fill="none" stroke="${c}" stroke-width="1.6"/>
+    <path d="M13.5 1v6.5H20" fill="none" stroke="${c}" stroke-width="1.6"/>${band}</svg>`;
+};
+const EN = { save: "Save", copy: "Copy", link: "Link", svg: "Sharp at any size", png: "Pastes anywhere", pdf: "Prints well" };
+const HE = { save: "שמירה", copy: "העתקה", link: "קישור", svg: "חד בכל גודל", png: "נדבק בכל מקום", pdf: "מודפס היטב" };
+const acts = (t, noLink) => `<div class="acts">
+  <button class="ib">${icon("dl")}<span>${t.save}</span></button>
+  <button class="ib">${icon("copy")}<span>${t.copy}</span></button>
+  <button class="ib"${noLink ? " disabled" : ""}>${icon("link")}<span>${t.link}</span></button></div>`;
+const row = (fmt, t = EN, noLink = false) => `<div class="frow">${file(fmt, 34)}<div class="name"><b>${fmt.toUpperCase()}</b><small>${t[fmt]}</small></div>${acts(t, noLink)}</div>`;
+const rows = (fmts, opts = {}) => `<div class="ctl frows ${opts.cls ?? ""}">${fmts.map((f) => row(f, opts.t, opts.noLink)).join("")}</div>`;
+const drawing = `<div class="drawing">drawing</div>`;
+const frame = (body, cls = "", dir = "") => `<div class="frame ${cls}"${dir ? ` dir="${dir}"` : ""}>${drawing}${body}</div>`;
+const col = (title, note, frames) => `<div class="col"><h3>${title}</h3><p class="note">${note}</p>${frames}</div>`;
+
+const toast = (text, open = true, info = false) => `<div class="toast"${info ? ' style="background:#0288d1"' : ""}>${text}${open ? "<b>Open</b>" : ""}</div>`;
+const chosen = [
+  col("Phone, light and dark", "Touch: each action is at least 48 × 52 px. Nothing sits under the box.",
+    frame(rows(["svg", "png"])) + frame(rows(["svg", "png"]), "dark")),
+  col("After Link", "The link is copied; the confirmation names the format, offers Open and stays longer. On a personal page (dark frame) it also says the link carries what was entered.",
+    frame(rows(["svg", "png"]) + toast("Copied PNG image link")) +
+    frame(rows(["svg", "png"]) + toast("Copied PNG image link. It includes what you entered here."), "dark")),
+  col("No image link for these settings", "Link looks disabled but stays focusable, so the rows keep their shape; tapping it says why.",
+    frame(rows(["svg", "png"], { noLink: true }) + toast("No image link for these settings.", false, true)) +
+    frame(rows(["svg", "png"], { noLink: true }) + toast("No image link for these settings.", false, true), "dark")),
+  col("With a mouse", "pointer: fine: the same rows, 40 px tall actions (the rule's floor is 24 px). The box stays at most 24rem wide on a wide screen.",
+    frame(rows(["svg", "png"], { cls: "mouse" })) + frame(rows(["svg", "png"], { cls: "mouse" }), "dark")),
+  col("Hebrew interface (draft labels)", "Logical properties mirror the row: the icon and name start on the right. SVG and PNG stay in Latin letters.",
+    frame(rows(["svg", "png"], { t: HE }), "", "rtl") + frame(rows(["svg", "png"], { t: HE }), "dark", "rtl")),
+  col("Later: PDF", "Not built in this plan (follow-up). A third format is one more row; nothing else moves.",
+    frame(rows(["svg", "png", "pdf"])) + frame(rows(["svg", "png", "pdf"]), "dark")),
+];
+document.getElementById("chosen-grid").innerHTML = chosen.join("");
+
+const card = (fmt, cls) => `<div class="card">${file(fmt, 46)}<div class="cap">${EN[fmt]}</div>${acts(EN)}</div>`;
+const B = (cls) => `<div class="ctl cards ${cls}">${card("svg")}${card("png")}</div>`;
+document.getElementById("weights-grid").innerHTML = [
+  col("Medium", "Weight 500, MUI's button weight, in the link colour.", frame(`<div style="--w:500">${B("")}</div>`) + frame(`<div style="--w:500">${B("")}</div>`, "dark")),
+  col("Regular", "Weight 400, in the link colour. Chosen.", frame(B("")) + frame(B(""), "dark")),
+  col("Regular, grey labels", "Weight 400 in secondary text; only the icons carry the link colour.", frame(B("muted")) + frame(B("muted"), "dark")),
+].join("");
+
+const chip = (fmt) => `<button class="chip">${file(fmt, 22, false)}${fmt.toUpperCase()}</button>`;
+const now = `<div class="ctl now">
+  <div>Download:<button class="btn">SVG</button>|<button class="btn">PNG</button></div>
+  <div>Copy to clipboard:<button class="btn">SVG</button>|<button class="btn">PNG</button></div>
+  <div>Image link:<button class="btn">SVG</button>|<button class="btn">PNG</button>|<button class="btn">Copy link</button></div>
+  <div><button class="btn">Copy page link</button></div></div>`;
+const A = `<div class="ctl rows">
+  <span class="act">${icon("dl")}Download</span>${chip("svg")}${chip("png")}
+  <span class="act">${icon("copy")}Copy image</span>${chip("svg")}${chip("png")}
+  <span class="act">${icon("link")}Copy link</span>${chip("svg")}${chip("png")}</div>`;
+const item = (fmt, hint = "") => `<div class="it">${file(fmt, 22, false)}${fmt.toUpperCase()}<span class="hint">${hint}</span></div>`;
+const C = `<div class="ctl menuwrap">
+  <button class="btn out">${icon("dl")}Export image${icon("caret")}</button>
+  <div class="menu"><div class="sh">Download</div>${item("svg", "vector")}${item("png", "picture")}
+    <div class="sh">Copy to clipboard</div>${item("svg")}${item("png")}
+    <div class="sh">Copy image link</div>${item("svg")}${item("png")}</div>
+  <div class="label">menu shown open</div></div>`;
+const D = `<div class="ctl">
+  <div class="seg"><button>${file("svg", 22, false)}SVG</button><button class="on">${file("png", 22, false)}PNG</button></div>
+  <div class="dacts"><button class="btn out">${icon("dl")}Download</button><button class="btn out">${icon("copy")}Copy</button><button class="btn out">${icon("link")}Link</button></div>
+  <div class="toast">Copied PNG link<b>Open</b></div></div>`;
+document.getElementById("options-grid").innerHTML = [
+  col("As it was", "Four centred lines of label and text buttons; labels and buttons don't line up; the pipes read as text; 9 controls.", frame(now) + frame(now, "dark")),
+  col("A · Grouped rows", "One row per action, named once with its icon, then a file chip per format. 6 targets, 3 rows.", frame(A) + frame(A, "dark")),
+  col("B · One card per format", "Format first, with a hint on which to choose. 6 targets in 2 cards. Became the chosen rows.", frame(B("")) + frame(B(""), "dark")),
+  col("C · One Export menu", "Smallest at rest, but every action is a tap further and hidden; the open menu is tall on a phone.", frame(C) + frame(C, "dark")),
+  col("D · Format, then action", "Pick SVG or PNG once, then three actions. 5 targets; a tap to switch format.", frame(D) + frame(D, "dark")),
+].join("");
+</script>
+</body>
+</html>
