@@ -214,21 +214,25 @@ index without a failing test. `ToolLayout`'s slots and the Oration's notes
 are children for this reason.
 
 A commit that adds or changes indexed public text (a new public page, prose on
-an indexed page, a component entry) moves the search catalogue's digest, and
-`src/search/embeddings/manifest.test.ts` and `src/search/semantic.test.ts`
-fail until its embeddings are published. Publishing is a paid call to the AI
-Gateway; resolving two branches' publishes is not (`pnpm search:assemble
-gemini-embedding-2-768-search-v1` rebuilds from the committed rows alone).
+an indexed page, a component entry) re-keys the records it touches. Until its
+embeddings are published those records are found by text only, and
+`pnpm search:build` reports less than full coverage (warning below 90%); no
+test fails (plan 087). Publishing is a paid call to the AI Gateway; resolving
+two branches' publishes is not (`pnpm search:assemble
+gemini-embedding-2-768-search-v1` prunes and checks from the committed rows
+alone).
 
-To publish from a worktree (gate worktrees have no `.env*`, and a fresh one has
-no embedding cache, so without the second step it re-embeds every passage;
-`../magickli` is the main checkout from a worktree beside it, elsewhere use its
-full path):
+To publish from a worktree (gate worktrees have no `.env*`; `../magickli` is
+the main checkout from a worktree beside it, elsewhere use its full path):
 
 1. Use the repository's Node (`nvm use 24`).
-2. Seed the cache from the main checkout, which is keyed by exact text and
-   model recipe and so is safe to share:
+2. Optionally, seed the cache from the main checkout, which is keyed by exact
+   text and model recipe and so is safe to share:
    `mkdir -p .private && cp -rn ../magickli/.private/site-search .private/`
+   A publish takes every committed row first, so even a fresh worktree pays
+   only for records with no committed row. The cache saves something only
+   when another checkout has already embedded that exact text (an edit
+   published on a branch not yet merged here, say); usually it saves nothing.
 3. Pass only the gateway key, never the rest of `.env.local`:
 
    ```bash
@@ -238,8 +242,9 @@ full path):
    Never print, log or commit the key.
 4. Copy the new cache entries back for the next worktree:
    `cp -rn .private/site-search/. ../magickli/.private/site-search/`
-5. Commit the changed `search-vectors/` rows, the manifest and the new matrix
-   with the change that needed them.
+5. Commit the changed `search-vectors/` rows (added and pruned) and
+   `src/search/embeddings/manifest.json`, if it changed, with the change that
+   needed them. There is no matrix to commit (plan 087, S3).
 
 **Agents may run this without asking** when the run's conservative estimate
 (the script prints it before any paid call, and refuses anything over $1) is

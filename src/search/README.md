@@ -64,6 +64,21 @@ row on disk is validated: a wrong length, a non-finite value or a norm far
 from 1 fails the build and the tests. Orphans are normal after a content
 edit and fail nothing; a publish prunes them.
 
+The committed rows are the only published form of the vectors: nothing is
+written under `public/`, so the service worker, which precaches `public/`,
+never downloads them. `search:build` also prints the SHA-256 of the covered
+records' rows concatenated in catalogue record order, the matrix the store
+ranks:
+
+```
+search: record-order matrix sha256 692a8226…88449 (3207 rows)
+```
+
+At full coverage it is the matrix a publish committed before plan 087's
+S3, so it compares with the `sha256` older manifests recorded;
+`search:publish` and `search:assemble` print the same digest for what they
+wrote.
+
 Coverage is per record. A record with a row ranks by meaning and text; a
 record without one (its text changed since the last publish) is left out of
 dense ranking only and is still found by text and fusion. Because a row is
@@ -74,10 +89,20 @@ record is covered (a profile or recipe change with no republish): then
 and `/search/index` reports `semanticAvailable: false`. Both apply the same
 rule (`embeddings/store.ts`); `/search/index` reads only the artifact's
 header. A missing artifact is an error, not zero coverage: it means
-`search:build` did not run. The store also checks the manifest's profile
-against `embeddings/profiles.ts`. Changing any field of a profile re-keys
-every row, so a changed recipe is a new profile, and `embeddings.test.ts`
-pins two keys.
+`search:build` did not run.
+
+`/search/index` reads the artifact while it is prerendered at build time,
+and so has no tracing entry; that is fine while the route stays
+`force-static`. If it ever renders at request time, give it an
+`outputFileTracingIncludes` entry for the artifact as `/api/search` has
+in `next.config.ts`.
+
+`embeddings/manifest.json` holds, besides its version, only `selected`, the
+shipped profile's key, and a copy of that profile as published. The store
+checks the copy against `embeddings/profiles.ts` and refuses a mismatch:
+changing any field of a profile re-keys every row, so a changed recipe is a
+new profile under a new key, never an edit in place, and
+`embeddings.test.ts` pins two keys.
 
 To refresh after changing content:
 
@@ -93,18 +118,21 @@ the worktree's private cache under `.private/site-search` (keyed like the
 rows), and calls the provider only for what is still missing. It verifies
 current public model pricing against a conservative $1 input estimate for
 those rows before provider work and disables provider retries. Cached query
-probes can be reused as well. A publish writes the new rows, prunes orphans,
-and still writes the matrix in `public/search-vectors` and its SHA-256 and
-catalogue digest in `embeddings/manifest.json`, deleting the profile's
-earlier matrix; nothing reads those for availability any more, and plan
-087's S3 removes them. Review the rows and manifest with the content change.
+probes can be reused as well. A publish writes the new rows, prunes orphans
+and writes `embeddings/manifest.json`, and nothing else is committed. Review
+the rows and manifest with the content change.
 
-When two branches have each published, a merge or rebase conflicts on the
-manifest, and git may also report the two matrices as a rename/rename
-conflict of the one they replaced. Every row either side needed is committed
-under `search-vectors/`, so resolve the manifest to either side's valid JSON
-(`search:build` parses it), keep both sides' row files (if both added the
-same row, either file will do), stage any matrix, and run
+A malformed committed row (wrong length, a non-finite value, a norm far from
+1) stops `search:publish` too, since it runs `search:build` first, and it
+keeps stopping it until the file is deleted by hand; the next publish then
+embeds that record again. That is deliberate: a malformed row means
+something wrote bad bytes into the repository, and replacing it silently
+would hide that.
+
+Two branches that each published merge cleanly: every row is its own file
+named by its input, and both write the same manifest unless they selected
+different profiles. If both added the same row, either file will do. After
+the merge run
 
 ```sh
 pnpm search:assemble gemini-embedding-2-768-search-v1
@@ -112,13 +140,17 @@ pnpm search:assemble gemini-embedding-2-768-search-v1
 
 It does what `search:publish` does with the vectors it reads from the
 committed rows alone, copying their bytes: no provider, credentials or
-network, so it costs nothing. It stops before writing anything if a record
-has no committed row, naming the page; that text needs `search:publish`.
-It deletes every other matrix of the profile, whichever you staged.
+network, so it costs nothing. It prunes rows the merged catalogue no longer
+references and rewrites the manifest. It stops before writing anything if a
+record has no committed row, naming the page (text the merge combined from
+both sides, say); that text needs `search:publish`. Skipping it is safe:
+it only leaves orphans on disk until the next publish. If the manifest does
+conflict, resolve it to either side's valid JSON
+(`search:build` parses it) before running it.
 
 Builds never silently re-embed. The server scores the covered rows
-exhaustively; no vector database or ANN index is needed. The browser does
-not download this matrix or a model. In development the search watcher
+exhaustively; no vector database or ANN index is needed. The browser
+downloads neither the vectors nor a model. In development the search watcher
 reruns `search:build` when source files, `embeddings/manifest.json` or the
 selected profile's row directory change, so a pull that adds rows reaches a
 running server.
