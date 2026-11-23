@@ -287,3 +287,27 @@ sizing is unchanged. The design is Loom's `docs/machine-slots.md`.
 - A test budget raised for load (`tests/loadBudget.ts`) states what it
   measured. Fix a slow test's cause before raising its budget, and raise
   it per test, never across the board.
+
+## The gates
+
+`pnpm gate` is the full gate: what CI's required checks and the release
+job run, step by step. That is install, `loom check`, lint, translations,
+types, both package smokes, the tests with coverage, both builds and `loom
+check --production`. `pnpm gate:quick` runs lint, translations and types,
+none of which wait for CPUs. Both are `scripts/gate.mjs`.
+
+- Each step runs with only basic variables from the shell (`PATH`, `HOME`,
+  the locale) plus CI's placeholders from `.env.ci`, so a gate never sees a
+  real credential or needs `.env.local`. Run them under Node 24 (`nvm use`);
+  the gate refuses another major version.
+- `.env.ci` is plain `KEY=value` lines and must stay equal to `ci.yml`'s
+  top-level `env` block; `scripts/gate.test.ts` checks both, and that every
+  value is a placeholder.
+- Every run logs each step's duration and exit code under the git common
+  directory, in `gate-logs/`.
+- When CI gains a required `pnpm` step, add it to `STEPS.full`; the test
+  fails until you do.
+
+Which gate a change needs before it lands is still the verification policy
+in the Loom skill. The quick tier isn't in use yet (Loom
+`docs/landing.md`, on the `design/landing` branch).

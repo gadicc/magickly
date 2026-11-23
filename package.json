@@ -16,6 +16,8 @@
     "check:turbopack": "pnpm i18n:compile && pnpm data:build && pnpm search:build && pnpm data:check && SERWIST_SUPPRESS_TURBOPACK_WARNING=1 loom slots run --label check:turbopack --max 6 -- next build --turbopack",
     "start": "next start",
     "check": "biome check .",
+    "gate": "node scripts/gate.mjs full",
+    "gate:quick": "node scripts/gate.mjs quick",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "typecheck": "pnpm i18n:compile && pnpm data:build && pnpm search:build && next typegen && tsc --noEmit && pnpm --filter magick-data typecheck && pnpm --filter magick-components typecheck",
