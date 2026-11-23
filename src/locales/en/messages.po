@@ -36,6 +36,72 @@ msgstr "The Rose Cross sigil of {name}, {hebrew}, traced on the Golden Dawn's ro
 msgid "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, traced on the Golden Dawn's rose of 22 letters"
 msgstr "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, traced on the Golden Dawn's rose of 22 letters"
 
+#. An option of the angel page's "Sigil style" menu, and a label in its list of every style's files: the angel's sigil inside a ring, the angel's name lettered in the ring
+#. js-lingui-explicit-id
+#: src/seo/angelSigilFiles.ts
+msgid "In a ring with its name"
+msgstr "In a ring with its name"
+
+#. An option of the angel page's "Sigil style" menu, and a label in its list of files: the sigil drawn on its own, the angel's name beneath it
+#. js-lingui-explicit-id
+#: src/seo/angelSigilFiles.ts
+msgid "Alone, with its name"
+msgstr "Alone, with its name"
+
+#. An option of the angel page's "Sigil style" menu, and a label in its list of files: the sigil drawn over the Golden Dawn's Rose Cross lettered with the Hebrew alphabet
+#. js-lingui-explicit-id
+#: src/seo/angelSigilFiles.ts
+msgid "On the rose"
+msgstr "On the rose"
+
+#. An option of the angel page's "Sigil style" menu, and a label in its list of files: the sigil inside a ring lettered with the angel's psalm verse in Latin
+#. js-lingui-explicit-id
+#: src/seo/angelSigilFiles.ts
+msgid "Talisman with its verse"
+msgstr "Talisman with its verse"
+
+#. Alt text of an angel's sigil inside a ring (angel page, 72 angels list). {name} is the angel's name in English, {hebrew} the same in Hebrew letters
+#. js-lingui-explicit-id
+#: src/seo/angelSigilFiles.ts
+msgid "The Rose Cross sigil of {name}, {hebrew}, inside a ring with the name in Hebrew"
+msgstr "The Rose Cross sigil of {name}, {hebrew}, inside a ring with the name in Hebrew"
+
+#. Alt text as above, for one of the two angels named Lauviah, told apart by {number}, their place among the 72
+#. js-lingui-explicit-id
+#: src/seo/angelSigilFiles.ts
+msgid "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, inside a ring with the name in Hebrew"
+msgstr "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, inside a ring with the name in Hebrew"
+
+#. Alt text of an angel's sigil drawn on its own, its name beneath (angel page). {name} is the angel's name in English, {hebrew} the same in Hebrew letters
+#. js-lingui-explicit-id
+#: src/seo/angelSigilFiles.ts
+msgid "The Rose Cross sigil of {name}, {hebrew}, drawn alone with the name beneath"
+msgstr "The Rose Cross sigil of {name}, {hebrew}, drawn alone with the name beneath"
+
+#. Alt text as above, for one of the two angels named Lauviah, told apart by {number}, their place among the 72
+#. js-lingui-explicit-id
+#: src/seo/angelSigilFiles.ts
+msgid "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, drawn alone with the name beneath"
+msgstr "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, drawn alone with the name beneath"
+
+#. Alt text of an angel's talisman (angel page): the sigil inside a ring lettered with the angel's psalm verse. {psalm} is the psalm's number in the Latin Bible's numbering
+#. js-lingui-explicit-id
+#: src/seo/angelSigilFiles.ts
+msgid "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} in Latin"
+msgstr "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} in Latin"
+
+#. Alt text as above, for one of the two angels named Lauviah, told apart by {number}, their place among the 72
+#. js-lingui-explicit-id
+#: src/seo/angelSigilFiles.ts
+msgid "A talisman of {name}, angel {number} of the 72, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} in Latin"
+msgstr "A talisman of {name}, angel {number} of the 72, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} in Latin"
+
+#. Alt text of the talisman of Jabamiah, the one angel whose verse is the Bible's first, not a psalm's
+#. js-lingui-explicit-id
+#: src/seo/angelSigilFiles.ts
+msgid "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with Genesis 1:1 in Latin"
+msgstr "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with Genesis 1:1 in Latin"
+
 #. js-lingui-explicit-id
 #: src/search/SearchButton.tsx
 msgid "Search the site"
@@ -1369,13 +1435,55 @@ msgstr "Loading offline rituals"
 
 #. js-lingui-explicit-id
 #: src/app/kabbalah/yhvh/72angels/ListSigil.tsx
-msgid "{name}'s Rose Cross sigil. <0>Watch it drawn</0> in the sigil generator."
-msgstr "{name}'s Rose Cross sigil. <0>Watch it drawn</0> in the sigil generator."
+msgid "{name}'s Rose Cross sigil, in a ring with its name. <0>Its page</0> has it on the rose, alone, and as a talisman with its verse; <1>watch it drawn</1> in the sigil generator."
+msgstr "{name}'s Rose Cross sigil, in a ring with its name. <0>Its page</0> has it on the rose, alone, and as a talisman with its verse; <1>watch it drawn</1> in the sigil generator."
 
 #. js-lingui-explicit-id
 #: src/app/kabbalah/yhvh/72angels/angels.tsx
 msgid "Open an angel to see its Rose Cross sigil."
 msgstr "Open an angel to see its Rose Cross sigil."
+
+#. Caption of an angel's sigil drawn inside a ring, on the angel's page. <0> is a book's title, set in italics; <1> links the plate of the book it cites
+#. js-lingui-explicit-id
+#: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
+msgid "The sigil inside a ring with the name in Hebrew at the top, as the angels' names are written round a pentacle in Mathers's <0>Key of Solomon</0> (1889), <1>Plate IV, Fig. 18</1>. Ours: one name instead of four, the name in roman letters at the bottom, and the sigil inside."
+msgstr "The sigil inside a ring with the name in Hebrew at the top, as the angels' names are written round a pentacle in Mathers's <0>Key of Solomon</0> (1889), <1>Plate IV, Fig. 18</1>. Ours: one name instead of four, the name in roman letters at the bottom, and the sigil inside."
+
+#. Caption of an angel's sigil drawn on its own, on the angel's page. <0> links the page of Regardie's The Golden Dawn it cites
+#. js-lingui-explicit-id
+#: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
+msgid "Drawn alone, with the name beneath, as the Golden Dawn's own sigils of Metatron and Elohim are printed (Regardie, vol. 4, <0>p. 58</0>). Giving the 72 this form is ours."
+msgstr "Drawn alone, with the name beneath, as the Golden Dawn's own sigils of Metatron and Elohim are printed (Regardie, vol. 4, <0>p. 58</0>). Giving the 72 this form is ours."
+
+#. Caption of an angel's sigil drawn over the Golden Dawn's rose, on the angel's page. <0> is the book's title, in italics; <1> and <2> link the two pages it cites
+#. js-lingui-explicit-id
+#: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
+msgid "Traced through the letters of the Golden Dawn's rose by the Order's rules (Regardie, <0>The Golden Dawn</0>, vol. 4, pp. <1>57</1>–<2>58</2>). The rose shows which letters the line passes through."
+msgstr "Traced through the letters of the Golden Dawn's rose by the Order's rules (Regardie, <0>The Golden Dawn</0>, vol. 4, pp. <1>57</1>–<2>58</2>). The rose shows which letters the line passes through."
+
+#. Caption of an angel's talisman, its sigil inside a ring lettered with its verse, on the angel's page. <0> and <3> are book titles, in italics; <1>, <2> and <4> link the pages they cite. A genius is one of the 72 angels, as Lenain calls them
+#. js-lingui-explicit-id
+#: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
+msgid "A talisman as Lenain describes the genii's, the genius's verse written round it (<0>La Science cabalistique</0>, <1>p. 45</1>), lettered like the talisman on his <2>title page</2>. The name inside follows Mathers's <3>Key of Solomon</3> (1889), <4>Plate IV, Fig. 21</4>. Ours: Lenain says the verses are in Hebrew, and we letter his Latin; he draws no genius's talisman; and the sigil inside is the Golden Dawn's."
+msgstr "A talisman as Lenain describes the genii's, the genius's verse written round it (<0>La Science cabalistique</0>, <1>p. 45</1>), lettered like the talisman on his <2>title page</2>. The name inside follows Mathers's <3>Key of Solomon</3> (1889), <4>Plate IV, Fig. 21</4>. Ours: Lenain says the verses are in Hebrew, and we letter his Latin; he draws no genius's talisman; and the sigil inside is the Golden Dawn's."
+
+#. Added to the talisman's caption for Jabamiah only, the 70th angel, whose verse is the Bible's first. {name} is the angel's name. <0> is the book's title, in italics; <1> links its page
+#. js-lingui-explicit-id
+#: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
+msgid "Lenain gives {name} no psalm but the first verse of Genesis, in French; the Latin here is the Vulgate's, which Kircher, his source, gives for the 70th genius (<0>Oedipus Aegyptiacus</0>, vol. II, <1>p. 280</1>)."
+msgstr "Lenain gives {name} no psalm but the first verse of Genesis, in French; the Latin here is the Vulgate's, which Kircher, his source, gives for the 70th genius (<0>Oedipus Aegyptiacus</0>, vol. II, <1>p. 280</1>)."
+
+#. Visible label of the menu on an angel's page that chooses how its Rose Cross sigil is drawn
+#. js-lingui-explicit-id
+#: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
+msgid "Sigil style"
+msgstr "Sigil style"
+
+#. Introduces the angel page's list of each sigil style's files, PNG and SVG, as plain links
+#. js-lingui-explicit-id
+#: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
+msgid "Every style:"
+msgstr "Every style:"
 
 #. js-lingui-explicit-id
 #: src/app/kabbalah/angel/[slug]/AngelSigil.tsx

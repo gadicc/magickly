@@ -31,15 +31,19 @@ type CiteProps<W extends WorkId> = {
  *
  *     <Cite work="agrippa1533" leaf={164} region="kameaSigils">leaf 164</Cite>
  *     <Cite work="lenainReissue" page={46}>46</Cite>
+ *     <Cite work="lenain1823" page={11} preliminary>title page</Cite>
  */
 export default function Cite<W extends WorkId>(props: CiteProps<W>) {
   const { work, region, plain = false, children, ...rest } = props;
-  const { leaf, page, front, ...anchor } = rest as typeof rest & {
+  const { leaf, page, front, preliminary, ...anchor } = rest as typeof rest & {
     leaf?: number;
     page?: number | string;
     front?: boolean;
+    preliminary?: boolean;
   };
-  const at = (leaf !== undefined ? { leaf } : { page, front }) as Locator<W>;
+  const at = (
+    leaf !== undefined ? { leaf } : { page, front, preliminary }
+  ) as Locator<W>;
   const mirror = mirrorOf(work, at);
   if (mirror)
     return (

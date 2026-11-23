@@ -41,6 +41,10 @@ import AngelPage from "./Angel";
  * And for plan 094's C1 (23 November 2026): "In the book" links each printed
  * page to that page of the scan the site transcribes and says so. Nothing
  * else in the text changed.
+ *
+ * And for plan 096's Y4 (23 November 2026): the sigil's section gained the
+ * style menu (its label and four options), the band's caption and the
+ * line of every style's files. Nothing else in the text changed.
  */
 const GOLDEN = readFileSync(
   path.join(import.meta.dirname, "angel.golden.txt"),
@@ -84,16 +88,16 @@ describe("the angel page", () => {
       );
   });
 
-  it("shares the page's card, then the sigil", async () => {
+  it("shares the page's card, then the band's sigil", async () => {
     const metadata = await generateMetadata(params("lauviah-17"));
     const images = metadata.openGraph?.images as { url: string; alt: string }[];
     expect(images).toHaveLength(2);
     expect(images[0].url).toMatch(/^\/og\//);
     expect(images[1]).toMatchObject({
-      url: "/kabbalah/angel/lauviah-17/lauviah-17-rose-cross-sigil.png",
+      url: "/kabbalah/angel/lauviah-17/lauviah-17-rose-cross-sigil-band.png",
       width: 1024,
       height: 1024,
-      alt: expect.stringContaining("Lauviah, angel 17 of the 72"),
+      alt: "The Rose Cross sigil of Lauviah, angel 17 of the 72, לאויה, inside a ring with the name in Hebrew",
     });
     // The rest of the page's metadata is as it was.
     expect(metadata.alternates?.canonical).toBe("/kabbalah/angel/lauviah-17");
@@ -120,23 +124,33 @@ describe("the angel page", () => {
     }
   });
 
-  it("shows the sigil's static PNG and links its files and the generator", async () => {
+  it("shows the band's static PNG and links its files and the generator", async () => {
     const html = await body(1);
     expect(html).toContain(
-      '<img src="/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png" width="1024" height="1024" alt="The Rose Cross sigil of Vehuiah, והויה, traced on the Golden Dawn&#x27;s rose of 22 letters" loading="lazy"',
+      '<img src="/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil-band.png" width="1024" height="1024" alt="The Rose Cross sigil of Vehuiah, והויה, inside a ring with the name in Hebrew" loading="lazy"',
     );
+    expect(html.match(/<img /g)).toHaveLength(1);
     expect(html).toContain(
       `href="/gd/sigils?text=${encodeURIComponent("והויה")}"`,
     );
     expect(html).toMatch(
-      /<a [^>]*download="vehuiah-rose-cross-sigil\.png" href="\/kabbalah\/angel\/vehuiah\/vehuiah-rose-cross-sigil\.png"[^>]*>Download PNG<\/a>/,
+      /<a [^>]*download="vehuiah-rose-cross-sigil-band\.png" href="\/kabbalah\/angel\/vehuiah\/vehuiah-rose-cross-sigil-band\.png"[^>]*>Download PNG<\/a>/,
     );
     expect(html).toMatch(
-      /<a [^>]*download="vehuiah-rose-cross-sigil\.svg" href="\/kabbalah\/angel\/vehuiah\/vehuiah-rose-cross-sigil\.svg"[^>]*>Download SVG<\/a>/,
+      /<a [^>]*download="vehuiah-rose-cross-sigil-band\.svg" href="\/kabbalah\/angel\/vehuiah\/vehuiah-rose-cross-sigil-band\.svg"[^>]*>Download SVG<\/a>/,
+    );
+    // Every style's files, as plain links, for a reader without
+    // JavaScript and for image search.
+    for (const name of ["band.png", "bare.svg", "talisman.png", "talisman.svg"])
+      expect(html).toContain(
+        `href="/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil-${name}"`,
+      );
+    expect(html).toContain(
+      'href="/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png"',
     );
   });
 
-  it("emits the trail and the sigil's two images in one graph", async () => {
+  it("emits the trail and every style's two images in one graph", async () => {
     const html = await body(1);
     const scripts = [
       ...html.matchAll(
@@ -151,18 +165,22 @@ describe("the angel page", () => {
     }[];
     expect(graph.map((node) => node["@type"])).toEqual([
       "BreadcrumbList",
-      "ImageObject",
-      "ImageObject",
+      ...Array(8).fill("ImageObject"),
     ]);
-    // Each image's URL and caption exactly as the page shows them.
+    // The band's first: its URL and caption exactly as the page shows them.
     expect(graph[1].contentUrl).toBe(
-      "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png",
+      "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil-band.png",
     );
     expect(graph[2].contentUrl).toBe(
-      "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.svg",
+      "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil-band.svg",
     );
     const alt = html.match(/<img [^>]*alt="([^"]*)"/)?.[1];
     expect(textOf(alt ?? "")).toBe(graph[1].caption);
+    // Every file the graph names is one the page links.
+    for (const node of graph.slice(1))
+      expect(html).toContain(
+        `href="${node.contentUrl?.replace("https://magick.ly", "")}"`,
+      );
   });
 
   it("links the decade's planet and the sign to their pages", async () => {

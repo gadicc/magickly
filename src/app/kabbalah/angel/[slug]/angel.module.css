@@ -23,18 +23,102 @@
   opacity: 0.7;
 }
 
-/* The Rose Cross sigil (plan 088, S4): the 1,024-pixel file shown small,
-   square, within the column on a phone. */
+/* The Rose Cross sigil (plan 088, S4), in the style chosen (plan 096):
+   the 1,024-pixel file shown small, square, within the column on a phone.
+   Every style the same size, so a swap moves nothing. */
+.styleChoice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2em;
+  margin: 0.6em 0 0.4em;
+}
+
+.styleChoice label {
+  font-size: 0.875rem;
+  opacity: 0.75;
+}
+
+.styleChoice select {
+  font: inherit;
+  font-size: 1rem;
+  min-block-size: 24px;
+  max-inline-size: 100%;
+  padding: 0.35em 0.6em;
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+}
+
+/* The options on the native list, which keeps the page's colours only in
+   some browsers. */
+.styleChoice option {
+  background: Canvas;
+  color: CanvasText;
+}
+
+.figure {
+  margin: 0.5em 0 1em;
+}
+
+/* The image opens at full size on a tap. */
+.full {
+  display: block;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+}
+
 .sigil {
   display: block;
   width: 100%;
   max-width: 18rem;
   height: auto;
-  margin: 0.5em 0 1em;
+}
+
+.figure figcaption {
+  margin-block-start: 0.6em;
+  font-size: 0.875rem;
 }
 
 .downloads {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4em 1.4em;
+}
+
+.every {
+  font-size: 0.875rem;
+}
+
+.every p {
+  margin-block-end: 0.2em;
+}
+
+.every ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Each link a target of its own (AGENTS.md "Layout"): 24px with a mouse,
+   44px on a touch screen. */
+.downloads a,
+.every a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 24px;
+}
+
+@media (pointer: coarse) {
+  .styleChoice select,
+  .downloads a,
+  .every a {
+    min-block-size: 44px;
+  }
+
+  .every a {
+    min-inline-size: 44px;
+  }
 }

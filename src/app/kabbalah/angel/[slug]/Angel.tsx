@@ -23,13 +23,7 @@ import { scriptRuns } from "@/app/books/la-science-cabalistique/hebrewRuns";
 import { reissuePageUrl } from "@/app/books/la-science-cabalistique/scan";
 import Witnesses from "@/app/books/la-science-cabalistique/Witnesses";
 import { angelSlug } from "@/lib/angelSlugs";
-import {
-  angelJsonLd,
-  angelSigilAltMessage,
-  angelSigilFiles,
-  angelSigilGeneratorHref,
-  angelSigilText,
-} from "@/seo/angelSigils";
+import { angelJsonLd, angelSigilSection } from "@/seo/angelSigils";
 import JsonLd from "@/seo/JsonLd";
 import {
   EntityFrame,
@@ -145,7 +139,6 @@ export default function AngelPage({
   const choir = christianChoirs[choirOf(no) - 1];
   const notes = notesOfGenius(no);
   const anchor = anchorOfGenius(no);
-  const sigil = angelSigilFiles(angel);
 
   return (
     <EntityFrame>
@@ -237,15 +230,7 @@ export default function AngelPage({
         <Row label="Contrary genius">{angel.contrary.en}</Row>
       </EntityTable>
 
-      <AngelSigil
-        name={angel.name.en}
-        number={angel.no}
-        hebrew={angelSigilText(angel)}
-        alt={angelSigilAltMessage(angel)}
-        png={sigil.png}
-        svg={sigil.svg}
-        generatorHref={angelSigilGeneratorHref(angel)}
-      />
+      <AngelSigil section={angelSigilSection(angel)} />
 
       <h2>Lenain’s entry</h2>
       <p className={styles.said}>{english}</p>

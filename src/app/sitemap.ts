@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { indexableLocalizedPaths, publicAlternates } from "@/i18n/publications";
 import { GD_HALLS } from "@/render/contracts/gdHall";
-import { allAngelSigilFiles } from "@/seo/angelSigils";
+import { allAngelSigilStyleFiles } from "@/seo/angelSigils";
 import { componentPages } from "@/seo/components";
 import { entityPages } from "@/seo/entities";
 import { hallFiles, hallPath } from "@/seo/halls";
@@ -17,15 +17,15 @@ import { SITE_URL } from "@/seo/site";
  * time posing as a modification date.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Each angel's page with its sigil's two files, the PNG first (plan 088,
-  // S4), as the halls' below. Next writes them unescaped, so the URLs
-  // carry no query.
+  // Each angel's page with its sigil's files, the PNG first (plan 088, S4),
+  // as the halls' below: the band's, then every other style's (plan 096,
+  // decision 4). Next writes them unescaped, so the URLs carry no query.
   // Each kamea's page with its square's two files likewise, and each
   // planetary intelligence's and spirit's with its sigil's (plan 093, K4).
   const images = new Map<string, string[]>();
   for (const { file } of [
     ...allKameaFiles(),
-    ...allAngelSigilFiles(),
+    ...allAngelSigilStyleFiles(),
     ...allPlanetaryNameSigilFiles(),
   ]) {
     const page = file.path.slice(0, file.path.lastIndexOf("/"));

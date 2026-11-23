@@ -41,6 +41,11 @@ describe("the works the site cites", () => {
     expect(citeUrl("lenainReissue", { page: "vj", front: true })).toBe(
       "https://books.google.com/books?id=ZqgpxTZ43HkC&pg=PRvj",
     );
+    // An unnumbered preliminary page, by Google's count: the 1823
+    // printing's title page (plan 096, Y0).
+    expect(citeUrl("lenain1823", { page: 11, preliminary: true })).toBe(
+      "https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PP11",
+    );
     expect(workUrl("lenain1823")).toBe(
       "https://books.google.com/books?id=qt9SAAAAcAAJ",
     );
@@ -110,6 +115,24 @@ describe("a citation", () => {
     );
     expect(html).toBe(
       '<a href="https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol2-1938/page/n54/mode/1up" rel="noreferrer">60</a>',
+    );
+  });
+
+  it("links an unnumbered preliminary page, never to the mirror", () => {
+    const html = renderToString(
+      <Cite work="lenain1823" page={11} preliminary plain rel="noreferrer">
+        title page
+      </Cite>,
+    );
+    expect(html).toBe(
+      '<a href="https://books.google.com/books?id=qt9SAAAAcAAJ&amp;pg=PP11" rel="noreferrer">title page</a>',
+    );
+    // The same number in the body is another page.
+    expect(citeUrl("lenain1823", { page: 11 })).toBe(
+      "https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA11",
+    );
+    expect(mirrorOf("lenain1823", { page: 11, preliminary: true })).toBe(
+      undefined,
     );
   });
 });

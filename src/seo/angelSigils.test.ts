@@ -1,10 +1,8 @@
 import angels from "magick-data/kabbalah/seventyTwoAngels";
 import { describe, expect, it } from "vitest";
-import { angelSlug } from "@/lib/angelSlugs";
 import { canonicalSigilText } from "@/render/contracts/roseSigil";
 import {
   ANGEL_SIGIL_BUILT_STYLES,
-  allAngelSigilFiles,
   allAngelSigilStyleFiles,
   angelJsonLd,
   angelSigilAlt,
@@ -13,7 +11,9 @@ import {
   angelSigilGeneratorHref,
   angelSigilRequest,
   angelSigilRouteFile,
+  angelSigilSection,
   angelSigilSocialImage,
+  angelSigilStyleAlt,
   angelSigilStyleFiles,
   angelSigilText,
 } from "./angelSigils";
@@ -29,15 +29,7 @@ describe("the angels' sigil files", () => {
     }
   });
 
-  it("names two files under each angel's page, the PNG first", () => {
-    const files = allAngelSigilFiles();
-    expect(files).toHaveLength(144);
-    expect(new Set(files.map(({ file }) => file.path)).size).toBe(144);
-    for (const { slug, angel, file } of files) {
-      expect(slug).toBe(angelSlug(angel.no));
-      expect(file.path).toBe(`/kabbalah/angel/${slug}/${file.name}`);
-      expect(file.name).toMatch(/^[a-z0-9-]+-rose-cross-sigil\.(?:png|svg)$/);
-    }
+  it("names the rose's two files under each angel's page, as plan 088 did", () => {
     expect(angelSigilFiles(vehuiah)).toEqual({
       png: {
         name: "vehuiah-rose-cross-sigil.png",
@@ -54,11 +46,6 @@ describe("the angels' sigil files", () => {
         style: "rose",
       },
     });
-    // Only the rose's: the pages and the sitemap name these until plan
-    // 096's Y4.
-    expect(new Set(files.map(({ file }) => file.style))).toEqual(
-      new Set(["rose"]),
-    );
   });
 
   it("asks for the default rose, shown, at the raster default", () => {
@@ -74,6 +61,17 @@ describe("the angels' sigil files", () => {
   it("names every style's two files, the rose's as they were (plan 096)", () => {
     const files = allAngelSigilStyleFiles();
     expect(files).toHaveLength(576);
+    // Each angel's band PNG first, then the rest (decision 4).
+    expect(files.slice(0, 8).map(({ file }) => file.name)).toEqual([
+      "vehuiah-rose-cross-sigil-band.png",
+      "vehuiah-rose-cross-sigil-band.svg",
+      "vehuiah-rose-cross-sigil-bare.png",
+      "vehuiah-rose-cross-sigil-bare.svg",
+      "vehuiah-rose-cross-sigil.png",
+      "vehuiah-rose-cross-sigil.svg",
+      "vehuiah-rose-cross-sigil-talisman.png",
+      "vehuiah-rose-cross-sigil-talisman.svg",
+    ]);
     expect(new Set(files.map(({ file }) => file.path)).size).toBe(576);
     for (const { slug, file } of files) {
       expect(file.path).toBe(`/kabbalah/angel/${slug}/${file.name}`);
@@ -133,10 +131,66 @@ describe("the angels' sigil files", () => {
   });
 });
 
+describe("an angel page's sigil section", () => {
+  it("hands the page every style, the band first, with its alt text", () => {
+    const section = angelSigilSection(vehuiah);
+    expect(section).toMatchObject({
+      name: "Vehuiah",
+      number: 1,
+      hebrew: "והויה",
+      psalm: 3,
+      genesis: false,
+      generatorHref: angelSigilGeneratorHref(vehuiah),
+    });
+    expect(section.styles.map(({ style }) => style)).toEqual([
+      "band",
+      "bare",
+      "rose",
+      "talisman",
+    ]);
+    for (const entry of section.styles) {
+      expect(entry.png).toEqual(angelSigilStyleFiles(vehuiah, entry.style).png);
+      expect(entry.svg).toEqual(angelSigilStyleFiles(vehuiah, entry.style).svg);
+    }
+    // Only Jabamiah letters Genesis, with no psalm.
+    const genesis = angels.filter((angel) => angelSigilSection(angel).genesis);
+    expect(genesis.map((angel) => angel.no)).toEqual([70]);
+    expect(angelSigilSection(angels[69]).psalm).toBe(0);
+  });
+
+  it("describes each style in its own words, the rose's as plan 088 did", () => {
+    expect(
+      Object.fromEntries(
+        (["band", "bare", "rose", "talisman"] as const).map((style) => [
+          style,
+          angelSigilStyleAlt(vehuiah, style),
+        ]),
+      ),
+    ).toEqual({
+      band: "The Rose Cross sigil of Vehuiah, והויה, inside a ring with the name in Hebrew",
+      bare: "The Rose Cross sigil of Vehuiah, והויה, drawn alone with the name beneath",
+      rose: "The Rose Cross sigil of Vehuiah, והויה, traced on the Golden Dawn's rose of 22 letters",
+      talisman:
+        "A talisman of Vehuiah, והויה: the Rose Cross sigil inside a ring lettered with a verse of Psalm 3 in Latin",
+    });
+    // The talisman names the psalm only, never a verse number (decision
+    // for Gadi 12): Lenain's are often not the Vulgate's.
+    for (const angel of angels) {
+      const alt = angelSigilStyleAlt(angel, "talisman");
+      if (angel.psalm.psalm > 0) {
+        expect(alt).toContain(`a verse of Psalm ${angel.psalm.psalm} in Latin`);
+        expect(alt).not.toMatch(/\d+:\d+/);
+      } else expect(alt).toContain("Genesis 1:1");
+    }
+  });
+});
+
 describe("an angel page's structured data", () => {
-  it("is one graph: the trail, then the PNG and the SVG", () => {
-    const data = angelJsonLd(vehuiah);
-    const [trail, png, svg] = data["@graph"];
+  const graphOf = (angel = vehuiah) =>
+    angelJsonLd(angel)["@graph"] as Record<string, unknown>[];
+
+  it("is one graph: the trail, then each style's PNG and SVG, the band first", () => {
+    const [trail, ...images] = graphOf();
     expect(trail).toMatchObject({ "@type": "BreadcrumbList" });
     expect(
       (trail as { itemListElement: { item: string }[] }).itemListElement.at(-1),
@@ -144,18 +198,28 @@ describe("an angel page's structured data", () => {
       name: "Vehuiah",
       item: "https://magick.ly/kabbalah/angel/vehuiah",
     });
-    const caption = angelSigilAlt(vehuiah);
-    expect(caption).toBe(
-      "The Rose Cross sigil of Vehuiah, והויה, traced on the Golden Dawn's rose of 22 letters",
+    expect(images.map((image) => image.contentUrl)).toEqual(
+      [
+        "band.png",
+        "band.svg",
+        "bare.png",
+        "bare.svg",
+        ".png",
+        ".svg",
+        "talisman.png",
+        "talisman.svg",
+      ].map(
+        (end) =>
+          `https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil${end.startsWith(".") ? "" : "-"}${end}`,
+      ),
     );
-    expect(png).toMatchObject({
+    const [bandPng, bandSvg] = images;
+    expect(bandPng).toMatchObject({
       "@type": "ImageObject",
-      "@id": "https://magick.ly/kabbalah/angel/vehuiah#sigil-png",
-      contentUrl:
-        "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png",
+      "@id": "https://magick.ly/kabbalah/angel/vehuiah#sigil-band-png",
       url: "https://magick.ly/kabbalah/angel/vehuiah",
-      name: "Rose Cross sigil of Vehuiah (והויה)",
-      caption,
+      name: "Rose Cross sigil of Vehuiah (והויה), in a ring with its name",
+      caption: angelSigilStyleAlt(vehuiah, "band"),
       encodingFormat: "image/png",
       width: 1024,
       height: 1024,
@@ -163,52 +227,101 @@ describe("an angel page's structured data", () => {
       acquireLicensePage: "https://magick.ly/about#licence",
       creditText: "Magick.ly, drawn by magick-components (MIT)",
       associatedMedia: {
-        "@id": "https://magick.ly/kabbalah/angel/vehuiah#sigil-svg",
-      },
-      isBasedOn: {
-        "@type": "Book",
-        url: "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol4-1940/page/n51/mode/1up",
+        "@id": "https://magick.ly/kabbalah/angel/vehuiah#sigil-band-svg",
       },
     });
-    expect(svg).toMatchObject({
-      "@type": "ImageObject",
-      "@id": "https://magick.ly/kabbalah/angel/vehuiah#sigil-svg",
-      contentUrl:
-        "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.svg",
+    expect(bandSvg).toMatchObject({
+      "@id": "https://magick.ly/kabbalah/angel/vehuiah#sigil-band-svg",
       encodingFormat: "image/svg+xml",
-      caption,
+      caption: angelSigilStyleAlt(vehuiah, "band"),
     });
     // The SVG states only its viewBox, so no pixel size is claimed.
-    expect(svg).not.toHaveProperty("width");
+    expect(bandSvg).not.toHaveProperty("width");
+    // The rose's caption is plan 088's.
+    expect(images[4]).toMatchObject({
+      "@id": "https://magick.ly/kabbalah/angel/vehuiah#sigil-rose-png",
+      caption: angelSigilAlt(vehuiah),
+      name: "Rose Cross sigil of Vehuiah (והויה), on the rose",
+    });
+    // Each PNG points at its own SVG.
+    for (const [i, image] of images.entries())
+      if (i % 2 === 0)
+        expect(image.associatedMedia).toEqual({ "@id": images[i + 1]["@id"] });
+  });
+
+  it("says what each style is based on (decision 4)", () => {
+    const basedOn = (i: number) => {
+      const value = graphOf()[1 + i].isBasedOn as
+        | { url: string; description: string }
+        | { url: string; description: string }[];
+      return (Array.isArray(value) ? value : [value]).map(
+        ({ url, description }) => [url, description.split(",")[0]],
+      );
+    };
+    const regardie = (leaf: number) =>
+      `https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol4-1940/page/n${leaf}/mode/1up`;
+    const mathers = "https://archive.org/details/b24884431/page/n79/mode/1up";
+    // band, bare, rose and talisman's PNGs; each SVG says the same.
+    expect(basedOn(0)).toEqual([
+      [mathers, "Plate IV"],
+      [regardie(51), "p.57"],
+    ]);
+    expect(basedOn(2)).toEqual([
+      [regardie(51), "p.57"],
+      [regardie(52), "p.58"],
+    ]);
+    expect(basedOn(4)).toEqual([[regardie(51), "p.57"]]);
+    expect(basedOn(6)).toEqual([
+      [
+        "https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA45",
+        "p.45 (the 72 verses written round the genii's talismans)",
+      ],
+      [mathers, "Plate IV"],
+      [regardie(51), "p.57"],
+    ]);
+    for (let i = 0; i < 8; i += 2) expect(basedOn(i + 1)).toEqual(basedOn(i));
+    expect(
+      (graphOf()[1].isBasedOn as { description: string }[])[0].description,
+    ).toContain("Fig. 18");
+    expect(
+      (graphOf()[7].isBasedOn as { description: string }[])[1].description,
+    ).toContain("Figs. 20 and 21");
   });
 });
 
 describe("the two Lauviahs", () => {
   it("are numbered where they are named, as their slugs are, and no one else", () => {
-    const numbered = angels.filter((angel) =>
-      angelSigilAlt(angel).includes(" of the 72"),
-    );
-    expect(numbered.map((angel) => angel.no)).toEqual([11, 17]);
+    for (const style of ["band", "bare", "rose", "talisman"] as const) {
+      const numbered = angels.filter((angel) =>
+        angelSigilStyleAlt(angel, style).includes(" of the 72"),
+      );
+      expect(
+        numbered.map((angel) => angel.no),
+        style,
+      ).toEqual([11, 17]);
+      // Same name, told apart by number.
+      expect(angelSigilStyleAlt(angels[10], style)).not.toBe(
+        angelSigilStyleAlt(angels[16], style),
+      );
+    }
     expect(angelSigilAlt(angels[10])).toBe(
       "The Rose Cross sigil of Lauviah, angel 11 of the 72, לאויה, traced on the Golden Dawn's rose of 22 letters",
     );
     const [, png17] = angelJsonLd(angels[16])["@graph"];
     expect(png17).toMatchObject({
-      name: "Rose Cross sigil of Lauviah, angel 17 (לאויה)",
-      caption: angelSigilAlt(angels[16]),
+      name: "Rose Cross sigil of Lauviah, angel 17 (לאויה), in a ring with its name",
+      caption: angelSigilStyleAlt(angels[16], "band"),
     });
-    // Same name, same sigil, told apart by number.
-    expect(angelSigilAlt(angels[10])).not.toBe(angelSigilAlt(angels[16]));
   });
 });
 
 describe("the sigil as a share image", () => {
-  it("is the static PNG at its size, described by its alt text", () => {
+  it("is the band's static PNG at its size, described by its alt text", () => {
     expect(angelSigilSocialImage(vehuiah)).toEqual({
-      url: "/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png",
+      url: "/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil-band.png",
       width: 1024,
       height: 1024,
-      alt: angelSigilAlt(vehuiah),
+      alt: angelSigilStyleAlt(vehuiah, "band"),
     });
   });
 });

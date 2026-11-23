@@ -190,10 +190,11 @@
       "contextHash": "7709a0631f4f3f6fcdcd05ed8451175dcc6f6bcd79ce3dc67d78a214dd8e3cc9",
       "files": {
         "src/app/kabbalah/KabbalahText.tsx": "17290a9a4ca444e9715a8828e609c109d4fa898ff87d2a2f6c349e933b7dca2a",
-        "src/app/kabbalah/angel/[slug]/Angel.tsx": "78fca23026843ddb075326f10af6604f705c7805d57308685a269d86831d7c51",
-        "src/app/kabbalah/angel/[slug]/AngelSigil.tsx": "3be0a55942441581766b2647ff40e549a978e2d429e573a2ba5fe3ee088414a7",
-        "src/app/kabbalah/angel/[slug]/[file]/route.ts": "9bd02f7e3aa04619f76199c00cdac7ffe262b680c98adc23768f617cb9d4a942",
+        "src/app/kabbalah/angel/[slug]/Angel.tsx": "80b3113e103d499b10dd335d56f76e6dfe1037b81f971260b0f6705c89f23b56",
+        "src/app/kabbalah/angel/[slug]/AngelSigil.tsx": "175026c7126149549d3f0b9632fd6663bf7da6b124a829b94c294e53b35968f4",
+        "src/app/kabbalah/angel/[slug]/[file]/route.ts": "7e081c8f1dd82e8a01cd01b3b0157216a18802fb2a161547b2e36b14bff105b4",
         "src/app/kabbalah/angel/[slug]/fields.ts": "10750035b0e463afb9b1149c04c9e81baa8268d3f78d13c5c44655c5a2312cae",
+        "src/app/kabbalah/angel/[slug]/urlState.ts": "cd634843a1bfcba66b216b4c165c69703b093c0404ef16493bf123f8cb4edd3e",
         "src/app/kabbalah/path/[id]/Path.tsx": "881cb3920912a877fe7d67ff9ed34d1cce9df0a3b019740d3c4b66ad807af282",
         "src/app/kabbalah/path/[id]/fields.ts": "f927dfcb8ff90cc03ff9abfa4ae81a9e079241c0329dd9f90c494e419d1e3507",
         "src/app/kabbalah/sephirah/[id]/Sephirah.tsx": "1399dd3add10f8174d9f0db513f1870dc31f8fd2b43456a3c608d76057dfb259",
@@ -203,7 +204,7 @@
         "src/app/kabbalah/tree/treeSettings.ts": "5a3311e08fd63aef5bd46ff71aec07d5dd0541345cc4072351a878efb98deff4",
         "src/app/kabbalah/treeLinks.ts": "c23df39540eb569a4a8db6a6ab821c245b91071c4920adc34be4bb7cd6b63faf",
         "src/app/kabbalah/yhvh/72angels/AngelsText.tsx": "93028a15ebe9111e8853e922e52c6b8df766f1fad5883d830359ac56fcb36e57",
-        "src/app/kabbalah/yhvh/72angels/ListSigil.tsx": "0e7966bd2e0926c7343db1eee609bff546b7a3e7abd6f16f2bf9c846fe1a3089",
+        "src/app/kabbalah/yhvh/72angels/ListSigil.tsx": "44472dbcc2635f746c0e8e0e07909cb4d5b817be887ea06c242e1638331f65d3",
         "src/app/kabbalah/yhvh/72angels/angels.tsx": "850e60ed90a69f2c4b92da86f36449e1bc60d936135f647a41e76ebdc776567f"
       }
     },
@@ -212,8 +213,8 @@
       "files": {
         "src/seo/Breadcrumbs.tsx": "5e72076059c6e47d1bbc47ca3f3e1804c3a19c8979aa6e3a4f09254c0aedd2ac",
         "src/seo/JsonLd.tsx": "bd559ecf37863150f173704a2fb68fbe43eee2d6eacdd5ef0befa070875c23c8",
-        "src/seo/angelSigilFiles.ts": "4bcf1cc52a97ccfc5a4c67ce875c4eb0c2a0e38ad328f2e212ec3ddeb3f3a320",
-        "src/seo/angelSigils.ts": "7430fc865f05b5ea59cd821d3f340b9dfb8dfb5b0b4e9f043c32368ed5247884",
+        "src/seo/angelSigilFiles.ts": "b0ec3200d09463451059a06e1fb356062672274145ff9c7adf621e59007d5d56",
+        "src/seo/angelSigils.ts": "fe69930149f01488cd04f0cbe7fd198f9477f891b7dc1324cc58daf4f9cc10ea",
         "src/seo/cardArt.ts": "220104d07c6e1445b67efa515158b72a6797fd07577456851c0346fb5375bcda",
         "src/seo/cardList.ts": "be039a91d040d5d4a92aa89562b4954743f95c6ca7b3840711dd63fd40da661b",
         "src/seo/cards.ts": "d49373d76c3dd58dae6ed9c3a8ed282e849720c80c6b79ac26af00c72b0ddb0d",

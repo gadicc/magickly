@@ -87,26 +87,35 @@ describe("sitemap", () => {
         );
   });
 
-  it("lists each angel's sigil, the PNG then the SVG (plan 088, S4)", () => {
+  it("lists each angel's sigils, the band's PNG first (plan 096, decision 4)", () => {
     const angels = sitemap().filter((entry) =>
       entry.url.includes("/kabbalah/angel/"),
     );
     expect(angels).toHaveLength(72);
+    const page = "https://magick.ly/kabbalah/angel/vehuiah";
     expect(angels[0]).toEqual({
-      url: "https://magick.ly/kabbalah/angel/vehuiah",
+      url: page,
       images: [
-        "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png",
-        "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.svg",
+        `${page}/vehuiah-rose-cross-sigil-band.png`,
+        `${page}/vehuiah-rose-cross-sigil-band.svg`,
+        `${page}/vehuiah-rose-cross-sigil-bare.png`,
+        `${page}/vehuiah-rose-cross-sigil-bare.svg`,
+        // The rose's, plan 088's files.
+        `${page}/vehuiah-rose-cross-sigil.png`,
+        `${page}/vehuiah-rose-cross-sigil.svg`,
+        `${page}/vehuiah-rose-cross-sigil-talisman.png`,
+        `${page}/vehuiah-rose-cross-sigil-talisman.svg`,
       ],
     });
     for (const entry of angels) {
       const page = entry.url;
-      expect(entry.images).toEqual([
-        expect.stringMatching(/-rose-cross-sigil\.png$/),
-        expect.stringMatching(/-rose-cross-sigil\.svg$/),
-      ]);
-      for (const image of entry.images ?? [])
-        expect(image.startsWith(`${page}/`)).toBe(true);
+      expect(entry.images).toEqual(
+        ["-band.png", "-band.svg", "-bare.png", "-bare.svg", ".png", ".svg"]
+          .concat(["-talisman.png", "-talisman.svg"])
+          .map(
+            (end) => `${page}/${page.split("/").at(-1)}-rose-cross-sigil${end}`,
+          ),
+      );
       for (const image of entry.images ?? [])
         expect(image).toMatch(
           /^https:\/\/magick\.ly\/kabbalah\/angel\/[a-z0-9-]+\/[a-z0-9-]+\.(?:png|svg)$/,
@@ -167,17 +176,17 @@ describe("sitemap", () => {
     );
     // The kameas' come first, with the public pages; then the angels' and
     // the planetary names', with the entity pages; then the halls'.
-    expect(images).toHaveLength(14 + 144 + 32 + 28);
+    expect(images).toHaveLength(14 + 576 + 32 + 28);
     expect(images[0].textContent).toBe(
       "https://magick.ly/astrology/kamea/saturn/kamea-of-saturn-magic-square.png",
     );
     expect(images[14].textContent).toBe(
-      "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png",
+      "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil-band.png",
     );
-    expect(images[14 + 144].textContent).toBe(
+    expect(images[14 + 576].textContent).toBe(
       "https://magick.ly/astrology/intelligence/agiel/sigil-of-agiel.png",
     );
-    expect(images[14 + 144 + 32].textContent).toBe(
+    expect(images[14 + 576 + 32].textContent).toBe(
       "https://magick.ly/gd/halls/neophyte/golden-dawn-neophyte-temple.png",
     );
   });

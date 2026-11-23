@@ -175,10 +175,19 @@ export type GoogleBooksWorkId = Exclude<WorkId, ArchiveWorkId>;
 export type Locator<W extends WorkId> = W extends ArchiveWorkId
   ? { leaf: number }
   : {
-      /** The printed page; roman for the front matter. */
+      /**
+       * The printed page; roman for the front matter. For an unnumbered
+       * preliminary page, Google's own count of the leaves before the
+       * first numbered one.
+       */
       page: number | string;
       /** The roman front matter (Google's PR), not the body (PA). */
       front?: boolean;
+      /**
+       * An unnumbered preliminary page, such as a title page (Google's PP),
+       * which has no printed number to cite it by.
+       */
+      preliminary?: boolean;
     };
 
 const scanOf = (work: WorkId): Work["scan"] => WORKS[work].scan;
@@ -199,8 +208,13 @@ export function citeUrl<W extends WorkId>(work: W, at: Locator<W>): string {
   const scan = scanOf(work);
   if (scan.site === "archive.org")
     return `${archiveBase(scan)}/page/n${(at as { leaf: number }).leaf}/mode/1up`;
-  const { page, front } = at as { page: number | string; front?: boolean };
-  return `https://books.google.com/books?id=${scan.id}&pg=${front ? "PR" : "PA"}${page}`;
+  const { page, front, preliminary } = at as {
+    page: number | string;
+    front?: boolean;
+    preliminary?: boolean;
+  };
+  const sequence = preliminary ? "PP" : front ? "PR" : "PA";
+  return `https://books.google.com/books?id=${scan.id}&pg=${sequence}${page}`;
 }
 
 /**
@@ -222,9 +236,15 @@ export function mirrorOf<W extends WorkId>(
         mirrored.item === scan.item &&
         mirrored.leaf === (at as { leaf: number }).leaf
       );
-    const { page, front } = at as { page: number | string; front?: boolean };
+    const { page, front, preliminary } = at as {
+      page: number | string;
+      front?: boolean;
+      preliminary?: boolean;
+    };
+    // The mirror cites body pages only.
     return (
       !front &&
+      !preliminary &&
       mirrored.site === "Google Books" &&
       mirrored.id === scan.id &&
       String(mirrored.page) === String(page)
