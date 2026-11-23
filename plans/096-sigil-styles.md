@@ -875,15 +875,19 @@ by-eye readings made knowing what the psalter reads and labelled so.
   only (ignoring case, accents, æ/ae, j/i, punctuation and word
   division), fails on an unlisted difference or a stale entry, and
   checks Lenain's references and #70. A deliberate one-letter mutation
-  failed it.
+  failed it. (The review found that too loose; it compares whole words
+  since, see [Review fixes](#review-fixes-23-november-2026).)
   - 58 of 71 psalm verses agreed (61 after Y2). The 13 others are in
     both printings:
     ten of Lenain's wording (#1, whose "Et tu" is Kircher's; #11
     "exultatur"; #14 "pauperis"; #23; #24; #37 "virtutem"; #39; #50;
     #58; #65), and three spellings of the period (#13, #63 "exultate",
     #19 "expectans"). #33 names Psalm 33 for 93:11 (Kircher has 83).
-    Kircher's Latin matches the Vulgate wherever he gives the same
-    verse.
+    Kircher's Latin mostly agrees with the Vulgate where he gives the
+    same verse (as the verse files' README puts it), with two
+    exceptions: #1, where his "Et tu … es" renders the Hebrew's ואתה,
+    and #37, where he gives the refrain's last form, "Domine Deus
+    virtutum" (Psalm 79:20, which he cites as 79:4), not Lenain's 79:8.
   - 29 of Lenain's 71 references differ from the Vulgate's verse
     numbers. `verses.json5` keeps both; the data keeps Lenain's.
   - **Ours, fixed:** #43 "præveniet" and #54 "cælo" (we read æ as œ).
@@ -1303,3 +1307,42 @@ Decided after the review (23 November 2026): Gadi chose the hybrid for
 files over M10's "every style static" (decision 3), with Y1 checking
 that first-request files stay cached, and no picker on the 72 list
 from a mock-up of three variants (decision 12).
+
+### Review fixes (23 November 2026)
+
+An adversarial review of the built branch (66db801c) found three majors
+and ten minors; an Opus agent (high) fixed them in eight commits,
+9c8ca736 to 946f5192.
+
+- **M1, made-up file names.** A proxy and one rewrite keep them from the
+  route, which answered with Next's internal `NoFallbackError` (likely a
+  function error on Vercel); decision 3 has the evidence and what a
+  Vercel preview must still check.
+- **M2, #33's psalm.** The talisman's alt text and caption name the
+  Vulgate's psalm (93 for #33, whom Lenain cites as Psalm 33), held to
+  `verses.json5` by a test; the Hebrew says the number is the Vulgate's.
+  The apparatus notes #33's number, kept as printed, with the 1823
+  printing and Kircher (p. 277, n284) as witnesses.
+- **M3, the verse guard.** It compares whole words, lists the one word
+  division (#44), and holds both texts to the plan's characters. That
+  found the Clementine's stanza heading `<Coph>` in #26's verse, now
+  stripped by `vulgate.ts`, whose output is pinned by SHA-256. A noted
+  verse is excused only its note's change, towards the psalter.
+  Mutations of the data (#54's first letters, a split word in #54, a
+  U+2019 in #2, a word dropped from noted #11, a hand edit of
+  `verses.json5`) each failed, and were restored.
+- **Minors.** Kircher's verse table is a witness in the apparatus, with
+  its leaves for #11, #14, #33 and #37; #47's note says only what its
+  witness shows; #19 and #63 cite Hetzenauer's printed spelling (from
+  archive.org's OCR); the plan's claim about Kircher is corrected; the
+  three Lenain text rows are signed 23 November and the 0.5.0 note says
+  what changed (`pages.json5` regenerates byte for byte from `output/`);
+  the byte pins say whether data or drawing moved; the legend test
+  compares characters; `sigilStyleCapitals` checks every capital
+  against the subset; the components README says which face ships
+  (Frank Ruhl Libre Bold, as the hall's) and which the caller supplies
+  (upright Noto Serif: shipping it would add a file, its source and
+  provenance rows for no current browser user); the app reads the
+  verses as `magick-data/json/…`.
+- **Not changed:** the captions' wording on Hebrew names (Gadi's call)
+  and one-letter-word scaling (not reachable).
