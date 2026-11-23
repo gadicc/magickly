@@ -95,11 +95,21 @@ The test compares letters only: case, accents, ligatures written out or not
 "usquequo") are ignored, since none of them is a reading. An apostrophe is
 kept.
 
-On 23 November 2026, after the fixes below, 58 of the 71 psalm verses
-agreed with the Vulgate. The thirteen that do not are listed in
-`differences.json5`: ten are Lenain's wording (one of them, the first,
+On 23 November 2026, after the fixes below, 61 of the 71 psalm verses
+agreed with the Vulgate. The ten that do not are listed in
+`differences.json5`: seven are Lenain's wording (one of them, the first,
 partly Kircher's), and three are spellings of the period ("exultate",
-"expectans"). Every one is in the 1823 printing as in the reissue.
+"expectans"). Every one is in the 1823 printing as in the reissue, and the
+field keeps it, since the talisman letters Lenain's Latin.
+
+Three more of Lenain's own slips, in both printings, are corrected in the
+field because they are not Latin as they stand, as 45's "adjuvebat" always
+was (plan 096, decided by the owner on 23 November 2026): 11's "exultatur"
+for "exaltetur", 14's "pauperis" for "pauperi" and 37's "virtutem" for
+"virtutum". Kircher has the psalter's word in each. The entry's French
+keeps Lenain's, and the apparatus notes each with the 1823 printing's
+reading (`scripts/seventyTwoAngels/notes.json5`, `../witnesses.json5`);
+`differences.json5` listed them until then.
 
 The audit also found seven differences that were not Lenain's, and the
 data now gives his reading:
@@ -122,8 +132,8 @@ latin", in *Oedipus Aegyptiacus* vol. II, p. 275. Kircher's table runs from
 p. 275 to p. 280, a verse for each genius with its psalm and verse
 (archive.org `bub_gb_XjfzMnomDQoC`, the Complutense copy, leaves n282 to
 n287). Where it gives the same verse, `differences.json5` records Kircher's
-Latin, which mostly agrees with the Vulgate, so the departures are
-Lenain's. Lenain does not always take Kircher's verse: for the 24th, 47th,
+Latin (and the apparatus's notes, for the three slips the field corrects),
+which mostly agrees with the Vulgate, so the departures are Lenain's. Lenain does not always take Kircher's verse: for the 24th, 47th,
 50th and 63rd genii Kircher gives another. For the seventieth Kircher gives
 Genesis 1:1 in Latin, "In principio creavit Deus cœlum & terram. Gen. 1."
 (p. 280, leaf n287); the verse the site letters is the Vulgate's.

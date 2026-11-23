@@ -54,8 +54,8 @@
     kind: "correction",
     field: "psalm.la",
     printed: "Deus ad virtutem converte nos",
-    used: "Deus virtutem",
-    why: "The page adds \"ad\", which the psalter does not have: \"Deus virtutum, converte nos\" (Psalm 79:8). \"virtutem\" for the psalter's \"virtutum\" is in both printings and is kept, as Lenain's.",
+    used: "Deus virtutum",
+    why: "The page adds \"ad\", which the psalter does not have, and reads the accusative \"virtutem\" where the psalter has the genitive: \"Deus virtutum, converte nos\" (Psalm 79:8), the God of hosts. Kircher's table, which Lenain cites for the verses, has \"virtutum\" (Oedipus Aegyptiacus II.1, p. 278). This field gives the verse as the psalter has it; the entry's French keeps what the page prints.",
   },
   {
     no: 47,
@@ -72,6 +72,28 @@
     printed: "super misericordiam ejus",
     used: "misericordia",
     why: "The page reads the accusative \"misericordiam\" where the psalter reads \"super misericordia ejus\" (Psalm 32:18).",
+  },
+  // The two below, and 37's "virtutem" above, are Lenain's own slips: both
+  // printings have them (vulgate/differences.json5 listed them until then).
+  // They are not Latin as they stand, so the field gives the psalter's word,
+  // as it does for 45's "adjuvebat", and the entry's French keeps his (plan
+  // 096, decided by the owner on 23 November 2026). Lenain's other
+  // departures from the psalter stay in the field, each listed there.
+  {
+    no: 11,
+    kind: "correction",
+    field: "psalm.la",
+    printed: "et exultatur Deus salutis meæ",
+    used: "exaltetur",
+    why: "The page reads \"exultatur\" (he rejoices) where the psalter reads \"et exaltetur Deus salutis meæ\" (Psalm 17:47), let the God of my salvation be exalted: another verb, and another mood. Kircher's table, which Lenain cites for the verses, has \"exaltetur\" (Oedipus Aegyptiacus II.1, p. 276). This field gives the verse as the psalter has it; the entry's French keeps what the page prints.",
+  },
+  {
+    no: 14,
+    kind: "correction",
+    field: "psalm.la",
+    printed: "refugium pauperis",
+    used: "pauperi",
+    why: "The page reads the genitive \"pauperis\" (the refuge of the poor) where the psalter reads the dative, \"Et factus est Dominus refugium pauperi\" (Psalm 9:10), a refuge for the poor. Kircher's table, which Lenain cites for the verses, has \"pauperi\" (Oedipus Aegyptiacus II.1, p. 276). This field gives the verse as the psalter has it; the entry's French keeps what the page prints.",
   },
   {
     no: 0,

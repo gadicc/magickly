@@ -20,6 +20,12 @@
 // lenainQuotations.test.ts holds the field to its page, and the five
 // places where the reissue departed from the 1823 printing (2, 17, 37, 47
 // and 64) are corrected in the field and noted in the apparatus instead.
+// So are three of Lenain's own slips, in both printings, that are not
+// Latin as they stand: 11 "exultatur", 14 "pauperis" and 37 "virtutem"
+// (plan 096, decided by the owner on 23 November 2026). The field gives
+// the psalter's word, as it does for 45's "adjuvebat", and the French
+// keeps his; lenainVulgate.test.ts holds all four. They were listed here
+// until then.
 //
 // `kind` is a "wording" (another word, or one more or fewer), a "spelling"
 // of the same word, or a "reference" (the psalm Lenain names). `whose`:
@@ -43,17 +49,6 @@
     why: "\"Et tu\" for the Vulgate's \"Tu autem\" is Kircher's Latin, which renders the Hebrew's \"ואתה\", and Lenain follows it. Leaving out \"es\" and adding \"et\" before \"gloria\" are Lenain's.",
   },
   {
-    no: 11,
-    field: "psalm.la",
-    kind: "wording",
-    ours: "Vivit Dominus et benedictus Deus meus, et exultatur Deus salutis meæ.",
-    vulgate: "et exaltetur Deus salutis meæ.",
-    print1823: { at: 53, reads: "et exultatur Deus salutis meæ" },
-    kircher: { leaf: 283, page: 276, reads: "& exaltetur Deus salutis meæ" },
-    whose: "lenain",
-    why: "\"exultatur\" (he rejoices) for \"exaltetur\" (let him be exalted): another verb, and another mood.",
-  },
-  {
     no: 13,
     field: "psalm.la",
     kind: "spelling",
@@ -63,17 +58,6 @@
     kircher: { leaf: 283, page: 276, reads: "cantate, exultate, & psallite" },
     whose: "spelling",
     why: "\"exultate\" is the Clementine Vulgate Project's \"exsultate\" without the s. Hetzenauer's Clementine prints \"exultate\" here (leaf n560, p. 538), as Kircher does.",
-  },
-  {
-    no: 14,
-    field: "psalm.la",
-    kind: "wording",
-    ours: "Et factus est Dominus refugium pauperis : adjutor in opportunitatibus, in tribulatione.",
-    vulgate: "Et factus est Dominus refugium pauperi ;",
-    print1823: { at: 54, reads: "refugium pauperis" },
-    kircher: { leaf: 283, page: 276, reads: "refugium pauperi" },
-    whose: "lenain",
-    why: "The genitive \"pauperis\" (the refuge of the poor) for the dative \"pauperi\" (a refuge for the poor).",
   },
   {
     no: 19,
@@ -118,17 +102,6 @@
     kircher: { leaf: 284, page: 277, reads: "83" },
     whose: "lenain",
     why: "Lenain names the 11th verse of Psalm 33; the verse he quotes, \"Dominus scit cogitationes hominum\", is Psalm 93:11. Kircher misnumbers it too, as Psalm 83, and Lenain's 33 may be a misreading of that, but nothing shows it. The field keeps Lenain's number.",
-  },
-  {
-    no: 37,
-    field: "psalm.la",
-    kind: "wording",
-    ours: "Deus virtutem converte nos : et ostende faciem tuam et salvi erimus.",
-    vulgate: "Deus virtutum, converte nos ;",
-    print1823: { at: 69, reads: "Deus virtutem converte nos" },
-    kircher: { leaf: 285, page: 278, reads: "Domine Deus virtutum, converte nos" },
-    whose: "lenain",
-    why: "The accusative \"virtutem\" for the genitive \"virtutum\" (God of hosts). Kircher gives the refrain's last form, \"Domine Deus virtutum\" (Psalm 79:20, which he cites as 79:4), with \"virtutum\". The reissue's added \"ad\" is noted in the apparatus.",
   },
   {
     no: 39,

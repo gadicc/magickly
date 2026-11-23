@@ -531,6 +531,24 @@
     ],
   },
   {
+    no: 11,
+    kind: 'correction',
+    field: 'psalm.la',
+    printed: 'et exultatur Deus salutis meæ',
+    used: 'exaltetur',
+    why: 'The page reads "exultatur" (he rejoices) where the psalter reads "et exaltetur Deus salutis meæ" (Psalm 17:47), let the God of my salvation be exalted: another verb, and another mood. Kircher\'s table, which Lenain cites for the verses, has "exaltetur" (Oedipus Aegyptiacus II.1, p. 276). This field gives the verse as the psalter has it; the entry\'s French keeps what the page prints. The 1823 printing has the same (p. 53), so the slip is Lenain\'s or his printer\'s, not the reissue\'s.',
+    page: 'p52',
+    witnesses: [
+      {
+        source: 'print1823',
+        label: '1823 printing, p. 53',
+        at: '53',
+        url: 'https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA53',
+        reads: 'et exultatur Deus salutis meæ',
+      },
+    ],
+  },
+  {
     no: 12,
     kind: 'reading',
     field: 'name.he',
@@ -645,6 +663,24 @@
         at: 'n62',
         url: 'https://archive.org/details/BIUSante_ms05365/page/n62/mode/1up',
         reads: '66–70',
+      },
+    ],
+  },
+  {
+    no: 14,
+    kind: 'correction',
+    field: 'psalm.la',
+    printed: 'refugium pauperis',
+    used: 'pauperi',
+    why: 'The page reads the genitive "pauperis" (the refuge of the poor) where the psalter reads the dative, "Et factus est Dominus refugium pauperi" (Psalm 9:10), a refuge for the poor. Kircher\'s table, which Lenain cites for the verses, has "pauperi" (Oedipus Aegyptiacus II.1, p. 276). This field gives the verse as the psalter has it; the entry\'s French keeps what the page prints. The 1823 printing has the same (p. 54), so the slip is Lenain\'s or his printer\'s, not the reissue\'s.',
+    page: 'p54',
+    witnesses: [
+      {
+        source: 'print1823',
+        label: '1823 printing, p. 54',
+        at: '54',
+        url: 'https://books.google.com/books?id=qt9SAAAAcAAJ&pg=PA54',
+        reads: 'refugium pauperis',
       },
     ],
   },
@@ -1120,8 +1156,8 @@
     kind: 'correction',
     field: 'psalm.la',
     printed: 'Deus ad virtutem converte nos',
-    used: 'Deus virtutem',
-    why: 'The page adds "ad", which the psalter does not have: "Deus virtutum, converte nos" (Psalm 79:8). "virtutem" for the psalter\'s "virtutum" is in both printings and is kept, as Lenain\'s. The reissue\'s resetting misprints this: the 1823 printing reads “Deus virtutem converte nos” (p. 69).',
+    used: 'Deus virtutum',
+    why: 'The page adds "ad", which the psalter does not have, and reads the accusative "virtutem" where the psalter has the genitive: "Deus virtutum, converte nos" (Psalm 79:8), the God of hosts. Kircher\'s table, which Lenain cites for the verses, has "virtutum" (Oedipus Aegyptiacus II.1, p. 278). This field gives the verse as the psalter has it; the entry\'s French keeps what the page prints. The 1823 printing has “Deus virtutem converte nos” (p. 69). The added "ad" is the reissue\'s, from its resetting; "virtutem" is in both printings, so it is Lenain\'s or his printer\'s.',
     page: 'p69',
     witnesses: [
       {

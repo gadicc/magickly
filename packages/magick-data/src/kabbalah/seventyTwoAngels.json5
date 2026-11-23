@@ -405,7 +405,7 @@
     psalm: {
       psalm: 17,
       verse: 50,
-      la: 'Vivit Dominus et benedictus Deus meus, et exultatur Deus salutis meæ.',
+      la: 'Vivit Dominus et benedictus Deus meus, et exaltetur Deus salutis meæ.',
     },
     invokedFor: {
       en: 'Against lightning, and to obtain victory.',
@@ -518,7 +518,7 @@
     psalm: {
       psalm: 9,
       verse: 9,
-      la: 'Et factus est Dominus refugium pauperis : adjutor in opportunitatibus, in tribulatione.',
+      la: 'Et factus est Dominus refugium pauperi : adjutor in opportunitatibus, in tribulatione.',
     },
     invokedFor: {
       en: 'Invoked against those who seek to usurp the fortune of others.',
@@ -1391,7 +1391,7 @@
     psalm: {
       psalm: 79,
       verse: 8,
-      la: 'Deus virtutem converte nos : et ostende faciem tuam et salvi erimus.',
+      la: 'Deus virtutum converte nos : et ostende faciem tuam et salvi erimus.',
     },
     invokedFor: {
       en: 'To obtain victory and to make an army lift the siege of a town.',

@@ -66,10 +66,13 @@
 // to the Clementine Vulgate on 23 November 2026 (plan 096, stage Y0; see
 // vulgate/README.md beside this file). Where the field and the psalter
 // differed, the reissue's page and the 1823 printing's were read by eye by
-// Claude (Opus 5.5), knowing what the psalter reads, so these five are not
+// Claude (Opus 5.5), knowing what the psalter reads, so these are not
 // blind readings; no manuscript reading was taken for them. Every other
 // difference from the psalter is in both printings, and is listed in
-// vulgate/differences.json5 rather than here.
+// vulgate/differences.json5 rather than here, except Lenain's three slips
+// that the field corrects (11 "exultatur", 14 "pauperis" and 37
+// "virtutem"; plan 096, decided by the owner on 23 November 2026), which
+// are noted here with the 1823 printing's reading, as 45's is.
 {
   readings: [
     {"no": 1, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 46, "reads": "20 mars, 31 avril, 11 août, 22 octobre, 2 janvier"}, "ms5365": {"at": 54, "reads": "20 mars, 31 avril, 11 août, 22 octobre, 2 janvier"}},
@@ -91,11 +94,13 @@
     {"no": 10, "field": "godName", "verdict": "lenain", "print1823": {"at": 52, "reads": "Siré et Eipi"}},
     {"no": 10, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 52, "reads": "29 mars, 9 juin, 19 août, 31 octobre, 11 janvier"}, "ms5365": {"at": 60, "reads": "29 mars, 9 juin, 19 août, 31 octobre, 11 janvier"}},
     {"no": 11, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 52, "reads": "30 mars, 10 juin, 20 août, 1 novembre, 12 janvier"}, "ms5365": {"at": 61, "reads": "30 mars, 10 juin, 20 août, 1 novembre, 12 janvier"}},
+    {"no": 11, "field": "psalm.la", "verdict": "lenain", "print1823": {"at": 53, "reads": "et exultatur Deus salutis meæ"}},
     {"no": 12, "field": "name.he", "verdict": "reissueCorrected", "print1823": {"at": 53, "reads": "חהעיה"}, "remark": "The 1823 page sets a clear het beside a clear he. The triad of the Shem HaMephorash is ההע, so the reissue's he is right and the 1823 het a slip."},
     {"no": 12, "field": "psalm.la", "verdict": "reissue", "print1823": {"at": 53, "reads": "Ut quid Domine recessisti longè"}, "ms5365": {"at": 61, "reads": "Ut quid Domine recessisti longè"}},
     {"no": 13, "field": "name.he", "verdict": "agree", "print1823": {"at": 53, "reads": "יזלאל"}, "ms5365": {"at": 61, "reads": "יזלאל"}},
     {"no": 13, "field": "presidingDays", "verdict": "lenain", "print1823": {"at": 54, "reads": "1 avril, 12 juin, 23 août, 3 septembre, 14 janvier"}, "ms5365": {"at": 62, "reads": "1 avril, 12 juin, 23 août, 3 septembre, 14 janvier"}},
     {"no": 14, "field": "degrees", "verdict": "lenain", "print1823": {"at": 54, "reads": "66–10"}, "ms5365": {"at": 62, "reads": "66–70"}},
+    {"no": 14, "field": "psalm.la", "verdict": "lenain", "print1823": {"at": 54, "reads": "refugium pauperis"}},
     {"no": 15, "field": "name.he", "verdict": "reissueCorrected", "print1823": {"at": 54, "reads": "לאירח"}, "remark": "The 1823 printing sets the name backwards. Its last letter, the reissue's first, is what looks like a het where the reissue and the verse have he. The triad of the Shem HaMephorash is הרי, in the reissue's order."},
     {"no": 17, "field": "invocation", "verdict": "lenain", "print1823": {"at": 56, "reads": "depuis 5 heures du matin jusqu'à 5 heures 20 minutes"}, "ms5365": {"at": 64, "reads": "depuis 5 heures du matin jusqu'à 5 heures 20 minutes"}},
     {"no": 17, "field": "psalm.la", "verdict": "reissue", "print1823": {"at": 56, "reads": "Domine Dominus noster"}, "remark": "The 1823 printing leaves out \"tuum\" after \"nomen\"; the reissue has it, as the psalter does, and so does this field."},
@@ -116,7 +121,7 @@
     {"no": 34, "field": "name.he", "verdict": "agree", "print1823": {"at": 67, "reads": "לההיה"}, "ms5365": {"at": 75, "reads": "לההיה"}, "remark": "The triad of the Shem HaMephorash, from Exodus 14:19–21, is להח: the verse has het where both printings have he."},
     {"no": 35, "field": "people", "verdict": "agree", "print1823": {"at": 68, "reads": ""}},
     {"no": 37, "field": "name.he", "verdict": "reissue", "print1823": {"at": 69, "reads": "אניאל"}, "ms5365": {"at": 77, "reads": "אניאל"}, "remark": "The triad of the Shem HaMephorash is אני."},
-    {"no": 37, "field": "psalm.la", "verdict": "reissue", "print1823": {"at": 69, "reads": "Deus virtutem converte nos"}},
+    {"no": 37, "field": "psalm.la", "verdict": "mixed", "print1823": {"at": 69, "reads": "Deus virtutem converte nos"}, "remark": "The added \"ad\" is the reissue's, from its resetting; \"virtutem\" is in both printings, so it is Lenain's or his printer's."},
     {"no": 38, "field": "invocation", "verdict": "absent", "print1823": {"at": 71, "reads": ""}, "ms5365": {"at": 78, "reads": ""}},
     {"no": 38, "field": "name.he", "verdict": "agree", "print1823": {"at": 69, "reads": "העמיה"}, "remark": "The triad of the Shem HaMephorash, from Exodus 14:19–21, is חעמ: the verse has het where both printings have he."},
     {"no": 39, "field": "name.he", "verdict": "agree", "print1823": {"at": 71, "reads": "רהעאל"}, "ms5365": {"at": 79, "reads": "רהעאל"}},

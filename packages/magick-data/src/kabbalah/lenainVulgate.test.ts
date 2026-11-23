@@ -17,6 +17,12 @@ import { describe, expect, it } from "vitest";
  * and ae), j for i, punctuation and where the words divide ("usque quo"
  * and "usquequo"), none of which is a reading. An apostrophe is kept: the
  * reissue's stray mark in "a me'ad" was taken for one.
+ *
+ * Four of Lenain's own slips, in both printings, are corrected in the field
+ * rather than listed, since they are not Latin as they stand: 45's
+ * "adjuvebat" from the start, and 11's, 14's and 37's since plan 096 (the
+ * owner's decision of 23 November 2026). Each keeps his word in the French
+ * and has a note in the apparatus with the 1823 printing's reading.
  */
 
 const read = (path: string) =>
@@ -47,9 +53,33 @@ interface Difference {
   why: string;
 }
 
+interface Note {
+  no: number;
+  kind: string;
+  field: string;
+  printed: string;
+  used: string;
+  witnesses?: { source: string; reads: string }[];
+}
+
 const angels: Angel[] = read("./seventyTwoAngels.json5");
 const verses: Verse[] = read("./lenain/vulgate/verses.json5");
 const differences: Difference[] = read("./lenain/vulgate/differences.json5");
+const apparatus: Note[] = read("./lenain/apparatus.json5");
+const french: string[] = read("./seventyTwoAngelsText/fr.json5");
+
+/**
+ * Lenain's slips the field corrects to the psalter's word: what both
+ * printings read, and what the field reads instead.
+ */
+const CORRECTED_SLIPS: Readonly<
+  Record<number, [printed: string, ours: string]>
+> = {
+  11: ["exultatur", "exaltetur"],
+  14: ["pauperis", "pauperi"],
+  37: ["virtutem", "virtutum"],
+  45: ["adjuvebat", "adjuvabat"],
+};
 
 /** The letters that make a reading, as the comment above says. */
 function letters(latin: string): string {
@@ -118,6 +148,36 @@ describe("the verses held to the Vulgate", () => {
       }
       expect(entry?.ours, `genius ${angel.no}`).toBe(String(angel.psalm.psalm));
       expect(entry?.vulgate, `genius ${angel.no}`).toBe(String(chapter));
+    }
+  });
+
+  it("corrects Lenain's slips that are not Latin, keeping them in the French and the apparatus", () => {
+    const corrected = apparatus.filter(
+      (n) => n.field === "psalm.la" && n.kind === "correction",
+    );
+    for (const [key, [printed, ours]] of Object.entries(CORRECTED_SLIPS)) {
+      const no = Number(key);
+      const where = `genius ${no}`;
+      const angel = angels.find((a) => a.no === no) as Angel;
+      const verse = verses.find((v) => v.no === no) as Verse;
+      const words = (latin: string) => latin.split(/[^\p{L}']+/u);
+      // The field has the psalter's word, and so agrees with the Vulgate.
+      expect(words(angel.psalm.la), where).toContain(ours);
+      expect(words(angel.psalm.la), where).not.toContain(printed);
+      expect(letters(verse.text), where).toContain(letters(angel.psalm.la));
+      expect(
+        differences.some((d) => d.no === no && d.field === "psalm.la"),
+        where,
+      ).toBe(false);
+      // The French keeps Lenain's word.
+      expect(words(french[no - 1]), where).toContain(printed);
+      // The apparatus says so, with the 1823 printing's reading, which has
+      // his word too: the slip is his, not the reissue's.
+      const note = corrected.find((n) => n.no === no);
+      expect(note?.printed, where).toContain(printed);
+      expect(note?.used, where).toContain(ours);
+      const print1823 = note?.witnesses?.find((w) => w.source === "print1823");
+      expect(words(print1823?.reads ?? ""), where).toContain(printed);
     }
   });
 
