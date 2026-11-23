@@ -15,6 +15,7 @@ import {
   KameaSigilImage,
 } from "magick-components/astrology/KameaSigil";
 import React from "react";
+import { usePageShare } from "@/app/pageShare";
 import { inkClass } from "@/drawings/Ink";
 import ToolLayout, {
   ToolControls,
@@ -25,6 +26,7 @@ import ExportControls from "@/export/ExportControls";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
 import UiText from "@/i18n/UiText";
 import { parseComponentImageRequest } from "@/render/componentImageRequest";
+import { CONTRACTS } from "@/render/contracts";
 import {
   KAMEA_IMAGE_PLANETS,
   type KameaImagePlanet,
@@ -152,6 +154,19 @@ export default function KameaSigils({
       return undefined;
     }
   })();
+  // The text stays out of the address bar (plan 027), which keeps the
+  // text the reader arrived with. Share sends the link that restores
+  // what is asked (even while its figure is placed), and says so where
+  // the contract is personal; with no text to trace, the bare page,
+  // never that stale text.
+  usePageShare(
+    canonical
+      ? {
+          url: () => kameaSigilPagePath({ planet, text: canonical, finals }),
+          personal: CONTRACTS["kamea-sigil"].personal,
+        }
+      : { url: () => "/astrology/kamea/sigils", personal: false },
+  );
 
   return (
     <ToolLayout>
@@ -376,12 +391,6 @@ export default function KameaSigils({
           }
           link={link}
           linkNote={link ? undefined : t(NO_SIGIL_LINK)}
-          share={
-            link
-              ? () =>
-                  kameaSigilPagePath({ planet, text: link.props.text, finals })
-              : undefined
-          }
         />
         <ReductionTable reduction={reduction} />
       </ToolPanel>

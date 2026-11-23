@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import VercelInsights from "@/analytics/VercelInsights";
 import ClientProviders from "./clientProviders";
 import MyAppBar from "./MyAppBar";
+import { PageShareProvider } from "./pageShare";
 import SiteFooter from "./SiteFooter";
 
 /**
@@ -37,9 +38,11 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
     <>
       <ClientProviders>
         <GlobalStyles styles={appBarStyles} />
-        <MyAppBar />
-        <div style={{ height: "var(--app-bar, 56px)" }} />
-        {children}
+        <PageShareProvider>
+          <MyAppBar />
+          <div style={{ height: "var(--app-bar, 56px)" }} />
+          {children}
+        </PageShareProvider>
         <SiteFooter />
       </ClientProviders>
       <VercelInsights />

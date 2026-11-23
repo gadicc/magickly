@@ -32,8 +32,8 @@ export default function TabletsText() {
         pyramid: tap a square, or choose its row and square, or follow a square
         from a name&apos;s detail. Each version comes with its sources and page
         references, and with how it differs from the others. Download the tablet
-        as SVG or PNG as it is shown, and use <i>Copy page link</i> to share the
-        page with the tablet, version, tab and square you chose.
+        as SVG or PNG as it is shown, and use the share button at the top of the
+        page to send a link with the tablet, version, tab and square you chose.
       </p>
       <H2 id="tablets-pyramids">The squares as pyramids</H2>
       <p>

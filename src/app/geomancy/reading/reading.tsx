@@ -20,12 +20,14 @@ import data from "magick-data";
 import { PlanetId } from "magick-data/astrology/planets";
 import React from "react";
 import { upcomingHoursForPlanetAtLocation } from "@/app/astrology/planetary-hours/utils";
+import { usePageShare } from "@/app/pageShare";
 import Ink, { inkClass } from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
 import PlaceChooser from "@/geo/PlaceChooser";
 import { UNNAMED_PLACE } from "@/geo/place";
 import usePlace, { type SourcedPlace } from "@/geo/usePlace";
 import { ordinal } from "@/lib/utils";
+import { CONTRACTS } from "@/render/contracts";
 import { mothersToString } from "@/render/contracts/astroGeomancyChart";
 import Cite from "@/sources/Cite";
 import Tetragram from "../Tetragram";
@@ -295,6 +297,18 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
 
   const [houseNoStr, setHouseNoStr] = React.useState(initial.house);
   const [mothers, setMothers] = React.useState<TetraRow[]>(initial.mothers);
+  // The reading stays out of the address bar (plan 027); Share sends the
+  // link that restores it, and says so where the contract is personal.
+  // Sixteen points always make a reading, so there is always a link.
+  usePageShare({
+    url: () =>
+      `/geomancy/reading?${readingSearchParams({
+        mothers,
+        house: houseNoStr,
+        planetId,
+      })}`,
+    personal: CONTRACTS["astro-geomancy-chart"].personal,
+  });
 
   const { daughters, nephews, witnesses, judges } = React.useMemo(
     () => compute(mothers),
@@ -778,13 +792,6 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
             slug: "astro-geomancy-chart",
             props: { mothers: mothersToString(mothers) },
           }}
-          share={() =>
-            `/geomancy/reading?${readingSearchParams({
-              mothers,
-              house: houseNoStr,
-              planetId,
-            })}`
-          }
         />
       </Container>
     </>

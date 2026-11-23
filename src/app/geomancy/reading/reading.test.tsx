@@ -70,12 +70,14 @@ describe("geomancy reading page", () => {
   // export controls as one row per format: the page without them is
   // byte-for-byte the same, and before and after they are one unbroken
   // insertion at the same place (before that, 81367 90d5e50d…, 81357
-  // f3d03d65… and 81368 42c28fb8…); the bytes are otherwise those from
-  // before the rekey.
+  // f3d03d65… and 81368 42c28fb8…), and when its stage 2 moved the page
+  // link to Share, removing only the block's "Copy page link" line (before
+  // that, 92078 ec8a8774…, 92068 a855467e… and 92079 a2bae48b…); the
+  // bytes are otherwise those from before the rekey.
   it.each([
     [
       "1",
-      "92078 ec8a8774e180f0762509f566ea248be775a60c1483a828bfca96ae2aa9f98247",
+      "87590 399b85e313d99d782171f937802959dea8e95f77024e945001e7887d759b9aa7",
       [
         "The querent: their life",
         "Good, except in war.",
@@ -85,7 +87,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "7",
-      "92068 a855467e90d57841acdf2926f3d153bd3d4f695c745a4ae40b577eb43e399185",
+      "87580 e5823b70ebeb6f7a50e27ff20740da5196e036ed9fa03bd3ace526d5d71ae23d",
       [
         "Marriage and other unions",
         "Indifferent.",
@@ -95,7 +97,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "12",
-      "92079 a2bae48bd84b233bd157e8c83a9f26f6c8033b6091cc0c752aa928e8217a4729",
+      "87591 298859199dd982ac99354d04ed26ba2403bb2efe9fb0828322f6e5da24882cc2",
       [
         "Enemies; servants; imprisonment",
         "Unfavourable generally.",

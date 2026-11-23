@@ -43,7 +43,8 @@ export default function ReadingText() {
         The twelve figures, Mothers, Daughters and Nephews, are set in the
         twelve houses of an astrological chart with their signs and planets, as
         in the Golden Dawn&apos;s astrological geomancy. Download the chart as
-        SVG or PNG, or copy a link that restores the same reading.
+        SVG or PNG, or use the share button at the top of the page to send a
+        link that restores the same reading.
       </p>
       <H2>The planet and the hour</H2>
       <p>

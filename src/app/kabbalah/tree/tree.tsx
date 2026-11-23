@@ -30,12 +30,9 @@ const ignoreSetting: SetSetting = () => {};
 export function TreeOfLifeView({
   settings: opts,
   onChange: set = ignoreSetting,
-  sharePath = "/kabbalah/tree",
 }: {
   settings: TreeSettings;
   onChange?: SetSetting;
-  /** Page path and query for the copied page link. */
-  sharePath?: string;
 }) {
   const { t } = useUiLanguage();
   const ref = React.useRef<SVGSVGElement>(null);
@@ -208,7 +205,6 @@ export function TreeOfLifeView({
             filename="TreeOfLife-magickly-export"
             link={link}
             linkNote={t(/*i18n*/ "No image link for these settings.")}
-            share={() => sharePath}
           />
           <div style={{ textAlign: "center", fontSize: "90%" }}>
             Hebrew Font:{" "}
@@ -252,10 +248,6 @@ export default function TreeOfLife() {
   }
 
   return (
-    <TreeOfLifeView
-      settings={treeSettings(searchParams)}
-      onChange={set}
-      sharePath={`${pathname}${query ? `?${query}` : ""}`}
-    />
+    <TreeOfLifeView settings={treeSettings(searchParams)} onChange={set} />
   );
 }

@@ -52,7 +52,7 @@ export function kameaSigilFromSearchParams(
 export const kameaSigilKey = (planet: string, text: string, finals: boolean) =>
   `${planet} ${finals} ${text}`;
 
-/** The generator's page for a state: what "Copy page link" copies. */
+/** The generator's page for a state: what Share sends for it. */
 export function kameaSigilPagePath(state: KameaSigilState): string {
   const params = new URLSearchParams({
     planet: state.planet,

@@ -67,7 +67,6 @@ import {
   type PanelTab,
   type TabletChoice,
   type TabletId,
-  tabletQuery,
   useTabletUrl,
 } from "./urlState";
 
@@ -788,16 +787,6 @@ export default function Tablets({
       // The downloads draw what is shown.
       link={linkNote ? undefined : link}
       linkNote={linkNote}
-      share={() =>
-        window.location.pathname +
-        tabletQuery({
-          tablet: id,
-          version,
-          tab,
-          square: pyramidSquare,
-          pyramids,
-        })
-      }
     />
   );
 

@@ -25,12 +25,12 @@ describe("TreeOfLifeView", () => {
     expect(html).toContain('href="/kabbalah/sephirah/malchut"');
   });
 
-  it("links the default image and the canonical page", () => {
+  it("links the default image, and leaves the page link to Share", () => {
     // The image link is copied, never shown (tree.link.test.tsx presses it).
     expect(html).toMatch(/<button[^>]*aria-label="Copy SVG image link"/);
     expect(html).not.toMatch(
       /<button[^>]*aria-label="Copy SVG image link"[^>]*aria-disabled/,
     );
-    expect(html).toContain("Copy page link");
+    expect(html).not.toContain("Copy page link");
   });
 });

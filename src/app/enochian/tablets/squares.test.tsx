@@ -153,18 +153,14 @@ describe("/enochian/tablets' Squares tab", () => {
     expect(detailHeading()).toBeNull();
   });
 
-  it("writes the square only while the Squares tab is open", async () => {
-    const writeText = vi.fn(async (_text: string) => {});
-    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+  it("writes the square only while the Squares tab is open", () => {
     render(<Tablets links={LINKS} />);
     openSquares();
     pick(3, 1);
     expect(window.location.search).toBe("?tab=squares&square=3,1");
     fireEvent.click(screen.getByRole("tab", { name: "Differences" }));
-    expect(window.location.search).toBe("?tab=differences");
-    fireEvent.click(screen.getByRole("button", { name: "Copy page link" }));
-    expect(await screen.findByText("Copied page link")).toBeTruthy();
-    expect(writeText).toHaveBeenLastCalledWith(
+    // The address Share sends.
+    expect(window.location.href).toBe(
       `${window.location.origin}${PAGE}?tab=differences`,
     );
     // Kept for the Squares tab, and written again there.
@@ -173,15 +169,11 @@ describe("/enochian/tablets' Squares tab", () => {
     expect(detailHeading()?.textContent).toBe("Row 3, square 1");
   });
 
-  it("copies a page link with the tab and the square", async () => {
-    const writeText = vi.fn(async (_text: string) => {});
-    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+  it("keeps the tab and the square in the address, which Share sends", () => {
     render(<Tablets links={LINKS} />);
     openSquares();
     pick(7, 6);
-    fireEvent.click(screen.getByRole("button", { name: "Copy page link" }));
-    expect(await screen.findByText("Copied page link")).toBeTruthy();
-    expect(writeText).toHaveBeenLastCalledWith(
+    expect(window.location.href).toBe(
       `${window.location.origin}${PAGE}?tab=squares&square=7,6`,
     );
   });

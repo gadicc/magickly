@@ -12,8 +12,9 @@ import {
   imageLinkNote,
   imageLinkOffered,
 } from "../../../../../tests/exportControls";
+import { renderWithShare, tapShare } from "../../../../../tests/pageShare";
 import KameaSigils from "./KameaSigils";
-import { DEFAULT_KAMEA_SIGIL } from "./kameaSigilState";
+import { DEFAULT_KAMEA_SIGIL, kameaSigilPagePath } from "./kameaSigilState";
 import { serverSeed } from "./serverSeed";
 
 afterEach(cleanup);
@@ -164,4 +165,55 @@ describe("/astrology/kamea/sigils", () => {
     // Five words, five tables of letters.
     expect(document.querySelectorAll("table tbody")).toHaveLength(5);
   }, 60_000);
+});
+
+// The name stays out of the address (plan 027), so Share sends the link
+// the page registers: the one "Copy page link" copied before.
+describe("/astrology/kamea/sigils' Share", () => {
+  it("sends the link that restores what is asked, saying it carries the name", async () => {
+    renderWithShare(
+      <KameaSigils initial={{ planet: "luna", text: "אלים", finals: false }} />,
+    );
+    await drawing("Sigil of אלים on the Kamea of the Moon");
+    const page = (finals: boolean) =>
+      `${window.location.origin}${kameaSigilPagePath({ planet: "luna", text: "אלים", finals })}`;
+    expect(await tapShare()).toEqual({
+      copied: [page(false)],
+      said: "Copied link to this page. It includes what you entered here.",
+    });
+    // A change of state reaches Share at once.
+    fireEvent.click(
+      screen.getByRole("checkbox", {
+        name: "Count final letters at 500 to 900",
+      }),
+    );
+    expect((await tapShare()).copied).toEqual([page(true)]);
+    expect(page(true)).toContain("finals=true");
+  });
+
+  it("sends the bare page, not the name it arrived with, while there is none to trace", async () => {
+    window.history.replaceState(
+      null,
+      "",
+      `/astrology/kamea/sigils?${new URLSearchParams({ planet: "luna", text: "אלים" })}`,
+    );
+    try {
+      renderWithShare(
+        <KameaSigils
+          initial={{ planet: "luna", text: "אלים", finals: false }}
+        />,
+      );
+      for (const value of ["", "אלים1"]) {
+        fireEvent.change(screen.getByRole("textbox", { name: "Hebrew name" }), {
+          target: { value },
+        });
+        expect(await tapShare()).toEqual({
+          copied: [`${window.location.origin}/astrology/kamea/sigils`],
+          said: "Copied link to this page",
+        });
+      }
+    } finally {
+      window.history.replaceState(null, "", "/");
+    }
+  });
 });

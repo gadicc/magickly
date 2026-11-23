@@ -6,6 +6,7 @@ import {
   imageLinkNote,
   imageLinkOffered,
 } from "../../../../tests/exportControls";
+import { renderWithShare, tapShare } from "../../../../tests/pageShare";
 import Sigils from "./sigils";
 
 afterEach(cleanup);
@@ -152,5 +153,47 @@ describe("/gd/sigils' words and debug view", () => {
     expect(
       container.querySelectorAll('svg circle[stroke-dasharray="0.6 0.4"]'),
     ).toHaveLength(5);
+  });
+});
+
+// The text stays out of the address (plan 027), so Share sends the link
+// the page registers: the one "Copy page link" copied before.
+describe("/gd/sigils' Share", () => {
+  it("sends the link that restores the sigil, saying it carries the text", async () => {
+    renderWithShare(
+      <Sigils
+        initial={{ text: "כתר", rose: false, version: "regardie1939" }}
+      />,
+    );
+    const sigil = (text: string) =>
+      `${window.location.origin}/gd/sigils?${new URLSearchParams({ text, rose: "false", version: "regardie1939" })}`;
+    expect(await tapShare()).toEqual({
+      copied: [sigil("כתר")],
+      said: "Copied link to this page. It includes what you entered here.",
+    });
+    fireEvent.change(screen.getByPlaceholderText("Sigil text"), {
+      target: { value: "גדי" },
+    });
+    expect((await tapShare()).copied).toEqual([sigil("גדי")]);
+  });
+
+  it("sends the bare page, not the text it arrived with, while there is no sigil", async () => {
+    window.history.replaceState(null, "", "/gd/sigils?text=%D7%92%D7%93%D7%99");
+    try {
+      renderWithShare(
+        <Sigils initial={{ text: "גדי", rose: true, version: "gd" }} />,
+      );
+      for (const value of ["", "גד-י"]) {
+        fireEvent.change(screen.getByPlaceholderText("Sigil text"), {
+          target: { value },
+        });
+        expect(await tapShare()).toEqual({
+          copied: [`${window.location.origin}/gd/sigils`],
+          said: "Copied link to this page",
+        });
+      }
+    } finally {
+      window.history.replaceState(null, "", "/");
+    }
   });
 });

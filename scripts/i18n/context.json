@@ -49,9 +49,11 @@
         "src/i18n/",
         "src/search/",
         "src/app/pathnames.ts",
-        "src/app/HomeTiles.tsx"
+        "src/app/HomeTiles.tsx",
+        "src/app/ShareButton.tsx",
+        "src/app/pageShare.tsx"
       ],
-      "description": "Shared navigation, language settings, search and homepage links."
+      "description": "Shared navigation, language settings, search, the app bar's Share and homepage links."
     },
     {
       "id": "temples",

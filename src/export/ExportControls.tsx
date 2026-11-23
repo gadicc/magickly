@@ -89,20 +89,6 @@ const TEXT = {
     comment:
       "Action in the confirmation after copying a drawing's image link, or failing to: opens that image in a new tab",
   },
-  copyPageLink: /*i18n*/ {
-    id: "Copy page link",
-    comment:
-      "Button below a drawing's export box: copies a link to this page with its current settings",
-  },
-  copiedPageLink: /*i18n*/ {
-    id: "Copied page link",
-    comment: "Confirms that the link to this page was copied",
-  },
-  copiedPersonalPageLink: /*i18n*/ {
-    id: "Copied page link. It includes what you entered here.",
-    comment:
-      "Confirms the copied link to a page made from what the reader typed (a name, a reading), and warns that the link carries it",
-  },
 } satisfies Record<string, ExportMessage>;
 
 interface Feedback {
@@ -132,8 +118,6 @@ export interface ExportControlsProps {
    * each row, looking disabled, and says this when pressed.
    */
   linkNote?: string;
-  /** Builds the interactive page URL that restores the current state. */
-  share?: () => string;
   /**
    * Changes the detached copy of the SVG that becomes a PNG, before it is
    * rasterised: download and copy as PNG only (the image links are drawn
@@ -186,7 +170,6 @@ export default function ExportControls({
   filename,
   link,
   linkNote,
-  share,
   prepare,
   credit,
   formats = EXPORT_FORMATS,
@@ -398,39 +381,6 @@ export default function ExportControls({
           );
         })}
       </Box>
-      {share && (
-        <div style={{ textAlign: "center", fontSize: "90%" }}>
-          <Button
-            sx={{
-              minWidth: 0,
-              px: 0.75,
-              py: 0,
-              fontSize: "inherit",
-              minBlockSize: 24,
-              "@media (pointer: coarse)": {
-                minBlockSize: 44,
-                minInlineSize: 44,
-              },
-            }}
-            disabled={busy}
-            onClick={() =>
-              run(async () => {
-                await copyText(absolute(share()));
-                return {
-                  severity: "success",
-                  message: t(
-                    personal
-                      ? TEXT.copiedPersonalPageLink.id
-                      : TEXT.copiedPageLink.id,
-                  ),
-                };
-              })
-            }
-          >
-            {t(TEXT.copyPageLink.id)}
-          </Button>
-        </div>
-      )}
       <Snackbar
         // A new confirmation is a new snackbar, so its timer restarts.
         key={feedback?.serial}

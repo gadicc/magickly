@@ -7,7 +7,6 @@ import {
   ExpandMore,
   Login,
   Menu as MenuIcon,
-  Share,
 } from "@mui/icons-material";
 import {
   AppBar,
@@ -47,6 +46,7 @@ import useHydrated from "@/ui/useHydrated";
 // import Link from "@/ui/Link";
 import { useLegacyRecoveryGate } from "./clientProviders";
 import pathnames from "./pathnames";
+import ShareButton from "./ShareButton";
 import type { NavLink } from "./siteNav";
 import useSiteNav from "./useSiteNav";
 
@@ -564,25 +564,6 @@ export default function ButtonAppBar() {
     }
   }
 
-  function share() {
-    const data = {
-      title: title + " - magick.ly",
-      text: t(
-        /*i18n*/ 'Check out "{title}" on magick.ly, the open source magick app!',
-        { title },
-      ),
-      url: window.location.href,
-    };
-
-    if (navigator.share)
-      navigator
-        .share(data)
-        .catch(() =>
-          alert(t(/*i18n*/ "The page could not be shared. Try again.")),
-        );
-    else alert(t(/*i18n*/ "Sharing not supported on this platform."));
-  }
-
   return (
     <div>
       <HideOnScroll>
@@ -665,13 +646,7 @@ export default function ButtonAppBar() {
               }}
             >
               <SearchButton />
-              <IconButton
-                color="inherit"
-                aria-label={t(/*i18n*/ "share")}
-                onClick={share}
-              >
-                <Share />
-              </IconButton>
+              <ShareButton title={title} />
               {userId ? (
                 <span>
                   <IconButton

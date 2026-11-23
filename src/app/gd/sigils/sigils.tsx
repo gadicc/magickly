@@ -25,6 +25,7 @@ import {
 } from "magick-components/gd/roseSigilLayout";
 import { sigilFigure } from "magick-components/sigil/SigilImage";
 import React from "react";
+import { usePageShare } from "@/app/pageShare";
 import { VersionNote, VersionSelect } from "@/drawings/DrawingVersion";
 import Ink from "@/drawings/Ink";
 import ToolLayout, {
@@ -37,6 +38,7 @@ import { useUiLanguage } from "@/i18n/LocaleProvider";
 import UiRichText from "@/i18n/UiRichText";
 import UiText from "@/i18n/UiText";
 import { parseComponentImageRequest } from "@/render/componentImageRequest";
+import { CONTRACTS } from "@/render/contracts";
 import {
   canonicalSigilText,
   foldFinalForms,
@@ -116,15 +118,27 @@ export default function Sigils({
       return undefined;
     }
   })();
-  const share = link
-    ? () => {
-        const params = new URLSearchParams({ text: link.props.text });
-        if (!link.props.rose) params.set("rose", "false");
-        if (link.props.version && link.props.version !== DEFAULT_ROSE_VERSION)
-          params.set("version", link.props.version);
-        return `/gd/sigils?${params}`;
-      }
-    : undefined;
+  // The text stays out of the address bar (plan 027), which keeps the
+  // text the reader arrived with. Share sends the link that restores the
+  // sigil, and says so where the contract is personal; with no sigil, the
+  // bare page, never that stale text.
+  usePageShare(
+    link
+      ? {
+          url: () => {
+            const params = new URLSearchParams({ text: link.props.text });
+            if (!link.props.rose) params.set("rose", "false");
+            if (
+              link.props.version &&
+              link.props.version !== DEFAULT_ROSE_VERSION
+            )
+              params.set("version", link.props.version);
+            return `/gd/sigils?${params}`;
+          },
+          personal: CONTRACTS[link.slug].personal,
+        }
+      : { url: () => "/gd/sigils", personal: false },
+  );
 
   return (
     <ToolLayout>
@@ -290,7 +304,6 @@ export default function Sigils({
           filename={`RoseSigil-${canonical.split(" ").join("-")}${version === DEFAULT_ROSE_VERSION ? "" : `-${version}`}`}
           link={link}
           linkNote={link ? undefined : t(NO_SIGIL_LINK)}
-          share={share}
         />
         <VersionNote
           note={ROSE_VERSION_NOTES[version]}

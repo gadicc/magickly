@@ -398,20 +398,15 @@ describe("ExportControls", () => {
       ["svg", "true", "SVG"],
       ["png", "true", "PNG"],
     ]);
-    // Nothing to open until a link is copied.
+    // Nothing to open until a link is copied, and nothing beside the rows:
+    // the page link is Share's, in the app bar (plan 097, decision 3).
     expect(screen.queryAllByRole("link")).toEqual([]);
+    expect(screen.getAllByRole("button")).toHaveLength(6);
   });
 
   it("copies each format's absolute image link and offers to open it", async () => {
     runtime.copyText.mockResolvedValue(undefined);
-    render(
-      <Page
-        filename="tree"
-        viewBox="-170.5 0 341 598"
-        link={TREE}
-        share={() => "/kabbalah/tree?field=name.roman"}
-      />,
-    );
+    render(<Page filename="tree" viewBox="-170.5 0 341 598" link={TREE} />);
     const origin = window.location.origin;
     for (const [format, href] of [
       ["SVG", `${origin}/api/render/tree-of-life?field=name.roman&fontSize=10`],
@@ -434,14 +429,6 @@ describe("ExportControls", () => {
     }
     expect(runtime.copyText).toHaveBeenCalledTimes(2);
     expect(screen.queryByText(/what you entered/)).toBeNull();
-
-    // The page link, for now a plain button under the box.
-    fireEvent.click(screen.getByRole("button", { name: "Copy page link" }));
-    expect(await screen.findByText("Copied page link")).toBeTruthy();
-    expect(runtime.copyText).toHaveBeenLastCalledWith(
-      `${origin}/kabbalah/tree?field=name.roman`,
-    );
-    expect(screen.queryByRole("link", { name: "Open" })).toBeNull();
   });
 
   it("keeps a confirmation that offers Open for 6 seconds, others for 2.5", async () => {
@@ -555,7 +542,6 @@ describe("ExportControls", () => {
             slug: "enochian-tablet",
             props: { id: "air", font: "latin" },
           }}
-          share={() => "/enochian/tablets"}
         />
       </>,
     );
@@ -584,9 +570,6 @@ describe("ExportControls", () => {
       `${origin}/api/render/enochian-tablet?fmt=png&id=air`,
     ]);
     expect(screen.queryByText(/what you entered/)).toBeNull();
-    expect(
-      screen.getAllByRole("button", { name: "Copy page link" }),
-    ).toHaveLength(1);
   });
 
   it("explains a missing link when Link is pressed, and copies nothing", async () => {
@@ -595,7 +578,6 @@ describe("ExportControls", () => {
         filename="tree"
         viewBox="-170.5 0 341 598"
         linkNote="No image link for this combination."
-        share={() => "/kabbalah/tree?showDaat=true&colorScale=king"}
       />,
     );
     // Nothing waits under the box.
@@ -617,7 +599,6 @@ describe("ExportControls", () => {
     expect(alert.className).toContain("MuiAlert-colorInfo");
     expect(runtime.copyText).not.toHaveBeenCalled();
     expect(screen.queryByRole("link", { name: "Open" })).toBeNull();
-    expect(screen.getByRole("button", { name: "Copy page link" })).toBeTruthy();
   });
 
   it("says in the confirmation that a personal page's link carries what was entered", async () => {
@@ -627,7 +608,6 @@ describe("ExportControls", () => {
         filename="sigil"
         viewBox="-50 -50 100 100"
         link={{ slug: "rose-sigil", props: { text: "גדי", rose: true } }}
-        share={() => "/gd/sigils?text=%D7%92%D7%93%D7%99"}
       />,
     );
     expect(screen.queryByText(/what you entered/)).toBeNull();
@@ -644,16 +624,6 @@ describe("ExportControls", () => {
     expect(
       screen.getByRole("link", { name: "Open" }).getAttribute("href"),
     ).toBe(href);
-    // The page link carries it too, and says so.
-    fireEvent.click(screen.getByRole("button", { name: "Copy page link" }));
-    expect(
-      await screen.findByText(
-        "Copied page link. It includes what you entered here.",
-      ),
-    ).toBeTruthy();
-    expect(runtime.copyText).toHaveBeenLastCalledWith(
-      `${window.location.origin}/gd/sigils?text=%D7%92%D7%93%D7%99`,
-    );
   });
 
   it("offers Save and Copy only on a page with no image route", () => {
@@ -665,7 +635,6 @@ describe("ExportControls", () => {
           .map((button) => button.textContent),
       ).toEqual(["Save", "Copy"]);
     expect(screen.queryByRole("button", { name: /image link/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: "Copy page link" })).toBeNull();
     expect(screen.queryByText(/what you entered/)).toBeNull();
   });
 

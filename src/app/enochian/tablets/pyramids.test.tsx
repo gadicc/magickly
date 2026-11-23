@@ -114,15 +114,11 @@ describe("/enochian/tablets drawn as pyramids (plan 095, decision 4)", () => {
       expect(link.getAttribute("href")).toMatch(/&pyramids=1$/);
   });
 
-  it("copies a page link that keeps the pyramids", async () => {
-    const writeText = vi.fn(async (_text: string) => {});
-    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+  it("keeps the pyramids in the address, which Share sends", () => {
     render(<Tablets />);
     choose("Tablet", "Air");
     fireEvent.click(pyramidsSwitch() as HTMLElement);
-    fireEvent.click(screen.getByRole("button", { name: "Copy page link" }));
-    expect(await screen.findByText("Copied page link")).toBeTruthy();
-    expect(writeText).toHaveBeenLastCalledWith(
+    expect(window.location.href).toBe(
       `${window.location.origin}${PAGE}?tablet=air&pyramids=1`,
     );
   });

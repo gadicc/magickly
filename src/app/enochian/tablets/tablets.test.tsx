@@ -452,17 +452,22 @@ describe("/enochian/tablets' choices in its URL", () => {
     expect(drawn(container).slice(0, 4).join("")).toBe("TaOA");
   });
 
-  it("copies a page link that restores the choices", async () => {
-    const writeText = vi.fn(async (_text: string) => {});
-    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+  it("keeps the choices in the address, which Share sends", () => {
     render(<Tablets />);
     choose("Tablet", "Fire");
     choose("Version", "Raphael's, 1587");
-    fireEvent.click(screen.getByRole("button", { name: "Copy page link" }));
-    expect(await screen.findByText("Copied page link")).toBeTruthy();
-    expect(writeText).toHaveBeenLastCalledWith(
+    expect(window.location.href).toBe(
       `${window.location.origin}${PAGE}?tablet=fire&version=raphael`,
     );
+    // Opened again, the address restores them.
+    cleanup();
+    render(<Tablets />);
+    expect(
+      screen.getByRole("combobox", { name: "Tablet" }).textContent,
+    ).toMatch(/Fire/);
+    expect(
+      screen.getByRole("combobox", { name: "Version" }).textContent,
+    ).toMatch(/Raphael/);
   });
 });
 
@@ -567,11 +572,13 @@ describe("/enochian/tablets across the breakpoint", () => {
     vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
     render(<Tablets />);
     const before = screen.getByRole("button", { name: "Save SVG" });
-    fireEvent.click(screen.getByRole("button", { name: "Copy page link" }));
-    expect(await screen.findByText("Copied page link")).toBeTruthy();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Copy SVG image link" }),
+    );
+    expect(await screen.findByText("Copied SVG image link")).toBeTruthy();
     resize(true);
     expect(screen.getByRole("button", { name: "Save SVG" })).toBe(before);
-    expect(screen.getByText("Copied page link")).toBeTruthy();
+    expect(screen.getByText("Copied SVG image link")).toBeTruthy();
     resize(false);
     expect(screen.getByRole("button", { name: "Save SVG" })).toBe(before);
   });

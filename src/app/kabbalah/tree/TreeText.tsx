@@ -42,8 +42,9 @@ export default function TreeText() {
         </li>
       </List>
       <p>
-        Download the diagram as SVG or PNG, copy it to the clipboard, or copy a
-        link that opens the Tree with your settings.
+        Download the diagram as SVG or PNG or copy it to the clipboard, and use
+        the share button at the top of the page to send a link that opens the
+        Tree with your settings.
       </p>
       <H2>The paths</H2>
       <p>
