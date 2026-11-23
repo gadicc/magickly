@@ -36,7 +36,7 @@ import { useSigilStyleUrl } from "./urlState";
 
 const CAPTIONS = {
   band: /*i18n*/ {
-    id: "The sigil inside a ring with the name in Hebrew at the top, as the angels' names are written round a pentacle in Mathers's <0>Key of Solomon</0> (1889), <1>Plate IV, Fig. 18</1>. Ours: one name instead of four, the name in roman letters at the bottom, and the sigil inside.",
+    id: "The sigil inside a ring with the name in Hebrew, as Lenain prints it, at the top, as the angels' names are written round a pentacle in Mathers's <0>Key of Solomon</0> (1889), <1>Plate IV, Fig. 18</1>. Ours: one name instead of four, the name in roman letters at the bottom, and the sigil inside.",
     comment:
       "Caption of an angel's sigil drawn inside a ring, on the angel's page. <0> is a book's title, set in italics; <1> links the plate of the book it cites",
   },
@@ -51,7 +51,7 @@ const CAPTIONS = {
       "Caption of an angel's sigil drawn over the Golden Dawn's rose, on the angel's page. <0> is the book's title, in italics; <1> and <2> link the two pages it cites",
   },
   talisman: /*i18n*/ {
-    id: "A talisman as Lenain describes the genii's, the genius's verse written round it (<0>La Science cabalistique</0>, <1>p. 45</1>), lettered like the talisman on his <2>title page</2>. The name inside follows Mathers's <3>Key of Solomon</3> (1889), <4>Plate IV, Fig. 21</4>. Ours: Lenain says the verses are in Hebrew, and we letter his Latin; he draws no genius's talisman; and the sigil inside is the Golden Dawn's.",
+    id: "A talisman as Lenain describes the genii's, the genius's verse written round it (<0>La Science cabalistique</0>, <1>p. 45</1>), lettered like the talisman on his <2>title page</2>. The name inside, in Hebrew as Lenain prints it, follows Mathers's <3>Key of Solomon</3> (1889), <4>Plate IV, Fig. 21</4>. Ours: Lenain says the verses are in Hebrew, and we letter his Latin; he draws no genius's talisman; and the sigil inside is the Golden Dawn's.",
     comment:
       "Caption of an angel's talisman, its sigil inside a ring lettered with its verse, on the angel's page. <0> and <3> are book titles, in italics; <1>, <2> and <4> link the pages they cite. A genius is one of the 72 angels, as Lenain calls them",
   },

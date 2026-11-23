@@ -167,12 +167,12 @@ export const ANGEL_SIGIL_STYLE_LABELS: Readonly<
 ) as Record<AngelSigilStyle, string>;
 
 const BAND_ALT = /*i18n*/ {
-  id: "The Rose Cross sigil of {name}, {hebrew}, inside a ring with the name in Hebrew",
+  id: "The Rose Cross sigil of {name}, {hebrew}, inside a ring with the name in Hebrew as Lenain prints it",
   comment:
     "Alt text of an angel's sigil inside a ring (angel page, 72 angels list). {name} is the angel's name in English, {hebrew} the same in Hebrew letters",
 };
 const BAND_ALT_NUMBERED = /*i18n*/ {
-  id: "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, inside a ring with the name in Hebrew",
+  id: "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, inside a ring with the name in Hebrew as Lenain prints it",
   comment:
     "Alt text as above, for one of the two angels named Lauviah, told apart by {number}, their place among the 72",
 };
@@ -187,17 +187,17 @@ const BARE_ALT_NUMBERED = /*i18n*/ {
     "Alt text as above, for one of the two angels named Lauviah, told apart by {number}, their place among the 72",
 };
 const TALISMAN_ALT = /*i18n*/ {
-  id: "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} (Vulgate numbering) in Latin",
+  id: "A talisman of {name}, {hebrew}: the Rose Cross sigil, with the name in Hebrew as Lenain prints it, inside a ring lettered with a verse of Psalm {psalm} (Vulgate numbering) in Latin",
   comment:
     "Alt text of an angel's talisman (angel page): the sigil inside a ring lettered with the angel's psalm verse. {psalm} is the psalm's number in the Latin Bible's numbering",
 };
 const TALISMAN_ALT_NUMBERED = /*i18n*/ {
-  id: "A talisman of {name}, angel {number} of the 72, {hebrew}: the Rose Cross sigil inside a ring lettered with a verse of Psalm {psalm} (Vulgate numbering) in Latin",
+  id: "A talisman of {name}, angel {number} of the 72, {hebrew}: the Rose Cross sigil, with the name in Hebrew as Lenain prints it, inside a ring lettered with a verse of Psalm {psalm} (Vulgate numbering) in Latin",
   comment:
     "Alt text as above, for one of the two angels named Lauviah, told apart by {number}, their place among the 72",
 };
 const TALISMAN_ALT_GENESIS = /*i18n*/ {
-  id: "A talisman of {name}, {hebrew}: the Rose Cross sigil inside a ring lettered with Genesis 1:1 in Latin",
+  id: "A talisman of {name}, {hebrew}: the Rose Cross sigil, with the name in Hebrew as Lenain prints it, inside a ring lettered with Genesis 1:1 in Latin",
   comment:
     "Alt text of the talisman of Jabamiah, the one angel whose verse is the Bible's first, not a psalm's",
 };

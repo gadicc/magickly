@@ -97,7 +97,7 @@ describe("the angel page", () => {
       url: "/kabbalah/angel/lauviah-17/lauviah-17-rose-cross-sigil-band.png",
       width: 1024,
       height: 1024,
-      alt: "The Rose Cross sigil of Lauviah, angel 17 of the 72, לאויה, inside a ring with the name in Hebrew",
+      alt: "The Rose Cross sigil of Lauviah, angel 17 of the 72, לאויה, inside a ring with the name in Hebrew as Lenain prints it",
     });
     // The rest of the page's metadata is as it was.
     expect(metadata.alternates?.canonical).toBe("/kabbalah/angel/lauviah-17");
@@ -127,7 +127,7 @@ describe("the angel page", () => {
   it("shows the band's static PNG and links its files and the generator", async () => {
     const html = await body(1);
     expect(html).toContain(
-      '<img src="/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil-band.png" width="1024" height="1024" alt="The Rose Cross sigil of Vehuiah, והויה, inside a ring with the name in Hebrew" loading="lazy"',
+      '<img src="/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil-band.png" width="1024" height="1024" alt="The Rose Cross sigil of Vehuiah, והויה, inside a ring with the name in Hebrew as Lenain prints it" loading="lazy"',
     );
     expect(html.match(/<img /g)).toHaveLength(1);
     expect(html).toContain(

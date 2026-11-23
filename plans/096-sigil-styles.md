@@ -1467,3 +1467,27 @@ fails it.
   it checks the committed file's SHA-256. To rebuild:
   `VULGATE_SOURCE_DIR=<dir> pnpm test scripts/seventyTwoAngels/vulgate.test.ts`,
   or `node --import tsx scripts/seventyTwoAngels/vulgate.ts <dir>`.
+
+### After the Vercel preview (23 November 2026)
+
+- **The preview** (gate/sigil-styles pushed with Gadi's go-ahead) found
+  two things `next start` hides, both fixed:
+  - Vercel's build writes no segment files under `.next/server/app`, so
+    `checkProxyBuild` failed the first deploy; on Vercel it now checks
+    only the matcher and the rewrite (61155798).
+  - A file drawn on its first request answered `STALE` on every later
+    request and was drawn again in the background each time, because
+    Vercel keeps a function's response fresh only for its `s-maxage`.
+    The bare and talisman files now send `s-maxage=31536000`, which
+    Vercel strips from what the browser sees (e9a2ca7a). On the third
+    preview they go `MISS`, then `HIT` with a growing `age`.
+  - On that preview 18 kinds of made-up name (another angel's file, an
+    unknown style or slug, capitals, percent-encoding, `.rsc`, a dotted
+    slug) all got the site's 404; a known file asked for with `RSC: 1`
+    got the 406; the angel page, its segment prefetch, the list and the
+    image API were unaffected.
+- **Gadi's decisions:** keep the guard; and the band's and talisman's
+  captions and alt texts now say the Hebrew name is "as Lenain prints
+  it", since nine of the 72 differ from the names derived from Exodus
+  14:19–21 and the files travel without the page's notes. The bare
+  style letters only the roman name and is unchanged.

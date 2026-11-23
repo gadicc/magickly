@@ -39,7 +39,7 @@ describe("the 72 angels' list sigils", () => {
     );
     expect(en).toContain('loading="lazy"');
     expect(en).toContain(
-      'alt="The Rose Cross sigil of Vehuiah, והויה, inside a ring with the name in Hebrew"',
+      'alt="The Rose Cross sigil of Vehuiah, והויה, inside a ring with the name in Hebrew as Lenain prints it"',
     );
     // The caption names the style and sends a reader to the page for the
     // other three (plan 096, decision 12).
@@ -52,7 +52,7 @@ describe("the 72 angels' list sigils", () => {
     const he = render("he");
     expect(he).toContain("סיגיל צלב הוורד של Vehuiah, בתוך טבעת עם שמו.");
     expect(he).toContain(
-      'alt="סיגיל צלב הוורד של Vehuiah, והויה, בתוך טבעת שבה השם בעברית"',
+      'alt="סיגיל צלב הוורד של Vehuiah, והויה, בתוך טבעת שבה השם בעברית כפי שלנן מדפיס אותו"',
     );
     for (const html of [en, he]) {
       expect(html).toContain('href="/kabbalah/angel/vehuiah"');

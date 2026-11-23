@@ -171,11 +171,11 @@ describe("an angel page's sigil section", () => {
         ]),
       ),
     ).toEqual({
-      band: "The Rose Cross sigil of Vehuiah, והויה, inside a ring with the name in Hebrew",
+      band: "The Rose Cross sigil of Vehuiah, והויה, inside a ring with the name in Hebrew as Lenain prints it",
       bare: "The Rose Cross sigil of Vehuiah, והויה, drawn alone with the name beneath",
       rose: "The Rose Cross sigil of Vehuiah, והויה, traced on the Golden Dawn's rose of 22 letters",
       talisman:
-        "A talisman of Vehuiah, והויה: the Rose Cross sigil inside a ring lettered with a verse of Psalm 3 (Vulgate numbering) in Latin",
+        "A talisman of Vehuiah, והויה: the Rose Cross sigil, with the name in Hebrew as Lenain prints it, inside a ring lettered with a verse of Psalm 3 (Vulgate numbering) in Latin",
     });
     // The talisman names the psalm only, never a verse number (decision
     // for Gadi 12): Lenain's are often not the Vulgate's. The psalm is the
@@ -203,7 +203,7 @@ describe("an angel page's sigil section", () => {
     const iehuiah = angels[32];
     expect(iehuiah.psalm.psalm).toBe(33);
     expect(angelSigilStyleAlt(iehuiah, "talisman")).toBe(
-      "A talisman of Iehuiah, יהויה: the Rose Cross sigil inside a ring lettered with a verse of Psalm 93 (Vulgate numbering) in Latin",
+      "A talisman of Iehuiah, יהויה: the Rose Cross sigil, with the name in Hebrew as Lenain prints it, inside a ring lettered with a verse of Psalm 93 (Vulgate numbering) in Latin",
     );
     const talisman = angelJsonLd(iehuiah)["@graph"].find((node) =>
       (node as { "@id"?: string })["@id"]?.endsWith("#sigil-talisman-png"),

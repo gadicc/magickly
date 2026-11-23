@@ -142,11 +142,11 @@ describe("an angel page's sigil section", () => {
   it("translates the menu, the captions and the alt text, keeping the links", () => {
     const en = serverHtml(1);
     expect(en).toContain(
-      'alt="The Rose Cross sigil of Vehuiah, והויה, inside a ring with the name in Hebrew"',
+      'alt="The Rose Cross sigil of Vehuiah, והויה, inside a ring with the name in Hebrew as Lenain prints it"',
     );
     const he = serverHtml(1, "he");
     expect(he).toContain(
-      'alt="סיגיל צלב הוורד של Vehuiah, והויה, בתוך טבעת שבה השם בעברית"',
+      'alt="סיגיל צלב הוורד של Vehuiah, והויה, בתוך טבעת שבה השם בעברית כפי שלנן מדפיס אותו"',
     );
     expect(he).toContain("סגנון הסיגיל");
     expect(he).toContain(">בתוך טבעת עם שמו</option>");
@@ -210,7 +210,7 @@ describe("an angel page's sigil section", () => {
         downloads: [talisman.png.path, talisman.svg.path],
         // The psalm only (decision for Gadi 12): Lenain's verse numbers
         // are often not the Vulgate's.
-        alt: "A talisman of Vehuiah, והויה: the Rose Cross sigil inside a ring lettered with a verse of Psalm 3 (Vulgate numbering) in Latin",
+        alt: "A talisman of Vehuiah, והויה: the Rose Cross sigil, with the name in Hebrew as Lenain prints it, inside a ring lettered with a verse of Psalm 3 (Vulgate numbering) in Latin",
       });
       expect(now.caption).toMatch(/^A talisman as Lenain describes/);
       expect(now.caption).not.toContain("Genesis");
@@ -276,7 +276,7 @@ describe("an angel page's sigil section", () => {
     const { container } = render(tree(70));
     const now = shown(container);
     expect(now.alt).toBe(
-      "A talisman of Jabamiah, יבמיה: the Rose Cross sigil inside a ring lettered with Genesis 1:1 in Latin",
+      "A talisman of Jabamiah, יבמיה: the Rose Cross sigil, with the name in Hebrew as Lenain prints it, inside a ring lettered with Genesis 1:1 in Latin",
     );
     expect(now.caption).toContain(
       "Lenain gives Jabamiah no psalm but the first verse of Genesis, in French; the Latin here is the Vulgate's",
