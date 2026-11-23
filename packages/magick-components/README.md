@@ -134,6 +134,7 @@ assembled graph, so they import magick-data's root entry, every table.
 | `gd/RoseSigilImage` | The same sigil with no hooks, for the server |
 | `gd/roseSigilGeometry` | The rose's letters and where a text's letters stand on it, on either version of the rose: `ROSE_LETTERS`, `roseRings()`, `roseLetters()`, `letterPoint()` and `sigilPoints()`, with `ROSE_VERSIONS` and `ROSE_VERSION_NOTES` |
 | `gd/roseSigilLayout` | The rose as a sigil layout, `roseSigilLayout()`, and the Golden Dawn's rules for it, `ROSE_SIGIL_PROFILE`, for the engine below |
+| `gd/roseSigilStyles` | A one-word sigil as a finished figure, with no hooks, for the server: in a ring with its name, alone with its name, or as a talisman with its verse (`StyledRoseSigilImage`, and `styledRoseSigilLayout()`, the same worked out without drawing), with `SIGIL_STYLES`, `SIGIL_STYLE_NOTES` and `SIGIL_STYLE_FONTS`; the rose's own style is `gd/RoseSigilImage`'s |
 | `sigil/types` | The sigil engine's contract ([below](#a-sigil-on-your-own-layout)): `SigilLayout`, `SigilProfile`, `SigilPlan` and the placed words' types |
 | `sigil/planSigil` | `planSigil()`, what each vertex of a text's sigil says (its place, visit, crooks and marks), and `sigilWords()`, which splits a text into words |
 | `sigil/ink` | The renderer: `wordInk()` and `sigilSubpaths()`, placed words as ink and path data, `sigilFrame()` and `sigilViewBox()`, and `DEFAULT_SIGIL_MARKS`, the mark sizes a profile can change |
@@ -461,6 +462,54 @@ default), and Regardie's of 1939 (`version="regardie1939"`).
 `ROSE_VERSION_NOTES`, from `gd/roseSigilGeometry`, names each and says
 where it comes from.
 
+### The sigil's styles
+
+`gd/roseSigilStyles` draws a one-word sigil as a finished figure, in the
+rose's 100-unit box, so that a style never changes the figure's size:
+
+- `band`: inside a ring, the Hebrew name at the top of the band, tops
+  outward, and the roman name upright at the bottom, after the angels'
+  names round a pentacle in Mathers's *Key of Solomon* (1889), Plate IV,
+  Fig. 18;
+- `bare`: alone, the roman name beneath in capitals, as Regardie prints
+  the Golden Dawn's own sigils (*The Golden Dawn*, vol. 4, 1940, p. 58);
+- `talisman`: inside a ring lettered with a verse, clockwise from a cross
+  at the top, tops outward, the Hebrew name inside, as Lenain describes a
+  genius's talisman (*La Science cabalistique*, 1823, p. 45);
+- `rose`, the sigil on the rose, is `RoseSigilImage`'s.
+
+```tsx
+import { StyledRoseSigilImage } from "magick-components/gd/roseSigilStyles";
+
+export const Vehuiah = () => (
+  <StyledRoseSigilImage
+    text="והויה"
+    sigilStyle="talisman"
+    legend="Et tu Domine susceptor meus et gloria mea et exaltans caput meum"
+    aria-label="A talisman of Vehuiah"
+  />
+);
+```
+
+The sigil is centred on its ink's bounds and scaled to its field, its
+line 1 unit wide at every scale. Every letter is its own `<text>`, placed
+and turned from measured advances, so no renderer's text layout decides
+where a letter goes or in what order. The verse is set in capitals by a
+fixed table, accents and ligatures kept, with its punctuation and without
+a final full stop, whose place the cross takes (`sigilStyleLegend()`),
+at the largest size up to a cap at which it fills the ring.
+`SIGIL_STYLE_NOTES` says where each style comes from and what is ours.
+
+The letters are measured in two faces, and the markup asks for each by
+its own family name, weight and style (`SIGIL_STYLE_FONTS`): Noto Serif
+Regular (400) and Frank Ruhl Libre Bold (700), as the repository's
+`scripts/gd-hall-fonts/build.py` subsets them from google/fonts at the
+commit [fonts/SOURCES.md](./fonts/SOURCES.md) names. The package does not
+ship them: supply both, to the page or to your renderer, or name your own
+with `latinFamily` and `hebrewFamily`; another build of either may set
+the letters differently. A character outside the subsets (Latin-1, and
+the 22 Hebrew letters with their final forms) is refused.
+
 ### A sigil on your own layout
 
 The rules know nothing of the rose. A layout (`SigilLayout`, from
@@ -722,6 +771,14 @@ engine takes new settings, each off unless set: a layout's `frame` and
 `data-placement`. The rose sigil draws exactly as before. It depends on
 magick-data 0.4.0.
 
+0.7.0 adds the rose sigil's styles (plan 096 in the repository):
+`gd/roseSigilStyles` draws a one-word sigil in a ring with its name,
+alone with its name, or as a talisman with its verse (see [The sigil's
+styles](#the-sigils-styles)), with no hooks, for the server. The rose
+style stays `gd/RoseSigilImage`'s. `astrology/KameaSigilImage` takes
+`columns`, setting a name of several words in rows. The rose sigil draws
+exactly as before. It depends on magick-data 0.5.0.
+
 ## Requirements
 
 React 19 and an ES module environment: Node 22 or later (`engines`
@@ -748,6 +805,7 @@ package's entries.
 | A sigil traced on a kamea (`sigil/kameaLayout`) | Drawn in code. The rose-cross sigil's engine (its row below), over the cells of magick-data's squares (Agrippa's, as the row above says); each letter is reduced to a cell by Aiq Bekar, the Qabalah of Nine Chambers (`magick-data/astrology/aiqBekar`), by the rule and the two worked examples in Regardie, *The Golden Dawn*, vol. 4 (Aries Press, Chicago, 1940), pp. 78–80 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaves n72–n74), from which only the method is taken | 2026-11-20 |
 | A name's sigil on its kamea (`astrology/KameaSigil`) | Drawn in code: the sigil traced on a kamea (`sigil/kameaLayout`, the row above) over the square `astrology/Kamea` draws (two rows above), a figure per word on its own square | 2026-11-21 |
 | The rose-cross sigil (`gd/RoseSigil`, `gd/RoseSigilImage`, `gd/roseSigilGeometry`, `gd/roseSigilLayout`, `sigil/types`, `sigil/planSigil`, `sigil/placeSigil`, `sigil/ink`, `sigil/SigilImage`) | Drawn in code. The rose's construction, three rings of letters at equal angles, is Gadi Cohen's original geometry, written out in `gd/roseSigilGeometry`, and the sigil is planned and placed over it by rule, our code, after the rules Regardie gives in *The Golden Dawn*, vol. 4 (Aries Press, Chicago, 1940), p. 57 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaf n51), from which only the rules are taken. The order of the letters is in two versions. The Golden Dawn's (`gd`, the default) is the figure Crowley printed in *The Equinox* I(3) (1910), Diagram 63, plate facing p. 210 (archive.org `crowley-equinox_202110`, "The Equinox Vol. 1, No. 3", leaf n220), and the colour key to the rose in "The Complete Symbol of the Tarot", *The Equinox* I(8) (1912), plate facing p. 145 (the same item, "The Equinox Vol. 1, No. 8", leaf n174). Regardie's (`regardie1939`), which exchanges Kaph and Tau, is *The Golden Dawn*, vol. 3 (Aries Press, Chicago, 1939), p. 53 and Diagram 20, p. 56 (archive.org `IsraelRegardie-TheGoldenDawn-Vol3-1939`, leaves n46 and n49) | 2026-11-19 |
+| An angel's sigil in its styles (`gd/roseSigilStyles`) | Drawn in code: the rose-cross sigil (its row above), moved into a ring or a box and lettered. The band follows the angels' names written round a pentacle in S. L. MacGregor Mathers, *The Key of Solomon the King* (London, 1889), Plate IV, Fig. 18, and its note, p. 61 (archive.org `b24884431`, the Wellcome Library copy, leaves n79 and n80). The bare style follows the Golden Dawn's sigils of Metatron and Elohim in Regardie, *The Golden Dawn*, vol. 4 (Aries Press, Chicago, 1940), p. 58 (archive.org `IsraelRegardie-TheGoldenDawn-Vol4-1940`, leaf n52), from which only the form is taken. The talisman letters the verse Lenain says is written round each genius's talisman, *La Science cabalistique* (Amiens, 1823), pp. 45 and 70 (Google Books `qt9SAAAAcAAJ`), as his title page's talisman is lettered (copied in Ms 5365, archive.org `BIUSante_ms05365`, leaf n2), with the name inside after Mathers's Figs. 20 and 21 (leaf n79; notes pp. 61–62, leaves n80–n81). The rings, the cross, the fit and the lettering's sizes are ours; the faces are Noto Serif and Frank Ruhl Libre (SIL OFL 1.1), which the package does not ship | 2026-11-23 |
 | The temple halls' art (`gd/hall`, `gd/hall/presets`, `gd/hall/tags`, `gd/hall/editor`) | Our own art, in code. The halls' layouts are facts from Regardie, *The Golden Dawn*, vol. 2 (Aries Press, Chicago, 1938), cited for each hall by page and archive.org leaf (`IsraelRegardie-TheGoldenDawn-Vol2-1938`); no drawing of his is copied. The planets' seals are `astrology/PlanetarySeal`'s, after Agrippa's woodcuts (1533; its row above), on a silver plate. Each art records its source in its `provenance` | 2026-11-21 |
 | The halls' fonts (`fonts/*`) | Subsets of Noto Serif and Frank Ruhl Libre under the SIL Open Font License 1.1, made from google/fonts at a pinned commit; [fonts/SOURCES.md](./fonts/SOURCES.md) gives the files, their hashes and how they are made | 2026-11-14 |
 | The Moon (`astrology/Moon`, `astrology/MoonWidget`) | The paths of the lit part and the disc adapt `phase_junk()` from moon-phase, Copyright © 2012 Regents of the University of California, under the BSD 3-Clause License, at a pinned commit (see [Licences](#licences)); the phase comes from lune (Apache-2.0, a dependency). The tile draws no picture of its own | 2026-11-14 |

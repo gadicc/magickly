@@ -1,6 +1,6 @@
 {
   "name": "magick-components",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "React components that draw magickal figures from magick-data: the Tree of Life, the Golden Dawn's temple halls, lamens and symbols, the rose-cross sigil, the Enochian tablets, the kameas, the planetary seals, the planetary spirits' geomantic sigils and the Moon",
   "keywords": [
     "magick",
@@ -60,6 +60,7 @@
     "./gd/RoseSigil": "./src/gd/RoseSigil.tsx",
     "./gd/roseSigilGeometry": "./src/gd/roseSigilGeometry.ts",
     "./gd/roseSigilLayout": "./src/gd/roseSigilLayout.ts",
+    "./gd/roseSigilStyles": "./src/gd/roseSigilStyles.tsx",
     "./gd/RoseSigilImage": "./src/gd/RoseSigilImage.tsx",
     "./gd/SevenBranchedCandlestick": "./src/gd/SevenBranchedCandlestick.tsx",
     "./gd/TableOfShewbread": "./src/gd/TableOfShewbread.tsx",
@@ -158,6 +159,10 @@
       "./gd/roseSigilLayout": {
         "types": "./lib/gd/roseSigilLayout.d.ts",
         "default": "./lib/gd/roseSigilLayout.js"
+      },
+      "./gd/roseSigilStyles": {
+        "types": "./lib/gd/roseSigilStyles.d.ts",
+        "default": "./lib/gd/roseSigilStyles.js"
       },
       "./gd/RoseSigilImage": {
         "types": "./lib/gd/RoseSigilImage.d.ts",

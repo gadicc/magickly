@@ -36,6 +36,7 @@
     "src/gd/RoseSigil.tsx",
     "src/gd/roseSigilGeometry.ts",
     "src/gd/roseSigilLayout.ts",
+    "src/gd/roseSigilStyles.tsx",
     "src/gd/RoseSigilImage.tsx",
     "src/gd/SevenBranchedCandlestick.tsx",
     "src/gd/TableOfShewbread.tsx",
