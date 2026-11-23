@@ -2,7 +2,6 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
-  readdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
@@ -15,10 +14,9 @@ import { EMBEDDING_PROFILES, type EmbeddingProfile } from "./profiles";
 import {
   gatherMatrix,
   MANIFEST,
-  MATRIX_DIRECTORY,
   matrixFromRows,
   missingRows,
-  publishMatrix,
+  publishVectors,
   rowSources,
 } from "./publish";
 import { digest } from "./records";
@@ -157,98 +155,75 @@ describe("the publish lookup order", () => {
   });
 });
 
-describe("publishMatrix", () => {
-  it("writes rows, the hashed matrix, the manifest and the artifact", () => {
+describe("publishVectors", () => {
+  it("writes the rows, the manifest and the artifact, and nothing under public/", () => {
     const keys = rows.map(([k]) => k);
     const matrix = Buffer.concat(rows.map(([, bytes]) => bytes));
-    const published = publishMatrix(root, profile, "catalogue", keys, matrix);
-    const sha256 = digest(matrix);
+    const published = publishVectors(root, profile, keys, matrix);
     expect(published).toEqual({
-      file: `test-profile-${sha256.slice(0, 12)}.bin`,
-      sha256,
       written: 3,
       pruned: [],
-      removed: [],
+      sha256: digest(matrix),
     });
-    expect(
-      readFileSync(join(root, MATRIX_DIRECTORY, published.file)).equals(matrix),
-    ).toBe(true);
+    expect(listRowKeys(root, profile.key)).toEqual([...keys].sort());
     expect(manifest(root)).toEqual({
-      version: 1,
+      version: 2,
       selected: "test-profile",
-      catalogueSha256: "catalogue",
-      profiles: [{ profile, file: published.file, sha256, rows: 3 }],
+      profile,
     });
     const artifact = parseVectorArtifact(
       readFileSync(join(root, VECTOR_ARTIFACT)),
     );
     expect(artifact.profile).toBe("test-profile");
     expect(artifact.keys).toEqual([...keys].sort());
+    // The rows are the only published form of the vectors (plan 087, S3).
+    expect(existsSync(join(root, "public"))).toBe(false);
   });
 
-  it("reproduces a published matrix from its committed rows alone", () => {
+  it("reproduces a publish from its committed rows alone", () => {
     const keys = rows.map(([k]) => k);
     const matrix = Buffer.concat(rows.map(([, bytes]) => bytes));
-    const first = publishMatrix(root, profile, "catalogue", keys, matrix);
-    const again = publishMatrix(
+    const first = publishVectors(root, profile, keys, matrix);
+    const before = readFileSync(join(root, MANIFEST), "utf8");
+    const again = publishVectors(
       root,
       profile,
-      "catalogue",
       keys,
       matrixFromRows(root, profile, keys),
     );
     expect(again).toEqual({ ...first, written: 0 });
+    expect(readFileSync(join(root, MANIFEST), "utf8")).toBe(before);
   });
 
-  it("prunes unreferenced rows and removes only the profile's earlier matrices", () => {
+  it("prunes only the published profile's unreferenced rows", () => {
     writeRows(root, profile.key, 4, rows);
     writeRows(root, other.key, 4, rows);
-    const directory = join(root, MATRIX_DIRECTORY);
-    mkdirSync(directory, { recursive: true });
-    const stale = "test-profile-0123456789ab.bin";
-    const kept = [
-      "other-profile-0123456789ab.bin",
-      "test-profile-extra-0123456789ab.bin",
-      "notes.txt",
-    ];
-    for (const name of [stale, ...kept])
-      writeFileSync(join(directory, name), "");
     const keys = [key("a1"), key("c3")];
-    const published = publishMatrix(
+    const published = publishVectors(
       root,
       profile,
-      "catalogue",
       keys,
       matrixFromRows(root, profile, keys),
     );
     expect(published.pruned).toEqual([key("b2")]);
-    expect(published.removed).toEqual([stale]);
-    expect(readdirSync(directory).sort()).toEqual(
-      [published.file, ...kept].sort(),
-    );
     expect(listRowKeys(root, profile.key)).toEqual(keys);
     expect(listRowKeys(root, other.key)).toHaveLength(3);
   });
 
-  it("keeps the earlier matrix when the manifest cannot be written", () => {
-    const directory = join(root, MATRIX_DIRECTORY);
-    mkdirSync(directory, { recursive: true });
-    const stale = "test-profile-0123456789ab.bin";
-    writeFileSync(join(directory, stale), "");
+  it("leaves the artifact alone when the manifest cannot be written", () => {
     mkdirSync(join(root, MANIFEST));
     expect(() =>
-      publishMatrix(root, profile, "catalogue", [key("a1")], rows[0][1]),
+      publishVectors(root, profile, [key("a1")], rows[0][1]),
     ).toThrow();
-    expect(existsSync(join(directory, stale))).toBe(true);
     expect(existsSync(join(root, VECTOR_ARTIFACT))).toBe(false);
   });
 
   it("leaves the manifest alone when the rows cannot be written", () => {
     writeFileSync(join(root, MANIFEST), "old\n");
     expect(() =>
-      publishMatrix(root, profile, "catalogue", [key("a1")], new Uint8Array(4)),
+      publishVectors(root, profile, [key("a1")], new Uint8Array(4)),
     ).toThrow(/does not match/);
     expect(readFileSync(join(root, MANIFEST), "utf8")).toBe("old\n");
-    expect(existsSync(join(root, MATRIX_DIRECTORY))).toBe(false);
+    expect(listRowKeys(root, profile.key)).toEqual([]);
   });
 });

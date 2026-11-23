@@ -14,37 +14,37 @@ import { EMBEDDING_PROFILES, type EmbeddingProfile } from "./profiles";
 import { type EmbeddingRecord, embeddingRecords } from "./records";
 import { decodeRow } from "./rowBytes";
 
+/**
+ * `embeddings/manifest.json` (plan 087, S3): which profile ships, and a copy
+ * of it as it was registered when published. Every row key hashes the whole
+ * profile, so the copy lets the store refuse a registered profile edited in
+ * place instead of added under a new key. The vectors themselves are the
+ * committed rows; nothing here names or hashes them.
+ */
 export interface SearchEmbeddingManifest {
-  version: 1;
+  version: 2;
+  /** The selected profile's key, or null for no meaning search. */
   selected: string | null;
-  catalogueSha256: string;
-  profiles: {
-    profile: EmbeddingProfile;
-    file: string;
-    sha256: string;
-    rows: number;
-  }[];
+  /** The selected profile as published; null when none is selected. */
+  profile: EmbeddingProfile | null;
 }
 
 /**
  * The manifest's selected profile, or null when none is selected. Throws
- * when the manifest's copy of it differs from the registered profile, since
- * every row key hashes the whole profile.
+ * when the manifest's copy of it differs from the registered profile, or
+ * is missing, since every row key hashes the whole profile.
  */
 export function selectedProfile(
   manifest: SearchEmbeddingManifest = manifestData as SearchEmbeddingManifest,
 ): EmbeddingProfile | null {
   if (!manifest.selected) return null;
-  const selected = manifest.profiles.find(
-    (entry) => entry.profile.key === manifest.selected,
-  );
   const expected = EMBEDDING_PROFILES.find(
     (profile) => profile.key === manifest.selected,
   );
   if (
-    !selected ||
     !expected ||
-    JSON.stringify(expected) !== JSON.stringify(selected.profile)
+    !manifest.profile ||
+    JSON.stringify(expected) !== JSON.stringify(manifest.profile)
   )
     throw new Error("Invalid search embedding manifest");
   return expected;

@@ -1,10 +1,4 @@
-import {
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { VECTOR_ARTIFACT } from "./artifact";
 import { type EmbeddingProfile, unitVector } from "./profiles";
@@ -24,13 +18,7 @@ import type { SearchEmbeddingManifest } from "./store";
  * alone). Node-only, like rows.ts.
  */
 
-/**
- * Where the published matrices live. /api/search reads the artifact, not
- * these, but the service worker precaches every file here, so an earlier
- * matrix left behind is downloaded for nothing.
- */
-export const MATRIX_DIRECTORY = "public/search-vectors";
-/** The manifest naming the published matrix. */
+/** The manifest recording the selected profile (store.ts). */
 export const MANIFEST = "src/search/embeddings/manifest.json";
 
 /** Positions in `keys` whose row is not committed. */
@@ -151,55 +139,44 @@ export async function gatherMatrix(
 }
 
 /** What a publish wrote and removed. */
-export interface PublishedMatrix {
-  /** The matrix's file name in `MATRIX_DIRECTORY`. */
-  file: string;
-  sha256: string;
+export interface PublishedVectors {
   /** Row files written because they were missing or differed. */
   written: number;
   /** Row keys pruned because no record references them. */
   pruned: string[];
-  /** The profile's earlier matrices, deleted once the manifest moved on. */
-  removed: string[];
+  /**
+   * SHA-256 of `matrix`, the rows in catalogue record order: what
+   * `search:build` prints as the record-order digest once every record has
+   * a row (plan 087, S3).
+   */
+  sha256: string;
 }
 
 /**
  * Publishes `matrix`, whose row i is the vector for `keys[i]`: writes and
- * prunes the committed rows, writes the matrix under its hash, points the
- * manifest at it, deletes the profile's earlier matrices, and rebuilds the
+ * prunes the committed rows, writes the manifest, and rebuilds the
  * artifact `search:build` assembles, so /api/search sees the rows without
- * another build. Rows go first and old matrices last, so a failure part way
- * leaves the old manifest naming a file that still exists.
+ * another build. The rows are the only published form of the vectors
+ * (plan 087, S3); nothing is written under `public/`. Rows go first, so a
+ * failure part way leaves the old manifest in place.
  */
-export function publishMatrix(
+export function publishVectors(
   root: string,
   profile: EmbeddingProfile,
-  catalogueSha256: string,
   keys: readonly string[],
   matrix: Uint8Array,
-): PublishedMatrix {
+): PublishedVectors {
   const { written, pruned } = publishRows(root, profile, keys, matrix);
-  const sha256 = digest(matrix);
-  const file = `${profile.key}-${sha256.slice(0, 12)}.bin`;
-  const directory = join(root, MATRIX_DIRECTORY);
-  mkdirSync(directory, { recursive: true });
-  writeFileSync(join(directory, file), matrix);
   const manifest: SearchEmbeddingManifest = {
-    version: 1,
+    version: 2,
     selected: profile.key,
-    catalogueSha256,
-    profiles: [{ profile, file, sha256, rows: keys.length }],
+    profile,
   };
   writeFileSync(join(root, MANIFEST), JSON.stringify(manifest, null, 2) + "\n");
-  const earlier = new RegExp(`^${profile.key}-[0-9a-f]{12}\\.bin$`);
-  const removed = readdirSync(directory).filter(
-    (name) => name !== file && earlier.test(name),
-  );
-  for (const name of removed) rmSync(join(directory, name));
   mkdirSync(join(root, VECTOR_ARTIFACT, ".."), { recursive: true });
   writeFileSync(
     join(root, VECTOR_ARTIFACT),
     assembleVectorArtifact(root, profile, keys).bytes,
   );
-  return { file, sha256, written, pruned, removed };
+  return { written, pruned, sha256: digest(matrix) };
 }

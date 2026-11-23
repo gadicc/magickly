@@ -1,9 +1,6 @@
-import { readdirSync } from "node:fs";
-import { resolve } from "node:path";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { GET as searchIndex } from "@/app/search/index/route";
 import { buildSearchCatalogue } from "./catalogue";
-import manifest from "./embeddings/manifest.json";
 import { embedSearchInputs } from "./embeddings/provider";
 import { loadSemanticIndex, semanticAvailable } from "./embeddings/store";
 import { searchSiteByMeaning } from "./semantic";
@@ -72,16 +69,5 @@ describe("published semantic index integration", () => {
       semanticAvailable: boolean;
     };
     expect(body.semanticAvailable).toBe(Boolean(index));
-  });
-});
-
-describe("the published vector files", () => {
-  // Until plan 087's S3 removes the directory: /api/search no longer reads
-  // it, but the service worker precaches every file there (publish.ts).
-  it("are only the ones the manifest names, since the service worker precaches every one", () => {
-    const dir = resolve(import.meta.dirname, "../../public/search-vectors");
-    expect(readdirSync(dir).sort()).toEqual(
-      manifest.profiles.map((profile) => profile.file).sort(),
-    );
   });
 });

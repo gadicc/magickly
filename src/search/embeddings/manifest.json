@@ -1,22 +1,14 @@
 {
-  "version": 1,
+  "version": 2,
   "selected": "gemini-embedding-2-768-search-v1",
-  "catalogueSha256": "8228febeeaecdee5b3ee2cfc587a509e859491b59a155165d7b6d0274523d22d",
-  "profiles": [
-    {
-      "profile": {
-        "key": "gemini-embedding-2-768-search-v1",
-        "model": "google/gemini-embedding-2",
-        "revision": "gateway-2026-11-09-v1",
-        "dimensions": 768,
-        "normalization": "l2",
-        "chunker": "words-180-overlap-24-v1",
-        "queryPrefix": "task: search result | query: ",
-        "documentPrefix": "title: {title} | text: "
-      },
-      "file": "gemini-embedding-2-768-search-v1-692a8226580b.bin",
-      "sha256": "692a8226580ba8cec4471ea9cb2d6798c32258969c793356f3b49e750bb88449",
-      "rows": 3207
-    }
-  ]
+  "profile": {
+    "key": "gemini-embedding-2-768-search-v1",
+    "model": "google/gemini-embedding-2",
+    "revision": "gateway-2026-11-09-v1",
+    "dimensions": 768,
+    "normalization": "l2",
+    "chunker": "words-180-overlap-24-v1",
+    "queryPrefix": "task: search result | query: ",
+    "documentPrefix": "title: {title} | text: "
+  }
 }
