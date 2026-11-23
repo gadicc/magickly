@@ -290,7 +290,9 @@ export const MIRRORED_PAGES = {
     label: "Agrippa, De occulta philosophia (1533), book II, p. CXLIX",
     copy: "the Library of Congress's copy",
     cited: "the Moon's intelligence of intelligences, numbered 3321",
-    highlight: { x: 0.11, y: 0.139, width: 0.635, height: 0.032 },
+    // Its top edge in the gap below the line above, whose "3321
+    // Schedbarschemoth" it used to clip (ink measured on this image).
+    highlight: { x: 0.11, y: 0.143, width: 0.635, height: 0.028 },
     // What the kameas' pages cite on the leaf (plan 093, decision 7).
     regions: {
       luna: {

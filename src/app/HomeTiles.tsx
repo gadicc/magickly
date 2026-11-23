@@ -1,9 +1,9 @@
 import GDLogoSquished from "@/goldendawn-logo-squished.svg";
 import AndroidMagician from "./img/android-magician.png";
 import AstrologyTile from "./img/astrology.jpeg";
-import MagicBook from "./img/Enchanted Book and Cosmic Nebula.png";
 import EnochianAngel from "./img/enochian-angel.webp";
 import GeomancyImg from "./img/geomancy.webp";
+import MagicBook from "./img/magic-book.webp";
 import MagicalTemple from "./img/magical-temple.webp";
 import OpenSourceImg from "./img/open-source.webp";
 import PortaeLucis from "./img/portae_lucis_upsampled.webp";
