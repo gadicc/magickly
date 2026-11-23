@@ -8,6 +8,7 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { imageLinkOffered } from "../../../../tests/exportControls";
 import { tabletNameLinks } from "./nameLinks";
 import Tablets from "./tablets";
 
@@ -41,7 +42,7 @@ const visit = (search: string) =>
 
 /** The name the SVG download is saved as, once the button is free. */
 const downloaded = async () => {
-  const button = screen.getAllByRole("button", { name: "Download SVG" })[0];
+  const button = screen.getAllByRole("button", { name: "Save SVG" })[0];
   await waitFor(() => expect(button.hasAttribute("disabled")).toBe(false));
   const calls = runtime.downloadBlob.mock.calls.length;
   fireEvent.click(button);
@@ -53,8 +54,7 @@ const live = (container: HTMLElement) =>
   container.querySelector('[role="tabpanel"] [aria-live="polite"]')
     ?.textContent;
 
-const imageLinked = () =>
-  screen.queryAllByRole("link", { name: "Open SVG image link" }).length > 0;
+const imageLinked = () => imageLinkOffered();
 
 describe("/enochian/tablets' chosen square across tablets", () => {
   it("lets go of a Watchtower's square when the Union is chosen", async () => {

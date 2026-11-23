@@ -1,7 +1,7 @@
 {
   "version": 1,
   "hashing": "sha256-utf8-lf-nfc-v1",
-  "contextHash": "180bcc86d3c73da37ea2b240f9929cedc318e36567aa3f3f8aaffa9cc63e6cb4",
+  "contextHash": "3fe05d9055ff4e190af5226ecdbdce8914e7217fb920fc78a0ede3b352441e8d",
   "configHash": "c622469fbb05d642191808ec08843f00e80885dfab9bcb9057aac7d7d47dad9d",
   "scopes": {
     "editor": {
@@ -77,7 +77,7 @@
         "src/app/enochian/tablets/nameWords.ts": "a65361e89c7e7aafb1f9ce54c3a57e0e38fc584ac80ba52fa019807a9aaee7c6",
         "src/app/enochian/tablets/pyramidWords.ts": "35b02e03e3558d33fcc8c921d357e537af0a59fe550add6c225f404b889dbe23",
         "src/app/enochian/tablets/squareReadings.ts": "21b10aba36a87cbb298db06645b8dc64590197dcafba9cfb6232c6c2697dfbc1",
-        "src/app/enochian/tablets/tablets.tsx": "526cda070eaa82a361537e6f0b0c0d5438df385979359da0d60c3119b3123ea7",
+        "src/app/enochian/tablets/tablets.tsx": "c199618d7e3fefcdcbb20105e2b99fa424d70f6f8925610e17865a2339c0f3a9",
         "src/app/enochian/tablets/urlState.ts": "0181837b6d3e8d4ff35aa9b97dd7635f729e2aed8b8b8d42497a8032fc11f4c0",
         "src/app/enochian/translate/AiReading.tsx": "c19f6583d4bbb0a59f7d7215fdd09bb62e297da5561881d6ffc99e41ecfaf373",
         "src/app/enochian/translate/Figures.tsx": "817ba5dbd269b76339609863959d6cd9a3b2374bce67699b4147c506f9523288",
@@ -191,6 +191,17 @@
         "src/app/enochian/translate/translator.tsx": "88daa7e17fd3c30b69ac12a51313f305b7861edc0908cab5c75307797d5f42c0"
       }
     },
+    "export": {
+      "contextHash": "0a3afb09826a2bd8f585c654451564b399297beeafa4dba13107807595cffec4",
+      "files": {
+        "src/export/ExportControls.tsx": "4234d14a9fa9571904ce140621b06f1d3822d6a2400f6323e1bf63bd4690107f",
+        "src/export/FileIcon.tsx": "02c69fcc595d757691e5713cb99375b7e29cd32e1cbc887f1161522b43799235",
+        "src/export/exportRuntime.ts": "3df684d7241979c1181fedf5c1c7de4cd0185648eabfa6f0385a3e2e85cfbee5",
+        "src/export/formats.ts": "197d0c7c9c05b26d1a7f26f2031ab291f6890d8827ce16759ee6a4b7430d08d0",
+        "src/export/pngText.ts": "307370287a3a98b3bad506dc8cb5259a3fe499e8f70a87974ad0137289b60ad9",
+        "src/export/svgExport.ts": "c6dd70a7e50ada1a707b2e1d18415af924e300481910adc6c978063addf32e34"
+      }
+    },
     "kabbalah": {
       "contextHash": "7709a0631f4f3f6fcdcd05ed8451175dcc6f6bcd79ce3dc67d78a214dd8e3cc9",
       "files": {
@@ -205,7 +216,7 @@
         "src/app/kabbalah/sephirah/[id]/Sephirah.tsx": "1399dd3add10f8174d9f0db513f1870dc31f8fd2b43456a3c608d76057dfb259",
         "src/app/kabbalah/sephirah/[id]/fields.ts": "7b8e97172d556ee71b807c968d56b778b96167827ad1b486b5bc6cddb1d4b96f",
         "src/app/kabbalah/tree/TreeText.tsx": "ebab96b171930d93093cf1d289549d03473ddb027ab3b1ad4d190441853d50f8",
-        "src/app/kabbalah/tree/tree.tsx": "7a9d4d60d68c263e70d0f298549037e2e49ee2df6cc92977ebe583136658ee7c",
+        "src/app/kabbalah/tree/tree.tsx": "f585cb220bd5e23f49bf9b45c15afcf8bae84dfc255c62fdd5201e835ab0d772",
         "src/app/kabbalah/tree/treeSettings.ts": "5a3311e08fd63aef5bd46ff71aec07d5dd0541345cc4072351a878efb98deff4",
         "src/app/kabbalah/treeLinks.ts": "c23df39540eb569a4a8db6a6ab821c245b91071c4920adc34be4bb7cd6b63faf",
         "src/app/kabbalah/yhvh/72angels/AngelsText.tsx": "93028a15ebe9111e8853e922e52c6b8df766f1fad5883d830359ac56fcb36e57",

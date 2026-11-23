@@ -17,6 +17,11 @@ import {
   onTestFinished,
   vi,
 } from "vitest";
+import {
+  copiedImageLink,
+  imageLinkNote,
+  imageLinkOffered,
+} from "../../../../tests/exportControls";
 import { LOADED_TEST_TIMEOUT } from "../../../../tests/loadBudget";
 import { tabletNameLinks } from "./nameLinks";
 import { differingSquares } from "./squareReadings";
@@ -90,9 +95,7 @@ describe("/enochian/tablets' tabs", () => {
     expect(container.querySelector("[data-highlight]")).toBeNull();
     expect(container.querySelector("[data-square]")).toBeNull();
     expect(container.querySelector("[data-regions]")).toBeNull();
-    expect(
-      screen.getAllByRole("link", { name: "Open SVG image link" }).length,
-    ).toBeGreaterThan(0);
+    expect(imageLinkOffered()).toBe(true);
     expect(
       screen.getByRole("heading", { level: 2, name: "Names on the tablet" }),
     ).toBeTruthy();
@@ -224,12 +227,10 @@ describe("/enochian/tablets' names", () => {
     expect(preview()).toBeNull();
     // A preview is no choice: the image link stays.
     fireEvent.mouseEnter(button);
-    expect(
-      screen.getAllByRole("link", { name: "Open SVG image link" }).length,
-    ).toBeGreaterThan(0);
+    expect(imageLinkOffered()).toBe(true);
   });
 
-  it("pins a chosen name, says its squares, and lets it go when chosen again", () => {
+  it("pins a chosen name, says its squares, and lets it go when chosen again", async () => {
     const { container } = render(<Tablets links={LINKS} />);
     const button = nameButton("Laidrom");
     expect(button.getAttribute("aria-pressed")).toBe("false");
@@ -239,14 +240,10 @@ describe("/enochian/tablets' names", () => {
     expect(chosen?.querySelectorAll("rect")).toHaveLength(7);
     expect(live(container)).toBe("Laidrom, a Senior: row 7, squares 7 to 1");
     // The image link waits until nothing is drawn over the tablet.
-    expect(
-      screen.queryAllByRole("link", { name: "Open SVG image link" }),
-    ).toHaveLength(0);
-    expect(
-      screen.getByText(
-        "No image link while a name, a square or the regions are shown.",
-      ),
-    ).toBeTruthy();
+    expect(imageLinkOffered()).toBe(false);
+    expect(await imageLinkNote()).toBe(
+      "No image link while a name, a square or the regions are shown.",
+    );
     // Its detail, under it in the list.
     const item = button.closest("li") as HTMLElement;
     expect(item.textContent).toContain("This version's letters:");
@@ -549,9 +546,7 @@ describe("/enochian/tablets' regions", () => {
       "The top rows, hatched",
       "The servient squares, left plain",
     ]);
-    expect(
-      screen.queryAllByRole("link", { name: "Open SVG image link" }),
-    ).toHaveLength(0);
+    expect(imageLinkOffered()).toBe(false);
     fireEvent.click(screen.getByRole("switch", { name: "Show the regions" }));
     expect(container.querySelector("[data-regions]")).toBeNull();
   });
@@ -701,7 +696,7 @@ describe("/enochian/tablets' Tablet of Union", () => {
     );
     // No tabs and no downloads for a drawing that is not there.
     expect(screen.queryByRole("tab")).toBeNull();
-    expect(screen.queryByRole("button", { name: "Download SVG" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Save SVG" })).toBeNull();
     fireEvent.click(
       screen.getByRole("button", { name: "Show the Golden Dawn's version" }),
     );
@@ -752,13 +747,9 @@ describe("/enochian/tablets' Tablet of Union", () => {
     expect(fire.textContent).toContain("AISMT:");
   });
 
-  it("names the Union in its downloads", () => {
+  it("names the Union in its downloads", async () => {
     window.history.replaceState(null, "", `${PAGE}?tablet=union`);
     render(<Tablets links={LINKS} />);
-    expect(
-      screen
-        .getAllByRole("link", { name: "Open SVG image link" })[0]
-        .getAttribute("href"),
-    ).toContain("id=union");
+    expect(await copiedImageLink()).toContain("id=union");
   });
 });

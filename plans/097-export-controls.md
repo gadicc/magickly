@@ -88,8 +88,9 @@ keeps them all).
 - Logical properties throughout, so the row mirrors in Hebrew. The format
   names stay in Latin letters. The icon is decorative (`aria-hidden`);
   each row is a `role="group"` named by its format.
-- Accessible names keep today's wording where it exists ("Download SVG",
-  "Copy SVG to clipboard", "Copy SVG image link") and add the PNG ones.
+- Accessible names contain the visible label (WCAG 2.5.3): "Save SVG",
+  "Copy SVG to clipboard", "Copy SVG image link", and the same for PNG.
+  "Download SVG" became "Save SVG" for this.
 
 ### 2. A link is copied, and its confirmation offers Open
 
@@ -175,8 +176,8 @@ system font; it is a design reference, not app code.
 
 ## Open questions
 
-1. **Wording.** "Save" rather than "Download" (shorter under an icon; the
-   accessible name still says Download), and the two hints.
+1. **Wording.** "Save" rather than "Download" (shorter under an icon),
+   and the two hints.
 
 ## Stages
 

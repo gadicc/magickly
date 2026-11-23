@@ -33,6 +33,11 @@
       "description": "A dictionary-based tool looking up words in both directions between English and Enochian."
     },
     {
+      "id": "export",
+      "paths": ["src/export/"],
+      "description": "Save, copy and link controls under a drawing, one row per file format. SVG, PNG and PDF are file formats and stay in Latin letters."
+    },
+    {
       "id": "kabbalah",
       "paths": ["src/app/kabbalah/"],
       "hierarchy": ["Kabbalah"],

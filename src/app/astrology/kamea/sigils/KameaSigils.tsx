@@ -43,6 +43,9 @@ import { reduceOnKamea } from "./reduction";
 import { useKameaSigil } from "./useKameaSigil";
 
 /** Each planet as the picker names it, in the Chaldean order. */
+// Link stays in the export rows while there is no sigil, and says why.
+const NO_SIGIL_LINK = /*i18n*/ "No image link until a sigil is drawn.";
+
 const PLANET_LABELS = KAMEA_PLANET_LABELS;
 
 /** A sigil's accessible name, by its square's planet. */
@@ -372,6 +375,7 @@ export default function KameaSigils({
               : `KameaSigil-${planet}`
           }
           link={link}
+          linkNote={link ? undefined : t(NO_SIGIL_LINK)}
           share={
             link
               ? () =>

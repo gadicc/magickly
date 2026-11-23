@@ -44,6 +44,9 @@ import {
 } from "@/render/contracts/roseSigil";
 import DebugSigil from "./DebugSigil";
 
+// Link stays in the export rows while there is no sigil, and says why.
+const NO_SIGIL_LINK = /*i18n*/ "No image link until a sigil is drawn.";
+
 export default function Sigils({
   initial,
 }: {
@@ -286,6 +289,7 @@ export default function Sigils({
           target={ref}
           filename={`RoseSigil-${canonical.split(" ").join("-")}${version === DEFAULT_ROSE_VERSION ? "" : `-${version}`}`}
           link={link}
+          linkNote={link ? undefined : t(NO_SIGIL_LINK)}
           share={share}
         />
         <VersionNote

@@ -7,6 +7,11 @@ import {
   waitFor,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
+import {
+  copiedImageLink,
+  imageLinkNote,
+  imageLinkOffered,
+} from "../../../../../tests/exportControls";
 import KameaSigils from "./KameaSigils";
 import { DEFAULT_KAMEA_SIGIL } from "./kameaSigilState";
 import { serverSeed } from "./serverSeed";
@@ -16,10 +21,11 @@ afterEach(cleanup);
 /** The drawing's accessible name, once its figure is placed. */
 const drawing = (name: string) => screen.findByRole("img", { name });
 
-const imageLink = () =>
-  screen
-    .getAllByRole("link", { name: "Open SVG image link" })[0]
-    .getAttribute("href") ?? "";
+/** The image link Link copies, once the figure is placed and it is offered. */
+const imageLink = async () => {
+  await waitFor(() => expect(imageLinkOffered()).toBe(true));
+  return copiedImageLink();
+};
 
 /** The reduction table's rows, as "letter number cell". */
 const rows = () =>
@@ -32,14 +38,13 @@ describe("/astrology/kamea/sigils", () => {
     render(<KameaSigils initial={DEFAULT_KAMEA_SIGIL} />);
     await drawing("Sigil of אגיאל on the Kamea of Saturn");
     expect(rows()).toEqual(["א 1 1", "ג 3 3", "י 10 1", "א 1 1", "ל 30 3"]);
-    await waitFor(() =>
-      expect(imageLink()).toBe(
-        `/api/render/kamea-sigil?${new URLSearchParams({ planet: "saturn", text: "אגיאל" })}`,
-      ),
+    expect(await imageLink()).toBe(
+      `/api/render/kamea-sigil?${new URLSearchParams({ planet: "saturn", text: "אגיאל" })}`,
     );
+    // The link carries the name, and its confirmation says so.
     expect(
       screen.getByText(
-        "Links include what you entered here. Share them only when you mean to.",
+        "Copied SVG image link. It includes what you entered here.",
       ),
     ).toBeTruthy();
     // The figure is drawn at its square's least legible size or larger.
@@ -92,7 +97,7 @@ describe("/astrology/kamea/sigils", () => {
       }),
     );
     expect(rows().at(-1)).toBe("ם 600 60");
-    await waitFor(() => expect(imageLink()).toContain("finals=true"));
+    expect(await imageLink()).toContain("finals=true");
   });
 
   it("traces a name chosen from the planet's list, and another planet's square", async () => {
@@ -125,9 +130,8 @@ describe("/astrology/kamea/sigils", () => {
       target: { value: "אגיאל1" },
     });
     expect(screen.getByText("Only Hebrew letters can be traced:")).toBeTruthy();
-    expect(
-      screen.queryAllByRole("link", { name: "Open SVG image link" }),
-    ).toEqual([]);
+    expect(imageLinkOffered()).toBe(false);
+    expect(await imageLinkNote()).toBe("No image link until a sigil is drawn.");
     fireEvent.change(screen.getByRole("textbox", { name: "Hebrew name" }), {
       target: { value: "א".repeat(33) },
     });

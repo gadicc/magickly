@@ -1487,7 +1487,7 @@ describe("sharing and export", { timeout: 20_000 }, () => {
     expect(runtime.copyText).toHaveBeenCalledWith(
       gdHallPug(HALL_PRESETS[3].hall),
     );
-    fireEvent.click(screen.getByLabelText("Download SVG"));
+    fireEvent.click(screen.getByLabelText("Save SVG"));
     expect(await screen.findByText("Downloading SVG")).toBeTruthy();
     const [blob, name] = runtime.downloadBlob.mock.calls[0] as [Blob, string];
     // An unchanged preset's export is named as its published image.

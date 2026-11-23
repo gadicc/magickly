@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
+import { copiedImageLink } from "../../../../../tests/exportControls";
 import Candlestick from "./candlestick";
 
 afterEach(cleanup);
@@ -12,7 +13,7 @@ const churches = (container: HTMLElement) =>
     .filter((text) => /^[A-Z][a-z]+$/.test(text ?? ""));
 
 describe("/gd/symbols/candlestick's versions", () => {
-  it("draws the 1909 figure by default, with its note", () => {
+  it("draws the 1909 figure by default, with its note", async () => {
     const { container } = render(<Candlestick />);
     fireEvent.mouseDown(screen.getByRole("combobox", { name: "Version" }));
     expect(
@@ -28,14 +29,10 @@ describe("/gd/symbols/candlestick's versions", () => {
     ).toBe(
       "https://archive.org/details/crowley-equinox_202110/The%20Equinox%20Vol.%201%2C%20No.%202/page/n266",
     );
-    expect(
-      screen
-        .getAllByRole("link", { name: "Open SVG image link" })[0]
-        .getAttribute("href"),
-    ).not.toContain("version=");
+    expect(await copiedImageLink()).not.toContain("version=");
   });
 
-  it("draws the modern arrangement when chosen, and links its image", () => {
+  it("draws the modern arrangement when chosen, and links its image", async () => {
     const { container } = render(<Candlestick />);
     fireEvent.mouseDown(screen.getByRole("combobox", { name: "Version" }));
     fireEvent.click(screen.getByRole("option", { name: "Modern" }));
@@ -43,10 +40,6 @@ describe("/gd/symbols/candlestick's versions", () => {
     expect(screen.getByRole("heading", { name: "Modern" })).toBeTruthy();
     // The modern order's source is cited by name, with no link.
     expect(screen.getByText(/Llewellyn, 2015 edition/).closest("a")).toBe(null);
-    expect(
-      screen
-        .getAllByRole("link", { name: "Open SVG image link" })[0]
-        .getAttribute("href"),
-    ).toContain("version=modern");
+    expect(await copiedImageLink()).toContain("version=modern");
   });
 });

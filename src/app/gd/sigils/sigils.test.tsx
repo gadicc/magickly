@@ -1,6 +1,11 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
+import {
+  copiedImageLink,
+  imageLinkNote,
+  imageLinkOffered,
+} from "../../../../tests/exportControls";
 import Sigils from "./sigils";
 
 afterEach(cleanup);
@@ -38,7 +43,7 @@ describe("/gd/sigils' versions", () => {
     );
   });
 
-  it("draws Regardie's rose, its note and links when chosen", () => {
+  it("draws Regardie's rose, its note and links when chosen", async () => {
     const { container } = render(
       <Sigils initial={{ text: "כתר", rose: true, version: "gd" }} />,
     );
@@ -48,17 +53,10 @@ describe("/gd/sigils' versions", () => {
     expect(labelAt(container, "כ")).toBe(tav);
     expect(labelAt(container, "ת")).toBe(kaph);
     expect(screen.getByRole("heading", { name: "Regardie 1939" })).toBeTruthy();
-    const link = screen.getAllByRole("link", {
-      name: "Open SVG image link",
-    })[0];
-    expect(link.getAttribute("href")).toContain("version=regardie1939");
+    expect(await copiedImageLink()).toContain("version=regardie1939");
     choose(/Golden Dawn/);
     expect(labelAt(container, "כ")).toBe(kaph);
-    expect(
-      screen
-        .getAllByRole("link", { name: "Open SVG image link" })[0]
-        .getAttribute("href"),
-    ).not.toContain("version=");
+    expect(await copiedImageLink()).not.toContain("version=");
   });
 
   it("opens in a shared link's version", () => {
@@ -74,12 +72,7 @@ describe("/gd/sigils' versions", () => {
 });
 
 describe("/gd/sigils' words and debug view", () => {
-  const imageLink = () =>
-    screen
-      .getAllByRole("link", { name: "Open SVG image link" })[0]
-      .getAttribute("href") ?? "";
-
-  it("draws each word as its own sigil and links the canonical text", () => {
+  it("draws each word as its own sigil and links the canonical text", async () => {
     const { container } = render(
       <Sigils initial={{ text: "גדי", rose: true, version: "gd" }} />,
     );
@@ -91,23 +84,22 @@ describe("/gd/sigils' words and debug view", () => {
       container.querySelector('svg[version="1.1"]')?.getAttribute("viewBox"),
     ).toBe("-150 -50 200 100");
     // The link's text is the contract's: Hebrew spelling, one space.
-    expect(new URL(imageLink(), "https://x").searchParams.get("text")).toBe(
-      "יהוה אלהים",
-    );
+    expect(
+      new URL(await copiedImageLink(), "https://x").searchParams.get("text"),
+    ).toBe("יהוה אלהים");
   });
 
-  it("marks what is neither a letter nor a space, and links nothing", () => {
+  it("marks what is neither a letter nor a space, and links nothing", async () => {
     render(<Sigils initial={{ text: "גדי", rose: true, version: "gd" }} />);
     fireEvent.change(screen.getByPlaceholderText("Sigil text"), {
       target: { value: "גד-י" },
     });
     expect(screen.getByText("Invalid characters:")).toBeTruthy();
-    expect(
-      screen.queryAllByRole("link", { name: "Open SVG image link" }),
-    ).toEqual([]);
+    expect(imageLinkOffered()).toBe(false);
+    expect(await imageLinkNote()).toBe("No image link until a sigil is drawn.");
   });
 
-  it("draws no more letters than the image contract takes", () => {
+  it("draws no more letters than the image contract takes", async () => {
     const { container } = render(
       <Sigils initial={{ text: "גדי", rose: false, version: "gd" }} />,
     );
@@ -124,9 +116,8 @@ describe("/gd/sigils' words and debug view", () => {
       screen.getByText("A sigil takes at most 32 letters; this text has 33."),
     ).toBeTruthy();
     expect(ink()).toHaveLength(0);
-    expect(
-      screen.queryAllByRole("link", { name: "Open SVG image link" }),
-    ).toEqual([]);
+    expect(imageLinkOffered()).toBe(false);
+    expect(await imageLinkNote()).toBe("No image link until a sigil is drawn.");
   });
 
   it("says when a figure could not be drawn with every mark clear", () => {

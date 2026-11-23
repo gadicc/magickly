@@ -10,6 +10,11 @@ import { hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { componentImageFilename } from "@/render/componentImageUrl";
+import {
+  copiedImageLink,
+  imageLinkNote,
+  imageLinkOffered,
+} from "../../../../tests/exportControls";
 import Tablets, { downloadName } from "./tablets";
 
 const PAGE = "/enochian/tablets";
@@ -184,7 +189,7 @@ describe("/enochian/tablets' versions", () => {
     expect(raphael.textContent).toMatch(/Row 8, square 1: R here, o there/);
   });
 
-  it("mirrors reversed letters and draws second letters as asked", () => {
+  it("mirrors reversed letters and draws second letters as asked", async () => {
     const { container } = render(<Tablets />);
     choose("Tablet", "Water");
     const mirrored = () =>
@@ -192,9 +197,7 @@ describe("/enochian/tablets' versions", () => {
     const corners = () => container.querySelectorAll("text[data-alt]").length;
     expect(mirrored()).toBe(2);
     expect(corners()).toBe(0);
-    expect(
-      screen.getAllByRole("link", { name: "Open SVG image link" }).length,
-    ).toBeGreaterThan(0);
+    expect(imageLinkOffered()).toBe(true);
     fireEvent.click(screen.getByRole("switch", { name: "Reversed letters" }));
     expect(mirrored()).toBe(0);
     expect(screen.queryByText(/^Second letters in/)).toBeNull();
@@ -205,14 +208,10 @@ describe("/enochian/tablets' versions", () => {
       screen.getByText(`Second letters in ${corners()} squares`),
     ).toBeTruthy();
     expect(screen.getByText("Row 5, square 12: y, l, h")).toBeTruthy();
-    expect(
-      screen.queryAllByRole("link", { name: "Open SVG image link" }),
-    ).toHaveLength(0);
-    expect(
-      screen.getByText(
-        "No image link with second letters shown or reversed letters plain.",
-      ),
-    ).toBeTruthy();
+    expect(imageLinkOffered()).toBe(false);
+    expect(await imageLinkNote()).toBe(
+      "No image link with second letters shown or reversed letters plain.",
+    );
   });
 
   it("names downloads for what is drawn", () => {
@@ -254,14 +253,11 @@ describe("/enochian/tablets' versions", () => {
     );
   });
 
-  it("links the image in the version shown", () => {
+  it("links the image in the version shown", async () => {
     render(<Tablets />);
     choose("Tablet", "Air");
     choose("Version", "The Equinox's");
-    const link = screen.getAllByRole("link", {
-      name: "Open SVG image link",
-    })[0];
-    expect(link.getAttribute("href")).toContain("id=air&version=equinox");
+    expect(await copiedImageLink()).toContain("id=air&version=equinox");
   });
 });
 
@@ -395,18 +391,14 @@ describe("/enochian/tablets while differences are shown", () => {
     expect(heading?.closest('[role="tabpanel"]')).toBeTruthy();
   });
 
-  it("offers no image link while the outlines are drawn", () => {
+  it("offers no image link while the outlines are drawn", async () => {
     render(<Tablets />);
-    expect(
-      screen.getAllByRole("link", { name: "Open SVG image link" }).length,
-    ).toBeGreaterThan(0);
+    expect(imageLinkOffered()).toBe(true);
     openDifferences();
-    expect(
-      screen.queryAllByRole("link", { name: "Open SVG image link" }),
-    ).toHaveLength(0);
-    expect(
-      screen.getByText("No image link while differences are shown."),
-    ).toBeTruthy();
+    expect(imageLinkOffered()).toBe(false);
+    expect(await imageLinkNote()).toBe(
+      "No image link while differences are shown.",
+    );
   });
 });
 
@@ -509,7 +501,7 @@ describe("/enochian/tablets beside its panel on a wide screen", () => {
     const order = () => {
       fireEvent.click(screen.getByRole("switch", { name: "Second letters" }));
       const list = screen.getByText(/^Second letters in \d+ squares$/);
-      const downloads = screen.getByRole("button", { name: "Download SVG" });
+      const downloads = screen.getByRole("button", { name: "Save SVG" });
       const following =
         list.compareDocumentPosition(downloads) &
         Node.DOCUMENT_POSITION_FOLLOWING;
@@ -574,14 +566,14 @@ describe("/enochian/tablets across the breakpoint", () => {
     const writeText = vi.fn(async (_text: string) => {});
     vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
     render(<Tablets />);
-    const before = screen.getByRole("button", { name: "Download SVG" });
+    const before = screen.getByRole("button", { name: "Save SVG" });
     fireEvent.click(screen.getByRole("button", { name: "Copy page link" }));
     expect(await screen.findByText("Copied page link")).toBeTruthy();
     resize(true);
-    expect(screen.getByRole("button", { name: "Download SVG" })).toBe(before);
+    expect(screen.getByRole("button", { name: "Save SVG" })).toBe(before);
     expect(screen.getByText("Copied page link")).toBeTruthy();
     resize(false);
-    expect(screen.getByRole("button", { name: "Download SVG" })).toBe(before);
+    expect(screen.getByRole("button", { name: "Save SVG" })).toBe(before);
   });
 
   it("prerenders the default tablet and hydrates a shared link on a wide screen", async () => {

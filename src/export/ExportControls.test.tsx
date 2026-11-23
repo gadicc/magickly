@@ -1,10 +1,39 @@
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import LocaleProvider from "@/i18n/LocaleProvider";
+import { messages as hebrew } from "@/locales/he/messages.js";
+import type { AnyComponentImageLink } from "@/render/componentImageUrl";
 import ExportControls, { type ExportControlsProps } from "./ExportControls";
+import { type ExportFormat, PNG_FORMAT, SVG_FORMAT } from "./formats";
 import { SvgExportError } from "./svgExport";
+
+const TREE: AnyComponentImageLink = {
+  slug: "tree-of-life",
+  props: {
+    field: "name.roman",
+    topText: "index",
+    bottomText: "",
+    colorScale: "queen",
+    letterAttr: "hermetic",
+    flip: false,
+    showDaat: false,
+    fontSize: 10,
+  },
+};
+const CANDLE: AnyComponentImageLink = {
+  slug: "seven-branched-candlestick",
+  props: {},
+};
 
 const runtime = vi.hoisted(() => ({
   rasterizeSvg: vi.fn(),
@@ -14,6 +43,24 @@ const runtime = vi.hoisted(() => ({
   copyText: vi.fn(),
 }));
 vi.mock("./exportRuntime", () => runtime);
+// LocaleProvider's; nothing here navigates.
+vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh() {} }) }));
+
+/** Every action's accessible name contains its visible label (WCAG 2.5.3). */
+const expectLabelsInNames = () => {
+  const buttons = screen
+    .getAllByRole("group")
+    .flatMap((row) => within(row).getAllByRole("button"));
+  expect(buttons).toHaveLength(6);
+  for (const button of buttons) {
+    const label = button.textContent ?? "";
+    expect(label).not.toBe("");
+    expect(button.getAttribute("aria-label")?.toLowerCase()).toContain(
+      label.toLowerCase(),
+    );
+  }
+  return buttons;
+};
 
 function Page({
   filename,
@@ -70,7 +117,7 @@ describe("ExportControls", () => {
     const png = new Blob(["png"], { type: "image/png" });
     runtime.rasterizeSvg.mockResolvedValue(png);
     render(<Page filename="tree" viewBox="-170.5 0 341 598" />);
-    fireEvent.click(screen.getByLabelText("Download SVG"));
+    fireEvent.click(screen.getByLabelText("Save SVG"));
     expect(runtime.downloadBlob).toHaveBeenCalledTimes(1);
     const [svgBlob, svgName] = runtime.downloadBlob.mock.calls[0] as [
       Blob,
@@ -81,7 +128,7 @@ describe("ExportControls", () => {
     expect(await svgBlob.text()).toContain('viewBox="-170.5 0 341 598"');
     expect(await screen.findByText("Downloading SVG")).toBeTruthy();
 
-    fireEvent.click(screen.getByLabelText("Download PNG"));
+    fireEvent.click(screen.getByLabelText("Save PNG"));
     expect(runtime.rasterizeSvg).toHaveBeenCalledWith(
       expect.stringContaining('width="1168"'),
       { width: 1168, height: 2048 },
@@ -105,7 +152,7 @@ describe("ExportControls", () => {
     });
     const credit = { svg: "<metadata>Art: us</metadata>", xmp: "<x>Art</x>" };
     render(<Page filename="hall" viewBox="0 0 10 10" credit={credit} />);
-    fireEvent.click(screen.getByLabelText("Download SVG"));
+    fireEvent.click(screen.getByLabelText("Save SVG"));
     await screen.findByText("Downloading SVG");
     const [svgBlob] = runtime.downloadBlob.mock.calls[0] as [Blob];
     expect(await svgBlob.text()).toMatch(
@@ -116,7 +163,7 @@ describe("ExportControls", () => {
     expect(runtime.copySvg.mock.calls[0][0]).toContain(
       "<metadata>Art: us</metadata>",
     );
-    fireEvent.click(screen.getByLabelText("Download PNG"));
+    fireEvent.click(screen.getByLabelText("Save PNG"));
     await screen.findByText("Downloading PNG");
     const [pngBlob, name] = runtime.downloadBlob.mock.calls[1] as [
       Blob,
@@ -153,8 +200,8 @@ describe("ExportControls", () => {
     expect(runtime.copyPng.mock.calls[0][0]).toBeInstanceOf(Promise);
     for (const label of [
       "Copy PNG to clipboard",
-      "Download PNG",
-      "Download SVG",
+      "Save PNG",
+      "Save SVG",
       "Copy SVG to clipboard",
     ])
       expect((screen.getByLabelText(label) as HTMLButtonElement).disabled).toBe(
@@ -187,7 +234,7 @@ describe("ExportControls", () => {
     const live = document.querySelector("svg") as SVGSVGElement;
 
     // SVG download and copy never see it.
-    fireEvent.click(screen.getByLabelText("Download SVG"));
+    fireEvent.click(screen.getByLabelText("Save SVG"));
     expect(await screen.findByText("Downloading SVG")).toBeTruthy();
     fireEvent.click(screen.getByLabelText("Copy SVG to clipboard"));
     expect(
@@ -218,8 +265,8 @@ describe("ExportControls", () => {
     );
     expect(live.hasAttribute("data-prepared")).toBe(false);
 
-    // Download PNG runs it again, on a fresh clone.
-    fireEvent.click(screen.getByLabelText("Download PNG"));
+    // Save PNG runs it again, on a fresh clone.
+    fireEvent.click(screen.getByLabelText("Save PNG"));
     await vi.waitFor(() => expect(prepare).toHaveBeenCalledTimes(2));
     expect(prepare.mock.calls[1][0]).not.toBe(clone);
     release();
@@ -233,7 +280,7 @@ describe("ExportControls", () => {
   it("fails the PNG export when prepare fails", async () => {
     const prepare = vi.fn().mockRejectedValue(new Error("no fonts"));
     render(<Page filename="hall" viewBox="0 0 10 10" prepare={prepare} />);
-    fireEvent.click(screen.getByLabelText("Download PNG"));
+    fireEvent.click(screen.getByLabelText("Save PNG"));
     expect(await screen.findByText("Export failed.")).toBeTruthy();
     expect(runtime.rasterizeSvg).not.toHaveBeenCalled();
     expect(runtime.downloadBlob).not.toHaveBeenCalled();
@@ -291,7 +338,7 @@ describe("ExportControls", () => {
     fireEvent.click(screen.getByLabelText("Copy PNG to clipboard"));
     expect(
       await screen.findByText(
-        "Clipboard access is not available here. Use Download instead.",
+        "Clipboard access is not available here. Use Save instead.",
       ),
     ).toBeTruthy();
     fireEvent.click(screen.getByLabelText("Copy SVG to clipboard"));
@@ -300,7 +347,7 @@ describe("ExportControls", () => {
 
   it("refuses PNG for an image without a viewport and copes with a missing target", async () => {
     render(<Page filename="x" />);
-    fireEvent.click(screen.getByLabelText("Download PNG"));
+    fireEvent.click(screen.getByLabelText("Save PNG"));
     expect(
       await screen.findByText("This image has no size to export."),
     ).toBeTruthy();
@@ -311,69 +358,196 @@ describe("ExportControls", () => {
       return <ExportControls target={ref} filename="none" />;
     }
     render(<Detached />);
-    fireEvent.click(screen.getAllByLabelText("Download SVG")[1]);
+    fireEvent.click(screen.getAllByLabelText("Save SVG")[1]);
     expect(await screen.findByText("Nothing to export yet.")).toBeTruthy();
     expect(runtime.downloadBlob).not.toHaveBeenCalled();
   });
 
-  it("offers canonical image links only for registered contracts", async () => {
+  it("names each row by its format and each action by what it does", () => {
+    render(<Page filename="tree" viewBox="-170.5 0 341 598" link={TREE} />);
+    const rows = screen.getAllByRole("group");
+    expect(rows.map((row) => row.getAttribute("aria-label"))).toEqual([
+      "SVG",
+      "PNG",
+    ]);
+    for (const [index, format] of ["SVG", "PNG"].entries())
+      expect(
+        within(rows[index])
+          .getAllByRole("button")
+          .map((button) => [
+            button.getAttribute("aria-label"),
+            button.textContent,
+          ]),
+      ).toEqual([
+        [`Save ${format}`, "Save"],
+        [`Copy ${format} to clipboard`, "Copy"],
+        [`Copy ${format} image link`, "Link"],
+      ]);
+    // So a voice command that says what it sees reaches the button.
+    expectLabelsInNames();
+    expect(within(rows[0]).getByText("Sharp at any size")).toBeTruthy();
+    expect(within(rows[1]).getByText("Pastes anywhere")).toBeTruthy();
+    // The file icons are decorative; the names are beside them.
+    expect(
+      [...document.querySelectorAll("[data-file-icon]")].map((icon) => [
+        icon.getAttribute("data-file-icon"),
+        icon.getAttribute("aria-hidden"),
+        icon.textContent,
+      ]),
+    ).toEqual([
+      ["svg", "true", "SVG"],
+      ["png", "true", "PNG"],
+    ]);
+    // Nothing to open until a link is copied.
+    expect(screen.queryAllByRole("link")).toEqual([]);
+  });
+
+  it("copies each format's absolute image link and offers to open it", async () => {
     runtime.copyText.mockResolvedValue(undefined);
     render(
       <Page
         filename="tree"
         viewBox="-170.5 0 341 598"
-        link={{
-          slug: "tree-of-life",
-          props: {
-            field: "name.roman",
-            topText: "index",
-            bottomText: "",
-            colorScale: "queen",
-            letterAttr: "hermetic",
-            flip: false,
-            showDaat: false,
-            fontSize: 10,
-          },
-        }}
+        link={TREE}
         share={() => "/kabbalah/tree?field=name.roman"}
       />,
     );
-    const svg = screen.getByLabelText(
-      "Open SVG image link",
-    ) as HTMLAnchorElement;
-    const png = screen.getByLabelText(
-      "Open PNG image link",
-    ) as HTMLAnchorElement;
-    expect(svg.getAttribute("href")).toBe(
-      "/api/render/tree-of-life?field=name.roman&fontSize=10",
-    );
-    expect(png.getAttribute("href")).toBe(
-      "/api/render/tree-of-life?fmt=png&field=name.roman&fontSize=10",
-    );
-    expect(svg.target).toBe("_blank");
-    expect(screen.queryByText(/Links include/)).toBeNull();
+    const origin = window.location.origin;
+    for (const [format, href] of [
+      ["SVG", `${origin}/api/render/tree-of-life?field=name.roman&fontSize=10`],
+      [
+        "PNG",
+        `${origin}/api/render/tree-of-life?fmt=png&field=name.roman&fontSize=10`,
+      ],
+    ]) {
+      fireEvent.click(
+        screen.getByRole("button", { name: `Copy ${format} image link` }),
+      );
+      expect(
+        await screen.findByText(`Copied ${format} image link`),
+      ).toBeTruthy();
+      expect(runtime.copyText).toHaveBeenLastCalledWith(href);
+      const open = screen.getByRole("link", { name: "Open" });
+      expect(open.getAttribute("href")).toBe(href);
+      expect(open.getAttribute("target")).toBe("_blank");
+      expect(open.getAttribute("rel")).toBe("noopener");
+    }
+    expect(runtime.copyText).toHaveBeenCalledTimes(2);
+    expect(screen.queryByText(/what you entered/)).toBeNull();
 
-    fireEvent.click(screen.getByLabelText("Copy SVG image link"));
-    expect(await screen.findByText("Copied image link")).toBeTruthy();
-    expect(runtime.copyText).toHaveBeenLastCalledWith(
-      `${window.location.origin}/api/render/tree-of-life?field=name.roman&fontSize=10`,
-    );
-    fireEvent.click(screen.getByLabelText("Copy page link"));
+    // The page link, for now a plain button under the box.
+    fireEvent.click(screen.getByRole("button", { name: "Copy page link" }));
     expect(await screen.findByText("Copied page link")).toBeTruthy();
     expect(runtime.copyText).toHaveBeenLastCalledWith(
-      `${window.location.origin}/kabbalah/tree?field=name.roman`,
+      `${origin}/kabbalah/tree?field=name.roman`,
     );
+    expect(screen.queryByRole("link", { name: "Open" })).toBeNull();
   });
 
-  it("keeps two linked instances independent and never warns for a share-only page", async () => {
+  it("keeps a confirmation that offers Open for 6 seconds, others for 2.5", async () => {
+    vi.useFakeTimers();
+    try {
+      runtime.copyText.mockResolvedValue(undefined);
+      render(<Page filename="candlestick" viewBox="0 0 1 1" link={CANDLE} />);
+      const settle = (ms: number) => act(() => vi.advanceTimersByTimeAsync(ms));
+      fireEvent.click(
+        screen.getByRole("button", { name: "Copy SVG image link" }),
+      );
+      await settle(0);
+      expect(screen.getByText("Copied SVG image link")).toBeTruthy();
+      await settle(5900);
+      expect(screen.queryByText("Copied SVG image link")).toBeTruthy();
+      await settle(200);
+      expect(screen.queryByText("Copied SVG image link")).toBeNull();
+
+      fireEvent.click(screen.getByRole("button", { name: "Save SVG" }));
+      await settle(0);
+      expect(screen.getByText("Downloading SVG")).toBeTruthy();
+      await settle(2400);
+      expect(screen.queryByText("Downloading SVG")).toBeTruthy();
+      await settle(200);
+      expect(screen.queryByText("Downloading SVG")).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("restarts the timer for each new confirmation", async () => {
+    vi.useFakeTimers();
+    try {
+      runtime.copyText.mockResolvedValue(undefined);
+      render(<Page filename="candlestick" viewBox="0 0 1 1" link={CANDLE} />);
+      const settle = (ms: number) => act(() => vi.advanceTimersByTimeAsync(ms));
+      fireEvent.click(
+        screen.getByRole("button", { name: "Copy SVG image link" }),
+      );
+      await settle(0);
+      expect(screen.getByText("Copied SVG image link")).toBeTruthy();
+      await settle(5000);
+      fireEvent.click(
+        screen.getByRole("button", { name: "Copy PNG image link" }),
+      );
+      await settle(0);
+      expect(screen.getByText("Copied PNG image link")).toBeTruthy();
+      // Past the first one's 6 seconds, the second still shows.
+      await settle(5000);
+      expect(screen.queryByText("Copied PNG image link")).toBeTruthy();
+      await settle(1100);
+      expect(screen.queryByText("Copied PNG image link")).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it.each([
+    ["unavailable", new SvgExportError("clipboard-unavailable")],
+    ["refused", new SvgExportError("clipboard-denied")],
+  ])(
+    "still offers Open when the clipboard is %s for a link",
+    async (_case, error) => {
+      runtime.copyText.mockRejectedValue(error);
+      render(<Page filename="tree" viewBox="0 0 1 1" link={TREE} />);
+      fireEvent.click(
+        screen.getByRole("button", { name: "Copy PNG image link" }),
+      );
+      const alert = await screen.findByRole("alert");
+      expect(
+        within(alert).getByText("Could not copy the link. Open it instead."),
+      ).toBeTruthy();
+      expect(alert.className).toContain("MuiAlert-colorError");
+      const href = `${window.location.origin}/api/render/tree-of-life?fmt=png&field=name.roman&fontSize=10`;
+      const open = within(alert).getByRole("link", { name: "Open" });
+      expect(open.getAttribute("href")).toBe(href);
+      expect(open.getAttribute("target")).toBe("_blank");
+    },
+  );
+
+  it("puts each visible label in its name in Hebrew too", () => {
+    render(
+      <LocaleProvider locale="he" messages={hebrew}>
+        <Page filename="tree" viewBox="0 0 1 1" link={TREE} />
+      </LocaleProvider>,
+    );
+    expect(
+      expectLabelsInNames().map((button) => [
+        button.textContent,
+        button.getAttribute("aria-label"),
+      ]),
+    ).toEqual([
+      ["שמירה", "שמירה כ־SVG"],
+      ["העתקה", "העתקה ללוח כ־SVG"],
+      ["קישור", "העתקת קישור לתמונת ה־SVG"],
+      ["שמירה", "שמירה כ־PNG"],
+      ["העתקה", "העתקה ללוח כ־PNG"],
+      ["קישור", "העתקת קישור לתמונת ה־PNG"],
+    ]);
+  });
+
+  it("keeps two linked instances independent", async () => {
     runtime.copyText.mockResolvedValue(undefined);
     render(
       <>
-        <Page
-          filename="a"
-          viewBox="0 0 1 1"
-          link={{ slug: "seven-branched-candlestick", props: {} }}
-        />
+        <Page filename="a" viewBox="0 0 1 1" link={CANDLE} />
         <Page
           filename="b"
           viewBox="0 0 1 1"
@@ -385,25 +559,37 @@ describe("ExportControls", () => {
         />
       </>,
     );
-    const [first, second] = screen.getAllByLabelText(
-      "Open SVG image link",
-    ) as HTMLAnchorElement[];
-    expect(first.getAttribute("href")).toBe(
-      "/api/render/seven-branched-candlestick",
+    const origin = window.location.origin;
+    fireEvent.click(
+      screen.getAllByRole("button", { name: "Copy PNG image link" })[1],
     );
-    expect(second.getAttribute("href")).toBe(
-      "/api/render/enochian-tablet?id=air",
-    );
-    fireEvent.click(screen.getAllByLabelText("Copy SVG image link")[1]);
-    expect(await screen.findByText("Copied image link")).toBeTruthy();
+    expect(await screen.findByText("Copied PNG image link")).toBeTruthy();
     expect(runtime.copyText).toHaveBeenLastCalledWith(
-      `${window.location.origin}/api/render/enochian-tablet?id=air`,
+      `${origin}/api/render/enochian-tablet?fmt=png&id=air`,
     );
-    expect(screen.queryByText(/Links include/)).toBeNull();
-    expect(screen.getAllByLabelText("Copy page link")).toHaveLength(1);
+    fireEvent.click(
+      screen.getAllByRole("button", { name: "Copy SVG image link" })[0],
+    );
+    expect(await screen.findByText("Copied SVG image link")).toBeTruthy();
+    expect(runtime.copyText).toHaveBeenLastCalledWith(
+      `${origin}/api/render/seven-branched-candlestick`,
+    );
+    // Each instance confirms its own copy.
+    expect(
+      screen
+        .getAllByRole("link", { name: "Open" })
+        .map((open) => open.getAttribute("href")),
+    ).toEqual([
+      `${origin}/api/render/seven-branched-candlestick`,
+      `${origin}/api/render/enochian-tablet?fmt=png&id=air`,
+    ]);
+    expect(screen.queryByText(/what you entered/)).toBeNull();
+    expect(
+      screen.getAllByRole("button", { name: "Copy page link" }),
+    ).toHaveLength(1);
   });
 
-  it("explains a missing link instead of hiding it silently", () => {
+  it("explains a missing link when Link is pressed, and copies nothing", async () => {
     render(
       <Page
         filename="tree"
@@ -412,31 +598,128 @@ describe("ExportControls", () => {
         share={() => "/kabbalah/tree?showDaat=true&colorScale=king"}
       />,
     );
+    // Nothing waits under the box.
     expect(
-      screen.getByText("No image link for this combination."),
-    ).toBeTruthy();
-    expect(screen.queryByLabelText("Open SVG image link")).toBeNull();
-    expect(screen.queryByText(/Links include/)).toBeNull();
-    expect(screen.getByLabelText("Copy page link")).toBeTruthy();
+      screen.queryByText("No image link for this combination."),
+    ).toBeNull();
+    const links = ["SVG", "PNG"].map((format) =>
+      screen.getByRole("button", { name: `Copy ${format} image link` }),
+    );
+    for (const link of links) {
+      // Looks disabled, but stays in the tab order to explain itself.
+      expect(link.getAttribute("aria-disabled")).toBe("true");
+      expect((link as HTMLButtonElement).disabled).toBe(false);
+      expect(link.tabIndex).toBe(0);
+    }
+    fireEvent.click(links[1]);
+    const alert = await screen.findByRole("alert");
+    expect(alert.textContent).toBe("No image link for this combination.");
+    expect(alert.className).toContain("MuiAlert-colorInfo");
+    expect(runtime.copyText).not.toHaveBeenCalled();
+    expect(screen.queryByRole("link", { name: "Open" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Copy page link" })).toBeTruthy();
   });
 
-  it("warns that links carry personal state for personal contracts", () => {
+  it("says in the confirmation that a personal page's link carries what was entered", async () => {
+    runtime.copyText.mockResolvedValue(undefined);
     render(
       <Page
         filename="sigil"
         viewBox="-50 -50 100 100"
         link={{ slug: "rose-sigil", props: { text: "גדי", rose: true } }}
+        share={() => "/gd/sigils?text=%D7%92%D7%93%D7%99"}
       />,
     );
-    expect(screen.getByText(/Links include what you entered/)).toBeTruthy();
+    expect(screen.queryByText(/what you entered/)).toBeNull();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Copy PNG image link" }),
+    );
     expect(
-      (
-        screen.getByLabelText("Open PNG image link") as HTMLAnchorElement
-      ).getAttribute("href"),
-    ).toBe("/api/render/rose-sigil?fmt=png&text=%D7%92%D7%93%D7%99");
-    cleanup();
-    render(<Page filename="plain" viewBox="0 0 1 1" />);
-    expect(screen.queryByText(/Image link/)).toBeNull();
-    expect(screen.queryByLabelText("Copy page link")).toBeNull();
+      await screen.findByText(
+        "Copied PNG image link. It includes what you entered here.",
+      ),
+    ).toBeTruthy();
+    const href = `${window.location.origin}/api/render/rose-sigil?fmt=png&text=%D7%92%D7%93%D7%99`;
+    expect(runtime.copyText).toHaveBeenLastCalledWith(href);
+    expect(
+      screen.getByRole("link", { name: "Open" }).getAttribute("href"),
+    ).toBe(href);
+    // The page link carries it too, and says so.
+    fireEvent.click(screen.getByRole("button", { name: "Copy page link" }));
+    expect(
+      await screen.findByText(
+        "Copied page link. It includes what you entered here.",
+      ),
+    ).toBeTruthy();
+    expect(runtime.copyText).toHaveBeenLastCalledWith(
+      `${window.location.origin}/gd/sigils?text=%D7%92%D7%93%D7%99`,
+    );
+  });
+
+  it("offers Save and Copy only on a page with no image route", () => {
+    render(<Page filename="hall" viewBox="0 0 1 1" />);
+    for (const row of screen.getAllByRole("group"))
+      expect(
+        within(row)
+          .getAllByRole("button")
+          .map((button) => button.textContent),
+      ).toEqual(["Save", "Copy"]);
+    expect(screen.queryByRole("button", { name: /image link/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Copy page link" })).toBeNull();
+    expect(screen.queryByText(/what you entered/)).toBeNull();
+  });
+
+  it("takes a third format as one more row, moving nothing else", async () => {
+    runtime.copyText.mockResolvedValue(undefined);
+    const pdf: ExportFormat = {
+      type: "pdf",
+      name: "PDF",
+      hint: { id: "Prints well" },
+      save: vi.fn(async () => {}),
+      copy: vi.fn(async () => ({ id: "Copied {format} to clipboard" })),
+      link: (link) => `/api/render/${link.slug}?fmt=pdf`,
+    };
+    const rows = (formats?: ExportFormat[]) => {
+      cleanup();
+      render(
+        <Page
+          filename="candlestick"
+          viewBox="0 0 1 1"
+          link={CANDLE}
+          formats={formats}
+        />,
+      );
+      return screen.getAllByRole("group");
+    };
+    const two = rows().map((row) => row.outerHTML);
+    const three = rows([SVG_FORMAT, PNG_FORMAT, pdf]);
+    expect(three.map((row) => row.getAttribute("aria-label"))).toEqual([
+      "SVG",
+      "PNG",
+      "PDF",
+    ]);
+    expect(three.slice(0, 2).map((row) => row.outerHTML)).toEqual(two);
+    expect(
+      within(three[2])
+        .getAllByRole("button")
+        .map((button) => button.getAttribute("aria-label")),
+    ).toEqual(["Save PDF", "Copy PDF to clipboard", "Copy PDF image link"]);
+    expect(within(three[2]).getByText("Prints well")).toBeTruthy();
+    expect(three[2].querySelector('[data-file-icon="pdf"]')?.textContent).toBe(
+      "PDF",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Save PDF" }));
+    expect(await screen.findByText("Downloading PDF")).toBeTruthy();
+    expect(pdf.save).toHaveBeenCalledWith(
+      expect.objectContaining({ filename: "candlestick" }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Copy PDF image link" }),
+    );
+    expect(await screen.findByText("Copied PDF image link")).toBeTruthy();
+    expect(runtime.copyText).toHaveBeenLastCalledWith(
+      `${window.location.origin}/api/render/seven-branched-candlestick?fmt=pdf`,
+    );
   });
 });

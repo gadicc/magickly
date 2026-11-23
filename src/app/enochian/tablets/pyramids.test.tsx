@@ -1,6 +1,10 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  imageLinkNote,
+  imageLinkOffered,
+} from "../../../../tests/exportControls";
 import Tablets, { downloadName } from "./tablets";
 
 const PAGE = "/enochian/tablets";
@@ -21,14 +25,12 @@ const pyramidsSwitch = () =>
 /** The tablet's pyramids, not the Squares tab's large one. */
 const squares = (container: HTMLElement) =>
   container.querySelectorAll("[data-pyramids] [data-pyramid]").length;
-const imageLinks = () =>
-  screen.queryAllByRole("link", { name: "Open SVG image link" });
 
 describe("/enochian/tablets drawn as pyramids (plan 095, decision 4)", () => {
-  it("draws every square as a pyramid, with a key, and says so in the URL", () => {
+  it("draws every square as a pyramid, with a key, and says so in the URL", async () => {
     const { container } = render(<Tablets />);
     expect(squares(container)).toBe(0);
-    expect(imageLinks().length).toBeGreaterThan(0);
+    expect(imageLinkOffered()).toBe(true);
     fireEvent.click(pyramidsSwitch() as HTMLElement);
     expect(squares(container)).toBe(156);
     expect(window.location.search).toBe("?pyramids=1");
@@ -44,10 +46,10 @@ describe("/enochian/tablets drawn as pyramids (plan 095, decision 4)", () => {
       "White, with no element: a Calvary square's lowest side, which carries its Sephirah",
     ]);
     // Until the image route has a slug of its own (decision 5).
-    expect(imageLinks()).toHaveLength(0);
-    expect(
-      screen.getByText("No image link while the tablet is drawn as pyramids."),
-    ).toBeTruthy();
+    expect(imageLinkOffered()).toBe(false);
+    expect(await imageLinkNote()).toBe(
+      "No image link while the tablet is drawn as pyramids.",
+    );
     choose("Tablet", "Tablet of Union");
     expect(squares(container)).toBe(20);
     // The params keep the order they were first written in.

@@ -294,6 +294,161 @@ msgstr "לא הצלחנו לטעון את השפה. נסו שוב."
 msgid "The language changed in this tab, but this browser could not save the preference."
 msgstr "השפה השתנתה בלשונית הזאת, אך הדפדפן לא הצליח לשמור את ההעדפה."
 
+#. Why to choose SVG, under its name in the export box below a drawing: a vector file stays sharp however large it is shown
+#. js-lingui-explicit-id
+#: src/export/formats.ts
+msgid "Sharp at any size"
+msgstr "חד בכל גודל"
+
+#. Confirms a drawing copied as an image. {format} is the file format, such as SVG, in Latin letters
+#. js-lingui-explicit-id
+#: src/export/formats.ts
+msgid "Copied {format} image to clipboard"
+msgstr "תמונת ה־{format} הועתקה ללוח"
+
+#. Confirms a drawing copied as SVG source text, where the browser cannot copy it as an image. {format} is the file format, SVG, in Latin letters
+#. js-lingui-explicit-id
+#: src/export/formats.ts
+msgid "Copied {format} text to clipboard"
+msgstr "טקסט ה־{format} הועתק ללוח"
+
+#. Why to choose PNG, under its name in the export box below a drawing: a picture that any app accepts when pasted
+#. js-lingui-explicit-id
+#: src/export/formats.ts
+msgid "Pastes anywhere"
+msgstr "נדבק בכל מקום"
+
+#. Confirms a drawing copied as a picture. {format} is the file format, such as PNG, in Latin letters
+#. js-lingui-explicit-id
+#: src/export/formats.ts
+msgid "Copied {format} to clipboard"
+msgstr "ה־{format} הועתק ללוח"
+
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Nothing to export yet."
+msgstr "אין עדיין מה לייצא."
+
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "This image has no size to export."
+msgstr "לתמונה הזאת אין גודל שאפשר לייצא."
+
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "This image is too large to export as PNG."
+msgstr "התמונה הזאת גדולה מכדי לייצא אותה כ־PNG."
+
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Could not draw the PNG."
+msgstr "לא הצלחנו לצייר את ה־PNG."
+
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Clipboard access is not available here. Use Save instead."
+msgstr "אין כאן גישה ללוח. אפשר להשתמש בשמירה במקום."
+
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "The browser refused clipboard access."
+msgstr "הדפדפן סירב לתת גישה ללוח."
+
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Could not start the download."
+msgstr "לא הצלחנו להתחיל את ההורדה."
+
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Export failed."
+msgstr "הייצוא נכשל."
+
+#. Shown when copying a drawing's image link fails; the confirmation still offers Open, a link to that image
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Could not copy the link. Open it instead."
+msgstr "לא הצלחנו להעתיק את הקישור. אפשר לפתוח אותו במקום."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+#: src/export/ExportControls.tsx
+msgid "Save"
+msgstr "שמירה"
+
+#. Label under the copy icon in the export box below a drawing: copies the drawing to the clipboard
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Copy"
+msgstr "העתקה"
+
+#. Label under the link icon in the export box below a drawing: copies a link to the drawing as an image file
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Link"
+msgstr "קישור"
+
+#. Accessible name of a drawing's Save button, which downloads the file; it contains the visible label Save. {format} is the file format, such as SVG or PNG, in Latin letters
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Save {format}"
+msgstr "שמירה כ־{format}"
+
+#. Accessible name of a drawing's Copy button. {format} is the file format, such as SVG or PNG, in Latin letters
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Copy {format} to clipboard"
+msgstr "העתקה ללוח כ־{format}"
+
+#. Accessible name of a drawing's Link button. {format} is the file format, such as SVG or PNG, in Latin letters
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Copy {format} image link"
+msgstr "העתקת קישור לתמונת ה־{format}"
+
+#. Confirms that a drawing's download started. {format} is the file format, such as SVG or PNG, in Latin letters
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Downloading {format}"
+msgstr "מורידים {format}"
+
+#. Confirms that the link to a drawing's image file was copied. {format} is the file format, such as SVG or PNG, in Latin letters
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Copied {format} image link"
+msgstr "הקישור לתמונת ה־{format} הועתק"
+
+#. Confirms the copied link to a drawing made from what the reader typed (a name, a reading), and warns that the link carries it. {format} is the file format, such as SVG or PNG, in Latin letters
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Copied {format} image link. It includes what you entered here."
+msgstr "הקישור לתמונת ה־{format} הועתק. הוא כולל את מה שהזנתם כאן."
+
+#. Action in the confirmation after copying a drawing's image link, or failing to: opens that image in a new tab
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Open"
+msgstr "פתיחה"
+
+#. Button below a drawing's export box: copies a link to this page with its current settings
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Copy page link"
+msgstr "העתקת קישור לעמוד"
+
+#. Confirms that the link to this page was copied
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Copied page link"
+msgstr "הקישור לעמוד הועתק"
+
+#. Confirms the copied link to a page made from what the reader typed (a name, a reading), and warns that the link carries it
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Copied page link. It includes what you entered here."
+msgstr "הקישור לעמוד הועתק. הוא כולל את מה שהזנתם כאן."
+
 #. js-lingui-explicit-id
 #: src/doc/useRitualEditorLayout.ts
 msgid "Source"
@@ -1443,6 +1598,11 @@ msgstr "סיגיל צלב הוורד של {name}, בתוך טבעת עם שמו.
 msgid "Open an angel to see its Rose Cross sigil."
 msgstr "פתחו מלאך כדי לראות את סיגיל צלב הוורד שלו."
 
+#. js-lingui-explicit-id
+#: src/app/kabbalah/tree/tree.tsx
+msgid "No image link for these settings."
+msgstr "אין קישור לתמונה בהגדרות האלה."
+
 #. Caption of an angel's sigil drawn inside a ring, on the angel's page. <0> is a book's title, set in italics; <1> links the plate of the book it cites
 #. js-lingui-explicit-id
 #: src/app/kabbalah/angel/[slug]/AngelSigil.tsx
@@ -1689,6 +1849,12 @@ msgstr "ישראל רגרדי, <0>The Golden Dawn</0>, כרך 4 (Aries Press, ש
 #: src/app/gd/sigils/SigilsText.tsx
 msgid "The rules, the figures' evidence and how the generator is tested against them, every pair and triple of letters included, are set out in <0>the project's design notes</0>."
 msgstr "הכללים, העדות שבאיורים והאופן שבו המחולל נבדק מולם, כולל כל זוג ושלשה של אותיות, מפורטים ב<0>הערות התכנון של הפרויקט</0>."
+
+#. js-lingui-explicit-id
+#: src/app/astrology/kamea/sigils/KameaSigils.tsx
+#: src/app/gd/sigils/sigils.tsx
+msgid "No image link until a sigil is drawn."
+msgstr "אין קישור לתמונה עד שמצויר סיגיל."
 
 #. js-lingui-explicit-id
 #: src/app/gd/sigils/sigils.tsx
@@ -2517,6 +2683,11 @@ msgstr "אין קישור לתמונה כשהלוח מצויר כפירמידו�
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
+msgid "No image link while differences are shown."
+msgstr "אין קישור לתמונה כשמוצגים ההבדלים."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
 msgid "No image link while a name, a square or the regions are shown."
 msgstr "אין קישור לתמונה כשמוצגים שם, משבצת או האזורים."
 
@@ -2524,6 +2695,11 @@ msgstr "אין קישור לתמונה כשמוצגים שם, משבצת או ה
 #: src/app/enochian/tablets/tablets.tsx
 msgid "No image link while a square is shown."
 msgstr "אין קישור לתמונה כשמוצגת משבצת."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "No image link with second letters shown or reversed letters plain."
+msgstr "אין קישור לתמונה כשמוצגות אותיות שניות או כשהאותיות ההפוכות מוצגות רגילות."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
@@ -2847,12 +3023,6 @@ msgstr "הבנתי"
 #: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
 msgid "Saving…"
 msgstr "שומרים…"
-
-#. js-lingui-explicit-id
-#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
-#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
-msgid "Save"
-msgstr "שמירה"
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx

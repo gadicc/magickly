@@ -637,7 +637,7 @@ export default function Tablets({
   const linkNote = pyramids
     ? t(/*i18n*/ "No image link while the tablet is drawn as pyramids.")
     : differencesShown
-      ? "No image link while differences are shown."
+      ? t(/*i18n*/ "No image link while differences are shown.")
       : onNames && (chosenName || regionsShown || nameSquare)
         ? t(
             /*i18n*/ "No image link while a name, a square or the regions are shown.",
@@ -645,7 +645,9 @@ export default function Tablets({
         : pyramidsShown && pyramidSquare
           ? t(/*i18n*/ "No image link while a square is shown.")
           : altShown || plainShown
-            ? "No image link with second letters shown or reversed letters plain."
+            ? t(
+                /*i18n*/ "No image link with second letters shown or reversed letters plain.",
+              )
             : undefined;
   const tabletNote = tabletNotes.tablets[id];
   const note = versionNote(version);

@@ -13,6 +13,7 @@ import { pathHref, sephirahHref } from "@/app/kabbalah/treeLinks";
 import Ink from "@/drawings/Ink";
 import ExportControls from "@/export/ExportControls";
 import { TREE_FONT_BASE_URL } from "@/fonts/tree";
+import { useUiLanguage } from "@/i18n/LocaleProvider";
 import Link from "@/ui/Link";
 import { type TreeSettings, treeImageLink, treeSettings } from "./treeSettings";
 
@@ -36,6 +37,7 @@ export function TreeOfLifeView({
   /** Page path and query for the copied page link. */
   sharePath?: string;
 }) {
+  const { t } = useUiLanguage();
   const ref = React.useRef<SVGSVGElement>(null);
   const link = treeImageLink(opts);
 
@@ -205,7 +207,7 @@ export function TreeOfLifeView({
             target={ref}
             filename="TreeOfLife-magickly-export"
             link={link}
-            linkNote="No image link for these settings."
+            linkNote={t(/*i18n*/ "No image link for these settings.")}
             share={() => sharePath}
           />
           <div style={{ textAlign: "center", fontSize: "90%" }}>

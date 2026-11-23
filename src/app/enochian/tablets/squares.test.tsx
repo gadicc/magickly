@@ -18,6 +18,10 @@ import {
   onTestFinished,
   vi,
 } from "vitest";
+import {
+  imageLinkNote,
+  imageLinkOffered,
+} from "../../../../tests/exportControls";
 import { LOADED_TEST_TIMEOUT } from "../../../../tests/loadBudget";
 import { tabletNameLinks } from "./nameLinks";
 import Tablets from "./tablets";
@@ -202,7 +206,7 @@ describe("/enochian/tablets' Squares tab", () => {
 });
 
 describe("/enochian/tablets' squares, tapped", () => {
-  it("opens a square's pyramid in the Squares tab, and lets it go on a second tap", () => {
+  it("opens a square's pyramid in the Squares tab, and lets it go on a second tap", async () => {
     const scrollIntoView = vi.fn();
     const own = Element.prototype.scrollIntoView;
     Element.prototype.scrollIntoView = scrollIntoView;
@@ -223,9 +227,10 @@ describe("/enochian/tablets' squares, tapped", () => {
     expect(scrollIntoView).toHaveBeenCalled();
     expect(document.activeElement).toBe(document.body);
     // The image link waits, and the download says the square.
-    expect(
-      screen.getByText("No image link while a square is shown."),
-    ).toBeTruthy();
+    expect(imageLinkOffered()).toBe(false);
+    expect(await imageLinkNote()).toBe(
+      "No image link while a square is shown.",
+    );
     // The outlined square, tapped again, lets it go.
     fireEvent.click(container.querySelector('[data-square="2,0"]') as Element);
     expect(detailHeading()).toBeNull();

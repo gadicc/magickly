@@ -66,12 +66,16 @@ describe("geomancy reading page", () => {
   // 80837 910f4c74…, 80827 bd978df9… and 80838 88f4df44…), and when the
   // export buttons' box gained `data-export-controls`, the drawing pages'
   // hook to align them, and nothing else (before that, 81343 c55494a3…,
-  // 81333 6aeda904… and 81344 adb50519…); the bytes are otherwise those
-  // from before the rekey.
+  // 81333 6aeda904… and 81344 adb50519…), and when plan 097 redrew the
+  // export controls as one row per format: the page without them is
+  // byte-for-byte the same, and before and after they are one unbroken
+  // insertion at the same place (before that, 81367 90d5e50d…, 81357
+  // f3d03d65… and 81368 42c28fb8…); the bytes are otherwise those from
+  // before the rekey.
   it.each([
     [
       "1",
-      "81367 90d5e50dc6a7aeabebc3b78cc2dff754feb693e21e644ef1218344f59e5e79a7",
+      "92078 ec8a8774e180f0762509f566ea248be775a60c1483a828bfca96ae2aa9f98247",
       [
         "The querent: their life",
         "Good, except in war.",
@@ -81,7 +85,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "7",
-      "81357 f3d03d65eb42dab83917003f1dcde5c4c1207711d55ebe249feac5291c2da7d1",
+      "92068 a855467e90d57841acdf2926f3d153bd3d4f695c745a4ae40b577eb43e399185",
       [
         "Marriage and other unions",
         "Indifferent.",
@@ -91,7 +95,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "12",
-      "81368 42c28fb85270a82006f47efece17c99900470b162c540f1f240bd5a6e1a895a0",
+      "92079 a2bae48bd84b233bd157e8c83a9f26f6c8033b6091cc0c752aa928e8217a4729",
       [
         "Enemies; servants; imprisonment",
         "Unfavourable generally.",
