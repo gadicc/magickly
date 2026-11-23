@@ -26,6 +26,7 @@ import {
 import { renderComponentImage } from "./componentImage";
 import { ANGEL_SIGIL_SLUGS, type AngelSigilSlug } from "./contracts/angelSigil";
 import { outlineComponentImage } from "./outlineTreeImage";
+import { componentInputsHash } from "./registry";
 
 const DRAWN: readonly DrawnSigilStyle[] = ["band", "bare", "talisman"];
 const sha256 = (value: string | Uint8Array) =>
@@ -238,77 +239,105 @@ describe("the angels' sigil styles (plan 096)", () => {
   }, 60_000);
 
   // The styles' reviewed bytes, by the image profile they were reviewed
-  // under, as the rose's: bytes that change come with a new profile and a
-  // new set, and a shipped profile's set never changes. The names and
-  // verses are inputs too, so a data fix moves the inputs pin below as
-  // well. Reviewed as rasterised, 23 November 2026.
+  // under, as the rose's: a change to the drawing comes with a new profile
+  // and a new set, and a shipped profile's drawing never changes. Unlike
+  // the rose's pins, these draw the data (an angel's names and verse), so a
+  // data fix moves them too. An image is keyed by its data as well as its
+  // profile (the inputs hash), so a data fix needs no new profile, only a
+  // fresh review. Each set records the inputs hash it was reviewed at, and
+  // the test says which of the two moved.
+  // Reviewed as rasterised, 23 November 2026.
   const ANGEL_SIGIL_PINS: Record<
     string,
-    readonly (readonly [query: string, byteSize: number, sha256: string])[]
+    {
+      /** `componentInputsHash("angel-sigil")` when the set was reviewed. */
+      inputs: string;
+      pins: readonly (readonly [
+        query: string,
+        byteSize: number,
+        sha256: string,
+      ])[];
+    }
   > = {
-    "magickli-angel-sigil-image-v1": [
-      // The default style.
-      [
-        "angel=vehuiah",
-        16_823,
-        "ef0a62a59030da3ad36a4dddf998a9cffc96407dd9489aeecb54cd05b02fc79d",
+    "magickli-angel-sigil-image-v1": {
+      inputs:
+        "25d38e34e607cd2be8980d1f20fa9363da42358a3d99e7a76af8820ea8404b9a",
+      pins: [
+        // The default style.
+        [
+          "angel=vehuiah",
+          16_823,
+          "ef0a62a59030da3ad36a4dddf998a9cffc96407dd9489aeecb54cd05b02fc79d",
+        ],
+        // The longest verse (#47).
+        [
+          "angel=asaliah&style=talisman",
+          131_317,
+          "19d259b0107010c9685763c4ee76fd7f0f4c65021eeab7a519ddb2a897108feb",
+        ],
+        // The smallest capitals (#31).
+        [
+          "angel=lecabel&style=talisman",
+          128_306,
+          "eb259e4550a408c63418de718b5a48ec4ee68a7667b438c77f51effd3480eff3",
+        ],
+        // æ, once misread as œ (#43), and Æ (#55).
+        [
+          "angel=veualiah&style=talisman",
+          65_516,
+          "28ff770a373286c3e5efc1093ca00a168f6fdf13d85d53b0d03fbcf8e673d521",
+        ],
+        [
+          "angel=mebahiah&style=talisman",
+          80_486,
+          "8d735fd9c657db366bcc5302b0c73fa03415a950947f7479c455f9039e394eb2",
+        ],
+        // The longest roman name, hyphened (#25).
+        [
+          "angel=nith-haiah&style=bare",
+          10_241,
+          "fa725e88aa3870fcc2f671322e495cc90c5028cfdf84e79513f896f6d4401460",
+        ],
+        // Genesis 1:1 in the Vulgate's Latin (#70, decision 8).
+        [
+          "angel=jabamiah&style=talisman",
+          50_882,
+          "986a6e8920539fe1e60385086fc9ecdd4336255b0eebe10cd41f052caf1dc155",
+        ],
       ],
-      // The longest verse (#47).
-      [
-        "angel=asaliah&style=talisman",
-        131_317,
-        "19d259b0107010c9685763c4ee76fd7f0f4c65021eeab7a519ddb2a897108feb",
-      ],
-      // The smallest capitals (#31).
-      [
-        "angel=lecabel&style=talisman",
-        128_306,
-        "eb259e4550a408c63418de718b5a48ec4ee68a7667b438c77f51effd3480eff3",
-      ],
-      // æ, once misread as œ (#43), and Æ (#55).
-      [
-        "angel=veualiah&style=talisman",
-        65_516,
-        "28ff770a373286c3e5efc1093ca00a168f6fdf13d85d53b0d03fbcf8e673d521",
-      ],
-      [
-        "angel=mebahiah&style=talisman",
-        80_486,
-        "8d735fd9c657db366bcc5302b0c73fa03415a950947f7479c455f9039e394eb2",
-      ],
-      // The longest roman name, hyphened (#25).
-      [
-        "angel=nith-haiah&style=bare",
-        10_241,
-        "fa725e88aa3870fcc2f671322e495cc90c5028cfdf84e79513f896f6d4401460",
-      ],
-      // Genesis 1:1 in the Vulgate's Latin (#70, decision 8).
-      [
-        "angel=jabamiah&style=talisman",
-        50_882,
-        "986a6e8920539fe1e60385086fc9ecdd4336255b0eebe10cd41f052caf1dc155",
-      ],
-    ],
+    },
   };
 
   it("pins the styles' reviewed bytes under their image profile", async () => {
-    const pins = ANGEL_SIGIL_PINS[ANGEL_SIGIL_IMAGE_PROFILE];
+    const set = ANGEL_SIGIL_PINS[ANGEL_SIGIL_IMAGE_PROFILE];
     expect(
-      pins,
+      set,
       `no reviewed bytes for ${ANGEL_SIGIL_IMAGE_PROFILE}: add its set to ANGEL_SIGIL_PINS`,
     ).toBeDefined();
-    for (const [query, byteSize, sha] of pins) {
+    const inputs = componentInputsHash("angel-sigil");
+    const dataMoved = inputs !== set.inputs;
+    for (const [query, byteSize, sha] of set.pins) {
       const image = await renderComponentImage(
         "angel-sigil",
         new URLSearchParams(query),
       );
       expect(
         [image.byteSize, image.sha256],
-        `angel-sigil?${query} draws other bytes than ${ANGEL_SIGIL_IMAGE_PROFILE} was reviewed with. ` +
-          "If the drawing changed on purpose, bump ANGEL_SIGIL_IMAGE_PROFILE in angelSigilImage.tsx " +
-          "and pin the reviewed bytes under the new profile; never re-pin a shipped profile.",
+        dataMoved
+          ? `angel-sigil?${query} draws other bytes, and the data it draws changed since the set was reviewed (inputs ${inputs}, reviewed at ${set.inputs}). ` +
+              "A data fix keeps the profile: look at the new images rasterised, then re-pin their bytes and this set's inputs " +
+              `under ${ANGEL_SIGIL_IMAGE_PROFILE}, with the inputs pin in registry.test.tsx.`
+          : `angel-sigil?${query} draws other bytes than ${ANGEL_SIGIL_IMAGE_PROFILE} was reviewed with, from the same data, so the drawing changed. ` +
+              "If on purpose, bump ANGEL_SIGIL_IMAGE_PROFILE in angelSigilImage.tsx and pin the reviewed bytes under the new profile; " +
+              "never re-pin a shipped profile for a drawing change.",
       ).toEqual([byteSize, sha]);
     }
+    // The bytes held, but the data moved: the set no longer says what it
+    // was reviewed at.
+    expect(
+      inputs,
+      `the data angel-sigil draws changed but no pinned image did: set this set's inputs to ${inputs}`,
+    ).toBe(set.inputs);
   }, 60_000);
 
   // A digest of the drawing itself, by the same profile: the package
