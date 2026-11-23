@@ -323,6 +323,36 @@ Settled after the review: the Calvary bar, per version (decision 2).
 2. **The square's detail.** The Squares tab, the picker, the large
    pyramid, the god and sphinx, URL, citations, i18n, the page's text and
    search.
+   **Built 23 November 2026** (`28a14de6`). The Squares tab
+   (`SquaresPanel.tsx`, keyed by tablet), the detail (`PyramidDetail.tsx`)
+   and its drawing (`PyramidDrawing.tsx`, app-local SVG), the words
+   (`pyramidWords.ts`, whole Lingui messages with Hebrew). Gadi chose, on
+   seeing it, the symbols upright by default with a switch to face them
+   outward as the Order painted them (page state, kept across squares and
+   tabs). Each symbol has an outline so it reads at 3:1 or better against
+   its side (the complementary colours alone are 1.2–1.4:1 on Water and
+   Fire). Which symbol a side shows when it carries several (the sign,
+   else the Sephirah's number, else the planet, else the Hebrew letter; a
+   geomantic figure as dots; the element's own mark otherwise) is ours.
+   A name's squares are links that push a history entry, so Back returns
+   to the name; `?tab=squares&square=row,column` is written only on that
+   tab and dropped off the grid and under Dee's and Raphael's versions.
+   The Calvary dispute is one square-specific sentence, the reading behind
+   a disclosure; only the O of OMEBB's sentence names vol. 4's worked
+   square. Noto Sans Coptic 2.004 (OFL), subset to the names' 29 letters
+   and sou, 2,548 bytes, from the google/fonts commit the other fonts pin,
+   loaded with the detail and precached by the service worker; Sothis's
+   first letter checked on the largest scan there is (the 2,648 px JP2),
+   medium confidence. `regardie1939` joins `works.ts`. Checked in a
+   browser at 1440 × 900 and 390 × 844, light and dark, every region, the
+   Union and Dee's note. A fresh Opus review rendered the detail for all
+   1,932 squares of the three versions without a data error, and found
+   the dispute sentence crediting vol. 4's worked square everywhere, the
+   picker submitting an off-grid square after a change of tablet, the sou
+   sign outside its font, low contrast, the letter missing for screen
+   readers, the square kept off its tab, and no history for a name's
+   squares; all fixed before the gate. `search:publish` embedded 18
+   passages.
 3. **Mock-up** of the pyramid drawing for Gadi (decision 4).
 4. **The drawing.** `Tablet`'s `pyramids`, the Union's, the switch, the
    key; default bytes unmoved.
@@ -447,6 +477,11 @@ table and by rule), and read the Equinox's plates and vol. 1's badge.
 
 ## Follow-ups (not in this plan)
 
+- **Stretch goal (Gadi, 23 November 2026): the tablet in 3D.** The whole
+  tablet as pyramids in three dimensions, which the reader can zoom and
+  rotate on desktop and phone, with gestures fit for each (drag to
+  rotate, pinch or wheel to zoom, a reset, keyboard controls, reduced
+  motion respected). After the flat tablet-wide drawing (stages 3–4).
 - The alternative colours, with a King-scale colour table.
 - One word for the Kerubic squares in both packages: magick-components'
   `regionFromPosition` still says `topRow` (and draws
