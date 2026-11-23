@@ -344,12 +344,14 @@ export const COMPONENT_IMAGE_REGISTRY: {
     inputs: KAMEA_INPUTS,
   },
   "kamea-sigil": {
-    // One row, one `<svg>`, as the generator's download.
+    // One row, one `<svg>`, as the generator's download; in rows with
+    // `columns` (a long name's card).
     render: (props) => (
       <KameaSigilImage
         planet={props.planet}
         text={props.text}
         finals={props.finals}
+        columns={props.columns}
         fontFamily={KAMEA_FONT_FAMILY}
       />
     ),

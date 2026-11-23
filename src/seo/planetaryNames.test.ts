@@ -2,12 +2,13 @@ import names from "magick-data/astrology/planetaryNames";
 import { describe, expect, it } from "vitest";
 import { CONTRACTS } from "@/render/contracts";
 import { socialCards } from "./cardList";
-import { socialCard } from "./cards";
+import { type CardArt, socialCard } from "./cards";
 import { entityPages } from "./entities";
 import { PUBLIC_PAGES } from "./pages";
 import {
   allPlanetaryNameSigilFiles,
   planetaryNameCardArt,
+  planetaryNameCardColumns,
   planetaryNameJsonLd,
   planetaryNamePage,
   planetaryNamePages,
@@ -143,6 +144,21 @@ describe("the planetary names' static sigil files", () => {
       raster: "query",
     });
     expect(card?.section).toBe("Astrology");
+    // A name of more words in rows, drawing its squares largest.
+    expect(
+      [1, 2, 3, 4, 5].map((words) => planetaryNameCardColumns(words)),
+    ).toEqual([1, 1, 2, 2, 2]);
+    const malcha = new URLSearchParams(
+      (
+        planetaryNameCardArt(names["malcha-betharsisim"]) as Extract<
+          CardArt,
+          { kind: "diagram" }
+        >
+      ).query,
+    );
+    expect(malcha.get("text")?.split(" ")).toHaveLength(5);
+    expect(malcha.get("columns")).toBe("2");
+    expect(malcha.get("width")).toBe("880");
     // The planet pages keep their section's art.
     expect(socialCard("/astrology/planet/saturn", "x").art).not.toEqual(
       card?.art,

@@ -24,7 +24,7 @@ import { KameaFigure } from "./Kamea.tsx";
  * name is one figure per word, each on its own square (decision 10):
  * `KameaSigil` sets them side by side, right to left, wrapping on a
  * narrow screen; `KameaSigilImage` draws them in one row, one `<svg>`, for
- * a download or an image route. Both draw the same figures, placed once
+ * a download or an image route (or in rows, `columns` words each). Both draw the same figures, placed once
  * for the whole text, and neither uses hooks, so the server draws them.
  */
 
@@ -267,12 +267,36 @@ export function KameaSigil({
   );
 }
 
-export type KameaSigilImageProps = KameaSigilProps;
+export interface KameaSigilImageProps extends KameaSigilProps {
+  /**
+   * Words a row: a text of more words is set in rows of this many, right
+   * to left and top to bottom, the last row centred (a long name's social
+   * card). Absent, or not fewer than the words, one row.
+   */
+  columns?: number;
+}
+
+/** Where each of `count` words sits when set `columns` a row. */
+function gridOffsets(
+  count: number,
+  columns: number,
+  pitch: number,
+): { x: number; y: number }[] {
+  const rows = Math.ceil(count / columns);
+  return Array.from({ length: count }, (_, k) => {
+    const row = Math.floor(k / columns);
+    const inRow = row === rows - 1 ? count - row * columns : columns;
+    const shift = (columns - inRow) / 2;
+    return { x: -((k % columns) + shift) * pitch, y: row * pitch };
+  });
+}
 
 /**
  * The same sigil in one `<svg>`: every word on its own square, in one row
  * from right to left, `size` pixels a word across. What a download or an
  * image route serves; `KameaSigil` draws the same figures, wrapping.
+ * With `columns` the words are set in rows instead (the row's figures,
+ * each moved to its place in the grid).
  */
 export function KameaSigilImage({
   planet,
@@ -287,29 +311,75 @@ export function KameaSigilImage({
   className,
   style,
   sigil: given,
+  columns,
 }: KameaSigilImageProps) {
   const sigil = sigilFor(planet, text, finals, given);
   const layout = kameaLayout(planet, { finals });
   const width = clampedSize(planet, size);
   const name = label === undefined ? defaultLabel(planet, text) : label;
   const regions = Math.max(1, sigil.figure.plan.length);
+  const backdrop = square({ planet, squareInk, paper, fontFamily });
+  const named = {
+    className,
+    style,
+    role: name ? "img" : undefined,
+    "aria-label": name || undefined,
+    "aria-hidden": name ? undefined : true,
+    "data-placement": sigil.failed ? "failed" : undefined,
+  } as const;
+  if (
+    columns === undefined ||
+    !Number.isInteger(columns) ||
+    columns < 1 ||
+    columns >= regions
+  )
+    return (
+      <SigilImage
+        text=""
+        layout={layout}
+        profile={KAMEA_SIGIL_PROFILE}
+        figure={sigil.figure}
+        stroke={ink}
+        backdrop={backdrop}
+        width={svgCoordinate(width * regions)}
+        height={width}
+        {...named}
+      />
+    );
+  const rows = Math.ceil(regions / columns);
+  const { frame } = sigil.figure;
+  const offsets = gridOffsets(regions, columns, frame.pitch);
+  const [x, y, across, high] = sigilViewBox(frame, columns);
+  const at = (offset: { x: number; y: number }) =>
+    `translate(${svgCoordinate(offset.x)} ${svgCoordinate(offset.y)})`;
   return (
-    <SigilImage
-      text=""
-      layout={layout}
-      profile={KAMEA_SIGIL_PROFILE}
-      figure={sigil.figure}
-      stroke={ink}
-      backdrop={square({ planet, squareInk, paper, fontFamily })}
-      width={svgCoordinate(width * regions)}
-      height={width}
-      className={className}
-      style={style}
-      role={name ? "img" : undefined}
-      aria-label={name || undefined}
-      aria-hidden={name ? undefined : true}
-      data-placement={sigil.failed ? "failed" : undefined}
-    />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      version="1.1"
+      viewBox={[x, y, across, svgCoordinate(high * rows)].join(" ")}
+      width={svgCoordinate(width * columns)}
+      height={svgCoordinate(width * rows)}
+      {...named}
+    >
+      {offsets.map(backdrop)}
+      <g
+        stroke={ink}
+        strokeWidth={svgCoordinate(
+          KAMEA_SIGIL_PROFILE.strokeWidth ?? layout.unit,
+        )}
+        fill="none"
+      >
+        {sigil.words.map((word, k) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: the order is the identity.
+          <g key={k} transform={at(offsets[k])}>
+            {word.paths.map((d, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: drawing order.
+              <path key={i} d={d} />
+            ))}
+          </g>
+        ))}
+      </g>
+    </svg>
   );
 }
 

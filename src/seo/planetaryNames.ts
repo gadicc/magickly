@@ -210,20 +210,45 @@ export function planetaryNameSocialImage(name: PlanetaryName): SocialImage {
 }
 
 /**
+ * How many of a name's `words` squares a row lets them be drawn largest
+ * in the card's art box: one row for a single word, rows for more (a
+ * two-word name stacks, Malcha's five go two, two and one).
+ */
+export function planetaryNameCardColumns(words: number): number {
+  let best = 1;
+  let side = 0;
+  for (let columns = 1; columns <= words; columns++) {
+    const rows = Math.ceil(words / columns);
+    const fits = Math.min(
+      CARD_ART_BOX.width / columns,
+      CARD_ART_BOX.height / rows,
+    );
+    if (fits > side) [best, side] = [columns, fits];
+  }
+  return best;
+}
+
+/**
  * A name page's card art: the name's own sigil on its square, a square a
- * word in one row. Asked for by width, twice the art box's: by the box's
- * height a long name's row would be wider than any image the contract
- * draws (Malcha's five squares, 5,100 pixels at 1,020 high).
+ * word, set in as many rows as draw the squares largest in the art box
+ * (`planetaryNameCardColumns`): one long row of Malcha's five squares
+ * left each a fifth of the box's width. Asked for by width, twice the art
+ * box's, which keeps every name inside the contract's limits.
  */
 export function planetaryNameCardArt(name: PlanetaryName): CardArt {
+  const text = planetaryNameSigilText(name);
+  const words = text.split(" ").length;
+  const columns = planetaryNameCardColumns(words);
+  const query = new URLSearchParams({
+    planet: planetOfName(name),
+    text,
+  });
+  if (columns < words) query.set("columns", String(columns));
+  query.set("width", String(CARD_ART_BOX.width * 2));
   return {
     kind: "diagram",
     slug: "kamea-sigil",
-    query: new URLSearchParams({
-      planet: planetOfName(name),
-      text: planetaryNameSigilText(name),
-      width: String(CARD_ART_BOX.width * 2),
-    }).toString(),
+    query: query.toString(),
     raster: "query",
   };
 }

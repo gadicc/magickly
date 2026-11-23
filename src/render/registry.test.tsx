@@ -236,6 +236,16 @@ describe("component image registry", () => {
     // A word on its square, then two, side by side (plan 093, decision 10).
     ["kamea-sigil", "planet=saturn&text=אגיאל", 1024, 1024, 12],
     ["kamea-sigil", "planet=venus&text=בני שרפים", 2048, 1024, 100],
+    // In rows (a long name's card): two words stacked, and five two a row.
+    ["kamea-sigil", "planet=venus&text=בני שרפים&columns=1", 1024, 2048, 100],
+    [
+      "kamea-sigil",
+      "planet=luna&text=מלכא בתרשיתים עד ברוח שחקים&columns=2",
+      // 2,048 by 3,072, scaled into the route's 4,194,304 pixels.
+      1672,
+      2508,
+      400,
+    ],
   ] as const)(
     "renders %s?%s as validated outlined SVG and a %dx%d PNG",
     async (slug, query, width, height, minimumPaths) => {
