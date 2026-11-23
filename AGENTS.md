@@ -247,3 +247,34 @@ the worktree or branch. Add the line after every run, paid or not, and sum the
 day's estimates before starting: if the day's total is $11 or more, or a run
 would take it to $12 or more, ask the operator first. Any other paid
 embedding work (a new profile, `search:compare`) is the operator's.
+
+## Heavy tasks share the machine's CPUs
+
+`test`, `test:coverage`, `test:chat-research`, `build` and
+`check:turbopack` run their Vitest or `next build` step through
+`loom slots run`. That step waits for a grant of CPUs from Loom's
+machine-wide pool, shared by every Loom app and agent on this machine,
+and runs pinned to them. Two cores always stay free. Vitest's
+`maxWorkers` and Next's `experimental.cpus` follow the grant
+(`LOOM_SLOTS`). Under CI the wrapper runs the step directly, so CI's own
+sizing is unchanged. The design is Loom's `docs/machine-slots.md`.
+
+- A gate that prints `Loom slots: waiting …` is queued, not hung. Run
+  `pnpm exec loom slots status` to see who holds the CPUs and who is ahead.
+  The wait gives up after 60 minutes with exit 122.
+- Run these tasks through `pnpm`. Do not call `vitest` or `next build`
+  directly to skip the line, and never add `--allow-unpooled`: it is the
+  operator's choice.
+- The test tasks ask for 4 to 8 CPUs (`--min 4 --max 8`), measured on
+  22 November 2026. Alone, the coverage suite took 230 s on 22 CPUs, 287 s
+  on 8 and 498 s on 4, so more than 8 barely helps.
+  - The floor of 4 makes a run wait for a useful grant rather than start
+    on 2 free CPUs: one such run took 18 minutes.
+  - With two runs at once and no grants, 33 tests timed out; with grants,
+    none did except corpus tests near their old 60 s budget.
+- Light multi-threaded steps (tsc, biome) may run as
+  `pnpm exec loom slots pin -- <command>`, which keeps them off the two
+  free cores without waiting.
+- A test budget raised for load (`tests/loadBudget.ts`) states what it
+  measured. Fix a slow test's cause before raising its budget, and raise
+  it per test, never across the board.

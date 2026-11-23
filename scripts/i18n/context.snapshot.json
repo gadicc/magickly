@@ -72,7 +72,7 @@
         "src/app/enochian/tablets/nameLinks.ts": "1172f39d7946794fafb0a8438e9e3bbda66a403069afe3fd833865d8206ceaeb",
         "src/app/enochian/tablets/nameWords.ts": "a65361e89c7e7aafb1f9ce54c3a57e0e38fc584ac80ba52fa019807a9aaee7c6",
         "src/app/enochian/tablets/squareReadings.ts": "21b10aba36a87cbb298db06645b8dc64590197dcafba9cfb6232c6c2697dfbc1",
-        "src/app/enochian/tablets/tablets.tsx": "f7960cd586ee24cd3fdbef82bae61a2005c93409b4c5a00a53d075a3c4acafaf",
+        "src/app/enochian/tablets/tablets.tsx": "9c26b22a2e27090132e83e24fc0dd34b0f7b63bc7577ef088f890b9d5fee4da7",
         "src/app/enochian/tablets/urlState.ts": "714736308bd4927ee3dc08000a79e302025d18d761232eca3e7ef4f9d6a4f662",
         "src/app/enochian/translate/AiReading.tsx": "c19f6583d4bbb0a59f7d7215fdd09bb62e297da5561881d6ffc99e41ecfaf373",
         "src/app/enochian/translate/Figures.tsx": "817ba5dbd269b76339609863959d6cd9a3b2374bce67699b4147c506f9523288",
@@ -203,7 +203,7 @@
         "src/app/kabbalah/tree/treeSettings.ts": "5a3311e08fd63aef5bd46ff71aec07d5dd0541345cc4072351a878efb98deff4",
         "src/app/kabbalah/treeLinks.ts": "c23df39540eb569a4a8db6a6ab821c245b91071c4920adc34be4bb7cd6b63faf",
         "src/app/kabbalah/yhvh/72angels/AngelsText.tsx": "2ad5f79d476d39fef174fca0c8648eb9def8a66ccb74ca9866e0c8d70ffb8bb6",
-        "src/app/kabbalah/yhvh/72angels/angels.tsx": "b90b1911188fe070d03e8da1d092c63e9a7181fdacb33dcaffd5d961bc87591a"
+        "src/app/kabbalah/yhvh/72angels/angels.tsx": "5b35ad0ac8dfe1e13d555392c1f43039f159651f0cc13b91e6739e02b5b39f9d"
       }
     },
     "metadata": {

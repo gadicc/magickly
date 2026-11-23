@@ -36,6 +36,7 @@ import {
 } from "magick-data/kabbalah/seventyTwoAngels/text";
 import Link from "next/link";
 import React from "react";
+import { ReadingColumn } from "@/app/PageText";
 import { angelSlug } from "@/lib/angelSlugs";
 import SourceLink from "@/sources/SourceLink";
 
@@ -285,134 +286,141 @@ function SevenyTwo() {
 
   return (
     <>
-      <Container style={{ textAlign: "justify" }}>
-        <details style={{ fontSize: "80%", marginTop: "1em" }}>
-          <summary>What is this?</summary>
-          <p style={{ fontSize: "80%" }}>
-            In Christian Kabbalah, Johann Reuchlin (1455–1522) considered the 72
-            names - made pronounceable by adding the suffixes &quot;El&quot; or
-            &quot;Yah&quot; - to be the names of angels: individuated products
-            of God&apos;s will. He lists these &quot;72 Angels of the Shem
-            HaMephorash&quot; in his <i>De Arte Cabbalistica</i> (1517), which
-            greatly influenced later Hermetic works including those of the
-            Golden Dawn. More info on the{" "}
-            <a
-              target="_blank"
-              href="https://en.wikipedia.org/wiki/Shem_HaMephorash"
-            >
-              Shem HaMephorash
-            </a>{" "}
-            wikipedia page.
-          </p>
-        </details>
-        <details style={{ fontSize: "80%", marginTop: "1em" }}>
-          <summary>Important note on sources used.</summary>
-          <p>
-            The material here is taken from{" "}
-            <a href="https://www.google.co.uk/books/edition/La_science_cabalistique/ZqgpxTZ43HkC?hl=en&gbpv=0">
-              <i>La Science Cabalistique</i>
-            </a>{" "}
-            by Lazare Lenain (1823; digitized by Google Books), or, as his title
-            page has it in full,{" "}
-            <i>
-              the Cabalistic Science, or the Art of Knowing the Good Genii who
-              influence the destiny of men
-            </i>
-            . It is read from the scan itself, page by page, rather than from an
-            OCR of it: that OCR could not read Lenain&apos;s Hebrew at all, and
-            read many of his digits as letters. The whole book is here as a{" "}
-            <Link href="/books/la-science-cabalistique">reading edition</Link>,
-            footnotes, tables and all, and{" "}
-            <a href="/docs/Lenain - La Science Cabalistique (1823).md">
-              as Markdown
-            </a>
-            .
-          </p>
-          <p>
-            The French beside each translation is what he printed, so you can
-            read what the English was made from. The English is translated from
-            that French and from nothing else.
-          </p>
-          <p>
-            Where the text is wrong it keeps its words, and a note says what is
-            wrong — an impossible 31 April, a genius numbered 36 in the middle
-            of the forties, five revolutions of 72 days called 260. The tables
-            on this page use the corrected value. Most of those notes found
-            themselves: Lenain&apos;s own four tables say what each entry should
-            contain, so a disagreement is arithmetic rather than opinion. Not
-            every slip is Lenain&apos;s: the 31 April is in his 1823 printing,
-            but the 36 and the 260 are the reissue&apos;s, and the notes say
-            which is which.
-          </p>
-          <p>
-            The Hebrew was the hard part. He dots his letters above rather than
-            within, and a machine reading those dots as vowel points loses
-            letters or invents them. Forty-seven names are given here because
-            two independent readings of the scan agree on them; the other
-            twenty-five were read by a person who reads Hebrew. Each name is
-            given both as the page points it and as its bare letters. Three, the
-            thirty-seventh, the sixty-eighth and the sixty-ninth, are misprinted
-            in the reissue; their bare letters follow the 1823 printing.
-          </p>
-          <p>
-            The scan is not of the 1823 printing but of a later reissue, which
-            reproduces Lenain&apos;s title page &mdash;{" "}
-            <i>
-              A Amiens, chez l&apos;Auteur, au Cabinet de lecture, place
-              Saint-Firmin, N. 1. 1823
-            </i>{" "}
-            &mdash; and adds a preface by Papus for the Ordre Kabbalistique de
-            la Rose-Croix. The volume does not date itself; the first reprint is
-            recorded as Dujols and Thomas, 1909. It is not a facsimile: the
-            reissue was reset from scratch, with modernised spelling, so its
-            page numbers are its own and not Lenain&apos;s. Where an editorial
-            note turns on what is printed, it also cites{" "}
-            <a href="https://books.google.com/books?id=qt9SAAAAcAAJ">
-              the 1823 printing
-            </a>{" "}
-            and{" "}
-            <a href="https://archive.org/details/BIUSante_ms05365">
-              a handwritten copy of it
-            </a>{" "}
-            (Bibliothèque interuniversitaire de santé, Ms 5365).
-          </p>
-          <p>
-            Lenain died in 1877 and Papus in 1916, so both texts are public
-            domain, and no rights are asserted over either. The reading, the
-            translation and the arrangement are{" "}
-            <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>{" "}
-            with the rest of the{" "}
-            <a href="https://github.com/gadicc/magickly/tree/main/packages/magick-data">
-              data
-            </a>
-            , and no rights are claimed where none subsist. This was done in an
-            effort to provide a Copyright-free version of this material,
-            however, a much better translation exists:
-          </p>
-          <p>
-            We highly recommend the{" "}
-            <a href="https://www.amazon.co.uk/Science-Kabbalah-Lazare-Lenain/dp/1947907093/ref=sr_1_1?crid=L3H786IAH9D0&keywords=the+science+of+the+kabbalah&qid=1695585748&sprefix=the+science+of+the+kabbalah%2Caps%2C121&sr=8-1">
-              translation by Piers A. Vaughan
-            </a>{" "}
-            (Amazon link), who has not only provided an outstanding work, but
-            also provided free, high quality images of the sigils on his blog,
-            in{" "}
-            <a href="https://rosecirclebooks.com/the-science-of-the-kabbalah-lenain/">
-              this post
-            </a>{" "}
-            and{" "}
-            <a href="https://rosecirclebooks.com/levi-seals-for-shemhamephorash/">
-              this post
-            </a>
-            . Nothing here is derived from his translation; it was consulted
-            only to check names against Lenain&apos;s own first table, whose{" "}
-            <SourceLink plain page="lenainReissue25">
-              fold-out leaf
-            </SourceLink>{" "}
-            this scan photographed folded.
-          </p>
-        </details>
-        <p>The sigils will be added at a later time.</p>
+      <Container>
+        <ReadingColumn>
+          <details style={{ fontSize: "0.875rem", marginTop: "1em" }}>
+            <summary>What is this?</summary>
+            <p>
+              In Christian Kabbalah, Johann Reuchlin (1455–1522) considered the
+              72 names - made pronounceable by adding the suffixes
+              &quot;El&quot; or &quot;Yah&quot; - to be the names of angels:
+              individuated products of God&apos;s will. He lists these &quot;72
+              Angels of the Shem HaMephorash&quot; in his{" "}
+              <i>De Arte Cabbalistica</i> (1517), which greatly influenced later
+              Hermetic works including those of the Golden Dawn. More info on
+              the{" "}
+              <a
+                target="_blank"
+                href="https://en.wikipedia.org/wiki/Shem_HaMephorash"
+              >
+                Shem HaMephorash
+              </a>{" "}
+              wikipedia page.
+            </p>
+          </details>
+          <details style={{ fontSize: "0.875rem", marginTop: "1em" }}>
+            <summary>Important note on sources used.</summary>
+            <p>
+              The material here is taken from{" "}
+              <a href="https://www.google.co.uk/books/edition/La_science_cabalistique/ZqgpxTZ43HkC?hl=en&gbpv=0">
+                <i>La Science Cabalistique</i>
+              </a>{" "}
+              by Lazare Lenain (1823; digitized by Google Books), or, as his
+              title page has it in full,{" "}
+              <i>
+                the Cabalistic Science, or the Art of Knowing the Good Genii who
+                influence the destiny of men
+              </i>
+              . It is read from the scan itself, page by page, rather than from
+              an OCR of it: that OCR could not read Lenain&apos;s Hebrew at all,
+              and read many of his digits as letters. The whole book is here as
+              a{" "}
+              <Link href="/books/la-science-cabalistique">reading edition</Link>
+              , footnotes, tables and all, and{" "}
+              <a href="/docs/Lenain - La Science Cabalistique (1823).md">
+                as Markdown
+              </a>
+              .
+            </p>
+            <p>
+              The French beside each translation is what he printed, so you can
+              read what the English was made from. The English is translated
+              from that French and from nothing else.
+            </p>
+            <p>
+              Where the text is wrong it keeps its words, and a note says what
+              is wrong — an impossible 31 April, a genius numbered 36 in the
+              middle of the forties, five revolutions of 72 days called 260. The
+              tables on this page use the corrected value. Most of those notes
+              found themselves: Lenain&apos;s own four tables say what each
+              entry should contain, so a disagreement is arithmetic rather than
+              opinion. Not every slip is Lenain&apos;s: the 31 April is in his
+              1823 printing, but the 36 and the 260 are the reissue&apos;s, and
+              the notes say which is which.
+            </p>
+            <p>
+              The Hebrew was the hard part. He dots his letters above rather
+              than within, and a machine reading those dots as vowel points
+              loses letters or invents them. Forty-seven names are given here
+              because two independent readings of the scan agree on them; the
+              other twenty-five were read by a person who reads Hebrew. Each
+              name is given both as the page points it and as its bare letters.
+              Three, the thirty-seventh, the sixty-eighth and the sixty-ninth,
+              are misprinted in the reissue; their bare letters follow the 1823
+              printing.
+            </p>
+            <p>
+              The scan is not of the 1823 printing but of a later reissue, which
+              reproduces Lenain&apos;s title page &mdash;{" "}
+              <i>
+                A Amiens, chez l&apos;Auteur, au Cabinet de lecture, place
+                Saint-Firmin, N. 1. 1823
+              </i>{" "}
+              &mdash; and adds a preface by Papus for the Ordre Kabbalistique de
+              la Rose-Croix. The volume does not date itself; the first reprint
+              is recorded as Dujols and Thomas, 1909. It is not a facsimile: the
+              reissue was reset from scratch, with modernised spelling, so its
+              page numbers are its own and not Lenain&apos;s. Where an editorial
+              note turns on what is printed, it also cites{" "}
+              <a href="https://books.google.com/books?id=qt9SAAAAcAAJ">
+                the 1823 printing
+              </a>{" "}
+              and{" "}
+              <a href="https://archive.org/details/BIUSante_ms05365">
+                a handwritten copy of it
+              </a>{" "}
+              (Bibliothèque interuniversitaire de santé, Ms 5365).
+            </p>
+            <p>
+              Lenain died in 1877 and Papus in 1916, so both texts are public
+              domain, and no rights are asserted over either. The reading, the
+              translation and the arrangement are{" "}
+              <a href="https://creativecommons.org/licenses/by/4.0/">
+                CC BY 4.0
+              </a>{" "}
+              with the rest of the{" "}
+              <a href="https://github.com/gadicc/magickly/tree/main/packages/magick-data">
+                data
+              </a>
+              , and no rights are claimed where none subsist. This was done in
+              an effort to provide a Copyright-free version of this material,
+              however, a much better translation exists:
+            </p>
+            <p>
+              We highly recommend the{" "}
+              <a href="https://www.amazon.co.uk/Science-Kabbalah-Lazare-Lenain/dp/1947907093/ref=sr_1_1?crid=L3H786IAH9D0&keywords=the+science+of+the+kabbalah&qid=1695585748&sprefix=the+science+of+the+kabbalah%2Caps%2C121&sr=8-1">
+                translation by Piers A. Vaughan
+              </a>{" "}
+              (Amazon link), who has not only provided an outstanding work, but
+              also provided free, high quality images of the sigils on his blog,
+              in{" "}
+              <a href="https://rosecirclebooks.com/the-science-of-the-kabbalah-lenain/">
+                this post
+              </a>{" "}
+              and{" "}
+              <a href="https://rosecirclebooks.com/levi-seals-for-shemhamephorash/">
+                this post
+              </a>
+              . Nothing here is derived from his translation; it was consulted
+              only to check names against Lenain&apos;s own first table, whose{" "}
+              <SourceLink plain page="lenainReissue25">
+                fold-out leaf
+              </SourceLink>{" "}
+              this scan photographed folded.
+            </p>
+          </details>
+          <p>The sigils will be added at a later time.</p>
+        </ReadingColumn>
       </Container>
       <Container>
         <FormControl>

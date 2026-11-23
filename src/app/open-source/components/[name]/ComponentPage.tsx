@@ -1,5 +1,6 @@
 import { hallPreset } from "magick-components/gd/hall/presets";
 import { directoryUrl } from "@/app/open-source/PackageCard";
+import { ReadingColumn } from "@/app/PageText";
 import BreakableName from "@/explorer/BreakableName";
 import {
   COMPONENT_EXAMPLES,
@@ -64,21 +65,25 @@ export default function ComponentPage({
           <BreakableName name={component.name} />
         </code>
       </h1>
-      <p className={styles.note}>{component.title}, from magick-components</p>
-      <DocText text={docs.description} />
-      <DrawnAfter name={component.name} className={styles.note} />
+      <ReadingColumn align="start">
+        <p className={styles.note}>{component.title}, from magick-components</p>
+        <DocText text={docs.description} />
+        <DrawnAfter name={component.name} className={styles.note} />
+      </ReadingColumn>
       <pre className={styles.importLine}>
         <code>{importLine(component)}</code>
       </pre>
-      <p className={styles.note}>
-        magick-components is on npm, under MIT (
-        <Link href="/open-source#magick-components">how to install it</Link>
-        ), and its source is in{" "}
-        <Link href={directoryUrl("packages/magick-components")}>
-          the app&apos;s repository
-        </Link>
-        .
-      </p>
+      <ReadingColumn align="start">
+        <p className={styles.note}>
+          magick-components is on npm, under MIT (
+          <Link href="/open-source#magick-components">how to install it</Link>
+          ), and its source is in{" "}
+          <Link href={directoryUrl("packages/magick-components")}>
+            the app&apos;s repository
+          </Link>
+          .
+        </p>
+      </ReadingColumn>
       <Explorer
         name={component.name}
         examples={examples}
