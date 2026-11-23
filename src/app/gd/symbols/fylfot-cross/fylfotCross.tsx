@@ -19,6 +19,8 @@ import data from "magick-data";
 import React from "react";
 import ToolLayout, { ToolDrawing, ToolPanel } from "@/drawings/ToolLayout";
 import OpenSource from "@/OpenSource";
+// Relative, so site search reads its text with the page's.
+import DrawnAfter from "../../../open-source/components/[name]/DrawnAfter";
 
 function unflat(flat: FylfotCell[], split = 5) {
   const unflat: FylfotCell[][] = [[], [], [], [], []];
@@ -145,6 +147,7 @@ export default function FylfotCrossPage() {
           </Grid>
         </div>
         <div>
+          <DrawnAfter name="FylfotCross" />
           <p>
             <b>Construction:</b> The symbol of the Sun is at the center of the
             cross at the point of stillness, while the zodiacal signs divided

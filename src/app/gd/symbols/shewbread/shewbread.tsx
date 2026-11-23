@@ -6,6 +6,8 @@ import Ink from "@/drawings/Ink";
 import ToolLayout, { ToolDrawing, ToolPanel } from "@/drawings/ToolLayout";
 import ExportControls from "@/export/ExportControls";
 import OpenSource from "@/OpenSource";
+// Relative, so site search reads its text with the page's.
+import DrawnAfter from "../../../open-source/components/[name]/DrawnAfter";
 
 export default function CandleStickPage() {
   const ref = React.useRef<SVGSVGElement>(null);
@@ -23,6 +25,7 @@ export default function CandleStickPage() {
           filename="TableOfShewbread-magickly-export"
           link={{ slug: "table-of-shewbread", props: {} }}
         />
+        <DrawnAfter name="TableOfShewbread" />
         <OpenSource
           files={[
             "/src/app/gd/symbols/shewbread/shewbread.tsx",
