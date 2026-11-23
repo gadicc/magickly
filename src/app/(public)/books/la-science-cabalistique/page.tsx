@@ -10,6 +10,7 @@ import { pageMetadata } from "@/seo/metadata";
 import { SITE_URL } from "@/seo/site";
 import { MIRRORED_PAGES, type MirroredPageKey } from "@/sources/mirroredPages";
 import SourceLink from "@/sources/SourceLink";
+import { citeUrl, workUrl } from "@/sources/works";
 import styles from "../../../books/la-science-cabalistique/reading.module.css";
 
 const PATH = "/books/la-science-cabalistique";
@@ -19,8 +20,9 @@ const PATH = "/books/la-science-cabalistique";
  * Complutense copy, photographed partly folded: the second copy, beside the
  * National Library of Poland's, which is mirrored and was transcribed.
  */
-const KIRCHER_PLATE_COMPLUTENSE =
-  "https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n294/mode/1up";
+const KIRCHER_PLATE_COMPLUTENSE = citeUrl("kircher1653Complutense", {
+  leaf: 294,
+});
 
 /** The Amiens library's records of its two copies of the 1823 printing. */
 const AMIENS_RECORD = (id: number) =>
@@ -83,11 +85,9 @@ export default function BookPage() {
         <h2>About this edition</h2>
         <p>
           {bookLeaves().length} leaves, read page by page from the{" "}
-          <a href="https://books.google.com/books?id=ZqgpxTZ43HkC">
-            Google Books scan
-          </a>{" "}
-          rather than from an OCR of it. Every page marker links to the
-          facsimile of that leaf.
+          <a href={workUrl("lenainReissue")}>Google Books scan</a> rather than
+          from an OCR of it. Every page marker links to the facsimile of that
+          leaf.
         </p>
         <p>
           The scan is not of the 1823 printing but of a later reissue, which
@@ -108,27 +108,23 @@ export default function BookPage() {
         <ul>
           <li>
             The base text: the reissue,{" "}
-            <a href="https://books.google.com/books?id=ZqgpxTZ43HkC">
-              Google Books ZqgpxTZ43HkC
-            </a>
-            , the Bibliothèque municipale de Lyon&apos;s copy, whose folded
-            plate shows the first table&apos;s rows {reissuePlate.from} to{" "}
+            <a href={workUrl("lenainReissue")}>Google Books ZqgpxTZ43HkC</a>,
+            the Bibliothèque municipale de Lyon&apos;s copy, whose folded plate
+            shows the first table&apos;s rows {reissuePlate.from} to{" "}
             {reissuePlate.to} (<PageLink page="lenainReissue25">p. 25</PageLink>
             ).
           </li>
           <li>
             The 1823 printing, Koninklijke Bibliotheek copy:{" "}
-            <a href="https://books.google.com/books?id=qt9SAAAAcAAJ">
-              Google Books qt9SAAAAcAAJ
-            </a>
-            . Cited in the editorial notes wherever it bears on one; its plate,
-            opened further, shows rows {plate1823.from} to {plate1823.to}, and
-            the same page names Lenain&apos;s sources (
+            <a href={workUrl("lenain1823")}>Google Books qt9SAAAAcAAJ</a>. Cited
+            in the editorial notes wherever it bears on one; its plate, opened
+            further, shows rows {plate1823.from} to {plate1823.to}, and the same
+            page names Lenain&apos;s sources (
             <PageLink page="lenain25">p. 25</PageLink>).
           </li>
           <li>
             A second copy of the reissue, also Lyon&apos;s:{" "}
-            <a href="https://books.google.com/books?id=BqzyzEEX3MAC">
+            <a href={workUrl("lenainReissueLyon2")}>
               Google Books BqzyzEEX3MAC
             </a>
             , its plate folded the same way, so it shows no further rows.
@@ -136,9 +132,7 @@ export default function BookPage() {
           <li>
             Bibliothèque interuniversitaire de santé, Ms 5365, an undated
             handwritten copy of the 1823 printing:{" "}
-            <a href="https://archive.org/details/BIUSante_ms05365">
-              archive.org BIUSante_ms05365
-            </a>{" "}
+            <a href={workUrl("lenainMs5365")}>archive.org BIUSante_ms05365</a>{" "}
             (Licence ouverte). Cited beside it; where the two differ, the
             difference is the copyist&apos;s.
           </li>

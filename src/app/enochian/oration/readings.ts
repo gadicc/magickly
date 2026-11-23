@@ -32,7 +32,12 @@ export interface Reading {
   dee: string;
   /** James's words there; empty where he leaves Dee's out. */
   james: string;
-  /** The archive.org leaf of James's page that has it: n38 is p. 53. */
+  /**
+   * The archive.org leaf of James's page that has it, cited through
+   * `<Cite work="james1994">` (src/sources/works.ts): each leaf of that
+   * scan is a spread, pp. 52–53 on n38 and pp. 54–55 on n39. In copyright:
+   * linked, never mirrored.
+   */
   leaf: 38 | 39;
   /**
    * A change of wording, noted below the prayer under a letter
@@ -89,14 +94,6 @@ export const readingLetter = (id: ReadingId) =>
 
 /** The fragment id of a change of wording's note. */
 export const readingAnchor = (id: ReadingId) => `oration-reading-${id}`;
-
-/**
- * James, *The Enochian Magick of Dr. John Dee* (Llewellyn, 1994; the scan is
- * the 1998 printing) on archive.org, a spread a leaf: pp. 52–53 on n38,
- * pp. 54–55 on n39. In copyright: linked, never mirrored.
- */
-export const jamesPage = (leaf: number) =>
-  `https://archive.org/details/theenochianmagickofdr.johndee.themostpowerfulsystemofmagickinitsoriginalunexpurg/page/n${leaf}/mode/1up`;
 
 /** The British Library's record for Dee's holograph, Sloane MS 3191. */
 export const SLOANE_3191 = "https://searcharchives.bl.uk/catalog/040-002115575";

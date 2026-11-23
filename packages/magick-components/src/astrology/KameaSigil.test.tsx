@@ -118,6 +118,55 @@ describe("KameaSigil", () => {
     expect(ink(row)[0]).toEqual(rowPaths);
   });
 
+  it("sets a long name in rows when asked, the last row centred", () => {
+    const text = "מלכא בתרשיתים עד ברוח שחקים";
+    const sigil = kameaSigil("luna", text);
+    const markup = renderToStaticMarkup(
+      <KameaSigilImage planet="luna" text={text} sigil={sigil} columns={2} />,
+    );
+    expect(svgs(markup)).toHaveLength(1);
+    // Two a row, three rows: a full row wide, a square a row high.
+    expect(markup).toContain('viewBox="-150 -50 200 300"');
+    expect(markup).toContain('width="658" height="987"');
+    expect(markup).toContain(
+      'aria-label="Sigil of מלכא בתרשיתים עד ברוח שחקים on the Kamea of Luna"',
+    );
+    // Right to left, top to bottom; the fifth word alone, centred.
+    const places = ["0 0", "-100 0", "0 100", "-100 100", "-50 200"];
+    const squares = [
+      ...markup.matchAll(/<g transform="translate\(([^)]+)\)"><rect/g),
+    ].map((m) => m[1]);
+    // The first square sits at the origin, untranslated, as in a row.
+    expect(squares).toEqual(places.slice(1));
+    const words = [
+      ...markup.matchAll(
+        /<g transform="translate\(([^)]+)\)">((?:<path [^>]*><\/path>)+)<\/g>/g,
+      ),
+    ];
+    expect(words.map((m) => m[1])).toEqual(places);
+    // Each word's own figure, moved whole: the generator's figures.
+    words.forEach(([, , paths], i) =>
+      expect([...paths.matchAll(/ d="([^"]+)"/g)].map((m) => m[1])).toEqual(
+        sigil.words[i].paths,
+      ),
+    );
+    // Without rows, or with as many a row as there are words, one row.
+    const row = renderToStaticMarkup(
+      <KameaSigilImage planet="luna" text={text} sigil={sigil} />,
+    );
+    for (const columns of [5, 6, 0, 1.5])
+      expect(
+        renderToStaticMarkup(
+          <KameaSigilImage
+            planet="luna"
+            text={text}
+            sigil={sigil}
+            columns={columns}
+          />,
+        ),
+      ).toBe(row);
+  });
+
   it("counts finals at 500 to 900 only when asked", () => {
     // Mem final: 40 as Mem, 600 (60) with finals, on the Moon's square.
     const plain = kameaSigil("luna", "אם");

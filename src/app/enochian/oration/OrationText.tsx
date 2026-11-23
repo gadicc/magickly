@@ -1,6 +1,7 @@
 import { H2, List, PageText } from "@/app/PageText";
+import Cite from "@/sources/Cite";
 import Link from "@/ui/Link";
-import { jamesPage, PETERSON, SLOANE_3191 } from "./readings";
+import { PETERSON, SLOANE_3191 } from "./readings";
 
 /**
  * Where the Oration comes from and how it is said, below it (plan 071, decision 5).
@@ -50,13 +51,13 @@ export default function OrationText() {
         <i>The Enochian Magick of Dr. John Dee</i> (Llewellyn, 1994; first
         published by Heptangle in 1984 as{" "}
         <i>The Enochian Evocation of Dr. John Dee</i>), pp.{" "}
-        <a href={jamesPage(38)} rel="noreferrer">
+        <Cite work="james1994" leaf={38} plain rel="noreferrer">
           53
-        </a>
+        </Cite>
         –
-        <a href={jamesPage(39)} rel="noreferrer">
+        <Cite work="james1994" leaf={39} plain rel="noreferrer">
           55
-        </a>
+        </Cite>
         . To read along with his book, choose his version above: the prayer then
         has his words, still with Dee&apos;s punctuation and capitals. We
         compared his pages with Peterson&apos;s transcription word by word

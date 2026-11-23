@@ -9,11 +9,16 @@ import { resolve } from "node:path";
 import { buildSearchCatalogue } from "../../src/search/catalogue";
 import {
   EMBEDDING_PROFILES,
+  type EmbeddingProfile,
   embeddingInput,
   unitVector,
 } from "../../src/search/embeddings/profiles";
 import { embedSearchInputs } from "../../src/search/embeddings/provider";
-import { publishMatrix } from "../../src/search/embeddings/publish";
+import {
+  gatherMatrix,
+  publishMatrix,
+  rowSources,
+} from "../../src/search/embeddings/publish";
 import {
   fuseSearchResults,
   rankVectors,
@@ -23,7 +28,6 @@ import {
   embeddingCacheKey,
   embeddingDocumentInput,
   embeddingRecords,
-  embeddingRowKey,
 } from "../../src/search/embeddings/records";
 import { createSearchEngine } from "../../src/search/engine";
 import { SEARCH_PROBES } from "./evaluation";
@@ -43,20 +47,35 @@ const profiles =
     ? EMBEDDING_PROFILES.filter((profile) => profile.key === process.argv[3])
     : EMBEDDING_PROFILES;
 if (!profiles.length) throw new Error("Choose a registered embedding profile");
+const cached = (profile: EmbeddingProfile, value: string) =>
+  resolve(cache, embeddingCacheKey(profile, value) + ".json");
+// Each row from the committed rows first, then this worktree's cache, then
+// the provider (publish.ts); only the provider's rows are estimated and paid.
+const plans = profiles.map((profile) => {
+  // The shared recipe (records.ts), so these keys are the rows store.ts finds.
+  const values = records.map((record) =>
+    embeddingDocumentInput(profile, record),
+  );
+  const keys = values.map((value) => embeddingCacheKey(profile, value));
+  const sources = rowSources(root, profile, keys, (key) =>
+    existsSync(resolve(cache, key + ".json")),
+  );
+  return { profile, values, keys, sources };
+});
 // Check live public pricing before any paid work; this task is deliberately small.
 const listing = await fetch("https://ai-gateway.vercel.sh/v1/models", {
   signal: AbortSignal.timeout(20_000),
 }).then((response) => response.json());
-const maxEstimate = profiles.reduce((total, profile) => {
+const maxEstimate = plans.reduce((total, { profile, values, sources }) => {
   const model = listing.data.find(
     (entry: { id: string }) => entry.id === profile.model,
   );
   const price = Number(model?.pricing?.input);
   if (!Number.isFinite(price) || price <= 0)
     throw new Error("Cannot verify model price");
-  const bytes = records.reduce(
-    (sum, record) =>
-      sum + Buffer.byteLength(embeddingDocumentInput(profile, record)) + 256,
+  const bytes = values.reduce(
+    (sum, value, i) =>
+      sources[i] === "provider" ? sum + Buffer.byteLength(value) + 256 : sum,
     0,
   );
   return total + (bytes * 2 + 100_000) * price;
@@ -67,26 +86,23 @@ console.log(
   `Conservative input estimate: $${maxEstimate.toFixed(4)} maximum; no provider retries`,
 );
 const report: unknown[] = [];
-for (const profile of profiles) {
+for (const { profile, values, keys, sources } of plans) {
   const started = performance.now();
-  // The shared recipe (records.ts), so these keys are the rows store.ts finds.
-  const values = records.map((record) =>
-    embeddingDocumentInput(profile, record),
-  );
-  const vectors: number[][] = [];
   let tokens = 0;
   let requested = 0;
-  // Cache by exact text + complete model recipe, allowing incremental reindexing.
-  for (let offset = 0; offset < values.length; offset += 32) {
-    const batch = values.slice(offset, offset + 32);
-    const paths = batch.map((value) =>
-      resolve(cache, embeddingCacheKey(profile, value) + ".json"),
-    );
-    const missing = batch.map((_, i) => i).filter((i) => !existsSync(paths[i]));
-    if (missing.length) {
+  const count = (source: string) =>
+    sources.filter((entry) => entry === source).length;
+  console.log(
+    `${profile.key}: ${values.length} passages; ${count("committed")} committed rows, ` +
+      `${count("cache")} cached, ${count("provider")} to embed`,
+  );
+  const bytes = await gatherMatrix(root, profile, keys, sources, {
+    readCache: (key) =>
+      JSON.parse(readFileSync(resolve(cache, key + ".json"), "utf8")),
+    async embed(positions) {
       const result = await embedSearchInputs(
         profile,
-        missing.map((i) => batch[i]),
+        positions.map((i) => values[i]),
         AbortSignal.timeout(60_000),
       );
       tokens += result.tokens;
@@ -99,24 +115,15 @@ for (const profile of profiles) {
           at: new Date().toISOString(),
         }) + "\n",
       );
-      requested += missing.length;
-      for (const [i, position] of missing.entries())
-        writeFileSync(paths[position], JSON.stringify(result.embeddings[i]));
-    }
-    vectors.push(
-      ...paths.map((path) =>
-        unitVector(JSON.parse(readFileSync(path, "utf8")), profile.dimensions),
-      ),
-    );
-    if (offset % 320 === 0)
-      console.log(
-        `${profile.key}: ${Math.min(offset + batch.length, values.length)}/${values.length} passages`,
-      );
-  }
-  const bytes = Buffer.alloc(vectors.length * profile.dimensions * 4);
-  for (const [row, vector] of vectors.entries())
-    for (let i = 0; i < vector.length; i++)
-      bytes.writeFloatLE(vector[i], (row * profile.dimensions + i) * 4);
+      requested += positions.length;
+      for (const [j, i] of positions.entries())
+        writeFileSync(
+          cached(profile, values[i]),
+          JSON.stringify(result.embeddings[j]),
+        );
+      return result.embeddings;
+    },
+  });
   const matrix = new Float32Array(
     bytes.buffer,
     bytes.byteOffset,
@@ -126,7 +133,7 @@ for (const profile of profiles) {
   if (mode === "compare")
     for (const probe of SEARCH_PROBES) {
       const input = embeddingInput(profile, "query", probe.query);
-      const file = resolve(cache, embeddingCacheKey(profile, input) + ".json");
+      const file = cached(profile, input);
       const start = performance.now();
       const queryCached = existsSync(file);
       if (!queryCached) {
@@ -180,7 +187,7 @@ for (const profile of profiles) {
       root,
       profile,
       catalogueDigest(catalogue),
-      records.map((record) => embeddingRowKey(profile, record)),
+      keys,
       bytes,
     );
     console.log(

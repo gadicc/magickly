@@ -290,7 +290,9 @@ export const MIRRORED_PAGES = {
     label: "Agrippa, De occulta philosophia (1533), book II, p. CXLIX",
     copy: "the Library of Congress's copy",
     cited: "the Moon's intelligence of intelligences, numbered 3321",
-    highlight: { x: 0.11, y: 0.139, width: 0.635, height: 0.032 },
+    // Its top edge in the gap below the line above, whose "3321
+    // Schedbarschemoth" it used to clip (ink measured on this image).
+    highlight: { x: 0.11, y: 0.143, width: 0.635, height: 0.028 },
     // What the kameas' pages cite on the leaf (plan 093, decision 7).
     regions: {
       luna: {
@@ -306,6 +308,20 @@ export const MIRRORED_PAGES = {
         cited:
           "Jupiter's square, in numbers and in Hebrew letters, with its seal and the characters of its intelligence and spirit",
         highlight: { x: 0.11, y: 0.506, width: 0.66, height: 0.35 },
+      },
+      // What the planetary seals cite on the leaf: the two squares, with
+      // their seals, the two boxes above as one.
+      saturnAndJupiter: {
+        cited:
+          "the squares of Saturn and Jupiter, with their seals and the characters of their intelligences and spirits",
+        highlight: { x: 0.11, y: 0.178, width: 0.66, height: 0.678 },
+      },
+      // What the kamea sigils' sources cite on the leaf: the Moon's names
+      // and the squares of Saturn and Jupiter, the three boxes above as one.
+      kameaSigils: {
+        cited:
+          "the names of the Moon's square, with their numbers, and the squares of Saturn and Jupiter",
+        highlight: { x: 0.11, y: 0.065, width: 0.66, height: 0.791 },
       },
       // The four characters on the leaf, each the box K6 read it in
       // (magick-data's planetaryNameCharacters, pixels of this 1800 by

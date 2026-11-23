@@ -72,6 +72,22 @@
   fill-opacity: 0.4;
 }
 
+/*
+ * A kamea under a sigil (KameaFigure's defaults): the square's frame,
+ * rules and numbers (`#000000`) take the ink, and its white ground
+ * (`#ffffff`) gives way to the page's. The sigil keeps its red, as the
+ * rose sigil's does.
+ */
+:global(.dark) .kamea [stroke="#000000"] {
+  stroke: var(--mui-palette-ink);
+}
+:global(.dark) .kamea g[fill="#000000"] {
+  fill: var(--mui-palette-ink);
+}
+:global(.dark) .kamea rect[fill="#ffffff"] {
+  fill: transparent;
+}
+
 /* Chakra figure: the black silhouette behind the coloured chakras. */
 :global(.dark) .chakras path[fill="#000"] {
   fill: var(--mui-palette-ink);

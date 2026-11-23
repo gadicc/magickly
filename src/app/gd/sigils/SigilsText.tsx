@@ -3,18 +3,16 @@ import { H2, H3, List, PageText } from "@/app/PageText";
 import Link from "@/i18n/PublicLink";
 import UiRichText from "@/i18n/UiRichText";
 import { SITE_REPOSITORY } from "@/seo/site";
+import Cite from "@/sources/Cite";
 
-/**
- * Regardie's *The Golden Dawn*, vol. 4 (Aries Press, Chicago, 1940), on
- * archive.org: the sigil rules on p. 57 (leaf n51) and the worked figures
- * on pp. 58–60 (leaves n52–n54), as plan 088 cites them. It was never
- * renewed, so it is public domain in the US, but it is in copyright
- * elsewhere to the end of 2055 (plan 091), so its pages are linked, never
- * mirrored (`src/sources/mirroredPages.ts` holds only works out of
- * copyright everywhere).
+/*
+ * Regardie's *The Golden Dawn*, vol. 4 (1940), cited through <Cite>
+ * (src/sources/works.ts): the sigil rules on p. 57 (leaf n51) and the
+ * worked figures on pp. 58–60 (leaves n52–n54), as plan 088 cites them. It
+ * was never renewed, so it is public domain in the US, but it is in
+ * copyright elsewhere to the end of 2055 (plan 091), so its pages are
+ * linked, never mirrored.
  */
-const regardiePage = (leaf: number) =>
-  `https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol4-1940/page/n${leaf}/mode/1up`;
 
 /** A sigil on this page, as a link that opens it in the generator. */
 const sigilHref = (text: string) =>
@@ -209,10 +207,10 @@ export default function SigilsText() {
             }
             components={{
               0: <i />,
-              1: <Outside href={regardiePage(51)} />,
-              2: <Outside href={regardiePage(52)} />,
-              3: <Outside href={regardiePage(53)} />,
-              4: <Outside href={regardiePage(54)} />,
+              1: <Cite work="regardie1940" leaf={51} plain rel="noreferrer" />,
+              2: <Cite work="regardie1940" leaf={52} plain rel="noreferrer" />,
+              3: <Cite work="regardie1940" leaf={53} plain rel="noreferrer" />,
+              4: <Cite work="regardie1940" leaf={54} plain rel="noreferrer" />,
             }}
           />
         </li>

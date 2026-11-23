@@ -60,6 +60,8 @@ afterEach(() => {
   // frame or scroll stubs to the next.
   vi.unstubAllGlobals();
   Reflect.deleteProperty(Element.prototype, "scrollIntoView");
+  localStorage.clear();
+  document.documentElement.style.removeProperty("--reader-text-size");
 });
 
 describe("the rails", () => {
@@ -97,17 +99,50 @@ describe("the rails", () => {
     expect(links[0].getAttribute("lang")).toBe("");
   });
 
+  it("label the variables Reading as, in the rail alone", () => {
+    read(doc(role(), say("hierophant", "Words.")));
+    const label = screen.getByRole("heading", { name: "Reading as" });
+    // Below 1,200 px the column shows the select with its own label.
+    expect(label.className).toMatch(/railOnly/);
+    expect(
+      label.closest("section")?.querySelector('[role="combobox"]'),
+    ).toBeTruthy();
+    cleanup();
+    read(doc(role(true), say("hierophant", "Words.")));
+    expect(screen.queryByRole("heading", { name: "Reading as" })).toBeNull();
+  });
+
+  it("keep the text size across reloads, within its range", () => {
+    localStorage.setItem("magickli:reader-text-size:v1", "295");
+    const { container } = read(doc(role(), say("hierophant", "Words.")));
+    // The body reads the size the <head> script sets, before hydration.
+    expect(
+      (container.querySelector('[data-reader-area="body"]') as HTMLElement)
+        .style.fontSize,
+    ).toBe("var(--reader-text-size, 100%)");
+    const size = () =>
+      document.documentElement.style.getPropertyValue("--reader-text-size");
+    expect(size()).toBe("295%");
+    const increase = screen.getByRole("button", { name: "increase font size" });
+    fireEvent.click(increase);
+    expect(size()).toBe("300%");
+    expect(localStorage.getItem("magickli:reader-text-size:v1")).toBe("300");
+    expect((increase as HTMLButtonElement).disabled).toBe(true);
+  });
+
   it("leave out Your next line without a role to read as", () => {
     read(doc(role(true), say("hierophant", "Words.")));
     expect(screen.queryByText("Your next line")).toBeNull();
     cleanup();
     read(doc(say("hierophant", "Words.")));
     expect(screen.queryByText("Your next line")).toBeNull();
+    // Without a role, the button counts nothing, and says so.
+    expect(screen.getByRole("button", { name: "Reader menu" })).toBeTruthy();
     // The floating button keeps its jump.
-    fireEvent.click(
-      screen.getByRole("button", { name: "SpeedDial basic example" }),
-    );
-    expect(screen.getByRole("menuitem", { name: "Jump to Next" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /^Reader menu/ }));
+    expect(
+      screen.getByRole("menuitem", { name: "Jump to your next line" }),
+    ).toBeTruthy();
   });
 
   it("go to a title by its place, recording it without a history entry", () => {
@@ -187,10 +222,11 @@ describe("Your next line", () => {
       ),
     );
     expect(countText()).toBe("2 lines before yours");
-    expect(
-      screen.getByRole("button", { name: "SpeedDial basic example" })
-        .textContent,
-    ).toContain("2");
+    // The floating button shows the count, and says what it counts.
+    const button = screen.getByRole("button", {
+      name: "Reader menu: 2 lines before yours",
+    });
+    expect(button.textContent).toContain("2");
   });
 
   it("leaves out a task in a closed summary and one in a footnote", () => {
@@ -242,6 +278,12 @@ describe("Your next line", () => {
       </ReaderShell>,
     );
     expect(countText()).toBe("Your line is next");
+    // The floating button's name has the digit it shows (label in name).
+    const button = screen.getByRole("button", { name: /^Reader menu/ });
+    expect(button.textContent).toBe("0");
+    expect(button.getAttribute("aria-label")).toBe(
+      "Reader menu: 0 lines before yours",
+    );
   });
 
   it("follows the scroll, once a frame", () => {
@@ -306,13 +348,8 @@ describe("Your next line", () => {
 
   it("jumps, and offers to jump back as well as on", () => {
     layOut();
-    const scrolled: Element[] = [];
-    Object.defineProperty(Element.prototype, "scrollIntoView", {
-      configurable: true,
-      value(this: Element) {
-        scrolled.push(this);
-      },
-    });
+    const scrollBy = vi.fn();
+    vi.stubGlobal("scrollBy", scrollBy);
     const scrollTo = vi.fn();
     vi.stubGlobal("scrollTo", scrollTo);
     read(doc(role(), say("hierophant", "One."), say("member", "Mine.")));
@@ -321,8 +358,14 @@ describe("Your next line", () => {
     fireEvent.click(
       screen.getByRole("button", { name: "Jump to your next line" }),
     );
-    expect(scrolled).toHaveLength(1);
-    expect(scrolled[0].textContent).toContain("Mine.");
+    // The line's end 88 px above the window's 768, clear of the floating
+    // button; it is short, so its start is well below the app bar's 56.
+    const line = screen
+      .getByText("Mine.")
+      .closest('[data-ritual-frame="task"]')!
+      .getBoundingClientRect();
+    expect(scrollBy).toHaveBeenCalledOnce();
+    expect(scrollBy).toHaveBeenCalledWith(0, line.bottom - (768 - 88));
     // Both, so the reader can jump on without going back first.
     expect(
       screen.getByRole("button", { name: "Jump to your next line" }),
@@ -372,8 +415,7 @@ function preview(ritual: DocNode, bottom = 768) {
       </div>
     </div>,
   );
-  const button = () =>
-    screen.getByRole("button", { name: "SpeedDial basic example" });
+  const button = () => screen.getByRole("button", { name: /^Reader menu/ });
   return { view, pane: pane.current!, count: () => button().textContent };
 }
 
@@ -449,18 +491,18 @@ describe("Your next line in the editor's preview pane", () => {
     vi.stubGlobal("scrollTo", scrollTo);
     const { pane } = preview(ritual());
     pane.scrollTop = 120;
+    fireEvent.click(screen.getByRole("button", { name: /^Reader menu/ }));
     fireEvent.click(
-      screen.getByRole("button", { name: "SpeedDial basic example" }),
+      screen.getByRole("menuitem", { name: "Jump to your next line" }),
     );
-    fireEvent.click(screen.getByRole("menuitem", { name: "Jump to Next" }));
-    // The next line's bottom brought to the pane's visible bottom, 768.
+    // The next line's end brought 88 px above the pane's visible bottom.
     const line = screen
       .getByText("Mine.")
       .closest('[data-ritual-frame="task"]')!
       .getBoundingClientRect();
-    expect(pane.scrollTop).toBe(120 + line.bottom - 768);
+    expect(pane.scrollTop).toBe(120 + line.bottom - (768 - 88));
     expect(intoView).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("menuitem", { name: "Jump Back" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Jump back" }));
     expect(pane.scrollTop).toBe(120);
     expect(scrollTo).not.toHaveBeenCalled();
   });

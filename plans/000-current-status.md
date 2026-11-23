@@ -1240,6 +1240,13 @@ Follow-ups are separate from the completed migration work:
   is the same; round the coordinates as plan 030 did for the Tree,
   which there moved the image identity: here the hall snapshots and
   the published hall images would change too.
+- TODO: two follow-ups from the search vector storage S2 review
+  ([plan 087](087-search-vector-storage.md#s2-review), 23 November
+  2026). The dev watcher stops seeing row changes if the profile's
+  `search-vectors/` directory is deleted and recreated (a checkout
+  without rows and back); only a manifest change re-arms it. And
+  `scripts/search/watch.mts`, `embed.mts`'s provider-only price filter
+  and a rejected index load while the artifact changes have no tests.
 
 Majou2 and MyReiki were read-only skill-evaluation fixtures. Neither was migrated.
 

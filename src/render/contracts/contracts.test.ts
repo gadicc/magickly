@@ -132,6 +132,8 @@ describe("component image contracts", () => {
       "planet=luna&text=אלים&finals=true",
       "planet=luna&text=מלכא בתרשיתים עד ברוח שחקים&finals=true&width=400",
       "planet=mercury&text=תפתרתרת&height=100",
+      "planet=venus&text=בני שרפים&columns=1",
+      "planet=luna&text=מלכא בתרשיתים עד ברוח שחקים&columns=2&width=880",
     ],
     // Sizes are PNG-only, so they round-trip in gdHall.test.ts.
     "gd-hall": ["", "hall=zelator-1", "hall=portal-2"],
@@ -583,6 +585,13 @@ describe("component image contracts", () => {
       "planet=saturn&text=א&finals=",
       "planet=saturn&text=א&rose=false",
       "planet=saturn&text=א&version=gd",
+      // Words a row: fewer than the words, as a whole number.
+      "planet=saturn&text=א&columns=1",
+      "planet=venus&text=בני שרפים&columns=2",
+      "planet=venus&text=בני שרפים&columns=0",
+      "planet=venus&text=בני שרפים&columns=01",
+      "planet=venus&text=בני שרפים&columns=1.5",
+      "planet=venus&text=בני שרפים&columns=",
     ])
       expect(() => parse("kamea-sigil", query)).toThrow(
         InvalidComponentImageRequest,
@@ -615,6 +624,27 @@ describe("component image contracts", () => {
       expect(
         renderToStaticMarkup(
           createElement(KameaSigilImage, { planet, text: props.text }),
+        ),
+      ).toContain(`viewBox="${viewBox.join(" ")}"`);
+    }
+    // In rows: a full row's width, a square's height a row.
+    for (const [planet, text, columns, viewBox] of [
+      ["venus", "בני שרפים", 1, [-50, -50, 100, 200]],
+      ["luna", "מלכא בתרשיתים עד ברוח שחקים", 2, [-150, -50, 200, 300]],
+      ["luna", "מלכא בתרשיתים עד ברוח שחקים", 3, [-250, -50, 300, 200]],
+    ] as const) {
+      const props = parse(
+        "kamea-sigil",
+        `planet=${planet}&text=${text}&columns=${columns}`,
+      );
+      expect(contractViewBox(contract, props)).toEqual(viewBox);
+      expect(
+        renderToStaticMarkup(
+          createElement(KameaSigilImage, {
+            planet,
+            text: props.text,
+            columns,
+          }),
         ),
       ).toContain(`viewBox="${viewBox.join(" ")}"`);
     }

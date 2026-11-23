@@ -1,18 +1,26 @@
+import { readdirSync } from "node:fs";
+import { resolve } from "node:path";
 import { expect, it } from "vitest";
-import { buildSearchCatalogue } from "@/search/catalogue";
 import manifest from "./manifest.json";
-import { catalogueDigest } from "./records";
+import { ROWS_DIRECTORY } from "./rows";
+import { selectedProfile } from "./store";
 
 /**
- * The published embeddings belong to one exact catalogue. When the
- * catalogue drifts from `manifest.catalogueSha256`, nothing fails: the
- * search index route reports `semanticAvailable: false` and the store
- * (`store.ts`) returns no vectors, so vector search switches off quietly
- * (plan 076, decision 8). A change to page prose, titles or descriptions
- * needs a paid refresh (`pnpm search:compare`, `pnpm search:publish`,
- * plan 070) in the same branch, or this fails.
+ * Meaning search uses every committed row that matches a record's exact
+ * input (plan 087, decision 2), so a change to page prose, titles or
+ * descriptions with no republish fails nothing: the changed records rank
+ * by text only until `pnpm search:publish` (plan 070), and `search:build`
+ * reports the coverage. Only malformed rows fail (rows.test.ts, and
+ * `search:build` itself); nothing here compares the catalogue's digest.
  */
-it("the catalogue matches the published embeddings", async () => {
-  const catalogue = await buildSearchCatalogue();
-  expect(catalogueDigest(catalogue)).toBe(manifest.catalogueSha256);
+it("selects a registered profile, recorded exactly as registered", () => {
+  expect(manifest.selected).toBeTruthy();
+  expect(selectedProfile()?.key).toBe(manifest.selected);
+});
+
+it("commits rows for the selected profile only (plan 087, S2 decision 4)", () => {
+  const directory = resolve(import.meta.dirname, "../../..", ROWS_DIRECTORY);
+  expect(
+    readdirSync(directory).filter((name) => !name.startsWith(".")),
+  ).toEqual([manifest.selected]);
 });

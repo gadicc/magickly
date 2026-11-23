@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
+import Cite from "@/sources/Cite";
 import styles from "./oration.module.css";
 import {
-  jamesPage,
   READINGS,
   type ReadingId,
   readingAnchor,
@@ -18,9 +18,9 @@ function Wording({ id, children }: { id: ReadingId; children?: ReactNode }) {
     <li id={readingAnchor(id)}>
       <b>{readingLetter(id)}.</b> Dee: &quot;{dee.replace(/,$/, "")}&quot;.
       James,{" "}
-      <a href={jamesPage(leaf)} rel="noreferrer">
+      <Cite work="james1994" leaf={leaf} plain rel="noreferrer">
         p. {leaf === 38 ? 53 : 54}
-      </a>
+      </Cite>
       : {james ? <>&quot;{james}&quot;.</> : "leaves it out."} {children}
     </li>
   );

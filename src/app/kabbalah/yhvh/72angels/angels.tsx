@@ -37,8 +37,12 @@ import {
 import Link from "next/link";
 import React from "react";
 import { ReadingColumn } from "@/app/PageText";
+import UiRichText from "@/i18n/UiRichText";
 import { angelSlug } from "@/lib/angelSlugs";
 import SourceLink from "@/sources/SourceLink";
+import { workUrl } from "@/sources/works";
+import styles from "./angels.module.css";
+import ListSigil from "./ListSigil";
 
 type AstrologySystem = "tropical" | "sidereal";
 
@@ -238,41 +242,44 @@ function Angel({
         </MuiLink>
       </AccordionSummary>
       <AccordionDetails>
-        <TableContainer component={Paper}>
-          <Table aria-label="simple table" size="small">
-            <TableBody>
-              <Said label="Angel (genius):" width={150}>
-                {angel.name.en}
-              </Said>
-              <Said label="Attribute:" width={150}>
-                {angel.attribute.en}
-              </Said>
-              <Said label="Rules:" width={150}>
-                {angel.people.en}
-              </Said>
-              <Said label="God Name:" width={150}>
-                {angel.godName}
-              </Said>
-              <Said label="Choir:">{choir.name.en}</Said>
-              <Said label="Governs:">
-                <Governs no={no} astrologySystem={astrologySystem} />
-              </Said>
-              <Said label="Presiding Days:">
-                {presidingDaysOf(no).map(formatMonthDay).join(", ")}
-              </Said>
-              <Said label="Invoked for:">{angel.invokedFor.en}</Said>
-              <Said label="Influences:">{angel.governs.en}</Said>
-              <Said label="Born under:">{angel.bornUnder.en}</Said>
-              <Said label="Contrary genius:">{angel.contrary.en}</Said>
-              <Said label="Psalm:">
-                {angel.psalm.psalm > 0 &&
-                  `${angel.psalm.psalm}:${angel.psalm.verse}${
-                    angel.psalm.la ? ` — ${angel.psalm.la}` : ""
-                  }`}
-              </Said>
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <div className={styles.entry}>
+          <TableContainer component={Paper}>
+            <Table aria-label="simple table" size="small">
+              <TableBody>
+                <Said label="Angel (genius):" width={150}>
+                  {angel.name.en}
+                </Said>
+                <Said label="Attribute:" width={150}>
+                  {angel.attribute.en}
+                </Said>
+                <Said label="Rules:" width={150}>
+                  {angel.people.en}
+                </Said>
+                <Said label="God Name:" width={150}>
+                  {angel.godName}
+                </Said>
+                <Said label="Choir:">{choir.name.en}</Said>
+                <Said label="Governs:">
+                  <Governs no={no} astrologySystem={astrologySystem} />
+                </Said>
+                <Said label="Presiding Days:">
+                  {presidingDaysOf(no).map(formatMonthDay).join(", ")}
+                </Said>
+                <Said label="Invoked for:">{angel.invokedFor.en}</Said>
+                <Said label="Influences:">{angel.governs.en}</Said>
+                <Said label="Born under:">{angel.bornUnder.en}</Said>
+                <Said label="Contrary genius:">{angel.contrary.en}</Said>
+                <Said label="Psalm:">
+                  {angel.psalm.psalm > 0 &&
+                    `${angel.psalm.psalm}:${angel.psalm.verse}${
+                      angel.psalm.la ? ` — ${angel.psalm.la}` : ""
+                    }`}
+                </Said>
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <ListSigil angel={angel} />
+        </div>
         <br />
         <OriginalText no={no} />
       </AccordionDetails>
@@ -312,7 +319,7 @@ function SevenyTwo() {
             <summary>Important note on sources used.</summary>
             <p>
               The material here is taken from{" "}
-              <a href="https://www.google.co.uk/books/edition/La_science_cabalistique/ZqgpxTZ43HkC?hl=en&gbpv=0">
+              <a href={workUrl("lenainReissue")}>
                 <i>La Science Cabalistique</i>
               </a>{" "}
               by Lazare Lenain (1823; digitized by Google Books), or, as his
@@ -372,13 +379,8 @@ function SevenyTwo() {
               reissue was reset from scratch, with modernised spelling, so its
               page numbers are its own and not Lenain&apos;s. Where an editorial
               note turns on what is printed, it also cites{" "}
-              <a href="https://books.google.com/books?id=qt9SAAAAcAAJ">
-                the 1823 printing
-              </a>{" "}
-              and{" "}
-              <a href="https://archive.org/details/BIUSante_ms05365">
-                a handwritten copy of it
-              </a>{" "}
+              <a href={workUrl("lenain1823")}>the 1823 printing</a> and{" "}
+              <a href={workUrl("lenainMs5365")}>a handwritten copy of it</a>{" "}
               (Bibliothèque interuniversitaire de santé, Ms 5365).
             </p>
             <p>
@@ -419,7 +421,12 @@ function SevenyTwo() {
               this scan photographed folded.
             </p>
           </details>
-          <p>The sigils will be added at a later time.</p>
+          <p>
+            {/* The adapter search reads (scripts/search/prose.ts). */}
+            <UiRichText
+              message={/*i18n*/ "Open an angel to see its Rose Cross sigil."}
+            />
+          </p>
         </ReadingColumn>
       </Container>
       <Container>

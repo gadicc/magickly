@@ -83,10 +83,16 @@ describe("the reader shell", () => {
       container.querySelector<HTMLElement>('[data-reader-area="body"]')?.style
         .fontSize,
     ];
-    expect(scaled()).toEqual(["100%", "100%"]);
+    // Both read the reader's size, which the control sets on <html>.
+    const size = "var(--reader-text-size, 100%)";
+    expect(scaled()).toEqual([size, size]);
     // The rail's control is the floating button's zoom.
     fireEvent.click(screen.getByRole("button", { name: "increase font size" }));
-    expect(scaled()).toEqual(["105%", "105%"]);
+    expect(
+      document.documentElement.style.getPropertyValue("--reader-text-size"),
+    ).toBe("105%");
+    document.documentElement.style.removeProperty("--reader-text-size");
+    localStorage.clear();
     expect(
       container.querySelector<HTMLElement>('[data-reader-area="title"]')?.style
         .fontSize,
@@ -106,9 +112,7 @@ describe("the reader shell", () => {
     expect(container.querySelector("[data-reader-shell]")).toBeNull();
     expect(container.querySelector(".docBody")).not.toBeNull();
     // The floating button stays.
-    expect(
-      screen.getByRole("button", { name: "SpeedDial basic example" }),
-    ).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Reader menu/ })).toBeTruthy();
   });
 
   it("server-renders a message on the surface without a title", () => {

@@ -69,7 +69,7 @@ import { hallDescription, hallPath } from "@/seo/halls";
 import { BOOK_PATH, lenainPages } from "@/seo/lenain";
 import { PUBLIC_PAGES } from "@/seo/pages";
 import { planetaryNameSigilText } from "@/seo/planetaryNames";
-import { ADAPTED_PAGES } from "./adaptedPages";
+import { UNEXTRACTED_PAGES } from "./adaptedPages";
 import prose from "./generated/prose.json";
 import type { SearchCatalogue, SearchDocument, SearchSection } from "./types";
 
@@ -300,7 +300,7 @@ export async function buildSearchCatalogue(): Promise<SearchCatalogue> {
     document.sections.push(...searchSections(id, title, text, href));
   }
   for (const [path, text] of Object.entries(prose))
-    if (!ADAPTED_PAGES.has(path)) add(path, "prose", "", text);
+    if (!UNEXTRACTED_PAGES.has(path)) add(path, "prose", "", text);
 
   for (const [kind, rows, prefix] of [
     ["planet", planets, "/astrology/planet/"],

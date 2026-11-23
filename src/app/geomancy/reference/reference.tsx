@@ -32,6 +32,7 @@ import {
   HeydonCitation,
   heydonLabel,
 } from "@/drawings/sigilSources";
+import Cite from "@/sources/Cite";
 import SourceLink from "@/sources/SourceLink";
 import Tetragram from "../Tetragram";
 import { figuresByPairs } from "./pairs";
@@ -79,14 +80,14 @@ export default function Geomancy() {
           <p>
             The figures&apos; meanings, and their meanings in each house, are
             the Golden Dawn&apos;s table as Crowley printed it in{" "}
-            <a href="https://archive.org/details/crowley-equinox_202110/The%20Equinox%20Vol.%201%2C%20No.%202/page/n158/mode/1up">
+            <Cite work="equinoxI2" leaf={158} plain>
               “A Handbook of Geomancy”
-            </a>
+            </Cite>
             , <i>The Equinox</i> I(2), 1909, with its abbreviations spelled out
             and “evil” read as “unfavourable”. What each house governs follows{" "}
-            <a href="https://archive.org/details/b20458563/page/n34/mode/1up">
+            <Cite work="agrippaFourthBook1655" leaf={34} plain>
               Agrippa&apos;s Fourth Book
-            </a>{" "}
+            </Cite>{" "}
             (Turner, 1655), in our own words.
           </p>
         </ReadingColumn>

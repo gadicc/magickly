@@ -3,11 +3,14 @@ import angels, { type Angel } from "magick-data/kabbalah/seventyTwoAngels";
 import { angelNameShared, angelSlug } from "@/lib/angelSlugs";
 import { messages as english } from "@/locales/en/messages.js";
 import { GD_HALL_LICENCE } from "@/render/contracts/gdHall";
+import { citeUrl } from "@/sources/works";
 import {
-  canonicalSigilText,
-  sigilRasterDefault,
-  sigilWordCount,
-} from "@/render/contracts/roseSigil";
+  type AngelSigilFile,
+  angelPath,
+  angelSigilAltMessage,
+  angelSigilFiles,
+  angelSigilText,
+} from "./angelSigilFiles";
 import { breadcrumbList, entityTrail } from "./Breadcrumbs";
 import type { SocialImage } from "./pages";
 import { SITE_ORGANIZATION, SITE_URL } from "./site";
@@ -18,64 +21,18 @@ import { SITE_ORGANIZATION, SITE_URL } from "./site";
  * name on the Golden Dawn's rose, as the temple halls' files are drawn
  * (plan 062, decisions 3, 7, 10 and 13). The files are the canonical,
  * indexable copies; `/api/render/rose-sigil` keeps its own out of the index.
+ * The files' names and paths are in `angelSigilFiles.ts`, re-exported here.
  */
 
-/** Where an angel's page is. */
-const angelPath = (angel: Angel) => `/kabbalah/angel/${angelSlug(angel.no)}`;
-
-/**
- * The text an angel's sigil traces: the name as the site spells it
- * (`name.he`), as the contract keeps it. Every one of the 72 is plain rose
- * letters, so this never falls back; a test holds it so.
- */
-export function angelSigilText(angel: Angel): string {
-  const text = canonicalSigilText(angel.name.he ?? "");
-  if (text === null)
-    throw new Error(`angel ${angel.no} has no sigil text: ${angel.name.he}`);
-  return text;
-}
-
-/**
- * The generator with an angel's name in it, encoded as the generator's own
- * example links encode theirs (`SigilsText.tsx`).
- */
-export const angelSigilGeneratorHref = (angel: Angel) =>
-  `/gd/sigils?text=${encodeURIComponent(angelSigilText(angel))}`;
-
-/** One of an angel's static sigil files. */
-export interface AngelSigilFile {
-  /** The file's name in the URL: `vehuiah-rose-cross-sigil.png`. */
-  name: string;
-  /** Its path on the site, under the angel's page. */
-  path: string;
-  format: "png" | "svg";
-  /** The PNG's pixels. The SVG states only its viewBox, so has none. */
-  width?: number;
-  height?: number;
-}
-
-/**
- * An angel's two files (plan 088, S4): the PNG at the contract's raster
- * default and the SVG, both on the Golden Dawn's rose with the rose shown.
- */
-export function angelSigilFiles(angel: Angel): {
-  png: AngelSigilFile & { width: number; height: number };
-  svg: AngelSigilFile;
-} {
-  const base = `${angelSlug(angel.no)}-rose-cross-sigil`;
-  const file = (format: "png" | "svg") => ({
-    name: `${base}.${format}`,
-    path: `${angelPath(angel)}/${base}.${format}`,
-    format,
-  });
-  return {
-    png: {
-      ...file("png"),
-      ...sigilRasterDefault(sigilWordCount(angelSigilText(angel))),
-    },
-    svg: file("svg"),
-  };
-}
+export {
+  ANGEL_SIGIL_ALT,
+  ANGEL_SIGIL_ALT_NUMBERED,
+  type AngelSigilFile,
+  angelSigilAltMessage,
+  angelSigilFiles,
+  angelSigilGeneratorHref,
+  angelSigilText,
+} from "./angelSigilFiles";
 
 /** Every angel's files, in the angels' order, as the route prerenders them. */
 export function allAngelSigilFiles(): {
@@ -102,26 +59,6 @@ export function angelSigilQuery(angel: Angel, file: AngelSigilFile) {
   if (file.format === "png") query.set("fmt", "png");
   return query;
 }
-
-/**
- * The sigil's alt text, in our own words, for Lingui: the page translates
- * it where it is shown, and the structured data's caption is its English.
- */
-export const ANGEL_SIGIL_ALT =
-  /*i18n*/ "The Rose Cross sigil of {name}, {hebrew}, traced on the Golden Dawn's rose of 22 letters";
-
-/**
- * The alt text of a genius whose name another shares (the two Lauviahs,
- * whose names and so whose sigils are the same): with its number, as its
- * slug has it, so that the two images are not described word for word
- * alike.
- */
-export const ANGEL_SIGIL_ALT_NUMBERED =
-  /*i18n*/ "The Rose Cross sigil of {name}, angel {number} of the 72, {hebrew}, traced on the Golden Dawn's rose of 22 letters";
-
-/** The alt text's message for an angel: numbered where the name is shared. */
-export const angelSigilAltMessage = (angel: Angel) =>
-  angelNameShared(angel.no) ? ANGEL_SIGIL_ALT_NUMBERED : ANGEL_SIGIL_ALT;
 
 /** The values the alt text names. */
 export const angelSigilAltValues = (angel: Angel) => ({
@@ -163,7 +100,7 @@ const REGARDIE_RULES = {
   publisher: { "@type": "Organization", name: "Aries Press" },
   datePublished: "1940",
   description: "p.57, archive.org leaf n51 (the rules of the Rose Cross sigil)",
-  url: "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol4-1940/page/n51/mode/1up",
+  url: citeUrl("regardie1940", { leaf: 51 }),
 } as const;
 
 /**

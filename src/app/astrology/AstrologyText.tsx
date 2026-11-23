@@ -28,8 +28,9 @@ export default function AstrologyText() {
         </li>
         <li>
           <Link href="/astrology/kamea/sigils">Kamea Sigils</Link> traces a
-          Hebrew name on the kamea, or magic square, of a planet, by the Golden
-          Dawn&apos;s reduction of its letters, and draws its sigil.
+          Hebrew name on the kamea, or magic square, of a planet, by the
+          reduction of its letters Regardie sets out in <em>The Golden Dawn</em>
+          , and draws its sigil.
         </li>
       </List>
       <H3>The planets</H3>

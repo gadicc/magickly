@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { KameaSigil } from "magick-components/astrology/KameaSigil";
 import PlanetarySpirit, {
   PLANETARY_SPIRIT_IDS,
 } from "magick-components/astrology/PlanetarySpirit";
@@ -41,6 +42,11 @@ const drawings: Record<InkDrawing, () => string[]> = {
   shewbread: () => [wrapped("shewbread", <TableOfShewbread />)],
   roseSigil: () => [
     wrapped("roseSigil", <RoseSigil text="אבג" showRose animate={false} />),
+  ],
+  // As the kamea generator draws it: a square a word, the sigil over it.
+  kamea: () => [
+    wrapped("kamea", <KameaSigil planet="saturn" text="אגיאל" />),
+    wrapped("kamea", <KameaSigil planet="luna" text="" />),
   ],
   chakras: () => [wrapped("chakras", <Chakras />)],
   lamen: () => [wrapped("lamen", <Lamen officer="hierophant" />)],

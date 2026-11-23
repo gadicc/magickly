@@ -18,7 +18,9 @@ import {
   presidingDaysOf,
   signOf,
 } from "magick-data/kabbalah/seventyTwoAngels/derived";
+import React from "react";
 import { scriptRuns } from "@/app/books/la-science-cabalistique/hebrewRuns";
+import { reissuePageUrl } from "@/app/books/la-science-cabalistique/scan";
 import Witnesses from "@/app/books/la-science-cabalistique/Witnesses";
 import { angelSlug } from "@/lib/angelSlugs";
 import {
@@ -287,11 +289,20 @@ export default function AngelPage({
       <h2>In the book</h2>
       <p>
         Printed on page{angel.printedPages.length > 1 ? "s" : ""}{" "}
-        {angel.printedPages.join(" and ")} of the reissue of{" "}
+        {angel.printedPages.map((page, i) => (
+          <React.Fragment key={page}>
+            {i ? " and " : ""}
+            <a href={reissuePageUrl(page) ?? undefined} rel="noreferrer">
+              {page}
+            </a>
+          </React.Fragment>
+        ))}{" "}
+        of the reissue of{" "}
         <Link href={BOOK}>
           <i>La Science Cabalistique</i>
         </Link>{" "}
-        (Amiens, 1823) that this site transcribes.{" "}
+        (Amiens, 1823) that this site transcribes; each page number opens that
+        page of the scan, on Google Books.{" "}
         {anchor ? (
           <Link href={`${BOOK}/chapitre-6#${anchor}`}>
             Read it in the French, on the page

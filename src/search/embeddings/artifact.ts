@@ -1,3 +1,4 @@
+import { closeSync, fstatSync, openSync, readSync } from "node:fs";
 import type { EmbeddingProfile } from "./profiles";
 import { type EmbeddingRecord, embeddingRowKey } from "./records";
 
@@ -15,20 +16,26 @@ import { type EmbeddingRecord, embeddingRowKey } from "./records";
  * - the rest: `keys.length × dimensions` little-endian float32 values,
  *   row i being `keys[i]`.
  *
- * Readers look rows up by key, never by position, so an artifact older or
- * newer than the catalogue can only lack rows, never pair a vector with the
- * wrong record.
+ * It holds only the rows some record referenced when it was assembled
+ * (plan 087, S2). Readers look rows up by key, never by position, so an
+ * artifact older or newer than the catalogue can only lack rows, never pair
+ * a vector with the wrong record.
  */
 export const VECTOR_ARTIFACT = "src/search/generated/search-vectors.bin";
 
 const MAGIC = "SVK1";
 const ROW_KEY = /^[0-9a-f]{64}$/;
 
-/** A parsed artifact; `matrix` holds the raw little-endian row bytes. */
-export interface VectorArtifact {
+/** An artifact's header: which profile, and which rows, it holds. */
+export interface VectorArtifactHeader {
   profile: string;
   dimensions: number;
+  /** Row keys, strictly ascending; row i of the matrix is `keys[i]`. */
   keys: string[];
+}
+
+/** A parsed artifact; `matrix` holds the raw little-endian row bytes. */
+export interface VectorArtifact extends VectorArtifactHeader {
   matrix: Buffer;
 }
 
@@ -57,16 +64,29 @@ export function encodeVectorArtifact(
   return Buffer.concat([prefix, header, ...sorted.map(([, bytes]) => bytes)]);
 }
 
-/** Parses and structurally validates an artifact; throws if it is malformed. */
-export function parseVectorArtifact(bytes: Buffer): VectorArtifact {
-  const invalid = () => new Error("Invalid search vector artifact");
-  if (bytes.length < 8 || bytes.toString("ascii", 0, 4) !== MAGIC)
+const invalid = () => new Error("Invalid search vector artifact");
+
+/** The header's length H from the first 8 bytes, after checking the magic. */
+function headerLength(prefix: Buffer) {
+  if (prefix.length < 8 || prefix.toString("ascii", 0, 4) !== MAGIC)
     throw invalid();
-  const length = bytes.readUInt32LE(4);
-  if (length % 4 || 8 + length > bytes.length) throw invalid();
+  const length = prefix.readUInt32LE(4);
+  if (length % 4) throw invalid();
+  return length;
+}
+
+/**
+ * Parses and validates the header, given its length and the artifact's
+ * total size, so the matrix length is checked without reading the matrix.
+ */
+function parseHeader(
+  json: string,
+  length: number,
+  size: number,
+): VectorArtifactHeader {
   let header: unknown;
   try {
-    header = JSON.parse(bytes.toString("utf8", 8, 8 + length));
+    header = JSON.parse(json);
   } catch {
     throw invalid();
   }
@@ -84,42 +104,75 @@ export function parseVectorArtifact(bytes: Buffer): VectorArtifact {
         typeof key === "string" &&
         ROW_KEY.test(key) &&
         (!i || keys[i - 1] < key),
-    )
+    ) ||
+    size !== 8 + length + keys.length * (dimensions as number) * 4
   )
     throw invalid();
-  const matrix = bytes.subarray(8 + length);
-  if (matrix.length !== keys.length * (dimensions as number) * 4)
-    throw invalid();
-  return { profile, dimensions: dimensions as number, keys, matrix };
+  return { profile, dimensions: dimensions as number, keys };
+}
+
+/** Parses and structurally validates an artifact; throws if it is malformed. */
+export function parseVectorArtifact(bytes: Buffer): VectorArtifact {
+  const length = headerLength(bytes);
+  if (8 + length > bytes.length) throw invalid();
+  const json = bytes.toString("utf8", 8, 8 + length);
+  return {
+    ...parseHeader(json, length, bytes.length),
+    matrix: bytes.subarray(8 + length),
+  };
 }
 
 /**
- * The raw bytes of every record's row, in record order, looked up by each
- * record's key under `profile`; null when the artifact is for another
- * profile or lacks any record's row.
+ * Reads and validates only an artifact's header, and checks the file's size
+ * against it, without reading the matrix: what `/search/index` needs to
+ * decide whether meaning search is available. Throws if the file is missing
+ * or malformed, as loading the whole artifact would.
  */
-export function recordMatrix(
-  artifact: VectorArtifact,
+export function readVectorArtifactHeader(path: string): VectorArtifactHeader {
+  const file = openSync(path, "r");
+  try {
+    const size = fstatSync(file).size;
+    const prefix = Buffer.alloc(8);
+    const length = headerLength(
+      prefix.subarray(0, readSync(file, prefix, 0, 8, 0)),
+    );
+    if (8 + length > size) throw invalid();
+    const header = Buffer.alloc(length);
+    if (readSync(file, header, 0, length, 8) !== length) throw invalid();
+    return parseHeader(header.toString("utf8"), length, size);
+  } finally {
+    closeSync(file);
+  }
+}
+
+/** A record the artifact has a row for: its position in each. */
+export interface CoveredRecord {
+  /** The record's position in the records given. */
+  record: number;
+  /** Its row's position in the artifact's matrix. */
+  row: number;
+}
+
+/**
+ * The records the artifact covers under `profile`, in record order, each
+ * found by its key, never by position (plan 087, decision 2). Records
+ * without a row are left out; none are covered when the artifact is for
+ * another profile. Meaning search is available exactly when this is not
+ * empty, the one rule `/api/search` and `/search/index` share (store.ts).
+ */
+export function artifactCoverage(
+  header: VectorArtifactHeader,
   profile: EmbeddingProfile,
   records: readonly EmbeddingRecord[],
-): Buffer | null {
+): CoveredRecord[] {
   if (
-    artifact.profile !== profile.key ||
-    artifact.dimensions !== profile.dimensions
+    header.profile !== profile.key ||
+    header.dimensions !== profile.dimensions
   )
-    return null;
-  const rowBytes = profile.dimensions * 4;
-  const index = new Map(artifact.keys.map((key, i) => [key, i]));
-  const matrix = Buffer.alloc(records.length * rowBytes);
-  for (const [row, record] of records.entries()) {
-    const at = index.get(embeddingRowKey(profile, record));
-    if (at === undefined) return null;
-    artifact.matrix.copy(
-      matrix,
-      row * rowBytes,
-      at * rowBytes,
-      (at + 1) * rowBytes,
-    );
-  }
-  return matrix;
+    return [];
+  const index = new Map(header.keys.map((key, i) => [key, i]));
+  return records.flatMap((record, i) => {
+    const row = index.get(embeddingRowKey(profile, record));
+    return row === undefined ? [] : [{ record: i, row }];
+  });
 }

@@ -61,3 +61,26 @@ export function currentSection(
   }
   return current;
 }
+
+/** The space above the visible bottom that a jump leaves below the line. */
+export const JUMP_CLEARANCE = 88;
+/** The space a jump leaves at least above a tall line's start. */
+const JUMP_HEADROOM = 24;
+
+/**
+ * How far to scroll down to bring the reader's next line into view, its
+ * cue above it: the line's end `JUMP_CLEARANCE` above the visible bottom,
+ * clear of the floating button (16 px from the edge, 56 px high) and a
+ * phone's toolbar, not on the edge itself. A line too tall for that keeps
+ * its start in view instead, just below the visible top (the app bar's
+ * edge), where its first words are. Positions are viewport pixels.
+ */
+export function jumpDistance(
+  line: { top: number; bottom: number },
+  visible: { top: number; bottom: number },
+): number {
+  return Math.min(
+    line.bottom - (visible.bottom - JUMP_CLEARANCE),
+    line.top - (visible.top + JUMP_HEADROOM),
+  );
+}

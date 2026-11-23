@@ -10,6 +10,7 @@ import GridOnIcon from "@mui/icons-material/GridOn";
 import { Button, IconButton } from "@mui/material";
 import type { ReactNode } from "react";
 import type { NextLine } from "@/doc/readerPosition";
+import { READER_TEXT_SIZE_RANGE } from "@/doc/readerTextSize";
 import { revealHall } from "@/doc/revealHall";
 import type { RitualContentsEntry, RitualHall } from "@/doc/ritualHalls";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
@@ -22,7 +23,12 @@ import shell from "../readerShell.module.css";
  * below, where the floating button does their work.
  */
 
-/** A rail's section: a small label over its content. */
+/**
+ * A rail's section: a small label over its content. A panel the column
+ * shows too, below 1,200 px, keeps its label to the rail, where the panels
+ * are cards side by side; at the top of the column its controls' own
+ * labels say enough.
+ */
 export function RailPanel({
   label,
   railOnly = true,
@@ -38,7 +44,11 @@ export function RailPanel({
       className={railOnly ? `${shell.panel} ${shell.railOnly}` : shell.panel}
     >
       {label && (
-        <h2 className={shell.label}>
+        <h2
+          className={
+            railOnly ? shell.label : `${shell.label} ${shell.railOnly}`
+          }
+        >
           <UiText message={label} />
         </h2>
       )}
@@ -52,7 +62,7 @@ const titleAnchor = (text: string) => text.replace(/ /g, "_");
 
 /**
  * The Contents rail: titles, with their halls indented under them, as the
- * floating button's Table of Contents lists them. `section` is the current
+ * floating button's Contents lists them. `section` is the current
  * title's index among the titles; `onTitle` goes to a title by that index,
  * since titles' texts may repeat.
  */
@@ -199,7 +209,7 @@ export function HallsPanel({
   );
 }
 
-/** The text-size control, as the floating button's Zoom In/Out. */
+/** The text-size control, as the floating button's Text size. */
 export function TextSizePanel({
   fontSize,
   setFontSize,
@@ -214,6 +224,7 @@ export function TextSizePanel({
         <IconButton
           size="small"
           aria-label={t(/*i18n*/ "decrease font size")}
+          disabled={fontSize <= READER_TEXT_SIZE_RANGE[0]}
           onClick={() => setFontSize(fontSize - 5)}
         >
           <RemoveIcon />
@@ -222,6 +233,7 @@ export function TextSizePanel({
         <IconButton
           size="small"
           aria-label={t(/*i18n*/ "increase font size")}
+          disabled={fontSize >= READER_TEXT_SIZE_RANGE[1]}
           onClick={() => setFontSize(fontSize + 5)}
         >
           <AddIcon />

@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { PUBLIC_PAGES } from "@/seo/pages";
 import { buildSearchCatalogue, tabletNamesText } from "./catalogue";
 import { createSearchEngine } from "./engine";
+import prose from "./generated/prose.json";
 import type { SearchCatalogue } from "./types";
 
 let catalogue: SearchCatalogue;
@@ -27,6 +28,21 @@ describe("the real public search catalogue", () => {
       "/doc/zelator",
       "/doc/theoricus",
     ]);
+    // The public rituals are found by their metadata; the reader's own
+    // controls and messages are not their text (plan 089, item 9).
+    for (const page of catalogue.documents.filter((page) =>
+      page.path.startsWith("/doc/"),
+    )) {
+      expect(page.title).toMatch(/ Ritual$/);
+      expect(
+        page.sections.filter((section) => section.id.startsWith("prose:")),
+      ).toEqual([]);
+      expect(JSON.stringify(page)).not.toMatch(/More Variables|not found/);
+    }
+    // Nor is it extracted for them in the first place.
+    expect(
+      Object.keys(prose).filter((path) => path.startsWith("/doc/")),
+    ).toEqual([]);
     for (const page of catalogue.documents) {
       expect(new Set(page.sections.map((section) => section.id)).size).toBe(
         page.sections.length,

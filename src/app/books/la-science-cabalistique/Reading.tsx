@@ -14,6 +14,7 @@ import { Fragment, type ReactNode } from "react";
 // (plan 079).
 import { scriptRuns } from "./hebrewRuns";
 import styles from "./reading.module.css";
+import { reissuePageUrl } from "./scan";
 import Witnesses from "./Witnesses";
 
 /**
@@ -27,14 +28,9 @@ import Witnesses from "./Witnesses";
  * navigation by page, which is how anyone reads a book by citation.
  */
 
-const SCAN = "https://books.google.com/books?id=ZqgpxTZ43HkC";
-
 /** The facsimile of one leaf. Roman front matter is PR, the body PA. */
-function facsimileUrl(label: string, sequence: string) {
-  if (!label) return null;
-  const prefix = sequence === "body" ? "PA" : "PR";
-  return `${SCAN}&pg=${prefix}${label}`;
-}
+const facsimileUrl = (label: string, sequence: string) =>
+  reissuePageUrl(label, sequence);
 
 /**
  * Hebrew set inside French runs left to right unless it is told otherwise, and
