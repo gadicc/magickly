@@ -22,6 +22,15 @@ corpus, prompts or transport.
   and public temple hall presets. Existing schemas/render contracts validate
   every descriptor; actual chat-runtime integration follows separately.
 
+**23 November 2026:** the all-or-nothing gate ("a stale catalogue never
+uses old vectors": any change to the catalogue digest turned meaning search
+off until a republish) became per-record coverage in
+[plan 087](087-search-vector-storage.md), stage S2. The guarantee is kept:
+each committed row is keyed by its record's exact prepared input, so no
+stale vector is ever used. A record whose text changed ranks by text only
+until the next publish; meaning search is unavailable only when no record
+has a row. `src/search/README.md` has the current contract.
+
 ## Comparison
 
 The public Gateway catalogue on 9 November lists Gemini Embedding 2 and Qwen3

@@ -42,12 +42,44 @@ never compared, including when dimensions happen to match.
 
 The initial comparison is recorded in `plans/070-site-search-comparison.json`.
 Gemini Embedding 2 at 768 dimensions is the initial selected profile. Qwen's
-comparison cache remains separate. The published binary matrix uses float32
-little-endian values, with an exact-byte SHA-256 and a digest of all catalogue
-records in `embeddings/manifest.json`. Only the selected profile ships; the
+comparison cache remains separate. Only the selected profile ships; the
 indexed public material and its vectors are public assets.
 
-To update after changing content:
+### Rows and coverage (plan 087)
+
+Each catalogue record (a page summary or passage) is embedded from one
+prepared input, `embeddingDocumentInput` in `embeddings/records.ts`, and its
+vector is committed as one row file named by `embeddingRowKey`, a hash of the
+complete profile and that exact input:
+`search-vectors/<profile>/<first two hex>/<key>.f32`, 768 float32 values,
+little-endian, unit length. Only the selected profile has committed rows.
+
+`pnpm search:build` (run by every build, type check, test task and the dev
+wrapper) builds the catalogue after the prose, computes every record's key
+and assembles the rows some record references into the ignored artifact
+`src/search/generated/search-vectors.bin` (format in `embeddings/artifact.ts`),
+which `/api/search` traces. It prints how many records have a row and how
+many rows nothing references (orphans), and warns below 90% coverage. Every
+row on disk is validated: a wrong length, a non-finite value or a norm far
+from 1 fails the build and the tests. Orphans are normal after a content
+edit and fail nothing; a publish prunes them.
+
+Coverage is per record. A record with a row ranks by meaning and text; a
+record without one (its text changed since the last publish) is left out of
+dense ranking only and is still found by text and fusion. Because a row is
+keyed by its exact input, no stale vector is ever used, and a content commit
+does not have to republish. Meaning search is unavailable only when no
+record is covered (a profile or recipe change with no republish): then
+`/api/search` answers 503 before spending quota or calling the provider,
+and `/search/index` reports `semanticAvailable: false`. Both apply the same
+rule (`embeddings/store.ts`); `/search/index` reads only the artifact's
+header. A missing artifact is an error, not zero coverage: it means
+`search:build` did not run. The store also checks the manifest's profile
+against `embeddings/profiles.ts`. Changing any field of a profile re-keys
+every row, so a changed recipe is a new profile, and `embeddings.test.ts`
+pins two keys.
+
+To refresh after changing content:
 
 ```sh
 pnpm search:compare
@@ -55,13 +87,17 @@ pnpm search:publish gemini-embedding-2-768-search-v1
 ```
 
 These are explicit provider tasks, never build hooks. They use `loom env` and
-the same Gateway credential/OIDC convention as chat. Each verifies current
-public model pricing against a conservative $1 input estimate before provider
-work and disables provider retries. A cache under `.private/site-search` is
-keyed by the full profile and exact prepared input, so only changed passages
-need new embeddings. Cached query probes can be reused as well. Review the
-generated manifest and binary with changes to the public content. A publish
-deletes the profile's earlier matrix in `public/search-vectors`.
+the same Gateway credential/OIDC convention as chat. Each takes every row it
+needs from the committed rows first (their bytes copied as they are), then
+the worktree's private cache under `.private/site-search` (keyed like the
+rows), and calls the provider only for what is still missing. It verifies
+current public model pricing against a conservative $1 input estimate for
+those rows before provider work and disables provider retries. Cached query
+probes can be reused as well. A publish writes the new rows, prunes orphans,
+and still writes the matrix in `public/search-vectors` and its SHA-256 and
+catalogue digest in `embeddings/manifest.json`, deleting the profile's
+earlier matrix; nothing reads those for availability any more, and plan
+087's S3 removes them. Review the rows and manifest with the content change.
 
 When two branches have each published, a merge or rebase conflicts on the
 manifest, and git may also report the two matrices as a rename/rename
@@ -80,11 +116,12 @@ network, so it costs nothing. It stops before writing anything if a record
 has no committed row, naming the page; that text needs `search:publish`.
 It deletes every other matrix of the profile, whichever you staged.
 
-Builds never silently re-embed. If the catalogue digest differs, semantic
-search is unavailable and ordinary text search continues. The index loader
-also validates the profile, binary size and checksum before any query call.
-The server scores the small matrix exhaustively; no vector database or ANN
-index is needed. The browser does not download this matrix or a model.
+Builds never silently re-embed. The server scores the covered rows
+exhaustively; no vector database or ANN index is needed. The browser does
+not download this matrix or a model. In development the search watcher
+reruns `search:build` when source files, `embeddings/manifest.json` or the
+selected profile's row directory change, so a pull that adds rows reaches a
+running server.
 
 ## HTTP and release
 
