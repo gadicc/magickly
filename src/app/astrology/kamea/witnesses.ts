@@ -8,6 +8,7 @@ import {
   MIRRORED_PAGES,
   type MirroredPageKey,
 } from "@/sources/mirroredPages";
+import { WORKS } from "@/sources/works";
 
 /**
  * The witnesses to the planetary names and squares (plan 093, Sources), and
@@ -34,11 +35,11 @@ export const WITNESS_LABELS: Record<PlanetaryNameWitness, string> = {
  * e-text of *777 Revised*, and Regardie's vol. 4.
  */
 export const WITNESS_ITEMS: Record<PlanetaryNameWitness, string> = {
-  agrippa1533: "DeOccultaPhilosophiaLoc1533",
-  agrippa1651: "b30335231",
-  barrett1801: "b22006795",
-  crowley777: "aleister-crowley-liber-777",
-  regardie1940: "IsraelRegardie-TheGoldenDawn-Vol4-1940",
+  agrippa1533: WORKS.agrippa1533.scan.item,
+  agrippa1651: WORKS.agrippa1651.scan.item,
+  barrett1801: WORKS.barrett1801.scan.item,
+  crowley777: WORKS.crowley777.scan.item,
+  regardie1940: WORKS.regardie1940.scan.item,
 };
 
 /**

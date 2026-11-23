@@ -1,5 +1,6 @@
 import type { PlanetarySpiritId } from "magick-components/astrology/PlanetarySpirit";
 import { archivePageUrl, MIRRORED_PAGES } from "@/sources/mirroredPages";
+import { citeUrl } from "@/sources/works";
 
 /**
  * The public-domain printings our redrawn sigils follow, as links to the
@@ -9,12 +10,6 @@ import { archivePageUrl, MIRRORED_PAGES } from "@/sources/mirroredPages";
  * `n…` of its page URLs. Heydon's pages are mirrored in the app
  * (`src/sources/mirroredPages.ts`); the Equinox's plate is not.
  */
-
-/** archive.org's single-page view of one leaf of an item, or of a file in it. */
-const leafUrl = (item: string, leaf: number, file?: string) =>
-  `https://archive.org/details/${item}${
-    file ? `/${encodeURIComponent(file)}` : ""
-  }/page/n${leaf}/mode/1up`;
 
 /**
  * John Heydon, *Theomagia, or The Temple of Wisdome*, vol. 1 (London,
@@ -79,7 +74,7 @@ export function HeydonCitation({ page }: { page: HeydonPage }) {
  */
 export const PLATE_X = {
   leaf: 256,
-  url: leafUrl("crowley-equinox_202110", 256, "The Equinox Vol. 1, No. 7"),
+  url: citeUrl("equinoxI7", { leaf: 256 }),
 } as const;
 
 /** "The Equinox I(7) (1912), Plate X", for a link's accessible name. */

@@ -8,6 +8,7 @@ import {
   sigilRasterDefault,
   sigilWordCount,
 } from "@/render/contracts/roseSigil";
+import { citeUrl } from "@/sources/works";
 import { breadcrumbList, entityTrail } from "./Breadcrumbs";
 import type { SocialImage } from "./pages";
 import { SITE_ORGANIZATION, SITE_URL } from "./site";
@@ -163,7 +164,7 @@ const REGARDIE_RULES = {
   publisher: { "@type": "Organization", name: "Aries Press" },
   datePublished: "1940",
   description: "p.57, archive.org leaf n51 (the rules of the Rose Cross sigil)",
-  url: "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol4-1940/page/n51/mode/1up",
+  url: citeUrl("regardie1940", { leaf: 51 }),
 } as const;
 
 /**

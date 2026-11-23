@@ -27,6 +27,7 @@ import { UNNAMED_PLACE } from "@/geo/place";
 import usePlace, { type SourcedPlace } from "@/geo/usePlace";
 import { ordinal } from "@/lib/utils";
 import { mothersToString } from "@/render/contracts/astroGeomancyChart";
+import Cite from "@/sources/Cite";
 import Tetragram from "../Tetragram";
 import { compute, tetragramFromRows } from "../tetragrams";
 import AstroGeomancyChart from "./AstroGeomancyChart";
@@ -574,18 +575,18 @@ function GeomancyReading({ initial }: { initial: GeomancyReadingState }) {
         <div style={{ opacity: 0.5, fontSize: "70%", marginTop: 5 }}>
           In our own words, on the Golden Dawn&apos;s order of names as Crowley
           gives it in{" "}
-          <a href="https://archive.org/details/crowley-equinox_202110/The%20Equinox%20Vol.%201%2C%20No.%202/page/n22/mode/1up">
+          <Cite work="equinoxI2" leaf={22} plain>
             “Liber O”
-          </a>{" "}
+          </Cite>{" "}
           (<i>The Equinox</i> I(2), 1909). The figures&apos; meanings in the
           houses are the Golden Dawn&apos;s table from his{" "}
-          <a href="https://archive.org/details/crowley-equinox_202110/The%20Equinox%20Vol.%201%2C%20No.%202/page/n158/mode/1up">
+          <Cite work="equinoxI2" leaf={158} plain>
             “A Handbook of Geomancy”
-          </a>{" "}
+          </Cite>{" "}
           in the same number; the houses follow{" "}
-          <a href="https://archive.org/details/b20458563/page/n34/mode/1up">
+          <Cite work="agrippaFourthBook1655" leaf={34} plain>
             Agrippa&apos;s Fourth Book
-          </a>{" "}
+          </Cite>{" "}
           (Turner, 1655).
         </div>
         <br />

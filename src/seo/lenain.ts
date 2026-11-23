@@ -1,4 +1,5 @@
 import { divisions } from "magick-data/kabbalah/lenain/volume";
+import { workUrl } from "@/sources/works";
 import { breadcrumbList, entityTrail } from "./Breadcrumbs";
 import type { EntityPage } from "./entities";
 
@@ -68,9 +69,9 @@ export function lenainSlugs() {
  */
 
 /** The scan this edition transcribes: a reissue, recorded as 1909. */
-const SCAN_URL = "https://books.google.com/books?id=ZqgpxTZ43HkC";
+const SCAN_URL = workUrl("lenainReissue");
 /** The 1823 printing itself, which the apparatus cites (plan 033). */
-const PRINT_1823_URL = "https://books.google.com/books?id=qt9SAAAAcAAJ";
+const PRINT_1823_URL = workUrl("lenain1823");
 const CC_BY = "https://creativecommons.org/licenses/by/4.0/";
 
 const LENAIN = {

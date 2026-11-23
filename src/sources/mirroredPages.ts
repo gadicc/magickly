@@ -307,6 +307,13 @@ export const MIRRORED_PAGES = {
           "Jupiter's square, in numbers and in Hebrew letters, with its seal and the characters of its intelligence and spirit",
         highlight: { x: 0.11, y: 0.506, width: 0.66, height: 0.35 },
       },
+      // What the planetary seals cite on the leaf: the two squares, with
+      // their seals, the two boxes above as one.
+      saturnAndJupiter: {
+        cited:
+          "the squares of Saturn and Jupiter, with their seals and the characters of their intelligences and spirits",
+        highlight: { x: 0.11, y: 0.178, width: 0.66, height: 0.678 },
+      },
       // What the kamea sigils' sources cite on the leaf: the Moon's names
       // and the squares of Saturn and Jupiter, the three boxes above as one.
       kameaSigils: {

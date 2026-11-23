@@ -39,6 +39,7 @@ import React from "react";
 import { ReadingColumn } from "@/app/PageText";
 import { angelSlug } from "@/lib/angelSlugs";
 import SourceLink from "@/sources/SourceLink";
+import { workUrl } from "@/sources/works";
 
 type AstrologySystem = "tropical" | "sidereal";
 
@@ -312,7 +313,7 @@ function SevenyTwo() {
             <summary>Important note on sources used.</summary>
             <p>
               The material here is taken from{" "}
-              <a href="https://www.google.co.uk/books/edition/La_science_cabalistique/ZqgpxTZ43HkC?hl=en&gbpv=0">
+              <a href={workUrl("lenainReissue")}>
                 <i>La Science Cabalistique</i>
               </a>{" "}
               by Lazare Lenain (1823; digitized by Google Books), or, as his
@@ -372,13 +373,8 @@ function SevenyTwo() {
               reissue was reset from scratch, with modernised spelling, so its
               page numbers are its own and not Lenain&apos;s. Where an editorial
               note turns on what is printed, it also cites{" "}
-              <a href="https://books.google.com/books?id=qt9SAAAAcAAJ">
-                the 1823 printing
-              </a>{" "}
-              and{" "}
-              <a href="https://archive.org/details/BIUSante_ms05365">
-                a handwritten copy of it
-              </a>{" "}
+              <a href={workUrl("lenain1823")}>the 1823 printing</a> and{" "}
+              <a href={workUrl("lenainMs5365")}>a handwritten copy of it</a>{" "}
               (Bibliothèque interuniversitaire de santé, Ms 5365).
             </p>
             <p>

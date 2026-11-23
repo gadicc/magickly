@@ -3,39 +3,19 @@ import { H2, H3, List, PageText } from "@/app/PageText";
 import Link from "@/i18n/PublicLink";
 import UiRichText from "@/i18n/UiRichText";
 import { SITE_REPOSITORY } from "@/seo/site";
-import SourceLink from "@/sources/SourceLink";
+import Cite from "@/sources/Cite";
 import { kameaSigilPagePath } from "./kameaSigilState";
 
-/**
- * Regardie's *The Golden Dawn*, vol. 4 (Aries Press, Chicago, 1940), on
- * archive.org: the method of tracing a name on a kamea on pp. 78–80
- * (leaves n72–n74), the Aiq Bekar table on p. 79 (n73). In copyright
- * where the site is read (plan 091), so its pages are linked, never
- * mirrored, and its facts are given in our own words.
+/*
+ * The scans this text cites, through <Cite> (src/sources/works.ts):
+ * Regardie's *The Golden Dawn*, vol. 4 (1940), the method of tracing a name
+ * on a kamea on pp. 78–80 (leaves n72–n74), the Aiq Bekar table on p. 79
+ * (n73), in copyright where the site is read (plan 091), so linked, never
+ * mirrored, and its facts given in our own words; Agrippa, *De occulta
+ * philosophia* (Cologne, 1533), book II, chapter 22, the names on leaf
+ * n163, the squares from n164 (Saturn and Jupiter, mirrored) to n168 (the
+ * Moon).
  */
-const regardiePage = (leaf: number) =>
-  `https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol4-1940/page/n${leaf}/mode/1up`;
-
-/**
- * Agrippa, *De occulta philosophia* (Cologne, 1533), book II, chapter 22,
- * the Library of Congress copy on archive.org: the names on leaf n163,
- * the squares from n164 (Saturn and Jupiter) to n168 (the Moon).
- */
-const agrippaPage = (leaf: number) =>
-  `https://archive.org/details/DeOccultaPhilosophiaLoc1533/page/n${leaf}/mode/1up`;
-
-/**
- * Leaf 164, which the site mirrors: opens the page in the lightbox with the
- * Moon's names and the two squares outlined (`src/sources`), and goes to
- * archive.org without JavaScript, as the other leaves do.
- */
-function AgrippaMirror({ children }: { children?: ReactNode }) {
-  return (
-    <SourceLink page="agrippa149" region="kameaSigils" plain>
-      {children}
-    </SourceLink>
-  );
-}
 
 const PLAN = `${SITE_REPOSITORY}/blob/main/plans/093-kameas-and-their-sigils.md`;
 
@@ -72,7 +52,7 @@ export default function KameaSigilsText() {
           components={{
             0: <i />,
             1: <i />,
-            2: <Outside href={regardiePage(72)} />,
+            2: <Cite work="regardie1940" leaf={72} plain rel="noreferrer" />,
           }}
         />
       </p>
@@ -183,9 +163,16 @@ export default function KameaSigilsText() {
             }
             components={{
               0: <i />,
-              1: <Outside href={agrippaPage(163)} />,
-              2: <AgrippaMirror />,
-              3: <Outside href={agrippaPage(168)} />,
+              1: <Cite work="agrippa1533" leaf={163} plain rel="noreferrer" />,
+              2: (
+                <Cite
+                  work="agrippa1533"
+                  leaf={164}
+                  region="kameaSigils"
+                  plain
+                />
+              ),
+              3: <Cite work="agrippa1533" leaf={168} plain rel="noreferrer" />,
             }}
           />
         </li>
@@ -196,9 +183,9 @@ export default function KameaSigilsText() {
             }
             components={{
               0: <i />,
-              1: <Outside href={regardiePage(72)} />,
-              2: <Outside href={regardiePage(74)} />,
-              3: <Outside href={regardiePage(73)} />,
+              1: <Cite work="regardie1940" leaf={72} plain rel="noreferrer" />,
+              2: <Cite work="regardie1940" leaf={74} plain rel="noreferrer" />,
+              3: <Cite work="regardie1940" leaf={73} plain rel="noreferrer" />,
             }}
           />
         </li>

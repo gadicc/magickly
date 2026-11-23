@@ -5,10 +5,10 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import * as React from "react";
+import Cite from "@/sources/Cite";
 import styles from "./oration.module.css";
 import {
   DEFAULT_ORATION_VERSION,
-  jamesPage,
   ORATION_VERSION_TITLES,
   ORATION_VERSIONS,
   type OrationVersion,
@@ -189,8 +189,14 @@ export default function Oration({ children }: { children?: React.ReactNode }) {
           <p className={styles.source}>
             <sup>1</sup> Geoffrey James,{" "}
             <i>The Enochian Magick of Dr. John Dee</i> (Llewellyn, 1994), pp.{" "}
-            <a href={jamesPage(38)}>53</a>–<a href={jamesPage(39)}>55</a>: his
-            words, with Dee&apos;s spelling modernised and Dee&apos;s
+            <Cite work="james1994" leaf={38} plain>
+              53
+            </Cite>
+            –
+            <Cite work="james1994" leaf={39} plain>
+              55
+            </Cite>
+            : his words, with Dee&apos;s spelling modernised and Dee&apos;s
             punctuation and capitals; see{" "}
             <a href="#oration-text-source">the text</a> below.
           </p>
