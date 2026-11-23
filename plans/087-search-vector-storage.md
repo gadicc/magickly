@@ -6,8 +6,9 @@ day ([below](#review-18-november-2026)) showed those measurements
 overstated the history cost about sixfold. Gadi reconfirmed decision 1 on
 the corrected numbers the same day and dropped the history rewrite
 (decision 6); S0 is done. S1 is on `main` since 18 November
-(below). S2 is being built on `gate/search-vectors`; Gadi settled its
-open questions on 23 November ([S2 decisions](#s2-decisions-23-november-2026)). Read [plan 070](070-site-search.md) (the site
+(below). S2 is built on `gate/search-vectors`, not yet on `main`; Gadi settled its
+open questions on 23 November ([S2 decisions](#s2-decisions-23-november-2026),
+[built](#built-23-november-2026-gatesearch-vectors)). Read [plan 070](070-site-search.md) (the site
 search and its embedding contract) and `src/search/README.md` first. The
 number was free on every local and remote branch on 18 November 2026.
 
@@ -399,6 +400,243 @@ Gadi took the recommendation on each of the questions above:
 5. **A profile change is a new profile.** Adding or changing any field of
    `EmbeddingProfile` re-keys every row; the golden test catches it, and
    the change is made as a new entry with a new key, not an edit.
+
+#### Built (23 November 2026, `gate/search-vectors`)
+
+Five commits, first built on `14a3b4c3` (`main`'s `3fd4826c` plus the S2
+decisions), then rebased onto `main`'s `37924292`
+([below](#rebased-onto-37924292)). The measurements up to the rebase
+section were taken before the rebase and name the commits as they were
+then:
+
+| Before the rebase | After | What |
+| --- | --- | --- |
+| `f26bc21a` | `09566109` | Per-record coverage: `search:build` assembles only referenced rows and reports coverage; the store and `/search/index` share one availability rule; tests |
+| `28ea401c` | `28997e31` | `search:publish` and `search:compare` take each row from the committed rows, then the private cache, then the provider |
+| `246acc5e` | `b0efa373` | The dev watcher also watches the selected profile's row directory and the manifest |
+| `9502f9b2` | `d60a275d` | `src/search/README.md`'s contract; plan 070's dated note |
+| `f17d8d0d` | `fb052382` | The store reloads when its artifact changes, so a dev server follows the watcher |
+
+- **Coverage in `search:build`.** After the prose it imports the
+  catalogue (only then, since the catalogue reads the `prose.json` just
+  written), computes every record's key with `embeddingRowKey` and
+  assembles only the rows some record references
+  (`assembleVectorArtifact(root, profile, keys)` in `rows.ts`). Every row
+  on disk is still validated, orphans too, so a malformed row fails the
+  build; orphans are only counted. It prints, for example,
+  `search: 3210/3210 records have embedding rows for
+  gemini-embedding-2-768-search-v1; assembled 3210 rows, 0 orphan rows
+  left on disk`, and below 90% a warning on stderr naming the share and
+  `pnpm search:publish <profile>` (or, at zero, that meaning search is
+  unavailable). The step is `scripts/search/vectors.ts`, so its branches
+  are tested; `buildProse.ts` wraps it in a function because tsx runs that
+  file as CommonJS, which has no top-level await.
+- **Coverage for `/search/index`.** The artifact holds only referenced
+  rows, so its header's keys are the coverage. `/search/index` reads the
+  header alone (`readVectorArtifactHeader`, which also checks the file's
+  size against it) and applies the store's rule to the current catalogue;
+  no separate coverage file.
+- **Store.** `coveredVectors` looks each record's row up by key
+  (`artifactCoverage`) and returns the covered records and their vectors,
+  built in one loop so a record and its vector cannot misalign;
+  `rankVectors` then scores only those, and `fuseSearchResults` merges
+  them with the lexical engine, which still indexes the whole catalogue.
+  Null (unavailable) when nothing is covered or the artifact is for
+  another profile. Removed from availability: the catalogue digest, the
+  `rows` count and the record-order matrix hash. Kept: the manifest's
+  profile against `EMBEDDING_PROFILES` (`selectedProfile`), and row
+  validation (length, finite values, norm) through `decodeRow`, moved to
+  `rowBytes.ts` so `/api/search` does not import the row files' handling.
+  A missing artifact throws (decision 3). The loaded index is cached per
+  artifact mtime and size, so a rebuilt artifact is reloaded (`f17d8d0d`).
+- **One availability rule.** `/api/search`'s `available()` is
+  `Boolean(await loadSemanticIndex())`; `/search/index`'s
+  `semanticAvailable` is `semanticAvailable(catalogue)` in `store.ts`; both
+  are "the selected profile, at least one covered record", from
+  `artifactCoverage`. `http.ts` checks `available()` before reserving
+  quota, so an uncovered index spends neither quota nor a provider call.
+- **Publish lookup order.** `rowSources` and `gatherMatrix`
+  (`publish.ts`): committed rows first, their bytes copied; then
+  `.private/site-search`; then the provider, in batches of 32, for the
+  rest. `embed.mts` works out the sources before the price check, so the
+  estimate counts only provider rows (plus the fixed allowance for query
+  probes). `search:compare` uses the same order, so it too no longer pays
+  for committed rows. `search:assemble` is unchanged and ran on this tree
+  without changing a file. Neither paid task was run.
+- **Watcher.** `watch.mts` reruns `search:build` for `.js`/`.ts` changes
+  under `src/`, for `src/search/embeddings/manifest.json`, and for any
+  change in `search-vectors/<selected profile>/` (recursively, that
+  directory only; until it exists, `search-vectors/` for it to appear; a
+  manifest change re-arms it). Checked with the watcher alone: a dot file
+  added and removed in a fan-out directory and a touched manifest each
+  rebuilt once; a touched `prose.json` did not.
+- **Tests.** `rows.test.ts`: referenced rows only, orphans counted and
+  not a failure, a malformed orphan (length, NaN, norm) a failure.
+  `artifact.test.ts`: coverage by key in any order, partial and
+  other-profile coverage, the header-only read, full and partial
+  `coveredVectors` with each covered record's own vector ranking its own
+  page and the uncovered one never ranking, zero coverage, bad rows.
+  `availability.test.ts`: both routes against full, half, empty and
+  other-profile artifacts derived from the real one (available ⇔ 200;
+  otherwise 503 with no quota or provider call), a missing artifact as an
+  error, and the reload. `publish.test.ts`: the lookup order, an
+  off-unit committed row copied rather than renormalised, batching, a
+  wrong-sized reply. `scripts/search/vectors.test.ts`: no profile (the
+  artifact removed, the catalogue never built), an unknown profile, a
+  malformed row, full coverage, orphans with the 90% warning, zero.
+  `manifest.test.ts` no longer compares the catalogue digest; it checks
+  the selected profile and that `search-vectors/` holds only its directory
+  (decision 4). `semantic.test.ts` picks a covered record (the planetary
+  hours summary while it has a row) and checks the two routes agree.
+- **Docs.** `src/search/README.md` describes the contract; plan 070 has a
+  dated note. `semantic.test.ts`'s comment now says the service worker,
+  not `/api/search`, takes every file in `public/search-vectors`; S3
+  deletes the test with the directory.
+- **Not changed:** `public/search-vectors`, the manifest's fields, the
+  matrix `search:publish` and `search:assemble` write, and the
+  `/api/search` tracing entry (S3).
+
+**`search:build` time** (wall clock; the watcher runs the script directly;
+Node 24.18.0, warm): before, at `14a3b4c3`, 0.56–0.66 s direct and
+1.20–1.48 s through `pnpm search:build`; after, 1.01–1.11 s direct on the
+uncommitted S2 tree, and 0.75–0.86 s direct and 1.36–1.42 s through pnpm at
+`f17d8d0d` after the gate's fresh install. The added 0.2–0.45 s is mostly
+importing the catalogue's modules under tsx (~0.4 s measured alone);
+building the catalogue takes ~60 ms and the 3,210 keys ~15 ms.
+
+**Acceptance, full coverage**, at `f17d8d0d` after its gate build (the
+same output on the uncommitted tree before the commits): a script outside
+the repository loading `loadSemanticIndex()` and hashing its `vectors`:
+
+```
+covered 3210/3210, record order: true, matrix bytes 9861120
+store sha256    a713523516b52c3da71826154a51467b38cef11ef44295893d2ec3472e3dbdd9
+manifest sha256 a713523516b52c3da71826154a51467b38cef11ef44295893d2ec3472e3dbdd9
+```
+
+So with every record covered the store's matrix is the published one and
+ranking is unchanged.
+
+**Acceptance, partial coverage**, on the uncommitted tree that became
+`f26bc21a`–`9502f9b2`, then reverted: one word added to the Moon page's
+prose (`src/app/astrology/moon/MoonText.tsx`). `pnpm search:build`:
+
+```
+search: 3208/3210 records have embedding rows for gemini-embedding-2-768-search-v1; assembled 3208 rows, 2 orphan rows left on disk
+```
+
+A direct store load:
+
+```
+available: true, /search/index rule: true
+covered 3208/3210; uncovered: /astrology/moon#prose:0, /astrology/moon#prose:156
+self-match to own page: 3208/3208
+dense top for a covered /astrology/moon row: /astrology/moon, /open-source/components/moon-widget, /astrology/planets
+lexical still finds the edited page: /astrology/moon
+```
+
+`pnpm test` on that tree exited 0: 736 files and 14,281 tests passed,
+3 files and 19 tests skipped. After the revert `search:build` reported
+3210/3210 again.
+
+**Gate** at `f17d8d0d`, from a script run with `bash`, each step's exit
+status recorded: Node 24.18.0; `rm -rf node_modules .next` and a fresh
+`pnpm install --frozen-lockfile`; `pnpm build` with the placeholder
+environment from `ci.yml`. The tasks ran as `package.json` records them,
+so `test` and `build` went through `loom slots run`.
+
+| Commit | install | check | typecheck | test | build |
+| --- | --- | --- | --- | --- | --- |
+| `f17d8d0d` | 0 | 0 (28 warnings, none in changed files) | 0 | 0 (736 files, 14,282 tests passed; 3 files, 19 tests skipped) | 0 |
+
+After the build, `.next/server/app/api/search/route.js.nft.json` lists
+`../../../../../src/search/generated/search-vectors.bin` and no row file,
+and the prerendered `/search/index` body has `"semanticAvailable":true`.
+The intermediate commits each passed `pnpm check`, `tsc --noEmit` and the
+search tests (`src/search`, `scripts/search`) on their own tree.
+`9502f9b2` is prose only.
+
+#### Rebased onto `37924292`
+
+`main` moved on while S2 was built. Its `0f20f618` ("fix(search): Index the
+public rituals by metadata") skips the `/doc/*` ritual pages' prose
+(`UNEXTRACTED_PAGES` in `adaptedPages.ts`, used by `buildProse.ts` and
+`catalogue.ts`), edited `src/search/README.md`'s content section, and
+republished: three rows pruned, the matrix now
+`gemini-embedding-2-768-search-v1-119768d57cf5.bin`. The rebase onto
+`37924292` conflicted only in `buildProse.ts`, resolved as S2's version
+with `main`'s `UNEXTRACTED_PAGES` filter and comment. The README merged
+without conflict, keeping both edits. The S2 decisions commit became
+`3ba12fda`.
+
+**Coverage**, at every rebased commit after `pnpm data:build`:
+
+```
+search: extracted public JSX prose for 41 pages
+search: 3207/3207 records have embedding rows for gemini-embedding-2-768-search-v1; assembled 3207 rows, 0 orphan rows left on disk
+```
+
+**Acceptance, full coverage**, at `fb052382` after its gate build, with
+the same script as above against the new manifest:
+
+```
+covered 3207/3207, record order: true, matrix bytes 9851904
+store sha256    119768d57cf5fa45708a3536507185dd272a3b961c8e5dfc3361f28e9982d456
+manifest sha256 119768d57cf5fa45708a3536507185dd272a3b961c8e5dfc3361f28e9982d456 (gemini-embedding-2-768-search-v1-119768d57cf5.bin)
+```
+
+**Each commit on its own tree** (checked out in the worktree; `pnpm
+data:build`, `pnpm search:build`, `pnpm check`, `next typegen` and
+`tsc --noEmit`, then the search tests in `src/search` and
+`scripts/search`):
+
+| Commit | data:build | search:build | check | tsc | search tests |
+| --- | --- | --- | --- | --- | --- |
+| `09566109` | 0 | 0 | 0 | 0 | 0 (15 files, 85 tests) |
+| `28997e31` | 0 | 0 | 0 | 0 | 0 (15 files, 88 tests) |
+| `b0efa373` | 0 | 0 | 0 | 0 | 0 (15 files, 88 tests) |
+| `d60a275d` | 0 | 0 | 0 | 0 | 0 (15 files, 88 tests) |
+| `fb052382` | 0 | 0 | 0 | 0 | 0 (15 files, 89 tests) |
+
+`pnpm check` reports 28 warnings on each, as it does on `main`'s
+`37924292`.
+
+**Gate** at `fb052382`, the same script and environment as before the
+rebase (fresh `pnpm install --frozen-lockfile`; `test` and `build` through
+`loom slots run`):
+
+| Commit | install | check | typecheck | test | build |
+| --- | --- | --- | --- | --- | --- |
+| `fb052382` | 0 | 0 (28 warnings, as on `37924292`) | 0 | 0 (737 files, 14,291 tests passed; 3 files, 19 tests skipped) | 0 |
+
+After the build the `/api/search` trace lists
+`../../../../../src/search/generated/search-vectors.bin` and no row file,
+and the prerendered `/search/index` body has `"semanticAvailable":true`.
+
+**`search:build` time**, direct, warm, alternating the two commits in
+one session so the machine's load is the same: `37924292` (S1's assembly
+of every row) 0.48–0.58 s, `fb052382` 0.71–0.82 s. Through `pnpm
+search:build` at `fb052382`: 1.14–1.32 s.
+
+#### For S3
+
+- `selectedProfile` checks the manifest's copy of the profile in
+  `profiles[]`; when S3 drops `file`, `sha256`, `rows` and
+  `catalogueSha256`, keep the profile object (or check another way).
+  `publishMatrix` then stops writing the matrix, and `semantic.test.ts`'s
+  file test goes.
+- With the matrix gone nothing records a digest of the published vectors,
+  so the full-coverage check above (the store's matrix hashing to the
+  manifest) can no longer be made. Printing the assembled matrix's
+  SHA-256 in `search:build` would keep a comparable number.
+- `/search/index` reads the artifact while it is prerendered and has no
+  tracing entry; fine while it stays `force-static`.
+- `search:build` now imports the catalogue, so it needs `data:build`
+  first, as every task already runs; a bare `pnpm search:build` or
+  `search:watch` on a fresh checkout fails without it. The watcher does
+  not rerun when `packages/magick-data` changes, though the catalogue
+  reads it; coverage is then reported late, never wrong, since the store
+  recomputes keys at load.
 
 ### S3. Remove `public/search-vectors`
 
