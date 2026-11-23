@@ -5,8 +5,9 @@ Status: designed, not built. Gadi settled decisions 1–3 and 6 on
 day ([below](#review-18-november-2026)) showed those measurements
 overstated the history cost about sixfold. Gadi reconfirmed decision 1 on
 the corrected numbers the same day and dropped the history rewrite
-(decision 6); S0 is done. S1 is built on `gate/search-vectors`
-(below); S2 is next. Read [plan 070](070-site-search.md) (the site
+(decision 6); S0 is done. S1 is on `main` since 18 November
+(below). S2 is being built on `gate/search-vectors`; Gadi settled its
+open questions on 23 November ([S2 decisions](#s2-decisions-23-november-2026)). Read [plan 070](070-site-search.md) (the site
 search and its embedding contract) and `src/search/README.md` first. The
 number was free on every local and remote branch on 18 November 2026.
 
@@ -378,6 +379,26 @@ the shared recipe, golden-key test and malformed-row tests landed in S1.
 - `semantic.test.ts`'s "only the files the manifest names" test says
   `/api/search` bundles every file there, no longer true; S3 deletes it
   with the directory.
+
+#### S2 decisions (23 November 2026)
+
+Gadi took the recommendation on each of the questions above:
+
+1. **Assemble only referenced rows.** `search:build` knows the
+   catalogue's keys once it computes coverage, so the artifact and the
+   function bundle carry only rows some record uses; orphans stay on disk
+   until a publish or `search:assemble` prunes them.
+2. **The dev watcher also watches the selected profile's row directory**
+   and `src/search/embeddings/manifest.json`, so a pull that adds rows or
+   changes the selection reaches a running dev server without a source
+   save.
+3. **A missing artifact stays an error.** It can only be missing when
+   `search:build` did not run, and then `prose.json` is missing too.
+4. **Only the shipped profile keeps committed rows.** `search:compare`
+   writes none, and no other profile's directory is committed.
+5. **A profile change is a new profile.** Adding or changing any field of
+   `EmbeddingProfile` re-keys every row; the golden test catches it, and
+   the change is made as a new entry with a new key, not an edit.
 
 ### S3. Remove `public/search-vectors`
 
