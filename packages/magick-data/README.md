@@ -513,10 +513,16 @@ changes for the 2nd, 11th, 14th, 17th, 37th, 43rd, 54th and 64th genii and
 misreadings of æ as œ (43, 54), five the reissue's misprints, which the
 1823 printing does not have (2, 17, 37's "ad", 47, 64), and three Lenain's
 own slips that are not Latin as they stand (11, 14, 37's "virtutem"), given
-the psalter's word as the 45th's "adjuvebat" always was. The entries'
-French keeps what the reissue prints where the slip is the printer's or
-Lenain's, and `lenain/apparatus` notes each, with the 1823 printing's
-reading in `lenain/witnesses`. In `planetaryNameCharacter`, a stroke may
+the psalter's word as the 45th's "adjuvebat" always was. The misreadings of
+æ are mended in the transcription too: `lenain/pages` (generated from it)
+and both entries' French and English in `seventyTwoAngelsText` read
+"præveniet" and "cælo". The entries' French otherwise keeps what the reissue
+prints where the slip is the printer's or Lenain's, and `lenain/apparatus`
+notes each, with the 1823 printing's reading in `lenain/witnesses` and, for
+11, 14 and 37, Kircher's (a new witness `source`, `kircherVerses`, the leaf
+of his table of the verses). `lenain/apparatus` also notes that the 33rd's
+verse is the Vulgate's Psalm 93:11, which Lenain cites as Psalm 33; the field
+keeps his number. In `planetaryNameCharacter`, a stroke may
 give `rings`, and a vertex `via`, `hook` and `bar`, points the reader
 recorded; `planetaryName` gives more of its witnesses' captions, read again
 from the leaves. No field or table is renamed or removed. The Vulgate's
@@ -582,15 +588,15 @@ provenance, and no version past 0.0.0 ships while a row has none.
 | `kabbalah/lenain/apparatus.json5` | [Lenain](#lenain) | 2026-11-23 |
 | `kabbalah/lenain/evidence.json5` | [Lenain](#lenain) | 2026-11-12 |
 | `kabbalah/lenain/kircherPlate.json5` | [Lenain](#lenain): Kircher's plate of the seventy-two names of God by nation (1653), the source of Lenain's first table's last two columns, read from the National Library of Poland's copy on Wikimedia Commons; and where Lenain's entries depart from it | 2026-11-19 |
-| `kabbalah/lenain/pages.json5` | [Lenain](#lenain) | 2026-11-12 |
+| `kabbalah/lenain/pages.json5` | [Lenain](#lenain) | 2026-11-23 |
 | `kabbalah/lenain/vulgate/differences.json5` | [Lenain](#lenain): ours, every place Lenain's Latin verse differs from the Vulgate's, with what the 1823 printing and Kircher read and whose the difference is | 2026-11-23 |
 | `kabbalah/lenain/vulgate/verses.json5` | [Lenain](#lenain): the Clementine Vulgate's text of the 72 genii's verses, from the Clementine Vulgate Project (public domain), each with the page of Hetzenauer's Clementine (Innsbruck, 1914) that prints it | 2026-11-23 |
-| `kabbalah/lenain/witnesses.json5` | [Lenain](#lenain): what the 1823 printing and the manuscript copy of it print where a note turns on a value, read from their page images | 2026-11-23 |
+| `kabbalah/lenain/witnesses.json5` | [Lenain](#lenain): what the 1823 printing and the manuscript copy of it print where a note turns on a value, read from their page images, and what Kircher's table of the verses prints where a note on a verse turns on it | 2026-11-23 |
 | `kabbalah/paths.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `kabbalah/sephirot.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `kabbalah/seventyTwoAngels.json5` | [Lenain](#lenain) | 2026-11-23 |
-| `kabbalah/seventyTwoAngelsText/en.json5` | [Lenain](#lenain) | 2026-11-12 |
-| `kabbalah/seventyTwoAngelsText/fr.json5` | [Lenain](#lenain) | 2026-11-12 |
+| `kabbalah/seventyTwoAngelsText/en.json5` | [Lenain](#lenain) | 2026-11-23 |
+| `kabbalah/seventyTwoAngelsText/fr.json5` | [Lenain](#lenain) | 2026-11-23 |
 | `kabbalah/souls.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `kabbalah/tribesOfIsrael.json5` | [Correspondences](#correspondences) | 2026-11-12 |
 | `materia/scents.json5` | [Correspondences](#correspondences) | 2026-11-12 |
@@ -627,7 +633,12 @@ handwritten copy of it
 ([archive.org BIUSante_ms05365](https://archive.org/details/BIUSante_ms05365),
 Licence ouverte). Each reading is a short value with its page or leaf, read
 from the page image: the 1823 printing is public domain, and the manuscript's
-images are offered under the Licence ouverte.
+images are offered under the Licence ouverte. Where a note on a verse turns
+on Kircher's table of the 72 verses, which Lenain cites for them
+(*Oedipus Aegyptiacus*, vol. II part 1, Rome 1653, pp. 275–280), it
+records what the table prints there too, with its leaf in the Complutense
+copy ([archive.org bub_gb_XjfzMnomDQoC](https://archive.org/details/bub_gb_XjfzMnomDQoC));
+Kircher died in 1680.
 
 **`lenain/kircherPlate.json5`** is the plate Lenain names as the source of
 his first table's last two columns: Athanasius Kircher, *Oedipus
