@@ -38,6 +38,53 @@ describe("/api/render/[slug]", () => {
     }
   });
 
+  it.each([
+    [
+      "?angel=vehuiah",
+      "/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil-band.svg",
+    ],
+    [
+      "?style=band&fmt=png&angel=vehuiah",
+      "/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil-band.png",
+    ],
+    [
+      "?angel=lauviah-17&style=bare&download=1",
+      "/kabbalah/angel/lauviah-17/lauviah-17-rose-cross-sigil-bare.svg",
+    ],
+    [
+      "?angel=jabamiah&style=talisman&fmt=png&width=300",
+      "/kabbalah/angel/jabamiah/jabamiah-rose-cross-sigil-talisman.png",
+    ],
+    // The rose is rose-sigil's file, which keeps its one identity.
+    [
+      "?angel=nith-haiah&style=rose&fmt=png",
+      "/kabbalah/angel/nith-haiah/nith-haiah-rose-cross-sigil.png",
+    ],
+    [
+      "?angel=nith-haiah&style=rose",
+      "/kabbalah/angel/nith-haiah/nith-haiah-rose-cross-sigil.svg",
+    ],
+  ])("sends angel-sigil%s to the angel's file", async (query, path) => {
+    const response = await get("angel-sigil", query);
+    expect(response.status).toBe(308);
+    expect(response.headers.get("location")).toBe(path);
+    expect(response.headers.get("cache-control")).toBe("public, max-age=86400");
+  });
+
+  it("refuses an angel-sigil query the contract refuses", async () => {
+    for (const query of [
+      "",
+      "?angel=lauviah",
+      "?angel=vehuiah&style=lamen",
+      "?angel=vehuiah&text=%D7%90",
+      "?angel=vehuiah&fmt=jpg",
+    ]) {
+      const response = await get("angel-sigil", query);
+      expect(response.status, query).toBe(400);
+      expect(response.headers.get("cache-control")).toBe("no-store");
+    }
+  });
+
   describe("kamea-sigil", () => {
     const he = (text: string) => encodeURIComponent(text);
     const canonical = (props: Record<string, string>) =>

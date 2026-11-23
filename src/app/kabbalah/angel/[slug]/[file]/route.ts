@@ -1,25 +1,34 @@
+import { NoFallbackError } from "next/dist/shared/lib/no-fallback-error.external";
 import { renderComponentImage } from "@/render/componentImage";
 import { contentDisposition } from "@/render/componentImageUrl";
-import { allAngelSigilFiles, angelSigilQuery } from "@/seo/angelSigils";
+import {
+  ANGEL_SIGIL_BUILT_STYLES,
+  allAngelSigilStyleFiles,
+  angelSigilRequest,
+  angelSigilRouteFile,
+} from "@/seo/angelSigils";
 
 /**
- * The 72 angels' Rose Cross sigils (plan 088, S4), a PNG and an SVG under
- * each angel's page, drawn once at build time by the image route's
- * renderer as the temple halls' files are (plan 062, decision 3): the
- * canonical, indexable copies, under names a download keeps. Anything else
- * is a 404 that renders nothing. The page is in `(public)`; this handler
- * sits beside its components, one segment below the page's URL.
+ * The 72 angels' sigils, a PNG and an SVG of each style under each angel's
+ * page (plan 088, S4; plan 096, decision 3), drawn by the image route's
+ * renderer: the canonical, indexable copies, under names a download keeps.
+ * The rose's and the band's are drawn when the site is built, as the
+ * temple halls' files are (plan 062, decision 3). The bare and talisman
+ * files are drawn on their first request and kept: `force-static` with no
+ * `revalidate`, so Next stores the first response and answers every later
+ * one from it, until the next deployment. The page is in `(public)`; this
+ * handler sits beside its components, one segment below the page's URL.
  */
-export const dynamicParams = false;
+export const dynamicParams = true;
+export const dynamic = "force-static";
 
 /** What browsers and the CDN may do with a sigil file: as the halls'. */
 const SIGIL_FILE_CACHE_CONTROL = "public, max-age=0, must-revalidate";
 
 export function generateStaticParams() {
-  return allAngelSigilFiles().map(({ slug, file }) => ({
-    slug,
-    file: file.name,
-  }));
+  return allAngelSigilStyleFiles()
+    .filter(({ file }) => ANGEL_SIGIL_BUILT_STYLES.includes(file.style))
+    .map(({ slug, file }) => ({ slug, file: file.name }));
 }
 
 export async function GET(
@@ -27,15 +36,15 @@ export async function GET(
   { params }: RouteContext<"/kabbalah/angel/[slug]/[file]">,
 ) {
   const { slug, file: name } = await params;
-  const found = allAngelSigilFiles().find(
-    (entry) => entry.slug === slug && entry.file.name === name,
-  );
-  if (!found) return new Response("Not found", { status: 404 });
+  const found = angelSigilRouteFile(slug, name);
+  // Any other name is the site's 404, as `dynamicParams = false` answers
+  // one, before anything is drawn: a 404 returned from here would be kept
+  // like any first response, one cache entry for every name a crawler or a
+  // typo makes up (plan 096, Y1).
+  if (!found) throw new NoFallbackError();
   const { angel, file } = found;
-  const image = await renderComponentImage(
-    "rose-sigil",
-    angelSigilQuery(angel, file),
-  );
+  const request = angelSigilRequest(angel, file);
+  const image = await renderComponentImage(request.slug, request.query);
   return new Response(image.bytes, {
     headers: {
       "Content-Type": image.contentType,

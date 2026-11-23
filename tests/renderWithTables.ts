@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { vi } from "vitest";
 import type { ComponentImageSlug } from "@/render/contracts";
+import { ANGEL_SIGIL_SLUGS } from "@/render/contracts/angelSigil";
 import { GD_HALL_SLUGS } from "@/render/contracts/gdHall";
 import { KAMEA_IMAGE_PLANETS } from "@/render/contracts/kamea";
 import { TREE_IMAGE_FIELDS } from "@/render/contracts/treeOfLife";
@@ -51,6 +52,9 @@ export const TABLE_FILES = {
   soul: "kabbalah/souls",
   tribeOfIsrael: "kabbalah/tribesOfIsrael",
   seventyTwoAngel: "kabbalah/seventyTwoAngels",
+  // Not a table: the genii's verses in the Vulgate (plan 096, Y0), which
+  // the app reads from the build directory (src/render/lenainVulgateVerses.ts).
+  lenainVulgateVerse: "kabbalah/lenain/vulgate/verses",
   chakra: "chakras",
   bodyPart: "body/parts",
   stone: "materia/stones",
@@ -139,6 +143,12 @@ export const DRAWING_QUERIES: Record<ComponentImageSlug, readonly string[]> = {
   "kamea-sigil": KAMEA_IMAGE_PLANETS.map((planet) => `planet=${planet}&text=א`),
   // Every hall: between them they draw every tablet, trump and board.
   "gd-hall": GD_HALL_SLUGS.map((slug) => `hall=${slug}`),
+  // Every angel's talisman (its Hebrew and verse, #70's from the Vulgate)
+  // and band (its Hebrew and roman name); the bare sigil draws no more.
+  "angel-sigil": ANGEL_SIGIL_SLUGS.flatMap((angel) => [
+    `angel=${angel}&style=talisman`,
+    `angel=${angel}`,
+  ]),
 };
 
 /** A changed copy of one table, for `loadWithTables`. */

@@ -3,13 +3,18 @@ import { describe, expect, it } from "vitest";
 import { angelSlug } from "@/lib/angelSlugs";
 import { canonicalSigilText } from "@/render/contracts/roseSigil";
 import {
+  ANGEL_SIGIL_BUILT_STYLES,
   allAngelSigilFiles,
+  allAngelSigilStyleFiles,
   angelJsonLd,
   angelSigilAlt,
+  angelSigilEveryStyle,
   angelSigilFiles,
   angelSigilGeneratorHref,
-  angelSigilQuery,
+  angelSigilRequest,
+  angelSigilRouteFile,
   angelSigilSocialImage,
+  angelSigilStyleFiles,
   angelSigilText,
 } from "./angelSigils";
 
@@ -38,6 +43,7 @@ describe("the angels' sigil files", () => {
         name: "vehuiah-rose-cross-sigil.png",
         path: "/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.png",
         format: "png",
+        style: "rose",
         width: 1024,
         height: 1024,
       },
@@ -45,17 +51,78 @@ describe("the angels' sigil files", () => {
         name: "vehuiah-rose-cross-sigil.svg",
         path: "/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil.svg",
         format: "svg",
+        style: "rose",
       },
     });
+    // Only the rose's: the pages and the sitemap name these until plan
+    // 096's Y4.
+    expect(new Set(files.map(({ file }) => file.style))).toEqual(
+      new Set(["rose"]),
+    );
   });
 
   it("asks for the default rose, shown, at the raster default", () => {
     const { png, svg } = angelSigilFiles(vehuiah);
-    expect(angelSigilQuery(vehuiah, png).toString()).toBe(
-      `text=${encodeURIComponent("והויה")}&fmt=png`,
+    const he = encodeURIComponent("והויה");
+    expect(angelSigilRequest(vehuiah, png)).toEqual({
+      slug: "rose-sigil",
+      query: new URLSearchParams(`text=${he}&fmt=png`),
+    });
+    expect(angelSigilRequest(vehuiah, svg).query.toString()).toBe(`text=${he}`);
+  });
+
+  it("names every style's two files, the rose's as they were (plan 096)", () => {
+    const files = allAngelSigilStyleFiles();
+    expect(files).toHaveLength(576);
+    expect(new Set(files.map(({ file }) => file.path)).size).toBe(576);
+    for (const { slug, file } of files) {
+      expect(file.path).toBe(`/kabbalah/angel/${slug}/${file.name}`);
+      expect(file.name).toBe(
+        `${slug}-rose-cross-sigil${file.style === "rose" ? "" : `-${file.style}`}.${file.format}`,
+      );
+      expect(angelSigilRouteFile(slug, file.name)?.file).toEqual(file);
+    }
+    expect(angelSigilEveryStyle(vehuiah).map(({ png }) => png.name)).toEqual([
+      "vehuiah-rose-cross-sigil-band.png",
+      "vehuiah-rose-cross-sigil-bare.png",
+      "vehuiah-rose-cross-sigil.png",
+      "vehuiah-rose-cross-sigil-talisman.png",
+    ]);
+    expect(angelSigilStyleFiles(angels[46], "talisman").png).toEqual({
+      name: "asaliah-rose-cross-sigil-talisman.png",
+      path: "/kabbalah/angel/asaliah/asaliah-rose-cross-sigil-talisman.png",
+      format: "png",
+      style: "talisman",
+      width: 1024,
+      height: 1024,
+    });
+    expect(angelSigilFiles(vehuiah)).toEqual(
+      angelSigilStyleFiles(vehuiah, "rose"),
     );
-    expect(angelSigilQuery(vehuiah, svg).toString()).toBe(
-      `text=${encodeURIComponent("והויה")}`,
+    // Built at deploy: the rose's and the band's (decision 3).
+    expect(ANGEL_SIGIL_BUILT_STYLES).toEqual(["rose", "band"]);
+    for (const [slug, name] of [
+      ["vehuiah", "jeliel-rose-cross-sigil-band.png"],
+      ["vehuiah", "vehuiah-rose-cross-sigil-rose.png"],
+      ["vehuiah", "vehuiah-rose-cross-sigil-band.jpg"],
+      ["lauviah", "lauviah-rose-cross-sigil-band.png"],
+      ["constructor", "constructor-rose-cross-sigil-band.png"],
+    ])
+      expect(angelSigilRouteFile(slug, name)).toBeUndefined();
+  });
+
+  it("asks angel-sigil for every other style, by slug and style", () => {
+    const band = angelSigilStyleFiles(vehuiah, "band");
+    expect(angelSigilRequest(vehuiah, band.png)).toEqual({
+      slug: "angel-sigil",
+      query: new URLSearchParams("angel=vehuiah&fmt=png"),
+    });
+    expect(angelSigilRequest(vehuiah, band.svg).query.toString()).toBe(
+      "angel=vehuiah",
+    );
+    const talisman = angelSigilStyleFiles(angels[10], "talisman");
+    expect(angelSigilRequest(angels[10], talisman.svg).query.toString()).toBe(
+      "angel=lauviah-11&style=talisman",
     );
   });
 

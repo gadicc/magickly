@@ -1,13 +1,21 @@
 import { createHash } from "node:crypto";
 import angels from "magick-data/kabbalah/seventyTwoAngels";
+import { NoFallbackError } from "next/dist/shared/lib/no-fallback-error.external";
 import sharp from "sharp";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
+// Counted, so that a name the route refuses is seen to draw nothing.
+vi.mock("@/render/componentImage", async (original) => {
+  const actual = await original<typeof import("@/render/componentImage")>();
+  return { renderComponentImage: vi.fn(actual.renderComponentImage) };
+});
 
 import { angelSlug } from "@/lib/angelSlugs";
 import { renderComponentImage } from "@/render/componentImage";
-import { GET, generateStaticParams } from "./route";
+import * as route from "./route";
+
+const { GET, generateStaticParams } = route;
 
 function get(slug: string, file: string) {
   return GET(new Request("https://magick.ly/kabbalah/angel"), {
@@ -16,19 +24,29 @@ function get(slug: string, file: string) {
 }
 
 describe("/kabbalah/angel/[slug]/[file]", () => {
-  it("prerenders a PNG and an SVG for each of the 72, named by its slug", () => {
+  it("prerenders the band's and the rose's PNG and SVG for each of the 72", () => {
+    // The bare and talisman files are drawn on their first request and
+    // kept (plan 096, decision 3): `force-static`, no `revalidate`, and
+    // names the build did not list let through to the handler.
+    expect(route.dynamic).toBe("force-static");
+    expect(route.dynamicParams).toBe(true);
+    expect("revalidate" in route).toBe(false);
     const params = generateStaticParams();
-    expect(params).toHaveLength(144);
+    expect(params).toHaveLength(288);
     expect(params).toEqual(
       angels.flatMap((angel) => {
         const slug = angelSlug(angel.no);
         return [
+          { slug, file: `${slug}-rose-cross-sigil-band.png` },
+          { slug, file: `${slug}-rose-cross-sigil-band.svg` },
           { slug, file: `${slug}-rose-cross-sigil.png` },
           { slug, file: `${slug}-rose-cross-sigil.svg` },
         ];
       }),
     );
-    expect(params.slice(0, 2)).toEqual([
+    expect(params.slice(0, 4)).toEqual([
+      { slug: "vehuiah", file: "vehuiah-rose-cross-sigil-band.png" },
+      { slug: "vehuiah", file: "vehuiah-rose-cross-sigil-band.svg" },
       { slug: "vehuiah", file: "vehuiah-rose-cross-sigil.png" },
       { slug: "vehuiah", file: "vehuiah-rose-cross-sigil.svg" },
     ]);
@@ -80,14 +98,67 @@ describe("/kabbalah/angel/[slug]/[file]", () => {
     );
   });
 
-  it("answers 404 for any other name", async () => {
+  it.each([
+    ["band", "vehuiah", "angel=vehuiah"],
+    ["bare", "nith-haiah", "angel=nith-haiah&style=bare"],
+    ["talisman", "jabamiah", "angel=jabamiah&style=talisman"],
+  ])(
+    "serves the %s's files as angel-sigil draws them",
+    async (style, slug, query) => {
+      for (const format of ["png", "svg"] as const) {
+        const name = `${slug}-rose-cross-sigil-${style}.${format}`;
+        const response = await get(slug, name);
+        expect(response.status).toBe(200);
+        expect(response.headers.get("content-type")).toBe(
+          format === "png" ? "image/png" : "image/svg+xml",
+        );
+        expect(response.headers.get("content-disposition")).toBe(
+          `inline; filename="${name}"`,
+        );
+        expect(response.headers.get("cache-control")).toBe(
+          "public, max-age=0, must-revalidate",
+        );
+        // Indexable: no noindex on any style's file.
+        expect(response.headers.get("x-robots-tag")).toBeNull();
+        const bytes = Buffer.from(await response.arrayBuffer());
+        const drawn = await renderComponentImage(
+          "angel-sigil",
+          new URLSearchParams(format === "png" ? `${query}&fmt=png` : query),
+        );
+        expect(bytes.equals(drawn.bytes)).toBe(true);
+        expect(response.headers.get("etag")).toBe(`"${drawn.sha256}"`);
+        if (format === "png")
+          expect(await sharp(bytes).metadata()).toMatchObject({
+            width: 1024,
+            height: 1024,
+          });
+      }
+    },
+    60_000,
+  );
+
+  it("answers any other name with the site's 404 before drawing anything", async () => {
+    vi.mocked(renderComponentImage).mockClear();
+    // What `dynamicParams = false` throws for a name the build did not
+    // list: Next answers it with the 404 page and keeps nothing, where a
+    // 404 returned from a `force-static` handler is kept like any first
+    // response.
     for (const [slug, file] of [
       ["vehuiah", "jeliel-rose-cross-sigil.png"],
+      ["vehuiah", "jeliel-rose-cross-sigil-band.png"],
       ["vehuiah", "vehuiah-rose-cross-sigil.jpg"],
       ["vehuiah", "vehuiah-rose-cross-sigil-small.png"],
+      ["vehuiah", "vehuiah-rose-cross-sigil-rose.png"],
+      ["vehuiah", "vehuiah-rose-cross-sigil-Band.png"],
+      ["vehuiah", "vehuiah-rose-cross-sigil-lamen.svg"],
       ["lauviah", "lauviah-rose-cross-sigil.png"],
+      ["lauviah", "lauviah-rose-cross-sigil-talisman.png"],
+      ["constructor", "constructor-rose-cross-sigil-band.png"],
       ["vehuiah", "vehuiah.png"],
     ])
-      expect((await get(slug, file)).status).toBe(404);
+      await expect(get(slug, file), `${slug}/${file}`).rejects.toBeInstanceOf(
+        NoFallbackError,
+      );
+    expect(renderComponentImage).not.toHaveBeenCalled();
   });
 });

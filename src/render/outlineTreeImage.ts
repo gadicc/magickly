@@ -43,6 +43,9 @@ export const SERVER_FONT_FILES = [
   "NotoSerif-Italic-latin1.ttf",
   "NotoSerif-BoldItalic-compass.ttf",
   "FrankRuhlLibre-Bold-letters.ttf",
+  // The angels' sigil styles' upright subset (plan 096), by the same
+  // script. Appended, so that no earlier list's order moves.
+  "NotoSerif-Regular-latin1.ttf",
 ] as const;
 export type ServerFontFile = (typeof SERVER_FONT_FILES)[number];
 const sha256 = (bytes: Uint8Array) =>

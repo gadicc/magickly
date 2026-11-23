@@ -7,17 +7,26 @@ import {
 } from "magick-components/enochian/Tablet";
 import RoseSigilImage from "magick-components/gd/RoseSigilImage";
 import { ROSE_VERSIONS } from "magick-components/gd/roseSigilGeometry";
+import { SIGIL_STYLES } from "magick-components/gd/roseSigilStyles";
 import { CANDLESTICK_VERSIONS } from "magick-components/gd/SevenBranchedCandlestick";
 import { KAMEA_PLANETS } from "magick-data/astrology/kameas";
 import tablets, {
   TABLET_VERSIONS,
   tabletVersion,
 } from "magick-data/enochian/tablets";
+import angels from "magick-data/kabbalah/seventyTwoAngels";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { angelSlug } from "@/lib/angelSlugs";
 import { parseComponentImageRequest } from "../componentImageRequest";
 import { componentImageQuery } from "../componentImageUrl";
+import {
+  ANGEL_SIGIL_GENESIS_VERSE,
+  ANGEL_SIGIL_SLUGS,
+  ANGEL_SIGIL_STYLES,
+  angelSigilFileBase,
+} from "./angelSigil";
 import {
   DEFAULT_MOTHERS,
   mothersFromString,
@@ -137,6 +146,14 @@ describe("component image contracts", () => {
     ],
     // Sizes are PNG-only, so they round-trip in gdHall.test.ts.
     "gd-hall": ["", "hall=zelator-1", "hall=portal-2"],
+    "angel-sigil": [
+      "angel=vehuiah",
+      "angel=vehuiah&style=band",
+      "angel=lauviah-17&style=bare",
+      "angel=nith-haiah&style=rose",
+      "angel=jabamiah&style=talisman&width=300",
+      "style=talisman&angel=asaliah&height=512",
+    ],
   };
 
   it.each(Object.entries(samples))(
@@ -337,6 +354,7 @@ describe("component image contracts", () => {
       "rose-sigil": "text=א",
       kamea: "planet=saturn",
       "kamea-sigil": "planet=saturn&text=א",
+      "angel-sigil": "angel=vehuiah",
     };
     for (const slug of COMPONENT_IMAGE_SLUGS) {
       const query = least[slug] ?? "";
@@ -678,6 +696,93 @@ describe("component image contracts", () => {
       expect(() => parse("rose-sigil", query)).toThrow(
         InvalidComponentImageRequest,
       );
+  });
+
+  it("names the 72 angels by their pages' slugs, and the styles as the package does", () => {
+    // Written out so that the contracts do not import the angels.
+    expect([...ANGEL_SIGIL_SLUGS]).toEqual(
+      angels.map((angel) => angelSlug(angel.no)),
+    );
+    expect(new Set(ANGEL_SIGIL_SLUGS).size).toBe(72);
+    expect([...ANGEL_SIGIL_STYLES]).toEqual([...SIGIL_STYLES]);
+    // Lenain cites no psalm for Jabamiah alone (#70), whose talisman
+    // letters Genesis 1:1 (plan 096, decision 8).
+    expect([...ANGEL_SIGIL_GENESIS_VERSE]).toEqual(
+      angels
+        .filter((angel) => angel.psalm.psalm === 0 || !angel.psalm.la)
+        .map((angel) => angelSlug(angel.no)),
+    );
+    expect([...ANGEL_SIGIL_GENESIS_VERSE]).toEqual(["jabamiah"]);
+  });
+
+  it("draws an angel's sigil from its slug and style alone, the band by default", () => {
+    expect(parse("angel-sigil", "angel=vehuiah")).toEqual({
+      angel: "vehuiah",
+      style: "band",
+    });
+    expect(parse("angel-sigil", "angel=mumiah&style=")).toEqual({
+      angel: "mumiah",
+      style: "band",
+    });
+    expect(
+      componentImageQuery({
+        slug: "angel-sigil",
+        props: parse("angel-sigil", "style=band&angel=vehuiah"),
+      }).toString(),
+    ).toBe("angel=vehuiah");
+    expect(
+      componentImageQuery(
+        {
+          slug: "angel-sigil",
+          props: parse("angel-sigil", "width=512&style=talisman&angel=ariel"),
+        },
+        { format: "png" },
+      ).toString(),
+    ).toBe("fmt=png&angel=ariel&style=talisman&width=512");
+    for (const query of [
+      "",
+      "angel=",
+      "style=bare",
+      "angel=Vehuiah",
+      "angel=lauviah",
+      "angel=lauviah-12",
+      "angel=constructor",
+      "angel=__proto__",
+      "angel=vehuiah&angel=jeliel",
+      "angel=vehuiah&style=Band",
+      "angel=vehuiah&style=lamen",
+      "angel=vehuiah&style=band&style=bare",
+      "angel=vehuiah&text=%D7%90",
+      "angel=vehuiah&legend=x",
+      "angel=vehuiah&roman=x",
+      "angel=vehuiah&version=regardie1939",
+      "angel=vehuiah&rose=false",
+      "angel=vehuiah&width=4097",
+    ])
+      expect(() => parse("angel-sigil", query), query).toThrow(
+        InvalidComponentImageRequest,
+      );
+    const contract = CONTRACTS["angel-sigil"];
+    expect(contract.personal).toBe(false);
+    // The files under the angels' pages are the copies to index.
+    expect(contract.indexed).toBe(false);
+    expect(contract.keys).toEqual(["angel", "style"]);
+    expect(contract.viewBox).toEqual(sigilViewBox(1));
+    expect(contract.rasterDefault).toEqual({ width: 1024, height: 1024 });
+    expect(
+      ANGEL_SIGIL_STYLES.map((style) =>
+        contract.filename(parse("angel-sigil", `angel=sitael&style=${style}`)),
+      ),
+    ).toEqual([
+      "sitael-rose-cross-sigil-band",
+      "sitael-rose-cross-sigil-bare",
+      // The rose's file, as plan 088 named it.
+      "sitael-rose-cross-sigil",
+      "sitael-rose-cross-sigil-talisman",
+    ]);
+    expect(angelSigilFileBase("lauviah-11", "band")).toBe(
+      "lauviah-11-rose-cross-sigil-band",
+    );
   });
 
   it("rejects unknown tablets and keys on the new slugs", () => {

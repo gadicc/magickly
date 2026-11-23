@@ -1,10 +1,13 @@
+import angels from "magick-data/kabbalah/seventyTwoAngels";
 import {
   InvalidComponentImageRequest,
   parseComponentImageRequest,
 } from "@/render/componentImageRequest";
 import { componentImageResponse } from "@/render/componentImageResponse";
 import { componentImageQuery } from "@/render/componentImageUrl";
+import { ANGEL_SIGIL_SLUGS } from "@/render/contracts/angelSigil";
 import { gdHall } from "@/render/contracts/gdHall";
+import { angelSigilStyleFiles } from "@/seo/angelSigilFiles";
 import { hallFiles } from "@/seo/halls";
 
 /**
@@ -26,6 +29,37 @@ function hallImageRedirect(request: Request): Response {
         // Relative, so it holds behind any proxy whatever host the
         // request reached the server under.
         Location: file.path,
+        "Cache-Control": "public, max-age=86400",
+      },
+    });
+  } catch (error) {
+    if (!(error instanceof InvalidComponentImageRequest)) throw error;
+    return new Response("Unsupported component image request", {
+      status: 400,
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
+}
+
+/**
+ * Every image `angel-sigil` draws is a file under the angel's page (plan
+ * 096, decision 3), and the rose's is `rose-sigil`'s file there, so the
+ * route sends every request to its file with a permanent redirect, as it
+ * sends the halls'. The file is the PNG at the raster default or the SVG:
+ * a size asked for is the same figure, and the redirect drops it, with
+ * `download`. The query is still read, so a wrong one is the route's
+ * usual 400.
+ */
+function angelSigilRedirect(request: Request): Response {
+  const query = new URL(request.url).searchParams;
+  query.delete("download");
+  try {
+    const { format, props } = parseComponentImageRequest("angel-sigil", query);
+    const angel = angels[ANGEL_SIGIL_SLUGS.indexOf(props.angel)];
+    return new Response(null, {
+      status: 308,
+      headers: {
+        Location: angelSigilStyleFiles(angel, props.style)[format].path,
         "Cache-Control": "public, max-age=86400",
       },
     });
@@ -80,6 +114,7 @@ export async function GET(
 ) {
   const { slug } = await context.params;
   if (slug === "gd-hall") return hallImageRedirect(request);
+  if (slug === "angel-sigil") return angelSigilRedirect(request);
   if (slug === "kamea-sigil") {
     const redirect = kameaSigilRedirect(request);
     if (redirect) return redirect;

@@ -160,10 +160,59 @@ describe("a data change and the images it can reach", () => {
           (rows.sol as { scent?: unknown }).scent = "swept";
         },
       ],
+      // A genius's attribute, beside the names and the verse its sigils
+      // draw.
+      [
+        "seventyTwoAngel",
+        (rows) => {
+          (rows[0] as { attribute: { en: string } }).attribute.en = "God";
+        },
+      ],
     ];
     for (const [table, change] of untouched) {
       const after = await withChange(table, change);
       expect([table, ...changedSlugs(base, after)]).toEqual([table]);
+    }
+  }, 180_000);
+
+  it("moves the angels' sigils alone when a verse or a name changes", async () => {
+    // A genius's Latin verse, which its talisman letters (plan 096): what a
+    // Y0 fix changed. Only angel-sigil reads it; the rose's files trace the
+    // Hebrew and read no table.
+    const verse = (rows: Record<string, unknown>) => {
+      (rows[46] as { psalm: { la: string } }).psalm.la =
+        "Quam magnificata sunt opera tua, Domine !";
+    };
+    // Jabamiah's Genesis 1:1, which Lenain gives only in French, is the
+    // Vulgate's, read from Y0's verse file; no other verse there is drawn.
+    const genesis = (rows: Record<string, unknown>) => {
+      (rows[69] as { text: string }).text = "In principio erat verbum.";
+    };
+    const firstPsalm = (rows: Record<string, unknown>) => {
+      (rows[0] as { text: string }).text = "Tu autem Domine.";
+    };
+    // The roman name the band and the bare sigil letter.
+    const roman = (rows: Record<string, unknown>) => {
+      (rows[24] as { name: { en: string } }).name.en = "Nith-Haïah";
+    };
+    for (const [table, change, reached] of [
+      ["seventyTwoAngel", verse, ["angel-sigil"]],
+      ["lenainVulgateVerse", genesis, ["angel-sigil"]],
+      ["lenainVulgateVerse", firstPsalm, []],
+      ["seventyTwoAngel", roman, ["angel-sigil"]],
+    ] as const) {
+      const after = await withChange(table, change);
+      expect([table, ...changedSlugs(base, after)]).toEqual([
+        table,
+        ...reached,
+      ]);
+      const renderer = await loadWithTables(changeTable(table, change));
+      for (const slug of COMPONENT_IMAGE_SLUGS)
+        expect(
+          `${table} ${slug} ${renderer.inputsHash(slug) === baseHashes[slug] ? "kept" : "moved"}`,
+        ).toBe(
+          `${table} ${slug} ${(reached as readonly string[]).includes(slug) ? "moved" : "kept"}`,
+        );
     }
   }, 180_000);
 

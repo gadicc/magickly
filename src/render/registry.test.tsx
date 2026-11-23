@@ -28,6 +28,7 @@ import {
   TREE_IMAGE_PROFILE,
 } from "./outlineTreeImage";
 import {
+  ANGEL_SIGIL_IMAGE_PROFILE,
   COMPONENT_IMAGE_REGISTRY,
   componentInputsHash,
   KAMEA_IMAGE_PROFILE,
@@ -71,6 +72,12 @@ describe("component image registry", () => {
       KAMEA_SIGIL_IMAGE_PROFILE,
     );
     expect(KAMEA_SIGIL_IMAGE_PROFILE).toBe("magickli-kamea-sigil-image-v1");
+    // So do the angels' sigil styles (plan 096); the rose's files stay
+    // rose-sigil's.
+    expect(COMPONENT_IMAGE_REGISTRY["angel-sigil"].profile).toBe(
+      ANGEL_SIGIL_IMAGE_PROFILE,
+    );
+    expect(ANGEL_SIGIL_IMAGE_PROFILE).toBe("magickli-angel-sigil-image-v1");
     // The other components still publish under the shared profile, so
     // their identities did not move with the sigil's.
     for (const slug of [
@@ -159,6 +166,12 @@ describe("component image registry", () => {
       "kamea-sigil",
       "533226af5c9cd2bb14ee91c389ae94607fb64febdf120c8c779691415f659f5d",
     ],
+    // The 72 genii's Hebrew and roman names and psalms, and #70's Genesis
+    // 1:1 from the Vulgate (plan 096, Y3).
+    [
+      "angel-sigil",
+      "25d38e34e607cd2be8980d1f20fa9363da42358a3d99e7a76af8820ea8404b9a",
+    ],
   ] as const)("pins the data %s draws", (slug, sha256) => {
     expect(componentInputsHash(slug)).toBe(sha256);
   });
@@ -246,6 +259,11 @@ describe("component image registry", () => {
       2508,
       400,
     ],
+    // The angels' styles (plan 096): the band's rings, name and sigil; the
+    // bare sigil and its name; a talisman's verse a path a letter.
+    ["angel-sigil", "angel=vehuiah", 1024, 1024, 15],
+    ["angel-sigil", "angel=nith-haiah&style=bare&width=300", 300, 300, 11],
+    ["angel-sigil", "angel=jabamiah&style=talisman", 1024, 1024, 40],
   ] as const)(
     "renders %s?%s as validated outlined SVG and a %dx%d PNG",
     async (slug, query, width, height, minimumPaths) => {
@@ -301,6 +319,11 @@ describe("component image registry", () => {
         ...base,
         "NotoSerif-Italic-latin1.ttf",
       ]);
+    expect(await files("angel-sigil", "angel=vehuiah")).toEqual([
+      ...base,
+      "NotoSerif-Regular-latin1.ttf",
+      "FrankRuhlLibre-Bold-letters.ttf",
+    ]);
     expect(await files("enochian-tablet")).toEqual([
       ...base,
       "EnochianPlain.ttf",

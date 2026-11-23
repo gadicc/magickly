@@ -1,6 +1,12 @@
 import type { Angel } from "magick-data/kabbalah/seventyTwoAngels";
 import { angelNameShared, angelSlug } from "@/lib/angelSlugs";
 import {
+  ANGEL_SIGIL_STYLES,
+  type AngelSigilSlug,
+  type AngelSigilStyle,
+  angelSigilFileBase,
+} from "@/render/contracts/angelSigil";
+import {
   canonicalSigilText,
   sigilRasterDefault,
   sigilWordCount,
@@ -43,33 +49,55 @@ export interface AngelSigilFile {
   /** Its path on the site, under the angel's page. */
   path: string;
   format: "png" | "svg";
+  /** The style it draws (plan 096): the rose's are plan 088's files. */
+  style: AngelSigilStyle;
   /** The PNG's pixels. The SVG states only its viewBox, so has none. */
   width?: number;
   height?: number;
 }
 
-/**
- * An angel's two files (plan 088, S4): the PNG at the contract's raster
- * default and the SVG, both on the Golden Dawn's rose with the rose shown.
- */
-export function angelSigilFiles(angel: Angel): {
+/** One style's two files: the PNG and the SVG. */
+export interface AngelSigilFiles {
   png: AngelSigilFile & { width: number; height: number };
   svg: AngelSigilFile;
-} {
-  const base = `${angelSlug(angel.no)}-rose-cross-sigil`;
+}
+
+/**
+ * An angel's two files of a style (plan 096, decision 3): the PNG at the
+ * contract's raster default, 1,024 pixels square, and the SVG. The rose's
+ * keep plan 088's names (`vehuiah-rose-cross-sigil.png`), on the Golden
+ * Dawn's rose with the rose shown; every other style adds its own
+ * (`vehuiah-rose-cross-sigil-band.png`).
+ */
+export function angelSigilStyleFiles(
+  angel: Angel,
+  style: AngelSigilStyle,
+): AngelSigilFiles {
+  const base = angelSigilFileBase(angelSlug(angel.no) as AngelSigilSlug, style);
   const file = (format: "png" | "svg") => ({
     name: `${base}.${format}`,
     path: `${angelPath(angel)}/${base}.${format}`,
     format,
+    style,
   });
   return {
     png: {
       ...file("png"),
+      // Every style is drawn in the rose's square (the package's viewBox
+      // for one word), so each has the rose's raster default.
       ...sigilRasterDefault(sigilWordCount(angelSigilText(angel))),
     },
     svg: file("svg"),
   };
 }
+
+/** An angel's rose files (plan 088, S4), which its page shows today. */
+export const angelSigilFiles = (angel: Angel): AngelSigilFiles =>
+  angelSigilStyleFiles(angel, "rose");
+
+/** Every style's files for an angel, in the styles' order. */
+export const angelSigilEveryStyle = (angel: Angel) =>
+  ANGEL_SIGIL_STYLES.map((style) => angelSigilStyleFiles(angel, style));
 
 /**
  * The sigil's alt text, in our own words, for Lingui: the page translates

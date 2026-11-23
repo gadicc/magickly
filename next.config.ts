@@ -143,6 +143,16 @@ export default async function (phase: string): Promise<NextConfig> {
         "./assets/fonts/*.ttf",
         resvgWasmTraceFile,
       ],
+      // The angels' bare and talisman sigils are drawn on their first
+      // request (plan 096, decision 3): the base fonts the rose and the
+      // styles draw over, the styles' two subsets and the WASM, which a
+      // drawing at build time finds without tracing.
+      "/kabbalah/angel/[slug]/[file]": [
+        "./public/fonts/*.ttf",
+        "./assets/fonts/NotoSerif-Regular-latin1.ttf",
+        "./assets/fonts/FrankRuhlLibre-Bold-letters.ttf",
+        resvgWasmTraceFile,
+      ],
       "/api/rituals/publication": [...ritualPublicationTraceFiles],
       "/api/rituals/publication/backfill": [...ritualPublicationTraceFiles],
     },

@@ -12,6 +12,13 @@ import type { ReactElement } from "react";
 import AstroGeomancyChart from "@/app/geomancy/reading/AstroGeomancyChart";
 import { figuresFromMothers } from "@/app/geomancy/tetragrams";
 import { pathHref, sephirahHref } from "@/app/kabbalah/treeLinks";
+import {
+  ANGEL_SIGIL_FONTS,
+  ANGEL_SIGIL_IMAGE_PROFILE,
+  ANGEL_SIGIL_INPUTS,
+  bareAngelSigilRoot,
+  renderAngelSigilImage,
+} from "./angelSigilImage";
 import type { ComponentImageProps, ComponentImageSlug } from "./contracts";
 import { mothersFromString } from "./contracts/astroGeomancyChart";
 import { TABLET_IDS } from "./contracts/enochianTablet";
@@ -53,6 +60,8 @@ export const KAMEA_IMAGE_PROFILE = "magickli-kamea-image-v1";
  * does; the squares' numbers and the planets' names are inputs.
  */
 export const KAMEA_SIGIL_IMAGE_PROFILE = "magickli-kamea-sigil-image-v1";
+
+export { ANGEL_SIGIL_IMAGE_PROFILE };
 
 /**
  * The response header a kamea sigil carries when placement could not draw
@@ -417,6 +426,16 @@ export const COMPONENT_IMAGE_REGISTRY: {
         fields: ["revision", "base", "choices", "variants", "reversedFrom"],
       },
     ],
+  },
+  "angel-sigil": {
+    // The band, the bare sigil and the talisman (plan 096), each drawn from
+    // the angel's slug alone: its Hebrew, roman name and verse are the
+    // data's. The rose is rose-sigil's, and is never drawn here.
+    render: renderAngelSigilImage,
+    source: bareAngelSigilRoot,
+    profile: ANGEL_SIGIL_IMAGE_PROFILE,
+    fonts: ANGEL_SIGIL_FONTS,
+    inputs: ANGEL_SIGIL_INPUTS,
   },
 };
 

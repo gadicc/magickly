@@ -6,6 +6,8 @@ import kameas, { KAMEA_PLANETS } from "magick-data/astrology/kameas";
 import enochianTablet, {
   TABLET_VERSION_RULES,
 } from "magick-data/enochian/tablets";
+import seventyTwoAngel from "magick-data/kabbalah/seventyTwoAngels";
+import { LENAIN_VULGATE_VERSES } from "./lenainVulgateVerses";
 
 /**
  * Hashing the data an image draws, so that a data edit moves the identity of
@@ -29,11 +31,14 @@ import enochianTablet, {
 export const IMAGE_INPUTS_PROFILE = "magickli-image-inputs-v1";
 
 /**
- * The tables a spec may read: the barrel, plus the one table a registered
- * component draws that the barrel leaves out, the tablets' version
- * rules and the kameas. `enochianTablet` is named in no
- * link in either direction, so the barrel does not assemble it
- * ([data.ts](../../packages/magick-data/src/data.ts)) and its rows are the raw JSON either way.
+ * The tables a spec may read: the barrel, plus the tables a registered
+ * component draws that the barrel leaves out (`enochianTablet` and
+ * `seventyTwoAngel`), the tablets' version rules, the kameas and the
+ * genii's verses. `enochianTablet` is named in no link in either
+ * direction, so the barrel does not assemble it
+ * ([data.ts](../../packages/magick-data/src/data.ts)) and its rows are the
+ * raw JSON either way; `seventyTwoAngel` is kept out of it on purpose, and
+ * is an array, so its row ids are the indices, "0" for the first genius.
  */
 export const DATA_INPUT_TABLES = {
   ...data,
@@ -57,6 +62,14 @@ export const DATA_INPUT_TABLES = {
       KAMEA_PLANETS.map((planet) => [planet, { cells: kameas[planet] }]),
     ),
   ),
+  seventyTwoAngel,
+  /**
+   * Not a table: the Vulgate's text of each genius's verse (plan 096, Y0),
+   * by the genius's number. The angels' talismans letter Lenain's Latin
+   * from `seventyTwoAngel`, and #70's, which he gives only in French, from
+   * here.
+   */
+  lenainVulgateVerse: LENAIN_VULGATE_VERSES,
 };
 
 /** A table a component may declare inputs from. */

@@ -1,3 +1,4 @@
+import { angelSigil } from "./angelSigil";
 import { astroGeomancyChart } from "./astroGeomancyChart";
 import { enochianTablet } from "./enochianTablet";
 import { gdHallImage } from "./gdHall";
@@ -23,6 +24,7 @@ export const CONTRACTS = {
   kamea,
   "kamea-sigil": kameaSigil,
   "gd-hall": gdHallImage,
+  "angel-sigil": angelSigil,
 } as const;
 
 export type ComponentImageSlug = keyof typeof CONTRACTS;

@@ -2,6 +2,10 @@ import { setupI18n } from "@lingui/core";
 import angels, { type Angel } from "magick-data/kabbalah/seventyTwoAngels";
 import { angelNameShared, angelSlug } from "@/lib/angelSlugs";
 import { messages as english } from "@/locales/en/messages.js";
+import {
+  ANGEL_SIGIL_STYLES,
+  type AngelSigilStyle,
+} from "@/render/contracts/angelSigil";
 import { GD_HALL_LICENCE } from "@/render/contracts/gdHall";
 import { citeUrl } from "@/sources/works";
 import {
@@ -9,6 +13,7 @@ import {
   angelPath,
   angelSigilAltMessage,
   angelSigilFiles,
+  angelSigilStyleFiles,
   angelSigilText,
 } from "./angelSigilFiles";
 import { breadcrumbList, entityTrail } from "./Breadcrumbs";
@@ -29,12 +34,17 @@ export {
   ANGEL_SIGIL_ALT_NUMBERED,
   type AngelSigilFile,
   angelSigilAltMessage,
+  angelSigilEveryStyle,
   angelSigilFiles,
   angelSigilGeneratorHref,
+  angelSigilStyleFiles,
   angelSigilText,
 } from "./angelSigilFiles";
 
-/** Every angel's files, in the angels' order, as the route prerenders them. */
+/**
+ * Every angel's rose files, in the angels' order: the files the angels'
+ * pages, structured data and sitemap name today (plan 088, S4).
+ */
 export function allAngelSigilFiles(): {
   slug: string;
   angel: Angel;
@@ -50,14 +60,79 @@ export function allAngelSigilFiles(): {
 }
 
 /**
- * The image request a file is drawn from: the name, the default rose
- * (`gd`) and the rose shown, which the contract leaves out of the query
- * as defaults, and `fmt=png` for the PNG at the raster default.
+ * When a style's files are drawn (plan 096, decision 3): the rose's and
+ * the band's when the site is built, the bare and talisman files on their
+ * first request, then kept.
  */
-export function angelSigilQuery(angel: Angel, file: AngelSigilFile) {
-  const query = new URLSearchParams({ text: angelSigilText(angel) });
+export const ANGEL_SIGIL_BUILT_STYLES: readonly AngelSigilStyle[] = [
+  "rose",
+  "band",
+];
+
+/** One of the files the angels' `[file]` route serves. */
+export interface AngelSigilRouteFile {
+  slug: string;
+  angel: Angel;
+  file: AngelSigilFile;
+}
+
+/**
+ * Every style's files for every angel, in the angels' order and each
+ * angel's in the styles' order (576): everything the route serves.
+ */
+export function allAngelSigilStyleFiles(): AngelSigilRouteFile[] {
+  return angels.flatMap((angel) =>
+    ANGEL_SIGIL_STYLES.flatMap((style) =>
+      Object.values(angelSigilStyleFiles(angel, style)).map((file) => ({
+        slug: angelSlug(angel.no),
+        angel,
+        file,
+      })),
+    ),
+  );
+}
+
+let byPath: Map<string, AngelSigilRouteFile> | undefined;
+
+/**
+ * The file an angel's slug and file name name, or `undefined`: a lookup of
+ * the 576, so nothing a request spells reaches a renderer first.
+ */
+export function angelSigilRouteFile(
+  slug: string,
+  name: string,
+): AngelSigilRouteFile | undefined {
+  byPath ??= new Map(
+    allAngelSigilStyleFiles().map((entry) => [
+      `${entry.slug}/${entry.file.name}`,
+      entry,
+    ]),
+  );
+  return byPath.get(`${slug}/${name}`);
+}
+
+/**
+ * The image request a file is drawn from. The rose's: `rose-sigil` with the
+ * name, the default rose (`gd`) and the rose shown, which the contract
+ * leaves out of the query as defaults. Every other style's: `angel-sigil`
+ * with the angel's slug and the style (the band, the default, left out).
+ * `fmt=png` for the PNG at the raster default.
+ */
+export function angelSigilRequest(
+  angel: Angel,
+  file: AngelSigilFile,
+): { slug: "rose-sigil" | "angel-sigil"; query: URLSearchParams } {
+  const query =
+    file.style === "rose"
+      ? new URLSearchParams({ text: angelSigilText(angel) })
+      : new URLSearchParams({ angel: angelSlug(angel.no) });
+  if (file.style !== "rose" && file.style !== "band")
+    query.set("style", file.style);
   if (file.format === "png") query.set("fmt", "png");
-  return query;
+  return {
+    slug: file.style === "rose" ? "rose-sigil" : "angel-sigil",
+    query,
+  };
 }
 
 /** The values the alt text names. */
