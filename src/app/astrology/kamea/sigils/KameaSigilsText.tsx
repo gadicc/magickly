@@ -3,6 +3,7 @@ import { H2, H3, List, PageText } from "@/app/PageText";
 import Link from "@/i18n/PublicLink";
 import UiRichText from "@/i18n/UiRichText";
 import { SITE_REPOSITORY } from "@/seo/site";
+import SourceLink from "@/sources/SourceLink";
 import { kameaSigilPagePath } from "./kameaSigilState";
 
 /**
@@ -22,6 +23,19 @@ const regardiePage = (leaf: number) =>
  */
 const agrippaPage = (leaf: number) =>
   `https://archive.org/details/DeOccultaPhilosophiaLoc1533/page/n${leaf}/mode/1up`;
+
+/**
+ * Leaf 164, which the site mirrors: opens the page in the lightbox with the
+ * Moon's names and the two squares outlined (`src/sources`), and goes to
+ * archive.org without JavaScript, as the other leaves do.
+ */
+function AgrippaMirror({ children }: { children?: ReactNode }) {
+  return (
+    <SourceLink page="agrippa149" region="kameaSigils" plain>
+      {children}
+    </SourceLink>
+  );
+}
 
 const PLAN = `${SITE_REPOSITORY}/blob/main/plans/093-kameas-and-their-sigils.md`;
 
@@ -170,7 +184,7 @@ export default function KameaSigilsText() {
             components={{
               0: <i />,
               1: <Outside href={agrippaPage(163)} />,
-              2: <Outside href={agrippaPage(164)} />,
+              2: <AgrippaMirror />,
               3: <Outside href={agrippaPage(168)} />,
             }}
           />
