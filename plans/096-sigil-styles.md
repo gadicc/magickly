@@ -1,6 +1,8 @@
 # Sigil styles — 23 November 2026
 
-Status: accepted 23 November 2026; nothing built. Revised the same day
+Status: accepted 23 November 2026. Y0 built (ac0f671c, 5c5f57a7) and the
+Y1 spike run, both 23 November ([What Y0 found](#what-y0-found),
+[What Y1 found](#what-y1-found)); Y2 to Y4 not started. Revised the same day
 after an adversarial review ([Review](#review-23-november-2026)). Gadi
 decided to offer four styles of an angel's rose sigil from the mock-up,
 not Vaughan's spaced letters, one at a time, with the name in the band
@@ -43,9 +45,9 @@ for without passing off a 2020 convention as tradition. It is also what
 
 "n" is the archive.org BookReader leaf. Lenain's pages are the reissue's
 printed pages, as the research read them in the local PDF and as
-`lenain/pages.json5` holds them. The 1823 printing's pages for the same
-passages are not yet found (Google Books served a CAPTCHA), and Y0 finds
-them. Readings of the plates are by eye, on the scans, by Claude (the
+`lenain/pages.json5` holds them. Y0 found the same passages on the same
+pages of the 1823 printing (Google Books `qt9SAAAAcAAJ`: `&pg=PA45`,
+`&pg=PA70`; the title page `&pg=PP11`). Readings of the plates are by eye, on the scans, by Claude (the
 research agent, this plan's author and the reviewer), 23 November 2026.
 Mathers's notes were read in an OCR of the scan the reviewer made. All
 of these are one pass, made knowing what to expect, and Y0 records them
@@ -56,7 +58,7 @@ as such.
 | 1. Bare | Regardie, *The Golden Dawn* vol. 4 (Chicago 1940), `IsraelRegardie-TheGoldenDawn-Vol4-1940` (works: `regardie1940`) | p. 58, n52 | Not renewed, so public domain in the US. In copyright elsewhere to the end of 2055. Treated as in copyright: facts and links only, nothing traced or mirrored (plan 091) | A line sigil with no rose, no ring and no box, the name in small roman capitals beneath |
 | 2. Rose | The same volume | rules p. 57 (n51); tracing over the rose p. 58 (n52) | As above | The rose behind the sigil: today's figure |
 | 3. Talisman | Lenain, *La Science cabalistique* (Amiens 1823; works: `lenain1823`, `lenainReissue`) | Text: pp. 45 and 70 (reissue). Title-page talisman: the reissue's front matter (PDF p. 9); Ms 5365 copies it at leaf n2 (`lenainMs5365`) | Public domain (Lenain d. 1877; Papus d. 1916) | Each genius's talisman has its verse written round it. The lettering's form: Latin capitals running clockwise from a cross at the top, tops outward |
-| 3. Talisman | Mathers, *The Key of Solomon the King* (London 1889), Wellcome copy `b24884431`, Public Domain Mark (works: `mathers1889`, new) | Pl. IV Fig. 20 (n79), note p. 61 (n80); Fig. 21 (n79), note p. 62 (leaf to record) | Public domain everywhere (Mathers d. 1918) | Fig. 20: seals inside a ring that carries a psalm verse. Fig. 21: an angel's name (Bariel, with Adoniel) inside the field, with a verse round it |
+| 3. Talisman | Mathers, *The Key of Solomon the King* (London 1889), Wellcome copy `b24884431`, Public Domain Mark (works: `mathers1889`, new) | Pl. IV Fig. 20 (n79), note p. 61 (n80); Fig. 21 (n79), note p. 62 (n81) | Public domain everywhere (Mathers d. 1918) | Fig. 20: seals inside a ring that carries a psalm verse. Fig. 21: an angel's name (Bariel, with Adoniel) inside the field, with a verse round it |
 | 4. Band | Mathers 1889, as above | Pl. IV Fig. 18 (n79), note p. 61 (n80) | As above | Angels' names written round a pentacle in Hebrew, each as a word in the band, tops outward. Mathers's note names them: Netoniel, Devachiah, Tzedeqiah and Parasiel |
 
 **Style 4's witness changed in review.** The first draft cited Pl. I
@@ -108,7 +110,10 @@ The captions say these, so a reader can tell the source from the site.
    - The mock-up's two small crosses at the sides are dropped: nothing
      sources them.
 
-### Readings of the plates (by eye; Y0 confirms)
+### Readings of the plates (by eye; Y0 confirmed them)
+
+Y0 read each plate again on its leaf and agreed with every reading
+below; its additions are in [What Y0 found](#what-y0-found).
 
 - **Mathers Pl. IV Fig. 18:**
   - נתוניאל at the top of the band and three more words at the other
@@ -172,39 +177,58 @@ What would settle whether it existed:
 Y0 searches for these. If the sphere is found, the talisman follows it
 and this plan is amended.
 
+**Y0's answer: a separate engraving, not a plate.** The 1823 printing's
+half-title verso (`&pg=PP10`) announces it as being engraved, showing
+the 72 genii's talismans divided among the twelve signs, to be sold
+separately "avec l'analyse" for 3 francs (2 to subscribers). So no
+collation of the book can settle it, and none lists it: Amiens 1711996
+("1 vol. (VII-153 p.) ; 08") and 293461 ("IV-153 p. ; 8°") name no
+plate, and Caillet's *Manuel bibliographique* vol. 2 (1912), no. 6491,
+p. 472 (archive.org `manuelbibliograp02cailuoft`, n483) gives the 1823
+printing no plate and the reissue "2 tab. h. t.", neither a sphere.
+Papus's *La Cabbale* (1903) does not mention it. What would settle it
+now: a copy of the engraving itself, catalogued apart from the book
+(the BnF's prints department, Amiens), or its deposit in the
+*Bibliographie de la France* for 1823–24.
+
 ### The verses
 
 - **What the data holds.** `psalm.la` in `seventyTwoAngels.json5` is
   Lenain's Latin from his entries. The psalm numbers are the Vulgate's,
-  as Lenain gives them (Ps. 3:3 for Vehuiah), and the page and the alt
-  texts use them. The edition's apparatus already holds his slips:
+  as Lenain gives them, but his verse numbers often are not (Y0: 29 of
+  71 differ; Vehuiah's Ps. 3:3 is the Vulgate's 3:4), and one psalm
+  number is wrong (#33's verse is 93:11). The edition's apparatus
+  already holds his slips:
   - `lenain/apparatus.json5` has two notes on `psalm.la`: #12, the
     reissue's misprint, and #45, Lenain's "adjuvebat";
   - `lenain/witnesses.json5` reads both against the 1823 printing and
     Ms 5365;
   - `lenainQuotations.test.ts` holds every verse against the bracketed
     Latin in his text.
-  - Nothing holds the verses against a psalter, so a slip common to
-    the data and the transcription passes.
-- **Lengths.** 46 characters (#19) to 103 (#47).
-- **Characters.** The Latin alphabet with à â æ è ë ï œ, the
-  punctuation `: , ; . ! ? '`, and Lenain's spaced colons.
-  - Œ and œ are not in Latin‑1 (#43 "prœveniet", #54 "cœlo").
+  - Nothing held the verses against a psalter, so a slip common to
+    the data and the transcription passed. Y0's guard now does
+    ([What Y0 found](#what-y0-found)).
+- **Lengths.** 46 characters (#19) to 103 (#47), unchanged by Y0.
+- **Characters** (after Y0). The Latin alphabet with à â æ è ë ï, the
+  punctuation `: , ; . ! ?`, and Lenain's spaced colons. No verse has
+  Œ, œ or an apostrophe now: #43's "prœveniet" and #54's "cœlo" were our
+  misreadings of æ, and #2's "me'ad" the reissue's stray mark.
   - The roman names add é ë ï and the hyphen (Sitaël, Séheiah, Eïael,
     Nith-Haiah, Iah-hel).
-- **For Y0:**
-  - #2, Jeliel: the data and the transcription read "a me'ad
-    defensionem", where the Vulgate has "a me ad defensionem". The
-    apostrophe is unchecked against the scan.
-  - #43: "prœveniet", where the Vulgate has "praeveniet".
-  - In a table row these pass unnoticed; lettered round a talisman they
-    do not.
+- **#2 and #43**, which the first draft sent to Y0, are settled and
+  fixed (below). In a table row such slips pass unnoticed; lettered
+  round a talisman they do not.
 - **#70 has a verse.** The first draft took the data's psalm 0 to mean
   none. Jabamiah's entry has no psalm. It prescribes "le 1er verset de
   la Genèse", which it gives only in French ("Au commencement Dieu créa
   le ciel et la terre"; `seventyTwoAngelsText/fr.json5`, and the
   extraction's note in `lenain/evidence.json5`). The Vulgate's Latin,
-  "In principio creavit Deus caelum et terram", is 42 characters.
+  "In principio creavit Deus cælum et terram", is 42 characters; Y0's
+  `verses.json5` records it. Kircher, whom Lenain names as his source for
+  the verses, prints it in Latin for the 70th genius ("In principio
+  creavit Deus cœlum & terram. Gen. 1."; *Oedipus Aegyptiacus* II.1,
+  p. 280, `kircher1653Complutense` n287), so the caption can cite
+  Lenain's own source rather than only the Vulgate.
 - **#11 and #17.** The two Lauviahs share a name, so their bare, rose
   and band figures are the same. Their talismans differ (Ps. 17:50 and
   8:1): this is the first style that tells them apart.
@@ -309,7 +333,7 @@ released as 0.7.0:
   - **What the talisman's ring letters** (decision 7), given the
     verse as the data holds it:
     - upper case, by a fixed table, keeping the accents and ligatures:
-      QUÀM, LONGÈ, ÆTERNUM, CŒLO, SITAËL;
+      QUÀM, LONGÈ, ÆTERNUM, CÆLO, SITAËL;
     - Lenain's punctuation as he prints it, his spaced colons
       included, except a final full stop, which the cross at the top
       takes the place of;
@@ -341,7 +365,7 @@ A new contract and registration, for the angels only (decision 1):
 | Profile | `magickli-angel-sigil-image-v1` |
 | Inputs | `{ table: "seventyTwoAngel", rows: "*", fields: ["name.he", "name.en", "psalm"] }`, plus Y0's verse file for #70. Both join `DATA_INPUT_TABLES`, as `enochianTablet` did, so the mutation and sweep tests cover them |
 | Fonts | The new upright Noto Serif subset and the Frank Ruhl Libre file Y1 picks (decision 13) |
-| Pins | Outlined bytes for: Vehuiah band; Asaliah talisman (the longest verse); #54 talisman (Œ) and #55 talisman (Æ); Nith-Haiah bare (the longest roman name); Jabamiah talisman (Genesis). A drawing digest over the package component with every name, roman and legend written out (as `ROSE_SIGIL_DIGEST_NAMES` is), so a data fix moves the inputs hash, not the drawing digest |
+| Pins | Outlined bytes for: Vehuiah band; Asaliah talisman (the longest verse); #43 talisman (æ, once misread as œ) and #55 talisman (Æ); Nith-Haiah bare (the longest roman name); Jabamiah talisman (Genesis). A drawing digest over the package component with every name, roman and legend written out (as `ROSE_SIGIL_DIGEST_NAMES` is), so a data fix moves the inputs hash, not the drawing digest |
 
 ### Files
 
@@ -356,17 +380,18 @@ talisman files drawn on their first request and cached:
 | Bare | `<slug>-rose-cross-sigil-bare.png` and `.svg` | 144 new |
 | Talisman | `<slug>-rose-cross-sigil-talisman.png` and `.svg` | 144 new (142 if #70 has none, decision 8) |
 
-- **Size.** The reviewer measured the rose's files at about 68–76 KB a
-  PNG and 12.7 KB an SVG. All 576 files come to about 20 MB. The new
-  styles' sizes are Y1's to measure; the talisman's outlined lettering
-  will make its SVG larger.
+- **Size** (Y1, all 72). Band: PNG median 66.5 KB, SVG 18.0 KB, 6.1 MB
+  for its 144 files. Bare: PNG 22.8 KB, SVG 7.4 KB, 2.2 MB. Talisman:
+  PNG 110 KB, SVG 80 KB (131 KB for #47, its outlined lettering), 13.8
+  MB. With the rose's, all 576 come to about 28 MB; the hybrid builds
+  about 12 MB of them.
 - **`AngelSigilFile`** gains a `style`, and the route draws each file
   through the contract its style needs.
 - **What is drawn at request time:** the bare and talisman files, once
-  per URL until the cache drops them. The route needs `dynamicParams` for
-  those two styles and a long `s-maxage`; whether Next keeps them as
-  regenerated files, and whether the cache survives a deploy, is Y1's to
-  find out.
+  per URL per deployment (decision 3). Y1 measured, on a local
+  production build: a PNG drawn in a median 10 ms (bare) or 33 ms
+  (talisman, 55 ms at most), an SVG in under 3 ms; then served from the
+  cache in about 2 ms.
 
 ### The angel page
 
@@ -384,8 +409,8 @@ The "Rose Cross sigil" section, in order:
    JavaScript, for whom the dropdown does nothing, still reaches every
    figure, and so does image search.
 
-- **Every style is 1,024 pixels square.** Swapping them moves nothing,
-  except where the talisman is set wider (decision 9).
+- **Every style is 1,024 pixels square,** and every one is shown at
+  the same size (decision 9), so swapping them moves nothing.
 - **Structured data, sitemap and share image** (decision 4):
   - The JSON-LD graph gives the band's PNG and SVG first, then each
     other style's PNG and SVG. Each style's `ImageObject` has its own
@@ -476,8 +501,10 @@ Draft alt texts:
 - **Bare:** "The Rose Cross sigil of {name}, {hebrew}, drawn alone with
   the name beneath".
 - **Talisman:** "A talisman of {name}, {hebrew}: the Rose Cross sigil
-  inside a ring lettered with {verse} in Latin", where {verse} is
-  "Psalm 3:3" (the Vulgate's numbering) or "Genesis 1:1".
+  inside a ring lettered with {verse} in Latin", where {verse} is "a
+  verse of Psalm 3" or "Genesis 1:1". The alt text names the psalm
+  only: Lenain's verse numbers are often not the Vulgate's (Y0), and the
+  page beside it gives both references. (Open: decision for Gadi 12.)
 
 ### Search
 
@@ -515,14 +542,14 @@ for the generator's follow-up.
 
 The section stays in the reading column.
 
-- The band, rose and bare figures keep today's 18rem, which is the
-  column's width on a 320 px phone.
-- **The talisman** is set wider, so its verse can be read. The reviewer
-  measured the longest verse's capitals at about 8 CSS px on a 343 px
-  figure and 7 px on a 288 px one. Y1 sets a legibility floor with Gadi
-  (decision 9). A unit test then computes every legend's capital
-  height at the narrowest width the page can show it, and fails below
-  the floor.
+- Every style keeps today's 18rem, which is the column's width on a
+  320 px phone (288 px).
+- **The talisman** is the same size, on one ring (decision 9). At 288 px
+  Y1 measured 10.3 px capitals for 68 of the 72 verses, 10.1 and 10.2 px
+  for #9 and #69, 8.7 px for #31 and 9.0 px for #47. The figure opens at
+  full size on a tap. A unit test computes every legend's capital
+  height at 288 px and fails below 8.5 px, so a longer verse or a
+  smaller figure cannot slip in.
 - Checked at 375, 768 and 1,440 px, light and dark.
 
 ## Decisions
@@ -557,11 +584,28 @@ the record. Gadi's four decisions of 23 November are not repeated.
    regeneration if route handlers support it here. They carry no
    `noindex`. Placements are not stored: the engine is deterministic and
    pinned, and storing them would be a second copy of the truth to save
-   at most about 160 ms once per file. Y1 measures whether a
-   first-request file stays cached (and across a deploy) and its cold
-   cost; if it does not, every style is built at deploy instead (576
-   files, about 20 MB).
-   *Alternatives:* every style static (the review's recommendation);
+   at most about 160 ms once per file.
+   **Confirmed after Y1** (Gadi, 23 November), knowing what Y1 found:
+   Vercel's caches are per deployment (its documentation; not measured
+   on Vercel), so the bare and talisman files are drawn again after
+   every deploy, about 33 ms for a talisman PNG. Gadi: keep the default
+   views fast, without lengthening build and deploy for views that may
+   not be opened once between deploys. What the route needs, from Y1:
+   - `generateStaticParams` for the band, `dynamicParams` for the rest,
+     and `dynamic = "force-static"` with no `revalidate`: Next 16.4
+     then keeps a first response (in `.next/server/route-cache`
+     locally) and answers later requests from it;
+   - `outputFileTracingIncludes` for the route's fonts and the resvg
+     WASM, which a request-time draw needs and a build-time one does not;
+   - a check against the 72 slugs and four styles before anything is
+     drawn, answering an unknown name with a plain 404 and no cache
+     entry: Next caches 404s too, so without it every made-up URL
+     leaves one behind;
+   - no `noindex` on these files (Y1: none is sent).
+   The band's 144 files add about 6 s to the build (73 s against 67 s,
+   the spike's build with and without them).
+   *Alternatives:* every style static (the review's recommendation;
+   Y1's numbers: about 28 MB in all, 16 MB more than the hybrid);
    `/api/render/angel-sigil` drawing everything, whose images carry
    `noindex` and so never reach image search.
 4. **The band is the share image, and comes first in the JSON-LD and
@@ -593,24 +637,33 @@ the record. Gadi's four decisions of 23 November are not repeated.
    - Two rings for long verses.
 8. **#70 Jabamiah gets a talisman lettered with Genesis 1:1 in the
    Vulgate's Latin** (42 characters), from Y0's verse file, captioned
-   as ours: Lenain names the verse but prints it only in French.
+   as ours: Lenain names the verse but prints it only in French. The
+   caption also cites Kircher p. 280 (n287), Lenain's source, which
+   gives it in Latin for the 70th genius.
    *Alternatives:*
    - No talisman for #70: the dropdown leaves it out, and a sentence
      says why.
    - Lenain's French.
-9. **The talisman is set wider than the others,** to whatever width
-   meets the legibility floor Y1 sets with Gadi, and opens at full size
-   on a tap. The others keep 18rem.
+9. **The talisman is the same size as the others, on one ring** (Gadi,
+   23 November, from Y1's sheet at real sizes): 18rem, 288 px on a
+   320 px phone, where 68 verses get 10.3 px capitals and the longest,
+   #47, 9 px. It opens at full size on a tap. The floor test holds
+   every verse at 8.5 px or more at 288 px.
    *Alternatives:*
-   - A second ring for verses over a length Y1 finds.
-   - A lower floor, with every style the same size.
+   - A second ring for the two verses over 90 characters (#31, #47),
+     which would give them 10.3 px too.
+   - The talisman set wider than the others (it would move the page
+     when the style changes).
 10. **The band's bottom:** the roman name, read upright, labelled ours.
-    No crosses.
+    No crosses. Y1 drew it so on all 72 and the band held (below).
     *Alternatives:*
     - The roman name tops outward, as Mathers's bottom words are.
     - Nothing at the bottom.
 11. **The ink is centred on its bounds and scaled to its style's
     field,** as in the mock-up, with the stroke kept the same on screen.
+    Y1: every sigil of the 72 fits, at least 2.2 units clear of the
+    ring, start circles and end bars included. A test holds that, and
+    that the talisman's box field's corners lie inside its verse ring.
     *Alternative:* one scale for all 72, the rose's frame (radius 40)
     mapped onto the field. That needs no bounds, keeps every mark the
     same size, and leaves each sigil where it lies on the rose, so many
@@ -624,14 +677,19 @@ the record. Gadi's four decisions of 23 November are not repeated.
     *Alternatives:* a picker in each entry (about 58 px more per open
     entry on a phone, 72 copies); one picker for the list (out of sight
     once scrolled; best if it ever follows a remembered choice).
-13. **Fonts.**
-    - A new upright Noto Serif subset (Latin‑1, Œ and œ), built by
+13. **Fonts** (settled at Y1).
+    - A new upright Noto Serif subset, weight 400, built by
       `scripts/gd-hall-fonts/build.py` as TrueType for resvg, with
       metrics in `fontMetrics.json` and a row in `assets/fonts/README.md`.
-    - Frank Ruhl Libre: the halls' Bold letter subset if it reads well
-      at size, or a weight-500 instance built the same way. Y1 decides
-      from side-by-side renders, and the weight is written into the
-      markup.
+      Latin‑1 covers every verse and name since Y0 (no Œ or œ remains);
+      add Œ and œ only if a legend ever needs them.
+    - Frank Ruhl Libre: the halls' existing Bold (700) letter subset,
+      which read better on the ring than a 500 instance in Y1's
+      side-by-side renders. No new Hebrew file.
+    - The weight is written into the markup, and a test pins the face
+      each legend resolves to. Y1 found the trap: a weight-500 cut is
+      named "… Medium", so markup asking for weight 500 of "Frank Ruhl
+      Libre" silently falls back to another font.
     *Alternative:* the halls' existing Noto Serif Italic subset for the
     Latin, which needs no new file but departs from Lenain's upright
     capitals.
@@ -644,7 +702,9 @@ the record. Gadi's four decisions of 23 November are not repeated.
     (Fig. 18) and the talisman (Figs. 20 and 21), with the regions
     outlined. The research's copy is 182,890 bytes; the mirror cap
     leaves 426,008 (`mirroredPages.test.ts` on `main`). Regardie is
-    never mirrored.
+    never mirrored. Done in Y0 (ac0f671c): 129,214 bytes as WebP, with
+    regions `fig18`, `fig20`, `fig21` and `figs20and21`; the mirror's
+    total is 4,203,206 bytes, 296,794 under the cap.
     *Alternative:* link only.
 
 ## Unproven claims: what Y1 tests
@@ -686,6 +746,101 @@ measurement that settles it.
    `noindex`. If they are not kept or are slow, decision 3 falls back to
    building all 576 (about 20 MB).
 
+## What Y1 found
+
+Y1 ran on 23 November 2026 in a scratch worktree off `main`, never
+committed; its scripts, renders and numbers are in the session's
+scratchpad, outside the repository. Each claim above, in order:
+
+1. **The verse reads round the ring.** All 72 legends laid out glyph by
+   glyph with Noto Serif's metrics, capitals 5 units at most, tracking
+   fitted to the length. Capital height in CSS px at 224 / 288 / 343 /
+   512 px: 8.0 / 10.3 / 12.2 / 18.3 for every verse up to about 87
+   characters (68 of them); #9 and #69 a hair less; #31 (101
+   characters) 6.8 / 8.7 / 10.4 / 15.5; #47 (102) 7.0 / 9.0 / 10.7 /
+   15.9. A second ring would give #31 and #47 the full size. resvg and
+   Chromium agree on all 5,416 glyph positions: median 0.006 unit,
+   largest 0.038, none over 0.05. Gadi chose one ring at 18rem from the
+   sheet at real sizes (decision 9).
+2. **The Hebrew band runs right to left across the top, tops outward,**
+   in both renderers for all 72, as Mathers's Fig. 18 does; the roman
+   name runs left to right at the bottom, upright; the talisman's verse
+   clockwise from the top.
+3. **Bounds and fit.** Ink bounds from `wordInk`'s commands (19 names
+   with crooks' cubics, 8 with nooses) against sampled outlines. Centred
+   on its bounds, every sigil fits each field with its stroke the same
+   on screen; the closest any ink, start circle or end bar comes to the
+   band's ring is 2.2 units, to the talisman's 2.7. With one fixed scale
+   instead (decision 11's alternative), 59 names sit more than 5 units
+   off centre.
+4. **Fonts:** decision 13 as now written.
+5. **Build and first request** (a local production build of Next
+   16.4.6, not Vercel): decision 3 and [Files](#files) have the numbers.
+   Every first-request file was kept and answered from the cache, with
+   `s-maxage=31536000` and no `noindex`. Whether Vercel's cache survives
+   a deploy was answered from its documentation (it does not), not
+   measured.
+
+## What Y0 found
+
+Built 23 November 2026 (ac0f671c, 5c5f57a7) by an Opus agent, its
+by-eye readings made knowing what the psalter reads and labelled so.
+
+- **Mathers 1889** is `mathers1889` in `works.ts`; Plate IV (n79) is
+  mirrored (decision 15). The notes are p. 61 (n80, Figs. 18–20) and
+  p. 62 (n81, Fig. 21). Fig. 20's verse is Psalm cxxv. 1; Fig. 21's is
+  Psalm cxii. 3 (Hebrew numbering).
+- **Lenain 1823** (Google Books `qt9SAAAAcAAJ`): the reissue's pp. 45,
+  70 and 142 are the same pages, its p. 7 is 1823 p. vii, and #70's
+  entry is pp. 93–95, the Genesis verse on p. 95. The title page
+  (`PP11`) has more than the plan read: DEUM VERUM, DEUM VIVUM and DEUM
+  SANCTUM along the triangle's sides, IAH, IOD and IAHO, and Α and Ω
+  beside the disc. `citeUrl` emits only `PR` and `PA` ids, so Y4 must
+  add `PP` before it can cite the title page.
+- **The sphère cabalistique** was sold separately; see
+  [above](#lenains-sphère-cabalistique).
+- **Regardie vol. 4** p. 58 (n52): Metatron's and Elohim's sigils, no
+  box, each name in small capitals beneath it, under the figure but not
+  centred on its ink. Pp. 59–60 are the ruled table.
+- **Kircher**, *Oedipus Aegyptiacus* II.1, pp. 275–280 (Complutense
+  n282–n287), gives all 72 verses in Hebrew and Latin; p. 274 (n281)
+  says one comes from the start of Genesis.
+- **The verse guard** (`packages/magick-data/src/kabbalah/lenain/vulgate/`
+  and `lenainVulgate.test.ts`): the Clementine Vulgate Project's `Ps.lat`
+  and `Gn.lat` (public domain), from a copy pinned to commit `38292f3f`
+  of `jrichter/ClementineVulgateConverter`, size and SHA-256 checked;
+  the project's own release has no copy of these files, and no archived
+  copy was found that day. Each verse links its leaf in Hetzenauer's
+  Clementine (Innsbruck 1914, archive.org
+  `biblia_sacra_vulgatae_etitionis_1914`). The test compares letters
+  only (ignoring case, accents, æ/ae, j/i, punctuation and word
+  division), fails on an unlisted difference or a stale entry, and
+  checks Lenain's references and #70. A deliberate one-letter mutation
+  failed it.
+  - 58 of 71 psalm verses agree. The 13 others are in both printings:
+    ten of Lenain's wording (#1, whose "Et tu" is Kircher's; #11
+    "exultatur"; #14 "pauperis"; #23; #24; #37 "virtutem"; #39; #50;
+    #58; #65), and three spellings of the period (#13, #63 "exultate",
+    #19 "expectans"). #33 names Psalm 33 for 93:11 (Kircher has 83).
+    Kircher's Latin matches the Vulgate wherever he gives the same
+    verse.
+  - 29 of Lenain's 71 references differ from the Vulgate's verse
+    numbers. `verses.json5` keeps both; the data keeps Lenain's.
+  - **Ours, fixed:** #43 "præveniet" and #54 "cælo" (we read æ as œ).
+  - **The reissue's, fixed in the field from the 1823 printing:** #2's
+    stray mark ("a me ad"), #17 "Dominus", #37's added "ad", #47's psalm
+    103 (not 104), #64 "misericordiam". The French keeps the reissue's
+    print, as #12 does; each has a note and a 1823 reading in
+    `witnesses.json5`.
+  - **Not fixed:** Lenain's own departures stay in the field (decision
+    for Gadi 11).
+  - The two new data files are registered for coverage but kept out of
+    the npm tarball until Gadi signs their Sources row (decision for
+    Gadi 13).
+- **Search:** one publish, $0.0265, 14 passages.
+- **Not done:** Ms 5365 was not read for the new notes, and only the
+  differing verses were read in the 1823 printing.
+
 ## Stages
 
 Built on a gate branch, `gate/sigil-styles`, from `main` after
@@ -693,8 +848,8 @@ Built on a gate branch, `gate/sigil-styles`, from `main` after
 
 | Stage | What | Gate |
 | --- | --- | --- |
-| Y0 | **Sources and the verse guard.** (a) Lenain 1823: the pages for the reissue's pp. 45 and 70, the title page, and #70's entry. (b) The sphère cabalistique: catalogue collations and other copies of 1823. (c) Mathers Pl. IV Figs. 18, 20 and 21 and their notes (pp. 61–62), with their leaves. (d) Regardie p. 58. (e) **The verses**, below. (f) `mathers1889` in `works.ts`, and Plate IV mirrored. (g) If a verse changed, `pnpm search:publish` | Gadi reviews the discrepancy table. The verse test is green and committed |
-| Y1 | **Spike** (above) | The numbers recorded here; Gadi chooses from side-by-side renders at real sizes (decisions 9, 10, 13) |
+| Y0 (built 23 Nov, ac0f671c, 5c5f57a7) | **Sources and the verse guard.** (a) Lenain 1823: the pages for the reissue's pp. 45 and 70, the title page, and #70's entry. (b) The sphère cabalistique: catalogue collations and other copies of 1823. (c) Mathers Pl. IV Figs. 18, 20 and 21 and their notes (pp. 61–62), with their leaves. (d) Regardie p. 58. (e) **The verses**, below. (f) `mathers1889` in `works.ts`, and Plate IV mirrored. (g) If a verse changed, `pnpm search:publish` | Gadi reviews the discrepancy table. The verse test is green and committed |
+| Y1 (run 23 Nov) | **Spike** (above) | The numbers recorded here; Gadi chooses from side-by-side renders at real sizes (decisions 9, 10, 13) |
 | Y2 | **Package:** `roseSigilStyles`, the bounds, the lettering, the notes. **Fonts:** the subset, metrics, README. magick-components 0.7.0, and magick-data's next minor if Y0 changed a verse | `roseDigest.mts` unchanged; the halls' pins unchanged; package tests (layout, glyph order, fit, bounds) |
 | Y3 | **Contract and route.** First, on `main`'s bytes, the pin over the 72 outlined rose SVGs. Then `angel-sigil`, its registration, its inputs (`seventyTwoAngel` and the verse file in `DATA_INPUT_TABLES`), the coverage test, the pins and the drawing digest, and the redirects | Contract, registry, dataInputs and route tests; `ROSE_SIGIL_PINS`, the rose's drawing digest and the new 72-SVG pin unchanged; the 144 rose files' hash list unchanged |
 | Y4 | **Angel pages and the list:** the 432 new files, the dropdown, URL state, captions with `<Cite>`, alt texts, downloads, the "Every style" line, JSON-LD, sitemap, share image, `ListSigil`; Lingui and Hebrew; search publish for the list's caption | The full gate (below); the hydration test; the browser checks; the 144 rose files again |
@@ -715,7 +870,9 @@ Y0's verse guard, committed in magick-data beside the apparatus:
 - **Fixes.** A transcription slip is fixed where the edition fixes its
   text, so the French and the field agree. A slip of Lenain's stays in
   the French and gets an apparatus note, and the field carries the
-  corrected verse, as #45's does.
+  corrected verse, as #45's does. Y0 applied this to our slips and
+  the reissue's, but not to Lenain's own departures, which its brief
+  left out; whether the field corrects them is decision for Gadi 11.
 
 Each stage is reviewed fresh before it merges (Opus, high), and the
 whole by Fable 5.2 (high) on the exact tree, as the project's commit
@@ -783,14 +940,16 @@ both models.
 - **The sphère cabalistique turns up.** If a copy of Lenain's sphere is
   found, it is the witness for the talisman, and the style may have to
   follow it. Y0 looks first.
-- **Long verses on phones.** If no width the page can give meets the
-  floor, a second ring or a lower floor has to carry it (decision 9).
+- **Long verses on phones.** Settled at one ring, 18rem (decision 9):
+  #31 and #47 are the smallest, at 8.7 and 9 px capitals on a 320 px
+  phone, and the floor test stops anything smaller.
 - **A shift after hydration.** A shared talisman link shows the band
   first, then swaps to the wider talisman. It is a layout shift on load
   for that link only. Keeping the box at the larger size until
   hydration is the fallback if it measures badly.
-- **A missing glyph falls back silently.** The coverage test and the Œ
-  and Æ pins guard it.
+- **A missing glyph falls back silently,** or a face does (Y1's
+  "Medium" trap). The coverage test, the face test and the æ and Æ pins
+  guard it.
 - **Search.** Up to two paid publishes, each under a dollar on the last
   runs' evidence.
 
@@ -817,6 +976,27 @@ Also for Gadi, from the revision:
    talisman drawn on first request and cached.
 9. **The generator as a follow-up** (decision 14).
 10. **The legibility floor** for the talisman's verse, at Y1 (decision 9).
+
+Decided after Y1 (23 November): one ring at 18rem, as recommended
+(decision 9), and the hybrid confirmed (decision 3).
+
+Open after Y0:
+
+11. **Lenain's own departures in the field.** The plan's Fixes rule
+    (correct Lenain's slip in the field, keep it in the French, as #45)
+    against Y0's brief (correct only where it is ours). Recommended:
+    correct the three that are not Latin as they stand, #11
+    "exultatur", #14 "pauperis" and #37 "virtutem", as #45 is; keep the
+    rest as Lenain's readings with a note (the reorderings, additions
+    and omissions, #1's "Et tu", which is Kircher's, and the period
+    spellings), since the talisman letters Lenain's Latin and its
+    caption says so.
+12. **The talisman's alt text:** name the psalm only ("a verse of
+    Psalm 3"), as now drafted; or give Lenain's reference, or the
+    Vulgate's.
+13. **Sign-off for Y0's two data files** (`lenain/vulgate/verses.json5`
+    and `differences.json5`): their Sources row needs Gadi's date
+    before they ship in magick-data's tarball.
 
 ## Review (23 November 2026)
 
