@@ -118,7 +118,7 @@ per-page work, decided page by page with mock-ups.
 
 | # | Work | Unlocks | Effort |
 |---|---|---|---|
-| B1 | One `<Cite>` component: links the exact leaf (archive.org `n<leaf>`, Google Books `pg=PA`, Gallica `/f`), opens the lightbox when the page is mirrored; replaces the hand-built links | every sourced page | M |
+| B1 | ~~One `<Cite>` component: links the exact leaf (archive.org `n<leaf>`, Google Books `pg=PA`, Gallica `/f`), opens the lightbox when the page is mirrored; replaces the hand-built links~~ (built 23 November: `src/sources/works.ts`, `citeUrl`, `<Cite>`; every hand-built scan link moved onto it) | every sourced page | M |
 | B2 | One provenance shape in magick-data: a works registry (item, edition, public-domain basis) and per-row `sources`/`checked`, after the Keys' shape; a minor release | C1–C6 | L (design first) |
 | B3 | Per-row source notes in the entity table (`EntityTable`/`Row`) | ~60 entity pages | S, after B2 |
 
@@ -170,7 +170,7 @@ on archive.org so far (Google Books and HathiTrust untried).
    touch shared components, so one at a time; each a commit, checked at
    375, 768 and 1,440 px.
 3. ~~**Quick source wins**~~: C1, C6 and C10 done 23 November.
-4. **B1, then B2's design** (plan, review, spike), then B3.
+4. ~~**B1**~~ (done 23 November), then **B2's design** (plan, review, spike), then B3. B2's works registry can grow out of B1's `WORKS`.
 5. **Source passes C2–C9 in parallel**, one subagent per dataset, each in
    its own worktree on a gate branch, since they touch separate data files;
    magick-data changes land together in one release.

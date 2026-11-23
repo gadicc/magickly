@@ -101,7 +101,11 @@ why. So, for facts taken from books and manuscripts:
    links the exact page or leaf of a scan (archive.org `/page/n<leaf>`,
    Google Books `&pg=PA<n>`, Gallica `/f<n>`), and the pages listing an
    edition's sources describe each one: what it is, whose copy, and what
-   it is used for.
+   it is used for. In the app, add the work to
+   `src/sources/works.ts` and cite it with `<Cite work leaf|page>` (or
+   `citeUrl` where only a URL will do), never a hand-built URL: one
+   registry keeps every link to a book the same, records whether it may
+   be shown, and opens the site's mirror wherever there is one.
 5. **Mirror what readers most need, within budget.** Public-domain pages
    that a page leans on heavily (a plate, a table, a source's cited page)
    may be mirrored in `public/sources/` and opened in the lightbox
