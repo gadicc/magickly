@@ -129,16 +129,16 @@ building it.
 
 | # | Route | Pages | Gap | Witnesses to check | Effort | Data |
 |---|---|---|---|---|---|---|
-| C1 | `/kabbalah/angel/[slug]` | 72 | Strong already; "In the book" links our transcript, not the 1823 page; psalms unchecked against the Vulgate | Google Books qt9SAAAAcAAJ; a Vulgate | S | little |
+| C1 | ~~`/kabbalah/angel/[slug]`~~ (done 23 November: each printed page links its page of the scan, 80b2b437; the psalms are still unchecked against the Vulgate) | 72 | Strong already; "In the book" links our transcript, not the 1823 page; psalms unchecked against the Vulgate | Google Books qt9SAAAAcAAJ; a Vulgate | S | little |
 | C2 | `/kabbalah/sephirah/[id]`, `/kabbalah/tree` | 12 | Nothing cited; the archangel conflict; chakras unlabelled | Agrippa 1533/1651, II scale of ten; Mathers, *Kabbalah Unveiled* (b24884443); Kircher 1653; *777* (1909) if a scan exists; Equinox I(2) | L | yes |
 | C3 | `/kabbalah/path/[id]` | 22 | Both letter schemes unsourced; letters from Wikipedia; tarot unsourced | Kircher's tree; Westcott, *Sepher Yetzirah* 1887; Kalisch 1877; Mantua 1562 (inferred available) | M–L | yes |
 | C4 | `/astrology/planet/[id]`, `/astrology/planets` | 16 | Names well witnessed; archangels, god names, colours unsourced | Agrippa II scale of seven; Heptameron (*Fourth Book* 1655, b20458563); Barrett 1801 | M | yes |
 | C5 | `/enochian/dictionary` | 1 (1,917 words) | ~2,000 meanings from "WE", an anonymous list of unknown licence | Phase 1: Keys words to Casaubon 1659 leaves from `keys.json5`; then Sloane (offline, plan 083) | M, then L | yes |
-| C6 | `/gd/symbols/*` | 4 | Research done (plan 080, the components' Provenance rows) but not shown on the pages | Equinox I(2) | S | no |
+| C6 | ~~`/gd/symbols/*`~~ (done 23 November: the shewbread and the fylfot cross say what they follow, on their pages and the components', c54f00aa) | 4 | Research done (plan 080, the components' Provenance rows) but not shown on the pages | Equinox I(2) | S | no |
 | C7 | `/gd/grade/[id]`, `/gd/grades` | 13 | Nothing cited | Equinox I(2)/(3); Regardie vol. 1 as links | S–M | yes |
 | C8 | `/astrology/zodiac` | 1 | One column cites *777*; rulers, dates, tribes, angels unsourced; tribe orders vary | Agrippa II scale of twelve; Equinox I(2) Diagram 16 | M | yes |
 | C9 | `/astrology/planetary-hours` | 1 | A sacred-texts.com link only | Mathers, *Key of Solomon* 1889; Gallica Clavicule MSS (inferred) | S | header |
-| C10 | `/astrology/kamea/sigils`, `/gd/sigils` | 2 | Exact leaves; no lightbox | Agrippa p149 is already mirrored | S | no |
+| C10 | ~~`/astrology/kamea/sigils`, `/gd/sigils`~~ (done 23 November: the kamea sigils' leaf 164 opens the mirror with its region outlined; Regardie's pages stay links) | 2 | Exact leaves; no lightbox | Agrippa p149 is already mirrored | S | no |
 | C11 | `/gd/halls/[slug]` | 15 | Regardie vol. 2 only, in copyright | Equinox I(2) for the Neophyte (inferred) | M | no |
 | C12 | `/enochian/keys`, `/enochian/tablets` | 2 | Exemplary; waiting on Sloane 3191 (plan 083) and a second reading | — | M | yes |
 
@@ -169,8 +169,7 @@ on archive.org so far (Google Books and HathiTrust untried).
 2. **Layout, serially, here**: A5, the help pages and the reader's and book's measure (A1 to A4 done). They
    touch shared components, so one at a time; each a commit, checked at
    375, 768 and 1,440 px.
-3. **Quick source wins**: C1, C6, C10 (small, separate files, high
-   traffic for C1).
+3. ~~**Quick source wins**~~: C1, C6 and C10 done 23 November.
 4. **B1, then B2's design** (plan, review, spike), then B3.
 5. **Source passes C2–C9 in parallel**, one subagent per dataset, each in
    its own worktree on a gate branch, since they touch separate data files;
