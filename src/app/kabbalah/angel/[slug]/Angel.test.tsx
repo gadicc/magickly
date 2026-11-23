@@ -37,6 +37,10 @@ import AngelPage from "./Angel";
  * And again for plan 033's Kircher plate (19 November 2026): Ariel's
  * name of God, Pino, departs from the plate's PIVR, so a note now says so,
  * citing the 1823 printing and the plate. Nothing else in the text changed.
+ *
+ * And for plan 094's C1 (23 November 2026): "In the book" links each printed
+ * page to that page of the scan the site transcribes and says so. Nothing
+ * else in the text changed.
  */
 const GOLDEN = readFileSync(
   path.join(import.meta.dirname, "angel.golden.txt"),
@@ -67,6 +71,17 @@ describe("the angel page", () => {
     const ariel = angelBySlug("ariel");
     expect(ariel?.no).toBe(46);
     expect(textOf(await body(46))).toBe(GOLDEN);
+  });
+
+  it("links each printed page to that page of the scan", async () => {
+    // Ariel is printed on pages 76 and 77 of the reissue, Google Books
+    // ZqgpxTZ43HkC, whose `pg=PA<n>` is the printed page (checked on page
+    // 46, Vehuiah's, 23 November 2026).
+    const html = await body(46);
+    for (const page of [76, 77])
+      expect(html).toContain(
+        `href="https://books.google.com/books?id=ZqgpxTZ43HkC&amp;pg=PA${page}"`,
+      );
   });
 
   it("shares the page's card, then the sigil", async () => {
