@@ -27,7 +27,9 @@ search uses the selected embedding model.
 Only public sources enter the catalogue. Account pages, private temple records,
 private ritual bodies and the separate chat PDF corpus are not searched. The
 three public ritual landing pages have catalogue metadata, not newly extracted
-copies of ritual texts. Adding private search requires permission-aware
+copies of ritual texts, and no extracted prose: their JSX is the reader's own
+interface (`INTERFACE_PAGES` in `adaptedPages.ts`), so rewording the reader
+needs no republish. Adding private search requires permission-aware
 retrieval and a separate storage/distribution contract.
 
 ## Embeddings
