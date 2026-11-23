@@ -18,6 +18,7 @@
     "check": "biome check .",
     "gate": "node scripts/gate.mjs full",
     "gate:quick": "node scripts/gate.mjs quick",
+    "gate:install-hook": "node scripts/gate.mjs install-hook",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "typecheck": "pnpm i18n:compile && pnpm data:build && pnpm search:build && next typegen && tsc --noEmit && pnpm --filter magick-data typecheck && pnpm --filter magick-components typecheck",

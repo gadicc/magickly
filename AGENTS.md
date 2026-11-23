@@ -307,6 +307,21 @@ none of which wait for CPUs. Both are `scripts/gate.mjs`.
   directory, in `gate-logs/`.
 - When CI gains a required `pnpm` step, add it to `STEPS.full`; the test
   fails until you do.
+- A passing `pnpm gate` writes a pass record for HEAD's tree under the git
+  common directory (`gate-stamps/`). It does so only if the worktree was
+  clean before and after (untracked files included), HEAD didn't move,
+  `node_modules` is the checkout's own, and no `.env*` other than `.env.ci`
+  is at the top. Otherwise it says why there's no record.
+- `pnpm gate --rc [rev]` (default `main`) gates a commit in one dedicated
+  worktree beside the main checkout (`magickli-gate-rc`), one run at a
+  time. Use it to get a record for main's tip before a push.
+- The push check (`pnpm gate:install-hook warn|enforce`, run once in the
+  main checkout) is a configured git hook. Pushing `main` needs a pass
+  record for the pushed commit's tree. `warn` reports and pushes anyway;
+  `enforce` refuses. `GATE_OVERRIDE=<sha>` (7 or more characters) lets
+  that one commit through, and every check is logged in
+  `gate-logs/push.tsv`. Never use `--no-verify`: it also skips the
+  private-history guard in `.git/hooks/pre-push`.
 
 Which gate a change needs before it lands is still the verification policy
 in the Loom skill. The quick tier isn't in use yet (Loom

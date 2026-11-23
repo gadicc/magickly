@@ -1,6 +1,15 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { gateEnv, logLine, nodeProblem, parseEnvFile, STEPS } from "./gate.mjs";
+import {
+  gateEnv,
+  logLine,
+  nodeProblem,
+  parseEnvFile,
+  parsePushLines,
+  pushVerdict,
+  STEPS,
+  stampProblems,
+} from "./gate.mjs";
 
 const envFile = parseEnvFile(readFileSync(".env.ci", "utf8"));
 const ciYml = readFileSync(".github/workflows/ci.yml", "utf8");
@@ -146,4 +155,91 @@ describe("STEPS", () => {
 
 it("logs a step as step, seconds and exit code", () => {
   expect(logLine("build", 61.25, 0)).toBe("build\t61.3\t0\n");
+});
+
+describe("stampProblems", () => {
+  const clean = {
+    passed: true,
+    statusBefore: [],
+    statusAfter: [],
+    treeBefore: "abc",
+    treeAfter: "abc",
+    nodeModulesIsLink: false,
+    envFiles: [".env.ci"],
+  };
+
+  it("lets a clean, passing gate write a record", () => {
+    expect(stampProblems(clean)).toEqual([]);
+  });
+
+  it.each([
+    ["a failure", { passed: false }, "the gate failed"],
+    [
+      "edits at the start",
+      { statusBefore: ["?? x"] },
+      "1 paths uncommitted at the start",
+    ],
+    [
+      "edits at the end",
+      { statusAfter: [" M y"] },
+      "1 paths uncommitted at the end",
+    ],
+    [
+      "a moved HEAD",
+      { treeAfter: "def" },
+      "HEAD's tree changed during the gate",
+    ],
+    [
+      "linked dependencies",
+      { nodeModulesIsLink: true },
+      "node_modules is a link",
+    ],
+    [
+      "a local env file",
+      { envFiles: [".env.ci", ".env.local"] },
+      ".env.local would reach the build",
+    ],
+  ])("refuses %s", (_, change, reason) => {
+    expect(stampProblems({ ...clean, ...change })).toEqual([reason]);
+  });
+});
+
+describe("the push check", () => {
+  it("reads git's pre-push lines", () => {
+    expect(parsePushLines("refs/heads/main aaa refs/heads/main bbb\n")).toEqual(
+      [
+        {
+          localRef: "refs/heads/main",
+          localSha: "aaa",
+          remoteRef: "refs/heads/main",
+          remoteSha: "bbb",
+        },
+      ],
+    );
+  });
+
+  const sha = "0123456789abcdef0123456789abcdef01234567";
+  it("passes a stamped commit, and an override naming it", () => {
+    expect(pushVerdict({ sha, stamped: true, override: undefined })).toBe(
+      "stamped",
+    );
+    expect(pushVerdict({ sha, stamped: false, override: "0123456" })).toBe(
+      "override",
+    );
+    expect(pushVerdict({ sha, stamped: false, override: sha })).toBe(
+      "override",
+    );
+  });
+
+  it("refuses an override that is short or names another commit", () => {
+    expect(pushVerdict({ sha, stamped: false, override: "012345" })).toBe(
+      "unstamped",
+    );
+    expect(pushVerdict({ sha, stamped: false, override: "1234567" })).toBe(
+      "unstamped",
+    );
+    expect(pushVerdict({ sha, stamped: false, override: undefined })).toBe(
+      "unstamped",
+    );
+  });
 });
