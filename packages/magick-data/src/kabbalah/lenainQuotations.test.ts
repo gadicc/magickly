@@ -27,11 +27,16 @@ interface Angel {
 interface Note {
   no: number;
   field: string;
+  printed: string;
+  used: string;
 }
 
 const angels: Angel[] = read("./seventyTwoAngels.json5");
 const french: string[] = read("./seventyTwoAngelsText/fr.json5");
 const apparatus: Note[] = read("./lenain/apparatus.json5");
+const vulgate: { no: number; text: string }[] = read(
+  "./lenain/vulgate/verses.json5",
+);
 
 /** Letters and spacing only: brackets, accents and pointing are not readings. */
 function plain(latin: string) {
@@ -61,10 +66,60 @@ function asPrinted(entry: string, ours: string) {
   return bestShare > 0.5 ? best : null;
 }
 
+/**
+ * The words one text has and the other does not, in order: what is left of
+ * each after their longest common run of words is taken out.
+ */
+function difference(page: string[], ours: string[]) {
+  const longest = page.map(() => new Array<number>(ours.length + 1).fill(0));
+  longest.push(new Array<number>(ours.length + 1).fill(0));
+  for (let i = page.length - 1; i >= 0; i--)
+    for (let j = ours.length - 1; j >= 0; j--)
+      longest[i][j] =
+        page[i] === ours[j]
+          ? longest[i + 1][j + 1] + 1
+          : Math.max(longest[i + 1][j], longest[i][j + 1]);
+  const removed: string[] = [];
+  const added: string[] = [];
+  let i = 0;
+  let j = 0;
+  while (i < page.length && j < ours.length) {
+    if (page[i] === ours[j]) {
+      i++;
+      j++;
+    } else if (longest[i + 1][j] >= longest[i][j + 1]) removed.push(page[i++]);
+    else added.push(ours[j++]);
+  }
+  return {
+    removed: [...removed, ...page.slice(i)],
+    added: [...added, ...ours.slice(j)],
+  };
+}
+
+/** The words of the psalter's verse as `plain` gives them, j as i. */
+const psalter = (text: string) => plain(text).replace(/j/g, "i").split(" ");
+
+/** Whether every word of `words` is one of `allowed`, each used once. */
+function within(words: string[], allowed: string[]) {
+  const left = [...allowed];
+  return words.every((word) => {
+    const at = left.indexOf(word);
+    if (at < 0) return false;
+    left.splice(at, 1);
+    return true;
+  });
+}
+
 describe("the Latin this edition prints", () => {
   it("quotes every psalm as the page sets it, or says why not", () => {
-    const noted = new Set(
-      apparatus.filter((n) => n.field === "psalm.la").map((n) => n.no),
+    // A note excuses only the change it records, and only towards the
+    // psalter: each word the page has and the field does not must be in the
+    // note's `printed` and not in the Vulgate's verse, and each word the
+    // field has instead must be in its `used` and in the verse. Everything
+    // else in the field is still held to the page, so a word dropped or
+    // changed elsewhere in a noted verse fails.
+    const noted = new Map(
+      apparatus.filter((n) => n.field === "psalm.la").map((n) => [n.no, n]),
     );
 
     const silent: string[] = [];
@@ -76,7 +131,27 @@ describe("the Latin this edition prints", () => {
       if (printed === null) continue;
       compared++;
       if (printed === plain(ours)) continue;
-      if (noted.has(angel.no)) continue;
+      const note = noted.get(angel.no);
+      if (note) {
+        const { removed, added } = difference(
+          printed.split(" "),
+          plain(ours).split(" "),
+        );
+        const verse = new Set(
+          psalter(vulgate.find((v) => v.no === angel.no)?.text ?? ""),
+        );
+        if (
+          within(removed, plain(note.printed).split(" ")) &&
+          within(added, plain(note.used).split(" ")) &&
+          removed.every((word) => !verse.has(word.replace(/j/g, "i"))) &&
+          added.every((word) => verse.has(word.replace(/j/g, "i")))
+        )
+          continue;
+        silent.push(
+          `${angel.no}: page has "${removed.join(" ")}" and ours "${added.join(" ")}", beyond its note's "${note.printed}" → "${note.used}"`,
+        );
+        continue;
+      }
       silent.push(`${angel.no}: page "${printed}" vs ours "${plain(ours)}"`);
     }
 

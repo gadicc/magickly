@@ -161,7 +161,8 @@ export function verifySource(name: SourceFile, bytes: Buffer): void {
  * A book's verses by "chapter:verse", from the project's plain-text
  * markup (code page 1252, one verse a line, "3:4 text"), with the markup
  * taken out: the slashes that end lines of verse, the brackets round a
- * passage set as verse and the backslashes that mark paragraphs. Its
+ * passage set as verse, the backslashes that mark paragraphs and the
+ * headings in angle brackets (Psalm 118's Hebrew letters, `<Coph>`). Its
  * spelling, capitals and punctuation, spaces before `: ; ? !` included,
  * are kept.
  */
@@ -175,6 +176,7 @@ export function parseBook(bytes: Buffer): Map<string, string> {
     verses.set(
       `${chapter}:${verse}`,
       body
+        .replace(/<[^<>]*>/g, " ")
         .replace(/[[\]\\]/g, " ")
         .replace(/\//g, " ")
         .replace(/\s+/g, " ")
@@ -248,10 +250,24 @@ const HEADER = `// The Vulgate's text of the verse Lenain prescribes for each ge
 // Do not hand-edit: run the script.
 `;
 
-function main() {
-  const dir = process.argv[2];
-  if (!dir)
-    throw new Error("usage: vulgate.ts <dir holding Ps.lat and Gn.lat>");
+/**
+ * The SHA-256 of `verses.json5` as this script writes it from the pinned
+ * sources. The two source files are not committed, so no test can rebuild
+ * the verses; this pins the output instead, and a test holds the committed
+ * file to it. A hand edit of a verse's text therefore fails the build unless
+ * this pin is changed with it, which only a run of the script should do: it
+ * prints the new hash, and refuses to call a changed output current.
+ */
+export const VERSES_SHA256 =
+  "9e66701833e0b345f5d8470e5fa5bee464661cc81a02eeaa34286b29f26a82c6";
+
+/** The file as this script writes it. */
+export function versesSource(verses: VulgateVerse[]): string {
+  return `${HEADER}${JSON5.stringify(verses, null, 2)}\n`;
+}
+
+/** The verses from a directory holding the two pinned books. */
+export function versesFrom(dir: string): VulgateVerse[] {
   const read = (name: SourceFile) => {
     const bytes = readFileSync(join(dir, name));
     verifySource(name, bytes);
@@ -263,12 +279,24 @@ function main() {
       "utf8",
     ),
   );
-  const verses = buildVerses(
-    { Ps: read("Ps.lat"), Gn: read("Gn.lat") },
-    angels,
-  );
-  writeFileSync(OUT_PATH, `${HEADER}${JSON5.stringify(verses, null, 2)}\n`);
-  console.log(`${verses.length} verses\n  ${OUT_PATH}`);
+  return buildVerses({ Ps: read("Ps.lat"), Gn: read("Gn.lat") }, angels);
+}
+
+function main() {
+  const dir = process.argv[2];
+  if (!dir)
+    throw new Error("usage: vulgate.ts <dir holding Ps.lat and Gn.lat>");
+  const verses = versesFrom(dir);
+  const source = versesSource(verses);
+  writeFileSync(OUT_PATH, source);
+  const sha256 = createHash("sha256").update(source).digest("hex");
+  console.log(`${verses.length} verses, SHA-256 ${sha256}\n  ${OUT_PATH}`);
+  if (sha256 !== VERSES_SHA256) {
+    console.error(
+      `The output differs from VERSES_SHA256 in ${import.meta.filename}: set it to ${sha256} in the same commit.`,
+    );
+    process.exitCode = 1;
+  }
 }
 
 if (process.argv[1]?.endsWith("vulgate.ts")) main();

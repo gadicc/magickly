@@ -13,10 +13,14 @@ import { describe, expect, it } from "vitest";
  * the 1823 printing and Kircher read and whose the difference is. A new
  * difference, or a listed one that no longer differs, fails here.
  *
- * The comparison ignores case, accents, ligatures written out or not (æ
- * and ae), j for i, punctuation and where the words divide ("usque quo"
- * and "usquequo"), none of which is a reading. An apostrophe is kept: the
- * reissue's stray mark in "a me'ad" was taken for one.
+ * The comparison is word by word: each `psalm.la` must be a run of whole
+ * words of its verse, from a word's first letter to a word's last, once
+ * case, accents, ligatures written out or not (æ and ae), j for i and
+ * punctuation are set aside, none of which is a reading. Where the words
+ * divide is a reading here: the one place Lenain divides a word the
+ * Clementine does not is listed (`DIVISIONS`). Both texts are held to the
+ * characters the plan allows (`LATIN`), so a stray mark, an apostrophe of
+ * any kind or a markup tag fails before any comparison.
  *
  * Four of Lenain's own slips, in both printings, are corrected in the field
  * rather than listed, since they are not Latin as they stand: 45's
@@ -81,16 +85,60 @@ const CORRECTED_SLIPS: Readonly<
   45: ["adjuvebat", "adjuvabat"],
 };
 
-/** The letters that make a reading, as the comment above says. */
-function letters(latin: string): string {
-  return latin
+/**
+ * Every character a verse may have, in the field or the Clementine: the
+ * Latin alphabet with à â æ è ë ï, the punctuation : , ; . ! ? and the
+ * space (plan 096, "The verses"). Nothing else, no apostrophe, no tag.
+ */
+const LATIN = /^[A-Za-zàâæèëï :,;.!?]+$/u;
+
+/**
+ * Where Lenain divides a word that the Clementine prints as one: not a
+ * reading, so the comparison joins it, but listed, so that no other
+ * division (a word split or two run together by a slip) passes.
+ */
+const DIVISIONS: Readonly<Record<number, [lenain: string, vulgate: string]>> = {
+  // The reissue's entry prints two words (lenainQuotations.test.ts holds
+  // the field to it); the Clementine, Psalm 118:108, one.
+  44: ["bene placita", "beneplacita"],
+};
+
+/** A word as the comparison reads it, as the comment above says. */
+const folded = (word: string) =>
+  word
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase()
     .replace(/æ/g, "ae")
     .replace(/œ/g, "oe")
-    .replace(/j/g, "i")
-    .replace(/[^a-z']/g, "");
+    .replace(/j/g, "i");
+
+/** The words of a verse, folded, without its punctuation. */
+const wordsOf = (latin: string) =>
+  latin
+    .split(/[ :,;.!?]+/)
+    .filter(Boolean)
+    .map(folded);
+
+/** Whether `ours` is a run of whole words of `verse`. */
+function wholeWords(ours: string, verse: string): boolean {
+  const part = wordsOf(ours);
+  const whole = wordsOf(verse);
+  if (!part.length) return false;
+  for (let at = 0; at + part.length <= whole.length; at++)
+    if (part.every((word, i) => word === whole[at + i])) return true;
+  return false;
+}
+
+/** The field with its listed division joined, as the Clementine has it. */
+function joined(no: number, ours: string): string {
+  const division = DIVISIONS[no];
+  return division ? ours.replace(division[0], division[1]) : ours;
+}
+
+/** The letters of a reading, for the looser check of a witness's reading. */
+function letters(latin: string): string {
+  return wordsOf(latin).join("");
 }
 
 const listed = (field: Difference["field"]) =>
@@ -107,7 +155,15 @@ describe("the verses held to the Vulgate", () => {
     }
   });
 
-  it("finds every psalm.la in its verse, or lists why not", () => {
+  it("letters every verse in the characters the plan allows", () => {
+    for (const angel of angels)
+      if (angel.psalm.la)
+        expect(angel.psalm.la, `genius ${angel.no}'s psalm.la`).toMatch(LATIN);
+    for (const verse of verses)
+      expect(verse.text, `genius ${verse.no}'s Vulgate`).toMatch(LATIN);
+  });
+
+  it("finds every psalm.la in its verse as whole words, or lists why not", () => {
     const known = listed("psalm.la");
     const unlisted: string[] = [];
     const stale: number[] = [];
@@ -117,7 +173,7 @@ describe("the verses held to the Vulgate", () => {
       if (!ours) continue;
       compared++;
       const verse = verses.find((v) => v.no === angel.no) as Verse;
-      const agrees = letters(verse.text).includes(letters(ours));
+      const agrees = wholeWords(joined(angel.no, ours), verse.text);
       const entry = known.get(angel.no);
       if (agrees) {
         if (entry) stale.push(angel.no);
@@ -131,6 +187,22 @@ describe("the verses held to the Vulgate", () => {
     expect(compared).toBe(71);
     expect(unlisted).toEqual([]);
     expect(stale).toEqual([]);
+  });
+
+  it("needs each listed division, and no other", () => {
+    for (const [key, [lenain, vulgate]] of Object.entries(DIVISIONS)) {
+      const no = Number(key);
+      const angel = angels.find((a) => a.no === no) as Angel;
+      const verse = verses.find((v) => v.no === no) as Verse;
+      const where = `genius ${no}`;
+      expect(angel.psalm.la, where).toContain(lenain);
+      expect(verse.text, where).toContain(vulgate);
+      // Without the join the verse would not be found: the entry is needed.
+      expect(wholeWords(angel.psalm.la, verse.text), where).toBe(false);
+      expect(wholeWords(joined(no, angel.psalm.la), verse.text), where).toBe(
+        true,
+      );
+    }
   });
 
   it("names each verse's psalm as the Vulgate numbers it, or lists why not", () => {
@@ -164,7 +236,7 @@ describe("the verses held to the Vulgate", () => {
       // The field has the psalter's word, and so agrees with the Vulgate.
       expect(words(angel.psalm.la), where).toContain(ours);
       expect(words(angel.psalm.la), where).not.toContain(printed);
-      expect(letters(verse.text), where).toContain(letters(angel.psalm.la));
+      expect(wholeWords(angel.psalm.la, verse.text), where).toBe(true);
       expect(
         differences.some((d) => d.no === no && d.field === "psalm.la"),
         where,
