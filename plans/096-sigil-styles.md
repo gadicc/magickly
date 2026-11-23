@@ -5,7 +5,8 @@ Y1 spike run, both 23 November ([What Y0 found](#what-y0-found),
 [What Y1 found](#what-y1-found)). Y2 built the same day
 ([What Y2 built](#what-y2-built)), and magick-components 0.7.0 after
 Gadi signed its row (31ae3e5a). Y3 built the same day
-([What Y3 built](#what-y3-built)); Y4 not started. Revised the same day
+([What Y3 built](#what-y3-built)), and Y4 the same day
+([What Y4 built](#what-y4-built)); the full gate is pending. Revised the same day
 after an adversarial review ([Review](#review-23-november-2026)). Gadi
 decided to offer four styles of an angel's rose sigil from the mock-up,
 not Vaughan's spaced letters, one at a time, with the name in the band
@@ -959,6 +960,62 @@ Not done: the whole-data sweep (`RENDER_INPUT_SWEEP=1`), which now
 draws 144 angel images a change; the mutation test covers a verse,
 #70's Genesis, another Vulgate verse (no move) and a roman name.
 
+## What Y4 built
+
+Built 23 November 2026 by an Opus agent (high): 2ad65ec5. The full gate
+(`test:coverage` and `build` over everything) is pending.
+
+- **The angel page** (`AngelSigil.tsx`): the heading; a native select
+  labelled "Sigil style" with the four descriptive names, in the
+  contract's order (band, bare, rose, talisman); one `<img>` of the
+  chosen style's PNG at 18rem on the light plate, wrapped in a plain
+  link to the PNG so that a tap opens it at full size (the old figure
+  had no such link); its caption; the generator sentence, unchanged;
+  Download PNG and SVG for the shown style; and "Every style:" as a
+  short list, one line a style with its PNG and SVG links, in the
+  HTML. Links are 24 px targets with a mouse and 44 px on a coarse
+  pointer, and so is the select.
+- **URL state** (`urlState.ts`), as the tablets page's: read through
+  `useSyncExternalStore` with an empty server snapshot, written with
+  `replaceState` (other params and the hash kept, the band never
+  written), unknown values the band, nothing stored.
+- **Captions** as drafted, each scan through `<Cite>`: Mathers Pl. IV
+  (n79, the mirror, outlining Fig. 18 or Fig. 21), Regardie pp. 57–58
+  (n51, n52), Lenain 1823 p. 45 and its title page, and for #70
+  Kircher p. 280 (n287). The title page is Google Books `PP11`:
+  `citeUrl` and `<Cite>` gained `preliminary` (Google's PP), tested,
+  and the mirror never matches such a page.
+- **Alt texts** per style, the Lauviahs numbered; the talisman's names
+  the psalm only, or Genesis 1:1 for #70. The rose's is plan 088's.
+- **Structured data, sitemap, share image:** each style's PNG and SVG,
+  the band's first, each `ImageObject` with its alt text as caption and
+  `isBasedOn` as decision 4 lists; a test holds those works to the
+  package's `SIGIL_STYLE_NOTES`, and every scan a caption links to the
+  notes or to the title page and Kircher's page. The sitemap gives each
+  angel eight images, the band's PNG first; the second Open Graph image
+  is the band's PNG.
+- **The 72 list** shows the band's PNG, with no menu; its caption names
+  the style and links the angel's page and the generator.
+- **Lingui:** the new messages are descriptors with translator comments
+  (Lingui's `/*i18n*/ { id, comment }`), except the list's caption, a
+  literal so that search still reads it; Hebrew written by the agent.
+  `i18n:context` flagged the changed scoped files (Y3's route among
+  them); the scopes' descriptions still hold, and the snapshot was
+  acknowledged without editing the context.
+- **Search:** one publish for the list's caption, $0.0205 estimated,
+  200 tokens, one row replaced.
+- **Checked** on a production build (`next start`, 127.0.0.1, a fresh
+  port, headless Chromium): Vehuiah in each style, Asaliah's talisman
+  and the list at 375, 768 and 1,440 px, light and dark, and Jabamiah's
+  talisman at 375. No sideways scroll; one 288 px figure in every
+  style, the select and the caption in the column; 44 px targets at 375
+  and 768 with a coarse pointer; a shared `?style=talisman` shows the
+  talisman once hydrated; without JavaScript the band and the "Every
+  style" list; no console errors. The angel pages have no Hebrew
+  edition. Safari not checked: no device.
+- **The rose:** the 144 rose files of this build match `main`'s
+  SHA-256 list.
+
 ## Stages
 
 Built on a gate branch, `gate/sigil-styles`, from `main` after
@@ -970,7 +1027,7 @@ Built on a gate branch, `gate/sigil-styles`, from `main` after
 | Y1 (run 23 Nov) | **Spike** (above) | The numbers recorded here; Gadi chooses from side-by-side renders at real sizes (decisions 9, 10, 13) |
 | Y2 (built 23 Nov, c9ab1d5c to 31ae3e5a) | **Package:** `roseSigilStyles`, the bounds, the lettering, the notes. **Fonts:** the subset, metrics, README. magick-components 0.7.0, and magick-data's next minor if Y0 changed a verse | `roseDigest.mts` unchanged; the halls' pins unchanged; package tests (layout, glyph order, fit, bounds) |
 | Y3 (built 23 Nov, 9011e06d, 609bdeb2) | **Contract and route.** First, on `main`'s bytes, the pin over the 72 outlined rose SVGs. Then `angel-sigil`, its registration, its inputs (`seventyTwoAngel` and the verse file in `DATA_INPUT_TABLES`), the coverage test, the pins and the drawing digest, and the redirects | Contract, registry, dataInputs and route tests; `ROSE_SIGIL_PINS`, the rose's drawing digest and the new 72-SVG pin unchanged; the 144 rose files' hash list unchanged |
-| Y4 | **Angel pages and the list:** the 432 new files, the dropdown, URL state, captions with `<Cite>`, alt texts, downloads, the "Every style" line, JSON-LD, sitemap, share image, `ListSigil`; Lingui and Hebrew; search publish for the list's caption | The full gate (below); the hydration test; the browser checks; the 144 rose files again |
+| Y4 (built 23 Nov, 2ad65ec5) | **Angel pages and the list:** the 432 new files, the dropdown, URL state, captions with `<Cite>`, alt texts, downloads, the "Every style" line, JSON-LD, sitemap, share image, `ListSigil`; Lingui and Hebrew; search publish for the list's caption | The full gate (below); the hydration test; the browser checks; the 144 rose files again |
 
 Y0's verse guard, committed in magick-data beside the apparatus:
 
