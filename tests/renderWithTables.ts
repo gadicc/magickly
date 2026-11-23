@@ -53,7 +53,8 @@ export const TABLE_FILES = {
   tribeOfIsrael: "kabbalah/tribesOfIsrael",
   seventyTwoAngel: "kabbalah/seventyTwoAngels",
   // Not a table: the genii's verses in the Vulgate (plan 096, Y0), which
-  // the app reads from the build directory (src/render/lenainVulgateVerses.ts).
+  // the app reads as published JSON, `magick-data/json/…/verses.json`
+  // (src/render/lenainVulgateVerses.ts).
   lenainVulgateVerse: "kabbalah/lenain/vulgate/verses",
   chakra: "chakras",
   bodyPart: "body/parts",
@@ -101,6 +102,11 @@ export async function loadWithTables(
   for (const name of Object.keys(TABLE_FILES) as TableFileName[]) {
     const rows = changed[name] ?? readTable(name);
     vi.doMock(path.join(DIST, `${TABLE_FILES[name]}.js`), () => ({
+      default: rows,
+    }));
+    // And as the JSON the package publishes beside it, which the app
+    // imports where a file is data, not a module (the Vulgate's verses).
+    vi.doMock(path.join(DIST, `${TABLE_FILES[name]}.json`), () => ({
       default: rows,
     }));
   }

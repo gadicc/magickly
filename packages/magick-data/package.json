@@ -95,7 +95,8 @@
     "./kabbalah/lenain/volume": "./src/kabbalah/lenain/volume.ts",
     "./kabbalah/lenain/notes": "./src/kabbalah/lenain/notes.ts",
     "./kabbalah/lenain/pieces": "./src/kabbalah/lenain/pieces.ts",
-    "./kabbalah/lenain/firstTable": "./src/kabbalah/lenain/firstTable.ts"
+    "./kabbalah/lenain/firstTable": "./src/kabbalah/lenain/firstTable.ts",
+    "./json/*.json": "./dist/*.json"
   },
   "publishConfig": {
     "exports": {

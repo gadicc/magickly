@@ -1,8 +1,10 @@
 import "server-only";
-// Not a module entry: magick-data publishes the file only as JSON data
-// (its Sources row signed 23 November 2026, plan 096), so the app reads the
-// workspace's build directly, as it reads the components' manifest.
-import verses from "../../packages/magick-data/dist/kabbalah/lenain/vulgate/verses.js";
+// Published as JSON data, not as a module (its Sources row signed 23
+// November 2026, plan 096): `magick-data/json/<path>.json`, as the package
+// offers every data file.
+import verses from "magick-data/json/kabbalah/lenain/vulgate/verses.json" with {
+  type: "json",
+};
 
 /**
  * One genius's verse as the Clementine Vulgate prints it (plan 096, Y0):
