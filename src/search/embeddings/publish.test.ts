@@ -13,11 +13,13 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { parseVectorArtifact, VECTOR_ARTIFACT } from "./artifact";
 import { EMBEDDING_PROFILES, type EmbeddingProfile } from "./profiles";
 import {
+  gatherMatrix,
   MANIFEST,
   MATRIX_DIRECTORY,
   matrixFromRows,
   missingRows,
   publishMatrix,
+  rowSources,
 } from "./publish";
 import { digest } from "./records";
 import { encodeRow, listRowKeys, writeRows } from "./rows";
@@ -70,6 +72,88 @@ describe("matrixFromRows", () => {
     expect(() =>
       matrixFromRows(root, { ...profile, dimensions: 3 }, [key("a1")]),
     ).toThrow(/bytes/);
+  });
+});
+
+describe("the publish lookup order", () => {
+  // a1 and b2 are committed; b2 and c3 are also cached; d4 is in neither.
+  const keys = [key("d4"), key("b2"), key("c3"), key("a1")];
+  const cache = new Map<string, number[]>([
+    [key("b2"), [0, 0, 0, 3]],
+    [key("c3"), [0, 0, 2, 0]],
+  ]);
+  beforeEach(() => writeRows(root, profile.key, 4, rows.slice(0, 2)));
+
+  it("takes committed rows first, then the cache, then the provider", () => {
+    expect(rowSources(root, profile, keys, (k) => cache.has(k))).toEqual([
+      "provider",
+      "committed",
+      "cache",
+      "committed",
+    ]);
+  });
+
+  it("copies committed rows as bytes and asks the provider only for the rest", async () => {
+    const asked: number[][] = [];
+    const matrix = await gatherMatrix(
+      root,
+      profile,
+      keys,
+      rowSources(root, profile, keys, (k) => cache.has(k)),
+      {
+        readCache: (k) => cache.get(k) ?? [],
+        async embed(positions) {
+          asked.push(positions);
+          return positions.map(() => [2, 0, 0, 0]);
+        },
+      },
+    );
+    expect(asked).toEqual([[0]]);
+    // b2's committed row is off unit length: copied, not renormalised, so
+    // its bytes stay the committed ones rather than the cache's [0,0,0,1].
+    expect(
+      matrix.equals(
+        Buffer.concat([
+          encodeRow([1, 0, 0, 0], 4),
+          offUnit,
+          encodeRow([0, 0, 1, 0], 4),
+          rows[0][1],
+        ]),
+      ),
+    ).toBe(true);
+  });
+
+  it("batches provider rows and checks what comes back", async () => {
+    const asked: number[][] = [];
+    const all = [key("e5"), key("f6"), key("e7")];
+    const sources = rowSources(root, profile, all, () => false);
+    await gatherMatrix(
+      root,
+      profile,
+      all,
+      sources,
+      {
+        readCache: () => [],
+        async embed(positions) {
+          asked.push(positions);
+          return positions.map(() => [0, 1, 0, 0]);
+        },
+      },
+      2,
+    );
+    expect(asked).toEqual([[0, 1], [2]]);
+    await expect(
+      gatherMatrix(root, profile, all, sources, {
+        readCache: () => [],
+        embed: async () => [],
+      }),
+    ).rejects.toThrow(/wrong number/);
+    await expect(
+      gatherMatrix(root, profile, all, sources, {
+        readCache: () => [],
+        embed: async (positions) => positions.map(() => [0, 0, 0]),
+      }),
+    ).rejects.toThrow(/Incompatible/);
   });
 });
 
