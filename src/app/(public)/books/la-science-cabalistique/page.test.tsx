@@ -62,6 +62,14 @@ describe("the book's sources", () => {
     expect(html).toContain(
       '<a href="https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n294/mode/1up">',
     );
+    // Kircher's table of the verses, whose leaves the notes on the verses
+    // link (plan 096), is read in the Complutense copy too.
+    expect(text).toContain(
+      "Kircher's table of the seventy-two verses, pp. 275 to 280, which Lenain cites for each genius's psalm: read in the Complutense copy, from archive.org bub_gb_XjfzMnomDQoC, leaf n283. Where a note on a verse turns on it, the note gives what Kircher prints and links its leaf, n283 to n287 (pp. 276 to 280).",
+    );
+    expect(html).toContain(
+      '<a href="https://archive.org/details/bub_gb_XjfzMnomDQoC/page/n283/mode/1up">',
+    );
     // The mirror's link is the plate's only link: its href is the file page.
     expect(
       html.split(`href="${pageUrl(MIRRORED_PAGES.kircherPlate)}"`).length - 1,

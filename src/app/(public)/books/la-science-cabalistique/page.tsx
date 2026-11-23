@@ -24,6 +24,14 @@ const KIRCHER_PLATE_COMPLUTENSE = citeUrl("kircher1653Complutense", {
   leaf: 294,
 });
 
+/**
+ * Kircher's table of the seventy-two verses (pp. 275–280) in the same copy,
+ * whose leaves n283 to n287 (pp. 276–280) the notes on the verses cite.
+ */
+const KIRCHER_VERSES_COMPLUTENSE = citeUrl("kircher1653Complutense", {
+  leaf: 283,
+});
+
 /** The Amiens library's records of its two copies of the 1823 printing. */
 const AMIENS_RECORD = (id: number) =>
   `https://bibliotheques.amiens.fr/Default/doc/SYRACUSE/${id}/la-science-cabalistique-ou-l-art-de-connaitre-les-bons-genies-qui-influent-sur-la-destinee-des-homme`;
@@ -177,6 +185,17 @@ export default function BookPage() {
                   archive.org bub_gb_XjfzMnomDQoC, leaf n294
                 </a>
                 .
+              </li>
+              <li>
+                Kircher&apos;s table of the seventy-two verses, pp. 275 to 280,
+                which Lenain cites for each genius&apos;s psalm: read in the
+                Complutense copy, from{" "}
+                <a href={KIRCHER_VERSES_COMPLUTENSE}>
+                  archive.org bub_gb_XjfzMnomDQoC, leaf n283
+                </a>
+                . Where a note on a verse turns on it, the note gives what
+                Kircher prints and links its leaf, n283 to n287 (pp. 276 to
+                280).
               </li>
             </ul>
           </li>
