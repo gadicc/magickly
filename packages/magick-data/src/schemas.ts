@@ -669,6 +669,8 @@ export const schemas = {
           elementId: "The sign's element: fire, earth, air or water.",
           tribeOfIsraelId:
             "The tribe of Israel the Golden Dawn gives the sign. Ephraim and Manasseh, Joseph's sons, each have a sign, and Levi and Joseph none.",
+          hebrewLetterId:
+            "The simple letter of the Hebrew alphabet the Golden Dawn gives the sign, whose path's trump is the sign's: He for Aries, the Emperor. One for each sign, and no two the same (Regardie, The Golden Dawn, vol. 4, 1940, p.298).",
         },
       }),
     }),
@@ -1346,6 +1348,103 @@ export const schemas = {
     }),
     v.description(
       "The three degrees that group the Golden Dawn's grades, each with a pillar of the Tree.",
+    ),
+  ),
+  gdGodForm: v.pipe(
+    v.strictObject({
+      id: v.pipe(
+        v.string(),
+        v.description(
+          "The god's name in lower case, as the table spells it in Latin letters: `osiris`, `tmoumathph`.",
+        ),
+      ),
+      no: v.pipe(
+        v.number(),
+        v.description(
+          "The row's number in the table, from 1 for Osiris to 15 for Kabexnuv.",
+        ),
+      ),
+      mix: v.pipe(
+        v.picklist(["each", "single", "pair", "three"]),
+        v.description(
+          "Which mix of elements on a servient square's four sides the god is given for: `each`, one side of each of the four elements, which the table calls Spirit; `single`, one element on three or four sides; `pair`, two elements on two sides each; `three`, three elements, one of them on two sides.",
+        ),
+      ),
+      name: v.pipe(
+        en,
+        v.description(
+          "The god's name as the table gives it in Latin letters, capitalised: Osiris, Tmoumathph.",
+        ),
+      ),
+      coptic: v.pipe(
+        v.string(),
+        v.description(
+          "The god's name as the table spells it in Coptic letters, read by hand from the page image: the letters as drawn, the first capital and the rest small, in Unicode's Coptic block and, for shai and ti, the Coptic letters of the Greek block (U+03E2 to U+03EF). Without the sign some names carry (`st`). Where a letter's shape and its sound part, or a reading is in doubt, `copticNote` says so.",
+        ),
+      ),
+      st: v.pipe(
+        v.boolean(),
+        v.description(
+          "Whether the table prints the sign it reads as \"st\" after the Coptic name (Coptic sou, ⲋ): a more spiritual form of the god, the sign being Kether's, as the table's footnote has it. Osiris, Isis, Nephthys, Aroueris and Harpocrates.",
+        ),
+      ),
+      station: v.pipe(
+        en,
+        v.description(
+          "The god's station in the Neophyte grade, as the table gives it, in our words: an officer's, or an invisible station.",
+        ),
+      ),
+      copticNote: v.optional(
+        v.pipe(
+          en,
+          v.description(
+            "Ours: how a letter of the Coptic was read, where its shape and its sound part or the reading is in doubt, checked against vol. 3's spellings of the god.",
+          ),
+        ),
+      ),
+      note: v.optional(
+        v.pipe(
+          en,
+          v.description("Ours: anything else the table gives with the god."),
+        ),
+      ),
+      vol3: v.optional(
+        v.pipe(
+          v.array(
+            v.pipe(
+              v.strictObject({
+                note: v.pipe(
+                  en,
+                  v.description("What vol. 3 has, in our words."),
+                ),
+                page: v.pipe(
+                  v.number(),
+                  v.description("The page of vol. 3, as printed."),
+                ),
+                leaf: v.pipe(
+                  v.number(),
+                  v.description(
+                    "The leaf of archive.org's scan, IsraelRegardie-TheGoldenDawn-Vol3-1939, /page/n<leaf>.",
+                  ),
+                ),
+              }),
+              v.description("One reading of vol. 3."),
+            ),
+          ),
+          v.description(
+            "Where the Z documents (Regardie, The Golden Dawn, vol. 3, 1939) differ from the table, or bear on it: the Kerub of the West's god, Apis' name, Harpocrates' station.",
+          ),
+        ),
+      ),
+      ...ids("gdGodForm", {
+        about: {
+          elementIds:
+            "The elements of the mix: Spirit for Osiris (one side of each element), one element for the four elemental gods, two for a pair, three for a Child of Horus, in the table's order.",
+        },
+      }),
+    }),
+    v.description(
+      "The Egyptian gods the Golden Dawn gives each mix of elements on a servient square's four sides, with the god's Coptic name and Neophyte station (Regardie, The Golden Dawn, vol. 4, 1940, p.315).",
     ),
   ),
 
@@ -2115,10 +2214,12 @@ export const schemas = {
       ),
       name: v.pipe(en, v.description("The element's name: Earth.")),
       ...ids("element", {
-        absent: ["elementalId"],
+        absent: ["elementalId", "hebrewLetterId"],
         about: {
           elementalId:
             "The elemental of the element, which names the element back. Spirit has none.",
+          hebrewLetterId:
+            "The mother letter of the Hebrew alphabet the Golden Dawn gives the element, whose path's trump is the element's: Aleph for Air, the Fool; Mem for Water; Shin for Fire (Regardie, The Golden Dawn, vol. 4, 1940, p.298). Earth has none of its own: that table gives its letter, Tav, and the Universe to Saturn with Earth, and Tav is Saturn's `hebrewLetterId`. Spirit has none.",
         },
       }),
     }),

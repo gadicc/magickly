@@ -54,6 +54,7 @@ import {
 } from "./nameWords";
 import { Sources, versionTitle } from "./Sources";
 import styles from "./tablets.module.css";
+import { tabletQuery } from "./urlState";
 
 /** A group of the list: the Great Cross, a quarter, or the Tablet of Union. */
 type GroupKey = "cross" | "union" | TabletQuarter;
@@ -132,6 +133,7 @@ export default function NamesPanel({
   clearSquare,
   links,
   revealed,
+  openSquare,
 }: {
   tablet: EnochianTabletID;
   version: TabletVersionId;
@@ -150,6 +152,11 @@ export default function NamesPanel({
   links: TabletNameLinks | undefined;
   /** Moves each time a choice on the tablet should be brought into view. */
   revealed: number;
+  /**
+   * Opens the Squares tab at a square, where the version has pyramids
+   * (plan 095, decision 3); none in Dee's and Raphael's.
+   */
+  openSquare?: (square: TabletSquare) => void;
 }) {
   const { t } = useUiLanguage();
   const [expanded, setExpanded] = React.useState<ReadonlySet<GroupKey>>(
@@ -368,6 +375,7 @@ export default function NamesPanel({
                           names={names}
                           links={links}
                           pick={pick}
+                          openSquare={openSquare}
                           t={t}
                         />
                       )}
@@ -501,6 +509,7 @@ function NameDetail({
   names,
   links,
   pick,
+  openSquare,
   t,
 }: {
   name: TabletName;
@@ -510,6 +519,7 @@ function NameDetail({
   names: readonly TabletName[];
   links: TabletNameLinks | undefined;
   pick: (id: TabletNameId) => void;
+  openSquare?: (square: TabletSquare) => void;
   t: Translate;
 }) {
   const variants = tabletNameVariants(tablets[tablet], name.id, version);
@@ -618,6 +628,48 @@ function NameDetail({
             {t(/*i18n*/ "{word} in the dictionary", { word: headword })}
           </a>
         </Typography>
+      )}
+      {openSquare && (
+        <>
+          <Line label={t(/*i18n*/ "Its squares as pyramids:")} />
+          <Box
+            component="ul"
+            sx={{
+              listStyle: "none",
+              p: 0,
+              my: 0.5,
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 0.5,
+            }}
+          >
+            {name.squares.map((square) => (
+              <li key={`${square.row},${square.column}`}>
+                {/* A link to the Squares tab at the square, which the
+                    page opens in place; a new tab opens the same view. */}
+                <Button
+                  size="small"
+                  variant="outlined"
+                  href={tabletQuery({
+                    tablet,
+                    version,
+                    tab: "squares",
+                    square,
+                  })}
+                  onClick={(event: React.MouseEvent) => {
+                    if (event.metaKey || event.ctrlKey || event.shiftKey)
+                      return;
+                    event.preventDefault();
+                    openSquare(square);
+                  }}
+                  sx={{ textTransform: "none", minHeight: 44 }}
+                >
+                  {squareInWords(square, t)}
+                </Button>
+              </li>
+            ))}
+          </Box>
+        </>
       )}
       {others.length > 0 && (
         <>

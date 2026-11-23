@@ -1,10 +1,15 @@
 import { tabletNames } from "magick-data/enochian/tabletNames";
+import { tabletRegion } from "magick-data/enochian/tabletPyramids";
 import tablets, {
   tabletVersion,
   WATCHTOWER_IDS,
 } from "magick-data/enochian/tablets";
 import { describe, expect, it } from "vitest";
-import { elementFromPosition, isCrossFromPosition } from "./tabletSvg.tsx";
+import {
+  elementFromPosition,
+  isCrossFromPosition,
+  regionFromPosition,
+} from "./tabletSvg.tsx";
 
 // The drawing finds its crosses and quarters by position; the names
 // (magick-data's tabletNames) read the same squares along their paths. The
@@ -38,4 +43,21 @@ describe("the drawing's crosses and quarters", () => {
           expect(elementFromPosition(x, y), key).toBe(element.get(key));
         }
     });
+});
+
+// The regions the drawing tints are magick-data's (plan 095, decision 1),
+// which calls the top row's squares Kerubic; the drawing's name for them,
+// `topRow`, is its own, kept for its `data-region` and its callers.
+describe("the drawing's regions", () => {
+  it("are magick-data's region rule, square by square", () => {
+    const named = { topRow: "kerubic" } as const;
+    for (let row = 0; row < 13; row++)
+      for (let column = 0; column < 12; column++) {
+        const drawn = regionFromPosition(row, column);
+        expect(
+          drawn === "topRow" ? named[drawn] : drawn,
+          `${row},${column}`,
+        ).toBe(tabletRegion(row, column));
+      }
+  });
 });

@@ -149,6 +149,14 @@ export const WORKS = {
     },
     rights: "in-copyright",
   },
+  regardie1939: {
+    title: "Regardie, The Golden Dawn, vol. 3 (Aries Press, Chicago, 1939)",
+    scan: {
+      site: "archive.org",
+      item: "IsraelRegardie-TheGoldenDawn-Vol3-1939",
+    },
+    rights: "in-copyright",
+  },
   regardie1940: {
     title: "Regardie, The Golden Dawn, vol. 4 (Aries Press, Chicago, 1940)",
     scan: {

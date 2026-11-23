@@ -51,6 +51,7 @@ import useEnochianFont, { EnochianFont } from "../useEnochianFont";
 import type { TabletNameLinks } from "./dictionaryLinks";
 import NamesPanel, { namesToChoose } from "./NamesPanel";
 import { Sources, versionTitle } from "./Sources";
+import SquaresPanel from "./SquaresPanel";
 import {
   countDifferences,
   differingSquares,
@@ -60,7 +61,14 @@ import {
   viewOf,
 } from "./squareReadings";
 import styles from "./tablets.module.css";
-import { type TabletId, tabletQuery, useTabletUrl } from "./urlState";
+import {
+  hasPyramids,
+  type PanelTab,
+  type TabletChoice,
+  type TabletId,
+  tabletQuery,
+  useTabletUrl,
+} from "./urlState";
 
 /**
  * The Watchtowers by name. The Tablet of Union's name is a message of
@@ -238,9 +246,6 @@ function showSquares(
     behavior: still ? "instant" : "smooth",
   });
 }
-
-/** The panel's tabs. */
-type PanelTab = "names" | "differences";
 
 /** A title inside a sentence: "the Golden Dawn's", not "The Golden Dawn's". */
 const midSentence = (title: string) => title.replace(/^The /, "the ");
@@ -469,16 +474,22 @@ export default function Tablets({
   links?: TabletNameLinks;
 } = {}) {
   const { t } = useUiLanguage();
-  const [{ tablet: id, version }, setChoice] = useTabletUrl();
+  const [
+    { tablet: id, version, tab: tabInUrl, square: squareInUrl },
+    setChoice,
+    pushChoice,
+  ] = useTabletUrl();
   const [reversed, setReversed] = React.useState(true);
   const [alt, setAlt] = React.useState(false);
   // Names by default, with nothing highlighted (plan 090, decision 2).
-  const [tab, setTab] = React.useState<PanelTab>("names");
+  const [tab, setTabShown] = React.useState<PanelTab>("names");
   const [selected, setSelected] = React.useState<TabletSquare>();
   // A square chosen on the tablet in the Names tab that lies in several
   // names.
   const [nameSquare, setNameSquare] = React.useState<TabletSquare>();
-  // A chosen square belongs to its tablet, in either tab: another tablet,
+  // The Squares tab's square, whose pyramid it shows (plan 095).
+  const [pyramidSquare, setPyramidSquare] = React.useState<TabletSquare>();
+  // A chosen square belongs to its tablet, in any tab: another tablet,
   // from the select or from the URL (Back, a link), clears it. The
   // Tablet of Union's squares are not a Watchtower's.
   const [selectedOn, setSelectedOn] = React.useState(id);
@@ -486,7 +497,47 @@ export default function Tablets({
     setSelectedOn(id);
     setSelected(undefined);
     setNameSquare(undefined);
+    setPyramidSquare(undefined);
   }
+  // Dee's and Raphael's tables have no pyramids, so no square to show.
+  if (pyramidSquare && !hasPyramids(version)) setPyramidSquare(undefined);
+  // The tab and the square a URL names: a shared link once hydrated (the
+  // prerendered page has neither), a URL changed under the page, or Back
+  // to an entry that records the tab it was left from. A URL that names
+  // neither leaves them as they are.
+  const urlKey = `${tabInUrl ?? ""} ${squareInUrl ? `${squareInUrl.row},${squareInUrl.column}` : ""}`;
+  const [urlSeen, setUrlSeen] = React.useState(" ");
+  if (urlSeen !== urlKey) {
+    setUrlSeen(urlKey);
+    if (tabInUrl) setTabShown(tabInUrl);
+    if (squareInUrl) setPyramidSquare(squareInUrl);
+  }
+  /**
+   * A change of the URL's choices, keeping the tab shown and the Squares
+   * tab's square in it; the square goes with its tablet.
+   */
+  const choose = (change: Partial<TabletChoice>) =>
+    setChoice({
+      tab,
+      ...(change.tablet && change.tablet !== id
+        ? {}
+        : { square: pyramidSquare }),
+      ...change,
+    });
+  /** Another tab: the URL holds the square only while Squares is open. */
+  const setTab = (next: PanelTab) => {
+    setTabShown(next);
+    setChoice({ tab: next, square: pyramidSquare });
+  };
+  // A choice of square made by keyboard takes the focus to its detail,
+  // whose heading then says it; one made on the tablet is said by the
+  // live region instead, so that it is not heard twice.
+  const [focusPyramid, setFocusPyramid] = React.useState(false);
+  const [announcePyramid, setAnnouncePyramid] = React.useState(false);
+  const pyramidFocused = React.useCallback(() => setFocusPyramid(false), []);
+  // The pyramid's symbols upright, or facing outward as the Order painted
+  // them: the page's for the session, across squares and tabs.
+  const [outward, setOutward] = React.useState(false);
   // The Names tab: a chosen name and one previewed, by id, which is the
   // same on every tablet and in every version, and the regions.
   const [chosenId, setChosenId] = React.useState<TabletNameId>();
@@ -524,6 +575,10 @@ export default function Tablets({
   const names = view ? tabletNames(view) : [];
   const tradition = TABLET_NAME_TRADITIONS[version];
   const onNames = tab === "names";
+  const onSquares = tab === "squares";
+  // The Squares tab draws and chooses squares only where there are
+  // pyramids.
+  const pyramidsShown = onSquares && hasPyramids(version);
   // The regions are a Watchtower's: the Union draws none, and so a
   // download or the image link does not count them there.
   const regionsShown = regions && !union;
@@ -551,7 +606,7 @@ export default function Tablets({
   const altShown = alt && seconds.length > 0;
   const plainShown =
     !reversed && (view?.marks ?? []).some((mark) => mark.reversed);
-  const differencesShown = !onNames && marked.length > 0;
+  const differencesShown = tab === "differences" && marked.length > 0;
   // The image link draws the tablet as published: its reversed letters
   // mirrored, and nothing drawn over it.
   const linkNote = differencesShown
@@ -560,9 +615,11 @@ export default function Tablets({
       ? t(
           /*i18n*/ "No image link while a name, a square or the regions are shown.",
         )
-      : altShown || plainShown
-        ? "No image link with second letters shown or reversed letters plain."
-        : undefined;
+      : pyramidsShown && pyramidSquare
+        ? t(/*i18n*/ "No image link while a square is shown.")
+        : altShown || plainShown
+          ? "No image link with second letters shown or reversed letters plain."
+          : undefined;
   const tabletNote = tabletNotes.tablets[id];
   const note = versionNote(version);
   const [, , viewWidth, viewHeight] = tabletViewBox(id);
@@ -601,6 +658,34 @@ export default function Tablets({
     if (squaresWanted)
       showSquares(ref.current, squaresWanted.squares, squaresWanted.union);
   }, [squaresWanted]);
+
+  /**
+   * A square chosen for the Squares tab: on the tablet (a second tap on
+   * it lets it go, and its detail is scrolled into view), with the picker
+   * or from a name's squares (the focus taken to its detail, and the tab
+   * opened).
+   */
+  const choosePyramid = (
+    square: TabletSquare | undefined,
+    focus = false,
+    from?: PanelTab,
+  ) => {
+    setTabShown("squares");
+    setPyramidSquare(square);
+    // From a name's square, a history entry, so Back returns to the name.
+    if (from) pushChoice({ tab: "squares", square }, from);
+    else setChoice({ tab: "squares", square });
+    setFocusPyramid(focus && Boolean(square));
+    setAnnouncePyramid(!focus);
+    setScrollToDetail(!focus && Boolean(square));
+  };
+  const pickPyramid = (square: TabletSquare) =>
+    choosePyramid(
+      pyramidSquare?.row === square.row &&
+        pyramidSquare.column === square.column
+        ? undefined
+        : square,
+    );
   /**
    * A square chosen on the tablet in the Names tab: its name pinned, or
    * let go, where it lies in one (or in one and the archangel built on
@@ -623,23 +708,32 @@ export default function Tablets({
     setRevealed((count) => count + 1);
   };
 
-  const highlights: TabletHighlights | undefined = onNames
-    ? {
-        name: chosenName && {
-          squares: chosenName.squares,
-          numbers:
-            squarePixels >= NUMBERED_SQUARE_PX
-              ? readingOrder(chosenName)
-              : undefined,
-        },
-        preview: previewed && { squares: previewed.squares },
-        regions: regionsShown,
-        squares: nameSquare ? [nameSquare] : [],
-        selected: nameSquare,
-        anySquare: true,
-        onSelect: pickName,
-      }
-    : { squares: marked, selected: chosen, onSelect: pickOnTablet };
+  const highlights: TabletHighlights | undefined = onSquares
+    ? pyramidsShown
+      ? {
+          squares: pyramidSquare ? [pyramidSquare] : [],
+          selected: pyramidSquare,
+          anySquare: true,
+          onSelect: pickPyramid,
+        }
+      : { squares: [] }
+    : onNames
+      ? {
+          name: chosenName && {
+            squares: chosenName.squares,
+            numbers:
+              squarePixels >= NUMBERED_SQUARE_PX
+                ? readingOrder(chosenName)
+                : undefined,
+          },
+          preview: previewed && { squares: previewed.squares },
+          regions: regionsShown,
+          squares: nameSquare ? [nameSquare] : [],
+          selected: nameSquare,
+          anySquare: true,
+          onSelect: pickName,
+        }
+      : { squares: marked, selected: chosen, onSelect: pickOnTablet };
 
   const exportControls = (
     <ExportControls
@@ -653,13 +747,20 @@ export default function Tablets({
         differences: differencesShown,
         name: onNames ? chosenName?.id : undefined,
         regions: onNames && regionsShown,
-        square: onNames ? nameSquare : chosen,
+        square: onNames
+          ? nameSquare
+          : onSquares
+            ? pyramidsShown
+              ? pyramidSquare
+              : undefined
+            : chosen,
       })}
       // The downloads draw what is shown.
       link={linkNote ? undefined : link}
       linkNote={linkNote}
       share={() =>
-        window.location.pathname + tabletQuery({ tablet: id, version })
+        window.location.pathname +
+        tabletQuery({ tablet: id, version, tab, square: pyramidSquare })
       }
     />
   );
@@ -668,7 +769,7 @@ export default function Tablets({
     <Container sx={{ p: 2 }}>
       <div
         ref={layout}
-        className={`${styles.layout} ${onNames && view ? styles.namesOpen : ""} ${union ? styles.union : ""}`}
+        className={`${styles.layout} ${(onNames || pyramidsShown) && view ? styles.namesOpen : ""} ${union ? styles.union : ""}`}
         style={
           {
             "--tablet-ratio": viewWidth / viewHeight,
@@ -691,9 +792,7 @@ export default function Tablets({
                 id="tablet-select"
                 value={id}
                 label="Tablet"
-                onChange={(e) =>
-                  setChoice({ tablet: e.target.value as TabletId })
-                }
+                onChange={(e) => choose({ tablet: e.target.value as TabletId })}
               >
                 {TABLET_IDS.map((tablet) => (
                   <MenuItem key={tablet} value={tablet}>
@@ -712,7 +811,7 @@ export default function Tablets({
                 value={version}
                 label="Version"
                 onChange={(e) =>
-                  setChoice({ version: e.target.value as TabletVersionId })
+                  choose({ version: e.target.value as TabletVersionId })
                 }
               >
                 {TABLET_VERSIONS.map((each) => (
@@ -756,7 +855,7 @@ export default function Tablets({
             // Any square chooses its names in the Names tab: a
             // Watchtower's grid, or the Tablet of Union, which draws in
             // the root.
-            ...(onNames && {
+            ...((onNames || pyramidsShown) && {
               '& svg[viewBox="0 0 244 264"], & > svg[viewBox="0 0 124 104"]': {
                 cursor: "pointer",
               },
@@ -776,7 +875,7 @@ export default function Tablets({
               highlights={highlights}
             />
           ) : (
-            <NoTablet version={version} choose={setChoice} />
+            <NoTablet version={version} choose={choose} />
           )}
         </Box>
 
@@ -799,6 +898,12 @@ export default function Tablets({
                 value="differences"
                 label={t(/*i18n*/ "Differences")}
                 id="tablet-tab-differences"
+                aria-controls="tablet-tabpanel"
+              />
+              <Tab
+                value="squares"
+                label={t(/*i18n*/ "Squares")}
+                id="tablet-tab-squares"
                 aria-controls="tablet-tabpanel"
               />
             </Tabs>
@@ -824,6 +929,30 @@ export default function Tablets({
                   clearSquare={() => setNameSquare(undefined)}
                   links={links}
                   revealed={revealed}
+                  openSquare={
+                    hasPyramids(version)
+                      ? (square) => choosePyramid(square, true, "names")
+                      : undefined
+                  }
+                />
+              ) : onSquares ? (
+                <SquaresPanel
+                  // Its picker starts again on another tablet's grid.
+                  key={id}
+                  tablet={id}
+                  version={version}
+                  view={view}
+                  square={pyramidSquare}
+                  choose={(square, focus) => choosePyramid(square, focus)}
+                  showVersion={() =>
+                    choose({ version: DEFAULT_TABLET_VERSION })
+                  }
+                  detail={detail}
+                  focusDetail={focusPyramid}
+                  focused={pyramidFocused}
+                  announce={announcePyramid}
+                  outward={outward}
+                  setOutward={setOutward}
                 />
               ) : (
                 <SquaresSection
@@ -878,9 +1007,11 @@ export default function Tablets({
           files={[
             "/src/app/enochian/tablets/tablets.tsx",
             "/src/app/enochian/tablets/NamesPanel.tsx",
+            "/src/app/enochian/tablets/PyramidDetail.tsx",
             "/packages/magick-components/src/enochian/Tablet.tsx",
             "/packages/magick-data/src/enochian/tablets.json5",
             "/packages/magick-data/src/enochian/TabletNames.ts",
+            "/packages/magick-data/src/enochian/TabletPyramids.ts",
             "/packages/magick-data/src/enochian/tabletNotes.json5",
           ]}
         />

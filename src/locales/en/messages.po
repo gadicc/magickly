@@ -2019,6 +2019,202 @@ msgid "Row {row}, square {column}"
 msgstr "Row {row}, square {column}"
 
 #. js-lingui-explicit-id
+#: src/app/astrology/kamea/planetaryNames.ts
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Spirit"
+msgstr "Spirit"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "decan {number} of {sign}"
+msgstr "decan {number} of {sign}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "the {kerub} and {sign}"
+msgstr "the {kerub} and {sign}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "the Sephirah {sephirah} ({number})"
+msgstr "the Sephirah {sephirah} ({number})"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "the {planet}"
+msgstr "the {planet}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "{title} (trump {number})"
+msgstr "{title} (trump {number})"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "the letter {letter}"
+msgstr "the letter {letter}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Left, side 1: {element}"
+msgstr "Left, side 1: {element}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Left, side 1: {element}, with {attributions}"
+msgstr "Left, side 1: {element}, with {attributions}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Top, side 2: {element}"
+msgstr "Top, side 2: {element}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Top, side 2: {element}, with {attributions}"
+msgstr "Top, side 2: {element}, with {attributions}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Right, side 3: {element}"
+msgstr "Right, side 3: {element}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Right, side 3: {element}, with {attributions}"
+msgstr "Right, side 3: {element}, with {attributions}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Bottom, side 4: white, with {attributions}"
+msgstr "Bottom, side 4: white, with {attributions}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Bottom, side 4: {element}"
+msgstr "Bottom, side 4: {element}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Bottom, side 4: {element}, with {attributions}"
+msgstr "Bottom, side 4: {element}, with {attributions}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Yod"
+msgstr "Yod"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "He"
+msgstr "He"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Vau"
+msgstr "Vau"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "He final"
+msgstr "He final"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "On the Great Cross, in a block of three squares under {letter} of the Name"
+msgstr "On the Great Cross, in a block of three squares under {letter} of the Name"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "On the Calvary cross of {quarter}"
+msgstr "On the Calvary cross of {quarter}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "A Kerubic square of {quarter}, under {letter} of the Name"
+msgstr "A Kerubic square of {quarter}, under {letter} of the Name"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "A servient square of {quarter}: its column under {column} of the Name, its rank under {rank}"
+msgstr "A servient square of {quarter}: its column under {column} of the Name, its rank under {rank}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "On the Tablet of Union, in the line of {element}, column {column}"
+msgstr "On the Tablet of Union, in the line of {element}, column {column}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "One side of each element: the god is {god}."
+msgstr "One side of each element: the god is {god}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "{element} on {count} of the four sides: the god is {god}."
+msgstr "{element} on {count} of the four sides: the god is {god}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Two sides of {first} and two of {second}: the god is {god}."
+msgstr "Two sides of {first} and two of {second}: the god is {god}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "{doubled} on two sides, {first} and {second} on one each: the god is {god}, a Child of Horus."
+msgstr "{doubled} on two sides, {first} and {second} on one each: the god is {god}, a Child of Horus."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "the {kerub}"
+msgstr "the {kerub}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Head and neck, from the top side: {kerub}."
+msgstr "Head and neck, from the top side: {kerub}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Body and forelimbs, from the left and right sides: {kerub} on both."
+msgstr "Body and forelimbs, from the left and right sides: {kerub} on both."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Body and forelimbs, from the left and right sides: {left} and {right}; the source does not say which gives which."
+msgstr "Body and forelimbs, from the left and right sides: {left} and {right}; the source does not say which gives which."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Hind limbs and tail, from the bottom side: {kerub}."
+msgstr "Hind limbs and tail, from the bottom side: {kerub}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "It is winged, since the Eagle or the Man is among its Kerubs."
+msgstr "It is winged, since the Eagle or the Man is among its Kerubs."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "It has no wings: neither the Eagle nor the Man is among its Kerubs."
+msgstr "It has no wings: neither the Eagle nor the Man is among its Kerubs."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Its tendency is male: {count} of its sides are active, Fire or Air."
+msgstr "Its tendency is male: {count} of its sides are active, Fire or Air."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Its tendency is female: {count} of its sides are passive, Water or Earth."
+msgstr "Its tendency is female: {count} of its sides are passive, Water or Earth."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "No tendency is stated: two of its sides are active and two passive."
+msgstr "No tendency is stated: two of its sides are active and two passive."
+
+#. js-lingui-explicit-id
 #: src/app/enochian/tablets/NamesPanel.tsx
 msgid "Names on the tablet"
 msgstr "Names on the tablet"
@@ -2105,8 +2301,194 @@ msgstr "{word} in the dictionary"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/NamesPanel.tsx
+msgid "Its squares as pyramids:"
+msgstr "Its squares as pyramids:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
 msgid "The other names through its squares:"
 msgstr "The other names through its squares:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Plate {plate}"
+msgstr "Plate {plate}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "p.{page}"
+msgstr "p.{page}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "{sephirah} ({number})"
+msgstr "{sephirah} ({number})"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its Sephirah"
+msgstr "Its Sephirah"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its Sephirah is {sephirah}."
+msgstr "Its Sephirah is {sephirah}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Every witness puts {sephirah} here: only the order of the bar is disputed."
+msgstr "Every witness puts {sephirah} here: only the order of the bar is disputed."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "The order of the bar is disputed, but every witness puts {sephirah} here, where the bar crosses the column."
+msgstr "The order of the bar is disputed, but every witness puts {sephirah} here, where the bar crosses the column."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "The order of the bar is disputed. This version follows the Equinox's plates; vol. 4's diagram and vol. 1's badge put {other} here."
+msgstr "The order of the bar is disputed. This version follows the Equinox's plates; vol. 4's diagram and vol. 1's badge put {other} here."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "The order of the bar is disputed. This version follows vol. 4's diagram and vol. 1's badge; the Equinox's plates put {other} here, and so does vol. 4's own worked example of this square, the O of OMEBB."
+msgstr "The order of the bar is disputed. This version follows vol. 4's diagram and vol. 1's badge; the Equinox's plates put {other} here, and so does vol. 4's own worked example of this square, the O of OMEBB."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "The order of the bar is disputed. This version follows vol. 4's diagram and vol. 1's badge; the Equinox's plates put {other} here."
+msgstr "The order of the bar is disputed. This version follows vol. 4's diagram and vol. 1's badge; the Equinox's plates put {other} here."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Why the bar's order is disputed"
+msgstr "Why the bar's order is disputed"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its god"
+msgstr "Its god"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "{god}'s station in the Neophyte grade: {station}."
+msgstr "{god}'s station in the Neophyte grade: {station}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "In Coptic, as the table spells it:"
+msgstr "In Coptic, as the table spells it:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "The table adds <0>ⲋ</0> to the name, a sign it reads as st and gives to Keter, for the god's more spiritual form."
+msgstr "The table adds <0>ⲋ</0> to the name, a sign it reads as st and gives to Keter, for the god's more spiritual form."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Our reading of the Coptic: {note}"
+msgstr "Our reading of the Coptic: {note}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Vol. 3 differs: {note}"
+msgstr "Vol. 3 differs: {note}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its sphinx"
+msgstr "Its sphinx"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Face the symbols outward, as the Order painted them"
+msgstr "Face the symbols outward, as the Order painted them"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its four sides"
+msgstr "Its four sides"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, {letter}."
+msgstr "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, {letter}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, {letter}."
+msgstr "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, {letter}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its angels"
+msgstr "Its angels"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its angel is {angel}: the servient name of its row, read from this square."
+msgstr "Its angel is {angel}: the servient name of its row, read from this square."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its great angel is {angel}, with {letter} of the Tablet of Union before it."
+msgstr "Its great angel is {angel}, with {letter} of the Tablet of Union before it."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "The rule it follows"
+msgstr "The rule it follows"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Where a witness departs from it here"
+msgstr "Where a witness departs from it here"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "Squares as pyramids"
+msgstr "Squares as pyramids"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "Dee's and Raphael's tables carry no elements, so their squares are not pyramids. The pyramids are the Golden Dawn's, in its three versions."
+msgstr "Dee's and Raphael's tables carry no elements, so their squares are not pyramids. The pyramids are the Golden Dawn's, in its three versions."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+#: src/app/enochian/tablets/tablets.tsx
+msgid "Show the Golden Dawn's version"
+msgstr "Show the Golden Dawn's version"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "The Golden Dawn treats every square as a truncated pyramid, with an element and an attribution on each of its four sides. Choose a square on the tablet, or a row and square here, to see its pyramid, the rule it follows and, below the cross bars, its angels, god and sphinx."
+msgstr "The Golden Dawn treats every square as a truncated pyramid, with an element and an attribution on each of its four sides. Choose a square on the tablet, or a row and square here, to see its pyramid, the rule it follows and, below the cross bars, its angels, god and sphinx."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "Choose a square"
+msgstr "Choose a square"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "Row"
+msgstr "Row"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "Square"
+msgstr "Square"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "Show"
+msgstr "Show"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "{square}: {region}"
+msgstr "{square}: {region}"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
@@ -2122,6 +2504,11 @@ msgstr "In the Tablet of Union, {squares} differ: {kinds}."
 #: src/app/enochian/tablets/tablets.tsx
 msgid "No image link while a name, a square or the regions are shown."
 msgstr "No image link while a name, a square or the regions are shown."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "No image link while a square is shown."
+msgstr "No image link while a square is shown."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
@@ -2146,6 +2533,11 @@ msgstr "Differences"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
+msgid "Squares"
+msgstr "Squares"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
 msgid "The Tablet of Union reads the same in all three Golden Dawn sources, Regardie's of 1940, the Equinox of 1912 and Greer's edition: no square differs, so none is outlined. Dee's and Raphael's tables have no Tablet of Union."
 msgstr "The Tablet of Union reads the same in all three Golden Dawn sources, Regardie's of 1940, the Equinox of 1912 and Greer's edition: no square differs, so none is outlined. Dee's and Raphael's tables have no Tablet of Union."
 
@@ -2158,11 +2550,6 @@ msgstr "Raphael's table of 1587 has no Tablet of Union. The Tablet of Union is t
 #: src/app/enochian/tablets/tablets.tsx
 msgid "Dee's tables of 1584 have no Tablet of Union. The Tablet of Union is the Golden Dawn's: it sets out the letters of Dee's Black Cross, which binds his four tables together and is not yet drawn here."
 msgstr "Dee's tables of 1584 have no Tablet of Union. The Tablet of Union is the Golden Dawn's: it sets out the letters of Dee's Black Cross, which binds his four tables together and is not yet drawn here."
-
-#. js-lingui-explicit-id
-#: src/app/enochian/tablets/tablets.tsx
-msgid "Show the Golden Dawn's version"
-msgstr "Show the Golden Dawn's version"
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/DocLoader.tsx
@@ -2828,11 +3215,6 @@ msgstr "Intelligence"
 #: src/app/astrology/kamea/planetaryNames.ts
 msgid "Intelligences"
 msgstr "Intelligences"
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/planetaryNames.ts
-msgid "Spirit"
-msgstr "Spirit"
 
 #. js-lingui-explicit-id
 #: src/app/astrology/kamea/planetaryNames.ts

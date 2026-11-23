@@ -223,3 +223,38 @@
 .namesItem {
   scroll-margin-top: calc(var(--app-bar, 56px) + 8px);
 }
+
+/*
+ * The Squares tab (plan 095, decision 3): the row and square picker, its
+ * selects and button side by side where they fit; the pyramid's plate no
+ * wider than its drawing; the gods' Coptic names in Noto Sans Coptic
+ * (public/fonts/NotoSansCoptic.css), the only face the site ships with
+ * Coptic letters.
+ */
+.picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 12px 0;
+}
+.picker > :not(button) {
+  min-width: 6.5em;
+}
+.pyramid {
+  max-width: 256px;
+  margin-inline: auto;
+}
+.coptic {
+  font-family: "Noto Sans Coptic", sans-serif;
+  font-size: 1.2em;
+}
+/* A switch's whole label is its target, at least 44px tall on a phone. */
+.touchable {
+  min-height: 44px;
+}
+/* A disclosure's summary is a target too. */
+.disclosure {
+  padding-block: 12px;
+  cursor: pointer;
+}

@@ -2019,6 +2019,202 @@ msgid "Row {row}, square {column}"
 msgstr "שורה {row}, משבצת {column}"
 
 #. js-lingui-explicit-id
+#: src/app/astrology/kamea/planetaryNames.ts
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Spirit"
+msgstr "רוח"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "decan {number} of {sign}"
+msgstr "דקאן {number} של {sign}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "the {kerub} and {sign}"
+msgstr "{kerub} ו־{sign}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "the Sephirah {sephirah} ({number})"
+msgstr "הספירה {sephirah} ({number})"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "the {planet}"
+msgstr "{planet}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "{title} (trump {number})"
+msgstr "{title} (קלף עליון {number})"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "the letter {letter}"
+msgstr "האות {letter}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Left, side 1: {element}"
+msgstr "שמאל, צלע 1: {element}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Left, side 1: {element}, with {attributions}"
+msgstr "שמאל, צלע 1: {element}, עם {attributions}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Top, side 2: {element}"
+msgstr "למעלה, צלע 2: {element}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Top, side 2: {element}, with {attributions}"
+msgstr "למעלה, צלע 2: {element}, עם {attributions}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Right, side 3: {element}"
+msgstr "ימין, צלע 3: {element}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Right, side 3: {element}, with {attributions}"
+msgstr "ימין, צלע 3: {element}, עם {attributions}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Bottom, side 4: white, with {attributions}"
+msgstr "למטה, צלע 4: לבן, עם {attributions}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Bottom, side 4: {element}"
+msgstr "למטה, צלע 4: {element}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Bottom, side 4: {element}, with {attributions}"
+msgstr "למטה, צלע 4: {element}, עם {attributions}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Yod"
+msgstr "יוד"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "He"
+msgstr "הא"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Vau"
+msgstr "וו"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "He final"
+msgstr "הא אחרונה"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "On the Great Cross, in a block of three squares under {letter} of the Name"
+msgstr "על הצלב הגדול, בקבוצה של שלוש משבצות תחת ה{letter} של השם"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "On the Calvary cross of {quarter}"
+msgstr "על צלב הגולגולתא של {quarter}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "A Kerubic square of {quarter}, under {letter} of the Name"
+msgstr "משבצת כרובית של {quarter}, תחת ה{letter} של השם"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "A servient square of {quarter}: its column under {column} of the Name, its rank under {rank}"
+msgstr "משבצת משרתת של {quarter}: הטור שלה תחת ה{column} של השם, השורה שלה תחת ה{rank}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "On the Tablet of Union, in the line of {element}, column {column}"
+msgstr "על לוח האיחוד, בשורה של {element}, טור {column}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "One side of each element: the god is {god}."
+msgstr "צלע אחת מכל יסוד: האל הוא {god}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "{element} on {count} of the four sides: the god is {god}."
+msgstr "{element} על {count} מתוך ארבע הצלעות: האל הוא {god}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Two sides of {first} and two of {second}: the god is {god}."
+msgstr "שתי צלעות של {first} ושתיים של {second}: האל הוא {god}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "{doubled} on two sides, {first} and {second} on one each: the god is {god}, a Child of Horus."
+msgstr "{doubled} על שתי צלעות, {first} ו{second} על אחת כל אחד: האל הוא {god}, אחד מבני הורוס."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "the {kerub}"
+msgstr "{kerub}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Head and neck, from the top side: {kerub}."
+msgstr "ראש וצוואר, מהצלע העליונה: {kerub}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Body and forelimbs, from the left and right sides: {kerub} on both."
+msgstr "גוף ורגליים קדמיות, מהצלעות השמאלית והימנית: {kerub} בשתיהן."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Body and forelimbs, from the left and right sides: {left} and {right}; the source does not say which gives which."
+msgstr "גוף ורגליים קדמיות, מהצלעות השמאלית והימנית: {left} ו־{right}; המקור אינו אומר איזו נותנת מה."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Hind limbs and tail, from the bottom side: {kerub}."
+msgstr "רגליים אחוריות וזנב, מהצלע התחתונה: {kerub}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "It is winged, since the Eagle or the Man is among its Kerubs."
+msgstr "יש לו כנפיים, כי הנשר או האדם נמנים עם הכרובים שלו."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "It has no wings: neither the Eagle nor the Man is among its Kerubs."
+msgstr "אין לו כנפיים: לא הנשר ולא האדם נמנים עם הכרובים שלו."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Its tendency is male: {count} of its sides are active, Fire or Air."
+msgstr "נטייתו זכרית: {count} מצלעותיו פעילות, אש או אוויר."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "Its tendency is female: {count} of its sides are passive, Water or Earth."
+msgstr "נטייתו נקבית: {count} מצלעותיו סבילות, מים או ארץ."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/pyramidWords.ts
+msgid "No tendency is stated: two of its sides are active and two passive."
+msgstr "לא נאמרת נטייה: שתיים מצלעותיו פעילות ושתיים סבילות."
+
+#. js-lingui-explicit-id
 #: src/app/enochian/tablets/NamesPanel.tsx
 msgid "Names on the tablet"
 msgstr "השמות שעל הלוח"
@@ -2105,8 +2301,194 @@ msgstr "{word} במילון"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/NamesPanel.tsx
+msgid "Its squares as pyramids:"
+msgstr "המשבצות שלו כפירמידות:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/NamesPanel.tsx
 msgid "The other names through its squares:"
 msgstr "השמות האחרים העוברים במשבצותיו:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Plate {plate}"
+msgstr "תמונה {plate}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "p.{page}"
+msgstr "עמ' {page}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "{sephirah} ({number})"
+msgstr "{sephirah} ({number})"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its Sephirah"
+msgstr "הספירה שלה"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its Sephirah is {sephirah}."
+msgstr "הספירה שלה היא {sephirah}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Every witness puts {sephirah} here: only the order of the bar is disputed."
+msgstr "כל העדים מציבים כאן את {sephirah}: רק סדר הזרוע שנוי במחלוקת."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "The order of the bar is disputed, but every witness puts {sephirah} here, where the bar crosses the column."
+msgstr "סדר הזרוע שנוי במחלוקת, אבל כל העדים מציבים כאן את {sephirah}, במקום שבו הזרוע חוצה את הטור."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "The order of the bar is disputed. This version follows the Equinox's plates; vol. 4's diagram and vol. 1's badge put {other} here."
+msgstr "סדר הזרוע שנוי במחלוקת. גרסה זו הולכת אחר הלוחות של האקווינוקס; התרשים של כרך 4 והתג של כרך 1 מציבים כאן את {other}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "The order of the bar is disputed. This version follows vol. 4's diagram and vol. 1's badge; the Equinox's plates put {other} here, and so does vol. 4's own worked example of this square, the O of OMEBB."
+msgstr "סדר הזרוע שנוי במחלוקת. גרסה זו הולכת אחר התרשים של כרך 4 והתג של כרך 1; הלוחות של האקווינוקס מציבים כאן את {other}, וכך גם הדוגמה שכרך 4 עצמו מפרט למשבצת זו, ה־O של OMEBB."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "The order of the bar is disputed. This version follows vol. 4's diagram and vol. 1's badge; the Equinox's plates put {other} here."
+msgstr "סדר הזרוע שנוי במחלוקת. גרסה זו הולכת אחר התרשים של כרך 4 והתג של כרך 1; הלוחות של האקווינוקס מציבים כאן את {other}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Why the bar's order is disputed"
+msgstr "מדוע סדר הזרוע שנוי במחלוקת"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its god"
+msgstr "האל שלה"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "{god}'s station in the Neophyte grade: {station}."
+msgstr "מקומו של {god} בדרגת הנאופיט: {station}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "In Coptic, as the table spells it:"
+msgstr "בקופטית, כפי שהטבלה מאייתת:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "The table adds <0>ⲋ</0> to the name, a sign it reads as st and gives to Keter, for the god's more spiritual form."
+msgstr "הטבלה מוסיפה לשם את <0>ⲋ</0>, סימן שהיא קוראת st ומייחסת לכתר, לצורתו הרוחנית יותר של האל."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Our reading of the Coptic: {note}"
+msgstr "הקריאה שלנו בקופטית: {note}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Vol. 3 differs: {note}"
+msgstr "כרך 3 שונה: {note}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its sphinx"
+msgstr "הספינקס שלה"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Face the symbols outward, as the Order painted them"
+msgstr "הפניית הסמלים החוצה, כפי שהמסדר צייר אותם"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its four sides"
+msgstr "ארבע הצלעות שלה"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, {letter}."
+msgstr "כל צלע מצוירת בצבע היסוד שלה, והסמל שלה בצבע המשלים, פונה החוצה, כפי שהמסדר צייר אותם. הפסגה נושאת את אות המשבצת, {letter}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, {letter}."
+msgstr "כל צלע מצוירת בצבע היסוד שלה, והסמל שלה בצבע המשלים, זקוף כדי שאפשר יהיה לקרוא אותו; המסדר צייר את הסמלים פונים החוצה. הפסגה נושאת את אות המשבצת, {letter}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its angels"
+msgstr "המלאכים שלה"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its angel is {angel}: the servient name of its row, read from this square."
+msgstr "המלאך שלה הוא {angel}: השם המשרת של השורה שלה, הנקרא ממשבצת זו."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Its great angel is {angel}, with {letter} of the Tablet of Union before it."
+msgstr "המלאך הגדול שלה הוא {angel}, ולפניו ה־{letter} מלוח האיחוד."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "The rule it follows"
+msgstr "הכלל שהיא הולכת לפיו"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Where a witness departs from it here"
+msgstr "היכן שעד סוטה ממנו כאן"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "Squares as pyramids"
+msgstr "משבצות כפירמידות"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "Dee's and Raphael's tables carry no elements, so their squares are not pyramids. The pyramids are the Golden Dawn's, in its three versions."
+msgstr "בלוחות של די ושל רפאל אין יסודות, ולכן המשבצות שלהם אינן פירמידות. הפירמידות הן של השחר הזהוב, בשלוש הגרסאות שלו."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+#: src/app/enochian/tablets/tablets.tsx
+msgid "Show the Golden Dawn's version"
+msgstr "הצגת הגרסה של השחר הזהוב"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "The Golden Dawn treats every square as a truncated pyramid, with an element and an attribution on each of its four sides. Choose a square on the tablet, or a row and square here, to see its pyramid, the rule it follows and, below the cross bars, its angels, god and sphinx."
+msgstr "השחר הזהוב רואה בכל משבצת פירמידה קטומה, עם יסוד וייחוס על כל אחת מארבע צלעותיה. בחרו משבצת על הלוח, או שורה ומשבצת כאן, כדי לראות את הפירמידה שלה, את הכלל שהיא הולכת לפיו, ומתחת לזרועות הצלב, את המלאכים, האל והספינקס שלה."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "Choose a square"
+msgstr "בחירת משבצת"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "Row"
+msgstr "שורה"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "Square"
+msgstr "משבצת"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "Show"
+msgstr "הצגה"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/SquaresPanel.tsx
+msgid "{square}: {region}"
+msgstr "{square}: {region}"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
@@ -2122,6 +2504,11 @@ msgstr "בלוח האיחוד יש הבדל ב־{squares}: {kinds}."
 #: src/app/enochian/tablets/tablets.tsx
 msgid "No image link while a name, a square or the regions are shown."
 msgstr "אין קישור לתמונה כשמוצגים שם, משבצת או האזורים."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "No image link while a square is shown."
+msgstr "אין קישור לתמונה כשמוצגת משבצת."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
@@ -2146,6 +2533,11 @@ msgstr "הבדלים"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
+msgid "Squares"
+msgstr "משבצות"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
 msgid "The Tablet of Union reads the same in all three Golden Dawn sources, Regardie's of 1940, the Equinox of 1912 and Greer's edition: no square differs, so none is outlined. Dee's and Raphael's tables have no Tablet of Union."
 msgstr "לוח האיחוד נקרא באותו אופן בכל שלושת המקורות של השחר הזהוב, של רגרדי מ־1940, של The Equinox מ־1912 ובמהדורה של גריר: אין משבצת שונה, ולכן אף אחת אינה מסומנת. בלוחות של די ושל רפאל אין לוח איחוד."
 
@@ -2158,11 +2550,6 @@ msgstr "בלוח של רפאל מ־1587 אין לוח איחוד. לוח האי�
 #: src/app/enochian/tablets/tablets.tsx
 msgid "Dee's tables of 1584 have no Tablet of Union. The Tablet of Union is the Golden Dawn's: it sets out the letters of Dee's Black Cross, which binds his four tables together and is not yet drawn here."
 msgstr "בלוחות של די מ־1584 אין לוח איחוד. לוח האיחוד הוא של השחר הזהוב: הוא מציג את אותיות הצלב השחור של די, המחבר את ארבעת לוחותיו יחד ועדיין אינו משורטט כאן."
-
-#. js-lingui-explicit-id
-#: src/app/enochian/tablets/tablets.tsx
-msgid "Show the Golden Dawn's version"
-msgstr "הצגת הגרסה של השחר הזהוב"
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/DocLoader.tsx
@@ -2828,11 +3215,6 @@ msgstr "תבונה"
 #: src/app/astrology/kamea/planetaryNames.ts
 msgid "Intelligences"
 msgstr "תבונות"
-
-#. js-lingui-explicit-id
-#: src/app/astrology/kamea/planetaryNames.ts
-msgid "Spirit"
-msgstr "רוח"
 
 #. js-lingui-explicit-id
 #: src/app/astrology/kamea/planetaryNames.ts

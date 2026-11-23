@@ -78,6 +78,7 @@ describe("the picklists a declaration states as literals", () => {
       enochianTablet: ["choices.gd[].from", "kind"],
       tetragram: ["rows[]"],
       gdGrade: ["orderId"],
+      gdGodForm: ["mix"],
       seventyTwoAngel: ["name.heSource"],
       alchemySymbol: ["category"],
     });
@@ -435,7 +436,7 @@ describe("the generated declarations' picklist literals", () => {
       .map((name) => [name, picklistPaths(schemas[name])] as const)
       .filter(([, paths]) => paths.length);
     // Every picklist the first test above lists, so none is skipped here.
-    expect(picked.flatMap(([, paths]) => paths)).toHaveLength(21);
+    expect(picked.flatMap(([, paths]) => paths)).toHaveLength(22);
 
     const program = compile(
       picked.map(

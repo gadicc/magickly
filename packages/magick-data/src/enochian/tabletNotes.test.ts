@@ -26,6 +26,9 @@ const allSources = (): TabletSource[] => [
   ...tabletNotes.names.rules.flatMap((rule) => rule.sources),
   ...tabletNotes.names.attributions.flatMap((note) => note.sources),
   ...tabletNotes.names.cited.flatMap((cited) => cited.sources),
+  ...tabletNotes.pyramids.rules.flatMap((rule) => rule.sources),
+  ...tabletNotes.pyramids.exceptions.flatMap((each) => each.sources),
+  ...tabletNotes.pyramids.readings.flatMap((reading) => reading.sources),
 ];
 
 describe("the tablet notes", () => {

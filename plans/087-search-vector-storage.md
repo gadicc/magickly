@@ -1,14 +1,18 @@
 # Search vector storage — 18 November 2026
 
-Status: designed, not built. Gadi settled decisions 1–3 and 6 on
+Status: done (23 November 2026). Gadi settled decisions 1–3 and 6 on
 18 November 2026 on the first measurements; the Fable 5.2 review the same
 day ([below](#review-18-november-2026)) showed those measurements
 overstated the history cost about sixfold. Gadi reconfirmed decision 1 on
 the corrected numbers the same day and dropped the history rewrite
-(decision 6); S0 is done. S1 is on `main` since 18 November
-(below). S2 is built on `gate/search-vectors`, not yet on `main`; Gadi settled its
-open questions on 23 November ([S2 decisions](#s2-decisions-23-november-2026),
-[built](#built-23-november-2026-gatesearch-vectors)). Read [plan 070](070-site-search.md) (the site
+(decision 6); S0 is done. S1 is on `main` since 18 November and S2 since
+23 November ([S2 decisions](#s2-decisions-23-november-2026),
+[built](#built-23-november-2026-gatesearch-vectors)). S3, which removes
+`public/search-vectors` and leaves the committed rows as the only
+published vectors, landed on 23 November too
+([S3, Built](#s3-built-23-november-2026-gatesearch-vectors-s3),
+[S3 review](#s3-review)).
+Read [plan 070](070-site-search.md) (the site
 search and its embedding contract) and `src/search/README.md` first. The
 number was free on every local and remote branch on 18 November 2026.
 
@@ -669,6 +673,148 @@ reuse.
 
 The last commit of the format change deletes the old directory and its
 tracing entry. History from here on grows by rows.
+
+#### S3, Built (23 November 2026, `gate/search-vectors-s3`)
+
+Built on `main`'s `6520b451`:
+
+| Commit | What |
+| --- | --- |
+| `a837b2f5` | `search:build` prints the record-order SHA-256 of the covered rows |
+| `868605ed` | Rows only: `public/search-vectors/` deleted, no matrix written, the manifest slimmed |
+| `3cd31c59` | `src/search/README.md`'s contract; AGENTS.md's publishing steps |
+
+- **The directory and the service worker.** `next.config.ts`'s
+  `precacheEntries()` walks all of `public/` except `docs/`, `sources/`
+  and the worker's own files, so every visitor's service worker
+  precached the ~9.8 MB matrix: the main checkout's `public/sw.js` of
+  17 November lists
+  `/search-vectors/gemini-embedding-2-768-search-v1-f0a834e1e89b.bin`.
+  Neither `next.config.ts` nor `src/app/sw.ts` had a special case for
+  the directory, and there was no tracing entry for it left to remove
+  (S1 had already pointed `/api/search` at the artifact), so deleting
+  the directory is the whole fix. After the gate's build, `public/sw.js`
+  has 486 precache entries and none names `search-vectors` or a `.bin`
+  file.
+- **Publish.** `publishMatrix` became `publishVectors(root, profile,
+  keys, matrix)`: it writes and prunes the rows, writes the manifest and
+  rebuilds the ignored artifact, and returns `{ written, pruned,
+  sha256 }`. `MATRIX_DIRECTORY`, the matrix and the deletion of earlier
+  matrices are gone. `search:publish` and `search:assemble` print
+  `record-order sha256 …` instead of a file name. `search:assemble` ran
+  on the final tree, printed `3207 rows from search-vectors, pruned 0;
+  record-order sha256 692a8226…`, and left the rows unchanged
+  (`git status` clean apart from the work).
+- **Manifest.** Version 2, `selected`, and `profile`, a copy of the
+  selected profile (null with none selected); `catalogueSha256`, `file`,
+  `sha256`, `rows` and the `profiles` array are gone. `selectedProfile`
+  throws unless the copy equals the registered profile, so an edit in
+  place is still refused, and so is a version 1 manifest, which has no
+  `profile`. `manifest.test.ts` pins the shape and the refusals (an
+  edited copy, a missing copy, an unregistered key). Two branches
+  publishing the same profile now write identical manifests, so they
+  merge without a conflict; the README says to run `search:assemble`
+  afterwards to prune, and how to resolve a manifest if two profiles
+  were selected. `catalogueDigest` stays for `embed.mts`'s private
+  report only.
+- **Digest.** `assembleVectorArtifact` hashes the covered keys' rows in
+  the order of `keys`, repeats included (as `coveredVectors` builds the
+  store's matrix), and `search:build` prints it. Proof on this tree,
+  before anything was deleted: the manifest's `sha256` and the committed
+  file's `sha256sum` were both
+  `692a8226580ba8cec4471ea9cb2d6798c32258969c793356f3b49e750bb88449`,
+  and `pnpm search:build` printed
+
+  ```
+  search: 3207/3207 records have embedding rows for gemini-embedding-2-768-search-v1; assembled 3207 rows, 0 orphan rows left on disk
+  search: record-order matrix sha256 692a8226580ba8cec4471ea9cb2d6798c32258969c793356f3b49e750bb88449 (3207 rows)
+  ```
+
+  It printed the same two lines at each later commit and in the gate's
+  build, with the matrix and the manifest's `sha256` gone.
+- **Tests.** `semantic.test.ts`'s "published vector files" test went
+  with the directory. `publish.test.ts` checks that a publish writes
+  nothing under `public/`; `rows.test.ts` and `vectors.test.ts` pin the
+  digest. `availability.test.ts` read none of the dropped fields.
+- **Docs.** `src/search/README.md` gives the final contract: rows only,
+  the digest, the manifest, merges, that a malformed committed row
+  blocks `search:publish` (which runs `search:build` first) until the
+  file is deleted, on purpose, and that `/search/index` reads the
+  artifact while prerendered, fine while it stays `force-static`.
+  AGENTS.md's publishing steps commit rows and the manifest with no
+  matrix. Seeding the cache from the main checkout (step 2) is now
+  optional: a publish takes committed rows first, so it saves only text
+  another checkout embedded that has no row here. The paragraph above
+  the steps no longer says a content edit fails tests until a publish,
+  untrue since S2. `plans/000-current-status.md` says nothing about the
+  vector files, so it is unchanged.
+
+**Each commit on its own tree** (`pnpm search:build`, `pnpm check`,
+`next typegen` and `tsc --noEmit`, the tests in `src/search` and
+`scripts/search`; Node 24.18.0):
+
+| Commit | search:build | check | tsc | search tests |
+| --- | --- | --- | --- | --- |
+| `a837b2f5` | 0 | 0 (28 warnings) | 0 | 0 (15 files, 89 tests) |
+| `868605ed` | 0 | 0 (28 warnings) | 0 | 0 (15 files, 89 tests) |
+| `3cd31c59` | 0 | 0 (28 warnings) | 0 | 0 (15 files, 89 tests) |
+
+None of the 28 warnings is in a changed file.
+
+**Gate** at `3cd31c59`, from a script run with `bash`, each step's exit
+status recorded: Node 24.18.0; `rm -rf node_modules .next` and a fresh
+`pnpm install --frozen-lockfile`; `pnpm build` with the placeholder
+environment from `ci.yml`; `test` and `build` through `loom slots run`
+as `package.json` records them.
+
+| Commit | install | check | typecheck | test | build |
+| --- | --- | --- | --- | --- | --- |
+| `3cd31c59` | 0 | 0 (28 warnings) | 0 | 0 (738 files, 14,300 tests passed; 3 files, 19 tests skipped) | 0 |
+
+After the build, `.next/server/app/api/search/route.js.nft.json` lists
+`../../../../../src/search/generated/search-vectors.bin` and no row
+file, `public/sw.js` has no `search-vectors` entry, and the prerendered
+`/search/index` body has `"semanticAvailable":true`. This record's
+commit changes only this plan.
+
+#### S3, landed (23 November 2026)
+
+Rebased onto `7bd4e2e0` (main's i18n work: `package.json`, the lockfile
+and AGENTS.md, no conflict): `a837b2f5`, `868605ed` and `3cd31c59` became
+`5741d4f3`, `e21a1ecf` and `1f1109c7`; the review's fixes are `c53b066b`.
+Gate at `e5afa428` (the rebased tree before `c53b066b`), same script, fresh
+install: install, check, typecheck and build 0; test 1, one timeout in
+`src/chat-research/configuredService.test.ts` (5 s, then `EACCES` cleaning
+its `/tmp` fixture), which S3 does not touch; that file alone passed 174
+of 174. After the build the precache manifest had no `search-vectors`
+entry, `/search/index` said `"semanticAvailable":true`, and `search:build`
+printed `692a8226…` for 3,207 records. Independently, recomputing each
+key with the recipe written out by hand and hashing the row files in
+record order also gave `692a8226…`, the pre-S3 manifest's `sha256`.
+
+On `c53b066b`: `pnpm check`, both `tsc` projects and the `src/search` and
+`scripts/search` tests (15 files, 91 tests) pass; a stray
+`public/search-vectors/x.bin` fails the new guard; a version 1 manifest
+makes `search:build` warn and `search:assemble` rewrite it byte for byte
+to the version 2 original.
+
+#### S3 review
+
+An independent Opus 5.5 review (high) found no critical or high defects.
+It recomputed the digest (`692a8226…`, 3,207 records), found nothing left
+reading the removed manifest fields or directory (runtime, tests, scripts,
+service worker, CI), and checked that a failed publish leaves a
+consistent tree and that AGENTS.md changed only in its publishing section.
+
+| Finding | Outcome |
+| --- | --- |
+| Nothing stopped `public/search-vectors/` coming back: a merge from a branch that published before S3 leaves it as a modify/delete conflict, and keeping it passed every test while the service worker precached it again | `manifest.test.ts` fails while the directory or any `.bin` under `public/` exists; the README says how to resolve such a merge (`c53b066b`) |
+| A version 1 manifest from such a merge failed late with an unhelpful message, and the README called skipping `search:assemble` safe | `selectedProfile` names `search:assemble`; `search:build` warns, so assemble can still repair it; README corrected (`c53b066b`) |
+| The digest line said "rows" for a count of records | "records" (`c53b066b`) |
+
+Not verified: that visitors' service workers drop the matrix they already
+precached. Serwist removes precached URLs missing from a new manifest when
+the new worker activates; no browser was tested.
 
 ## History rewrite (dropped; kept for reference)
 

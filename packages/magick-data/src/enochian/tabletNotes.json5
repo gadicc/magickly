@@ -8,7 +8,11 @@
 // Rows and columns are counted from 0, as in tablets.json5. "names" cites
 // where the names TabletNames.ts reads along its paths come from, and the
 // spellings the sources print that no path gives (plan 090); the names
-// themselves are computed, never written here.
+// themselves are computed, never written here. "pyramids" cites the rules
+// by which TabletPyramids.ts computes each square's pyramid, by witness,
+// the places where a witness departs from them and whose slip each is, and
+// the readings that are ours (plan 095); the attributions themselves are
+// computed, never written here.
 //
 // Generated once from a script outside the repository and edited by hand
 // since; nothing regenerates it.
@@ -58,6 +62,13 @@
       "year": 1940,
       "archive": {
         "item": "IsraelRegardie-TheGoldenDawn-Vol4-1940"
+      }
+    },
+    "regardie1937": {
+      "title": "Israel Regardie, The Golden Dawn, vol. 1 (Aries Press, Chicago, 1937)",
+      "year": 1937,
+      "archive": {
+        "item": "IsraelRegardie-thegoldenDawn-vol1-1937"
       }
     },
     "regardie1939": {
@@ -1343,6 +1354,650 @@
         { "tablet": "fire", "id": "bottom-right-kerubic-archangel", "spelling": "PZIZA" }
       ]
     }
+  },
+  "pyramids": {
+    "rules": [
+      {
+        "topic": "sides",
+        "witness": "regardie1940",
+        "text": "Every square of the four Watchtowers and of the Tablet of Union is a truncated pyramid: four triangles round a flat top that holds the square's letter. The triangles are numbered 1 on the left, 2 at the top, 3 on the right and 4 at the bottom, and each is painted in its element's colour, Fire red, Water blue, Air yellow, Earth black and Spirit white; a side that carries a planet takes the colour of the element the planet rules, the Sun and Jupiter Fire, Saturn and Mercury Air, Venus and the Moon Earth, Mars Water.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 291,
+            "leaf": 283
+          },
+          {
+            "work": "regardie1940",
+            "page": 293,
+            "leaf": 285
+          },
+          {
+            "work": "regardie1940",
+            "page": 294,
+            "leaf": 286
+          }
+        ]
+      },
+      {
+        "topic": "sides",
+        "witness": "equinox1912",
+        "text": "The Equinox describes each square by its upper, lower, left and right sides, without colours, and its plates draw every square of the four Watchtowers and of the Tablet of Union as a pyramid, with a symbol in each triangle.",
+        "sources": [
+          {
+            "work": "equinox1912",
+            "page": 237,
+            "leaf": 249
+          },
+          {
+            "work": "equinox1912",
+            "plate": "IV",
+            "leaf": 242
+          },
+          {
+            "work": "equinox1912",
+            "plate": "V",
+            "leaf": 243
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VI",
+            "leaf": 244
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VII",
+            "leaf": 245
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VIII",
+            "leaf": 246
+          }
+        ]
+      },
+      {
+        "topic": "greatCross",
+        "witness": "regardie1940",
+        "text": "The Great Cross is read in blocks of three squares, down its two columns (passing over the line across the middle) and along that line, the Linea Spiritus Sancti. The blocks take the letters of the Name in turn, from the top and from the left, starting with the tablet's own letter and going back through the Name. The left column takes the cardinal sign of the block's letter's element, the right column the mutable sign and the line the kerubic sign, and a block's three squares are its sign's three decans, downward and rightward, so the decans do not follow the order in which the letters are read. Side 1 carries the sign, with the decan's small card; side 2 Spirit; side 3 the decan's planet; side 4 the tablet's element.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 282,
+            "leaf": 274
+          },
+          {
+            "work": "regardie1940",
+            "page": 283,
+            "leaf": 275
+          },
+          {
+            "work": "regardie1940",
+            "page": 285,
+            "leaf": 277
+          },
+          {
+            "work": "regardie1940",
+            "page": 286,
+            "leaf": 278
+          },
+          {
+            "work": "regardie1940",
+            "page": 287,
+            "leaf": 279
+          },
+          {
+            "work": "regardie1940",
+            "page": 293,
+            "leaf": 285
+          }
+        ]
+      },
+      {
+        "topic": "greatCross",
+        "witness": "equinox1912",
+        "text": "The Equinox gives the Great Cross's squares the same sides, the sign on the left and its decan's planet on the right, and its plates draw them so.",
+        "sources": [
+          {
+            "work": "equinox1912",
+            "page": 237,
+            "leaf": 249
+          },
+          {
+            "work": "equinox1912",
+            "plate": "IV",
+            "leaf": 242
+          },
+          {
+            "work": "equinox1912",
+            "plate": "V",
+            "leaf": 243
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VI",
+            "leaf": 244
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VII",
+            "leaf": 245
+          }
+        ]
+      },
+      {
+        "topic": "calvaryCross",
+        "witness": "regardie1940",
+        "text": "Each lesser angle's Calvary cross holds the ten Sephiroth: Keter at the top of its column, Tiferet where the bar crosses it, and Netzach, Hod, Yesod and Malchut below; Chochmah, Binah, Chesed and Gevurah are on the bar, in an order the witnesses dispute (the reading on the Calvary bar gives each witness's order). Side 1 carries the tablet's element, side 2 Spirit, side 3 the lesser angle's element, and side 4 the Sephirah, with the card of its number in the lesser angle's suit, the Ace for Keter, and on the six from Keter to Tiferet a planet with its trump: Jupiter, Mercury, the Moon, Venus, Mars and the Sun.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 287,
+            "leaf": 279
+          },
+          {
+            "work": "regardie1940",
+            "page": 288,
+            "leaf": 280
+          },
+          {
+            "work": "regardie1940",
+            "page": 290,
+            "leaf": 282
+          },
+          {
+            "work": "regardie1940",
+            "page": 294,
+            "leaf": 286
+          },
+          {
+            "work": "regardie1940",
+            "page": 295,
+            "leaf": 287
+          }
+        ]
+      },
+      {
+        "topic": "calvaryCross",
+        "witness": "equinox1912",
+        "text": "The Equinox gives the Calvary crosses' squares the same sides, and its plates print each square's Sephirah as a number on its lower side.",
+        "sources": [
+          {
+            "work": "equinox1912",
+            "page": 238,
+            "leaf": 250
+          },
+          {
+            "work": "equinox1912",
+            "plate": "IV",
+            "leaf": 242
+          },
+          {
+            "work": "equinox1912",
+            "plate": "V",
+            "leaf": 243
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VI",
+            "leaf": 244
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VII",
+            "leaf": 245
+          }
+        ]
+      },
+      {
+        "topic": "kerubic",
+        "witness": "regardie1940",
+        "text": "A lesser angle's Kerubic squares, its top row less the cross's square, take the letters of the Name across, with the lesser angle's own letter on the outside square; vol. 4 tabulates all sixteen ranks. A square's letter gives its Kerub, Yod the Lion, He the Eagle, Vau the Man and He final the Bull, and its court card of the lesser angle's suit in the Order's ranks, King, Queen, Prince and Princess. Side 1 carries the court card, side 2 the tablet's element, side 3 the Kerub with its sign, side 4 the lesser angle's element.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 284,
+            "leaf": 276
+          },
+          {
+            "work": "regardie1940",
+            "page": 288,
+            "leaf": 280
+          },
+          {
+            "work": "regardie1940",
+            "page": 289,
+            "leaf": 281
+          },
+          {
+            "work": "regardie1940",
+            "page": 295,
+            "leaf": 287
+          }
+        ]
+      },
+      {
+        "topic": "kerubic",
+        "witness": "equinox1912",
+        "text": "The Equinox's text gives the Kerubic squares' upper and lower sides only; its plates draw the Kerub's element on the left and on the right.",
+        "sources": [
+          {
+            "work": "equinox1912",
+            "page": 238,
+            "leaf": 250
+          },
+          {
+            "work": "equinox1912",
+            "plate": "IV",
+            "leaf": 242
+          },
+          {
+            "work": "equinox1912",
+            "plate": "V",
+            "leaf": 243
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VI",
+            "leaf": 244
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VII",
+            "leaf": 245
+          }
+        ]
+      },
+      {
+        "topic": "servient",
+        "witness": "regardie1940",
+        "text": "The servient squares' columns take the letters of the Kerubic squares above them, and their ranks the same letters read from right to left, downward. A column's letter gives an element and a rank's a quality: Yod cardinal, He kerubic, Vau mutable, and He final the element itself, Earth as Saturn. Side 1 carries the tablet's element, with that sign or element; side 2 the column's element, with the trump of the sign or element; side 3 the lesser angle's element, with the geomantic figure the table of attributions by Hebrew letter gives it; side 4 the rank's element, with the Hebrew letter.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 284,
+            "leaf": 276
+          },
+          {
+            "work": "regardie1940",
+            "page": 289,
+            "leaf": 281
+          },
+          {
+            "work": "regardie1940",
+            "page": 295,
+            "leaf": 287
+          },
+          {
+            "work": "regardie1940",
+            "page": 298,
+            "leaf": 290
+          }
+        ]
+      },
+      {
+        "topic": "servient",
+        "witness": "equinox1912",
+        "text": "The Equinox gives the servient squares' sides by their elements, and its plates draw an element on each.",
+        "sources": [
+          {
+            "work": "equinox1912",
+            "page": 238,
+            "leaf": 250
+          },
+          {
+            "work": "equinox1912",
+            "plate": "IV",
+            "leaf": 242
+          },
+          {
+            "work": "equinox1912",
+            "plate": "V",
+            "leaf": 243
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VI",
+            "leaf": 244
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VII",
+            "leaf": 245
+          }
+        ]
+      },
+      {
+        "topic": "union",
+        "witness": "regardie1940",
+        "text": "The Tablet of Union's squares carry Spirit above and below. Side 1 carries the column's element, Spirit in the first, with the column's card of the line's suit, the Aces first, then the Prince, the Queen, the Princess and the King; side 3 the line's element, Air, Water, Earth and Fire from the top.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 290,
+            "leaf": 282
+          },
+          {
+            "work": "regardie1940",
+            "page": 296,
+            "leaf": 288
+          },
+          {
+            "work": "regardie1940",
+            "page": 301,
+            "leaf": 293
+          },
+          {
+            "work": "regardie1940",
+            "page": 302,
+            "leaf": 294
+          }
+        ]
+      },
+      {
+        "topic": "union",
+        "witness": "equinox1912",
+        "text": "The Equinox gives the Tablet of Union's squares the same sides, and draws them on its last plate.",
+        "sources": [
+          {
+            "work": "equinox1912",
+            "page": 238,
+            "leaf": 250
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VIII",
+            "leaf": 246
+          }
+        ]
+      },
+      {
+        "topic": "gods",
+        "witness": "regardie1940",
+        "text": "On a servient square the mix of the four sides' elements gives the god who rules above the pyramid, and their Kerubs the sphinx within it. A table of fifteen gods covers every mix: one side of each element, Osiris; three or four sides of one element, that element's god; two sides each of two elements, the pair's god; three elements, one of them twice, the Child of Horus of those three. The squares worked with their gods, the N of nhdD, the C of CPao and the l of lSha, follow it, and the list of the Children of Horus gives each the same three elements.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 310,
+            "leaf": 302
+          },
+          {
+            "work": "regardie1940",
+            "page": 311,
+            "leaf": 303
+          },
+          {
+            "work": "regardie1940",
+            "page": 315,
+            "leaf": 307
+          },
+          {
+            "work": "regardie1940",
+            "page": 318,
+            "leaf": 310
+          },
+          {
+            "work": "regardie1940",
+            "page": 319,
+            "leaf": 311
+          },
+          {
+            "work": "regardie1940",
+            "page": 321,
+            "leaf": 313
+          },
+          {
+            "work": "regardie1940",
+            "page": 361,
+            "leaf": 353
+          }
+        ]
+      }
+    ],
+    "exceptions": [
+      {
+        "id": "plateBlankTriangles",
+        "witness": "equinox1912",
+        "squares": [
+          {
+            "tablet": "water",
+            "row": 8,
+            "column": 5
+          },
+          {
+            "tablet": "water",
+            "row": 8,
+            "column": 6
+          }
+        ],
+        "side": 4,
+        "text": "Two triangles of the Water tablet's plate are blank, the lower sides of the Great Cross's two squares on its ninth row, where the rule and every other square of the column have the tablet's Water. The printer's omission.",
+        "sources": [
+          {
+            "work": "equinox1912",
+            "plate": "V",
+            "leaf": 243
+          }
+        ]
+      },
+      {
+        "id": "plateDotlessSuns",
+        "witness": "equinox1912",
+        "squares": [
+          {
+            "tablet": "earth",
+            "row": 2,
+            "column": 5
+          },
+          {
+            "tablet": "earth",
+            "row": 11,
+            "column": 5
+          },
+          {
+            "tablet": "fire",
+            "row": 5,
+            "column": 5
+          }
+        ],
+        "side": 3,
+        "text": "Three Suns on the plates of Earth and Fire are printed as a plain circle, without the dot, each where the decans put the Sun (the third decan of Capricorn twice, the second of Aries once); the plates' other Suns have it. The printer's slip.",
+        "sources": [
+          {
+            "work": "equinox1912",
+            "plate": "VI",
+            "leaf": 244
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VII",
+            "leaf": 245
+          }
+        ]
+      },
+      {
+        "id": "vol4ThreeOfSwords",
+        "witness": "regardie1940",
+        "squares": [
+          {
+            "tablet": "air",
+            "row": 1,
+            "column": 5
+          }
+        ],
+        "side": 3,
+        "text": "Vol. 4's diagram of the Air tablet's Great Cross draws the 3 of Swords, the second decan of Libra, with Jupiter, as it does the 4 of Swords below, where the decans give Saturn and the Equinox's plate has Saturn. A slip in vol. 4's drawing.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 287,
+            "leaf": 279
+          },
+          {
+            "work": "equinox1912",
+            "plate": "IV",
+            "leaf": 242
+          }
+        ]
+      },
+      {
+        "id": "vol4Omebb",
+        "witness": "regardie1940",
+        "versions": [
+          "gd",
+          "regardie"
+        ],
+        "squares": [
+          {
+            "tablet": "water",
+            "row": 1,
+            "column": 7
+          }
+        ],
+        "side": 4,
+        "text": "Vol. 4 works the O of OMEBB, the bar's leftmost square in the Water angle of the Water tablet, as Gevurah, which is the Equinox's order of the bar; its own diagram of a lesser angle and the badge of the Ten Squares have Binah there. So vol. 4 disagrees with itself, and the Golden Dawn's and Regardie's versions, which follow the diagram and the badge, give Binah.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 302,
+            "leaf": 294
+          },
+          {
+            "work": "regardie1940",
+            "page": 290,
+            "leaf": 282
+          },
+          {
+            "work": "regardie1937",
+            "page": 157,
+            "leaf": 148
+          }
+        ]
+      }
+    ],
+    "readings": [
+      {
+        "id": "calvaryBar",
+        "text": "Vol. 4's diagram of the Earth angle of the Water tablet and the Ten Squares badge of the 27th Path in vol. 1 have Binah, Gevurah, Tiferet, Chesed and Chochmah from the left, as the Order draws the Tree; the Equinox's plates have Gevurah, Binah, Tiferet, Chochmah and Chesed in every lesser angle, and vol. 4's worked O of OMEBB agrees with them. An Order manuscript of the Concourse of the Forces, or a painted tablet, would settle it.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 290,
+            "leaf": 282
+          },
+          {
+            "work": "regardie1937",
+            "page": 157,
+            "leaf": 148
+          },
+          {
+            "work": "equinox1912",
+            "plate": "IV",
+            "leaf": 242
+          },
+          {
+            "work": "equinox1912",
+            "plate": "V",
+            "leaf": 243
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VI",
+            "leaf": 244
+          },
+          {
+            "work": "equinox1912",
+            "plate": "VII",
+            "leaf": 245
+          },
+          {
+            "work": "regardie1940",
+            "page": 302,
+            "leaf": 294
+          }
+        ]
+      },
+      {
+        "id": "sphinx",
+        "text": "Vol. 4 builds a servient square's sphinx from the Kerubs of its four sides: the top side gives the head and neck, the left and right sides the body and forelimbs, the bottom side the hind limbs and tail, and the Eagle and the Man give it wings. It does not say which of the left and right sides gives which, and they differ on most squares, so we list the four Kerubs by side rather than draw one figure. Ours, not the source's.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 311,
+            "leaf": 303
+          }
+        ]
+      },
+      {
+        "id": "tendency",
+        "text": "Vol. 4 gives a square's sphinx a male or a female tendency by whether its active or its passive sides prevail. Where two sides are active and two passive it states none, and we show none rather than choose. Ours, not the source's.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 312,
+            "leaf": 304
+          }
+        ]
+      },
+      {
+        "id": "children",
+        "text": "Where three elements meet on a servient square, one of them twice, we give the Child of Horus of the three elements present, as the gods' table lists them and the list of the Children confirms; vol. 4 works one such square, the N of nhdD (Water, Air, Air and Fire), and gives it Ahephi. That every other doubling follows the same reading is ours.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 315,
+            "leaf": 307
+          },
+          {
+            "work": "regardie1940",
+            "page": 318,
+            "leaf": 310
+          },
+          {
+            "work": "regardie1940",
+            "page": 361,
+            "leaf": 353
+          }
+        ]
+      },
+      {
+        "id": "earthAsSaturn",
+        "text": "The servient squares of rank He final carry their column's element itself. Earth has no letter of its own among the three mothers, so the table of attributions by Hebrew letter gives Earth's squares Saturn's letter, Tav, with the Universe and Caput Draconis, and its diagrams draw Saturn there.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 289,
+            "leaf": 281
+          },
+          {
+            "work": "regardie1940",
+            "page": 290,
+            "leaf": 282
+          },
+          {
+            "work": "regardie1940",
+            "page": 298,
+            "leaf": 290
+          }
+        ]
+      },
+      {
+        "id": "geomanticFigures",
+        "text": "A servient square's geomantic figure is the one the table of attributions by Hebrew letter gives its sign or element, Fortuna Minor for Air, Via for Water, Cauda Draconis for Fire and Caput Draconis for Earth among them. The figures' own signs cannot give it: two figures share Cancer and two share Leo.",
+        "sources": [
+          {
+            "work": "regardie1940",
+            "page": 298,
+            "leaf": 290
+          },
+          {
+            "work": "regardie1940",
+            "page": 357,
+            "leaf": 349
+          }
+        ]
+      }
+    ]
   },
   "squares": {
     "air": [

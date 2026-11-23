@@ -1,0 +1,18 @@
+/*
+ * Noto Sans Coptic, for the Coptic names of the gods on the tablets page
+ * (plan 095): SIL OFL 1.1, see NotoSansCoptic-OFL.txt and
+ * coptic-font-sources.md. scripts/coptic-font/build.py subsets it to the
+ * letters of gd/godForms.json5's names and sou; the tablets page imports
+ * this stylesheet, and the browser fetches the font only when one of these
+ * letters is drawn.
+ */
+@font-face {
+  font-family: "Noto Sans Coptic";
+  src: url("NotoSansCoptic-gods.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+03E2-03E3, U+03EE, U+2C80-2C81, U+2C83, U+2C85, U+2C89,
+    U+2C8B-2C91, U+2C93-2C95, U+2C99-2C9B, U+2C9D, U+2C9F, U+2CA1, U+2CA3,
+    U+2CA5, U+2CA7, U+2CA9, U+2CAB, U+2CB1;
+}

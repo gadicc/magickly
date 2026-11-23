@@ -214,21 +214,25 @@ index without a failing test. `ToolLayout`'s slots and the Oration's notes
 are children for this reason.
 
 A commit that adds or changes indexed public text (a new public page, prose on
-an indexed page, a component entry) moves the search catalogue's digest, and
-`src/search/embeddings/manifest.test.ts` and `src/search/semantic.test.ts`
-fail until its embeddings are published. Publishing is a paid call to the AI
-Gateway; resolving two branches' publishes is not (`pnpm search:assemble
-gemini-embedding-2-768-search-v1` rebuilds from the committed rows alone).
+an indexed page, a component entry) re-keys the records it touches. Until its
+embeddings are published those records are found by text only, and
+`pnpm search:build` reports less than full coverage (warning below 90%); no
+test fails (plan 087). Publishing is a paid call to the AI Gateway; resolving
+two branches' publishes is not (`pnpm search:assemble
+gemini-embedding-2-768-search-v1` prunes and checks from the committed rows
+alone).
 
-To publish from a worktree (gate worktrees have no `.env*`, and a fresh one has
-no embedding cache, so without the second step it re-embeds every passage;
-`../magickli` is the main checkout from a worktree beside it, elsewhere use its
-full path):
+To publish from a worktree (gate worktrees have no `.env*`; `../magickli` is
+the main checkout from a worktree beside it, elsewhere use its full path):
 
 1. Use the repository's Node (`nvm use 24`).
-2. Seed the cache from the main checkout, which is keyed by exact text and
-   model recipe and so is safe to share:
+2. Optionally, seed the cache from the main checkout, which is keyed by exact
+   text and model recipe and so is safe to share:
    `mkdir -p .private && cp -rn ../magickli/.private/site-search .private/`
+   A publish takes every committed row first, so even a fresh worktree pays
+   only for records with no committed row. The cache saves something only
+   when another checkout has already embedded that exact text (an edit
+   published on a branch not yet merged here, say); usually it saves nothing.
 3. Pass only the gateway key, never the rest of `.env.local`:
 
    ```bash
@@ -238,8 +242,9 @@ full path):
    Never print, log or commit the key.
 4. Copy the new cache entries back for the next worktree:
    `cp -rn .private/site-search/. ../magickli/.private/site-search/`
-5. Commit the changed `search-vectors/` rows, the manifest and the new matrix
-   with the change that needed them.
+5. Commit the changed `search-vectors/` rows (added and pruned) and
+   `src/search/embeddings/manifest.json`, if it changed, with the change that
+   needed them. There is no matrix to commit (plan 087, S3).
 
 **Agents may run this without asking** when the run's conservative estimate
 (the script prints it before any paid call, and refuses anything over $1) is
@@ -282,3 +287,27 @@ sizing is unchanged. The design is Loom's `docs/machine-slots.md`.
 - A test budget raised for load (`tests/loadBudget.ts`) states what it
   measured. Fix a slow test's cause before raising its budget, and raise
   it per test, never across the board.
+
+## The gates
+
+`pnpm gate` is the full gate: what CI's required checks and the release
+job run, step by step. That is install, `loom check`, lint, translations,
+types, both package smokes, the tests with coverage, both builds and `loom
+check --production`. `pnpm gate:quick` runs lint, translations and types,
+none of which wait for CPUs. Both are `scripts/gate.mjs`.
+
+- Each step runs with only basic variables from the shell (`PATH`, `HOME`,
+  the locale) plus CI's placeholders from `.env.ci`, so a gate never sees a
+  real credential or needs `.env.local`. Run them under Node 24 (`nvm use`);
+  the gate refuses another major version.
+- `.env.ci` is plain `KEY=value` lines and must stay equal to `ci.yml`'s
+  top-level `env` block; `scripts/gate.test.ts` checks both, and that every
+  value is a placeholder.
+- Every run logs each step's duration and exit code under the git common
+  directory, in `gate-logs/`.
+- When CI gains a required `pnpm` step, add it to `STEPS.full`; the test
+  fails until you do.
+
+Which gate a change needs before it lands is still the verification policy
+in the Loom skill. The quick tier isn't in use yet (Loom
+`docs/landing.md`, on the `design/landing` branch).

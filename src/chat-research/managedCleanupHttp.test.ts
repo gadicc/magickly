@@ -246,3 +246,96 @@ it("rejects unsupported token formats before reading a secret or private configu
   expect(secret).not.toHaveBeenCalled();
   expect(load).not.toHaveBeenCalled();
 });
+
+it("accepts only paired canonical or exact own deployment targets for platform cron", async () => {
+  const deploymentOrigin = "https://cleanup-owned-example.vercel.app";
+  for (const [urlOrigin, host, accepted] of [
+    [origin, "synthetic.example", true],
+    [deploymentOrigin, "cleanup-owned-example.vercel.app", true],
+    [origin, "cleanup-owned-example.vercel.app", false],
+    [deploymentOrigin, "synthetic.example", false],
+    ["https://other.vercel.app", "other.vercel.app", false],
+    [
+      "https://cleanup-owned-example.vercel.app.evil.test",
+      "cleanup-owned-example.vercel.app.evil.test",
+      false,
+    ],
+  ] as const) {
+    const load = vi.fn(async () => ({}) as ResearchManagedCleanupOptions),
+      secret = vi.fn(() => token);
+    const handler = createResearchManagedCleanupHttpHandler({
+      origin,
+      tokenFormat: "vercel-cron",
+      deploymentOrigin,
+      secret,
+      loadOptions: load,
+    });
+    const response = await handler(
+      request(
+        { headers: { host, authorization: "Bearer " + token } },
+        urlOrigin + RESEARCH_MANAGED_CLEANUP_PATH,
+      ),
+    );
+    expect(response.status).toBe(accepted ? 200 : 404);
+    expect(load).toHaveBeenCalledTimes(accepted ? 1 : 0);
+    expect(secret).toHaveBeenCalledTimes(accepted ? 1 : 0);
+  }
+});
+it.each([
+  "http://owned.vercel.app",
+  "https://owned.vercel.app:444",
+  "https://owned.vercel.app/",
+  "https://owned.vercel.app?x=1",
+  "https://user@owned.vercel.app",
+  "https://owned.example.test",
+  "https://nested.owned.vercel.app",
+  "https://*.vercel.app",
+])("refuses untrusted deployment origin %s", (deploymentOrigin) => {
+  expect(() =>
+    createResearchManagedCleanupHttpHandler({
+      origin,
+      tokenFormat: "vercel-cron",
+      deploymentOrigin,
+      secret: () => token,
+      loadOptions: vi.fn(),
+    }),
+  ).toThrow();
+});
+it("dedicated bearer cannot adopt a deployment origin", () => {
+  expect(() =>
+    createResearchManagedCleanupHttpHandler({
+      origin,
+      deploymentOrigin: "https://owned.vercel.app",
+      secret: () => token,
+      loadOptions: vi.fn(),
+    }),
+  ).toThrow();
+});
+it("deployment target still denies before private loading without the exact token", async () => {
+  const load = vi.fn(),
+    secret = vi.fn(() => token),
+    deploymentOrigin = "https://owned.vercel.app";
+  const handler = createResearchManagedCleanupHttpHandler({
+    origin,
+    tokenFormat: "vercel-cron",
+    deploymentOrigin,
+    secret,
+    loadOptions: load,
+  });
+  for (const headers of [
+    { host: "owned.vercel.app" },
+    { host: "owned.vercel.app", authorization: "Bearer " + "b".repeat(64) },
+  ] as HeadersInit[]) {
+    expect(
+      (
+        await handler(
+          request(
+            { headers },
+            deploymentOrigin + RESEARCH_MANAGED_CLEANUP_PATH,
+          ),
+        )
+      ).status,
+    ).toBe(404);
+  }
+  expect(load).not.toHaveBeenCalled();
+});

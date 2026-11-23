@@ -1,3 +1,4 @@
+import { DECANS } from "../astrology/decans.ts";
 import type { PlanetId } from "../astrology/Planets.ts";
 import type { ZodiacId } from "../astrology/Zodiac.ts";
 
@@ -50,17 +51,6 @@ const SIGNS: ZodiacId[] = [
   "capricorn",
   "aquarius",
   "pisces",
-];
-
-/** The decades descend the Chaldean order from Mars, and repeat every seven. */
-const DECADE_PLANETS: PlanetId[] = [
-  "mars",
-  "sol",
-  "venus",
-  "mercury",
-  "luna",
-  "saturn",
-  "jupiter",
 ];
 
 function assertAngelNumber(no: number) {
@@ -162,9 +152,13 @@ export function decadeOf(no: number): number {
   return Math.ceil(no / ANGELS_PER_DECADE);
 }
 
-/** The planet ruling the angel's decade. */
+/**
+ * The planet ruling the angel's decade: the decan's (`astrology/decans`),
+ * the decades descending the Chaldean order from Mars, as the Golden
+ * Dawn's decans do.
+ */
 export function planetOf(no: number): PlanetId {
-  return DECADE_PLANETS[(decadeOf(no) - 1) % DECADE_PLANETS.length];
+  return DECANS[decadeOf(no) - 1].planetId;
 }
 
 /** Which of the nine choirs the angel belongs to, counting from the seraphim. */

@@ -290,9 +290,69 @@ Settled after the review: the Calvary bar, per version (decision 2).
    `tarot/minorCards`; `enochian/tabletPyramids` with the region rule;
    `gd/godForms.json5`; the notes, Sources rows, exports, smoke test;
    tests against stage 0's fixture.
+   **Built 23 November 2026** (`aa99a712`). `tabletPyramids(view)` and
+   `tabletPyramid(view, square)`, cached and frozen, nothing for Dee's and
+   Raphael's versions; a square's `sides` 1–4 carry an `elementId` (one of
+   `alchemy/elements`' five, Spirit included; absent only on a Calvary
+   square's side 4, which carries the Sephirah) and an `attribution` of
+   ids (`zodiacId`, `decanId`, `planetId`, `elementId`, `sephirahId`,
+   `pathId` for the trump, `hebrewLetterId`, `minorCardId`, `tetragramId`,
+   `kerubId`); servient squares add `angel` and `greatAngel` from
+   `tabletNames`, `godFormId` and `sphinx` (the Kerub of each side). The
+   region rule is `tabletRegion` (`undefined` off the grid), the Name's
+   letters `yod`, `he`, `vav`, `heFinal` with `NAME_LETTER_HEBREW`, and
+   every constant is exported with its page and leaf. `astrology/decans`
+   is now the 72 angels' source of decans, their outputs unchanged;
+   `tarot/minorCards` has 56 cards with the Order's court ranks;
+   `gd/godForms.json5` is a table (`gdGodForm`) with the Coptic names read
+   by hand from p.315 at 2,648 px (Sothis's first letter low in
+   confidence, to be checked before it is shown; no font the site ships
+   covers Coptic). Where it departs: magick-components keeps `topRow`
+   (follow-up), and the Earth squares of a rank under He final draw
+   Saturn on side 1, with Tav as its letter. Tests: the five plates under
+   `equinox` but for the five named slips, and under `gd` those plus the
+   64 bar sides; pp.283, 284, 287 (one named exception), 290, 298; the ten
+   worked squares and three worked gods; every computed attribution over
+   2,016 squares against values written out in the test; the exceptions a
+   closed set; the counts. A fresh Opus review found no blocker or major;
+   its minor findings (untested attributions, an open set of exceptions,
+   the region rule off the grid, `vau` against the letters' `vav`, small
+   API points) were fixed before the gate. The Sources rows for
+   `gd/godForms.json5` and `enochian/tabletNotes.json5` are dated
+   2026-11-23, which Gadi confirmed that day.
 2. **The square's detail.** The Squares tab, the picker, the large
    pyramid, the god and sphinx, URL, citations, i18n, the page's text and
    search.
+   **Built 23 November 2026** (`28a14de6`). The Squares tab
+   (`SquaresPanel.tsx`, keyed by tablet), the detail (`PyramidDetail.tsx`)
+   and its drawing (`PyramidDrawing.tsx`, app-local SVG), the words
+   (`pyramidWords.ts`, whole Lingui messages with Hebrew). Gadi chose, on
+   seeing it, the symbols upright by default with a switch to face them
+   outward as the Order painted them (page state, kept across squares and
+   tabs). Each symbol has an outline so it reads at 3:1 or better against
+   its side (the complementary colours alone are 1.2–1.4:1 on Water and
+   Fire). Which symbol a side shows when it carries several (the sign,
+   else the Sephirah's number, else the planet, else the Hebrew letter; a
+   geomantic figure as dots; the element's own mark otherwise) is ours.
+   A name's squares are links that push a history entry, so Back returns
+   to the name; `?tab=squares&square=row,column` is written only on that
+   tab and dropped off the grid and under Dee's and Raphael's versions.
+   The Calvary dispute is one square-specific sentence, the reading behind
+   a disclosure; only the O of OMEBB's sentence names vol. 4's worked
+   square. Noto Sans Coptic 2.004 (OFL), subset to the names' 29 letters
+   and sou, 2,548 bytes, from the google/fonts commit the other fonts pin,
+   loaded with the detail and precached by the service worker; Sothis's
+   first letter checked on the largest scan there is (the 2,648 px JP2),
+   medium confidence. `regardie1939` joins `works.ts`. Checked in a
+   browser at 1440 × 900 and 390 × 844, light and dark, every region, the
+   Union and Dee's note. A fresh Opus review rendered the detail for all
+   1,932 squares of the three versions without a data error, and found
+   the dispute sentence crediting vol. 4's worked square everywhere, the
+   picker submitting an off-grid square after a change of tablet, the sou
+   sign outside its font, low contrast, the letter missing for screen
+   readers, the square kept off its tab, and no history for a name's
+   squares; all fixed before the gate. `search:publish` embedded 18
+   passages.
 3. **Mock-up** of the pyramid drawing for Gadi (decision 4).
 4. **The drawing.** `Tablet`'s `pyramids`, the Union's, the switch, the
    key; default bytes unmoved.
@@ -374,14 +434,15 @@ in the session's scratch for stage 1's fixture.
   sources', confirmed for a doubled element by nhdD.
 - **Where vol. 3 differs (the Z documents, pp.101–104, leaves
   n93–n96).** The East's and the South's Kerubs agree with p.315 (Athor;
-  Pasht). Vol. 3 makes the Water Kerub a power of Thoomoo (Tum) and the
-  Earth Kerub of Ahaphshi, where p.315 gives Sothis for the West and Apis
-  for the North; Sothis is not in vol. 3 at all, and Apis only as "the
-  Bull" (p.129). Harpocrates stands between the Hegemon and the Altar in
-  vol. 4 p.315 and vol. 3 p.121, but between the Hegemon and the Evil
-  Triad at vol. 3 p.103. The pyramids' gods are p.315's (the table made
-  for them); the stations of West and North are shown with vol. 3's
-  reading beside them.
+  Pasht), and so does the North's: vol. 3's Earth Kerub is a power of
+  Ahaphshi, which is the Coptic name p.315 prints for Apis (found in stage
+  1; vol. 3 names Apis in English only as "the Bull", p.129). The West
+  differs: vol. 3 makes the Water Kerub a power of Thoomoo (Tum), where
+  p.315 gives Sothis, who is not in vol. 3 at all. Harpocrates stands
+  between the Hegemon and the Altar in vol. 4 p.315 and vol. 3 p.121, but
+  between the Hegemon and the Evil Triad at vol. 3 p.103. The pyramids'
+  gods are p.315's (the table made for them); the West's station is shown
+  with vol. 3's reading beside it.
 - **The Coptic names** are transcribed with high confidence for six
   rows, medium for seven, low for Osiris and Sothis; stage 1 reads those
   by hand at a larger size before any is shown.
@@ -416,7 +477,16 @@ table and by rule), and read the Equinox's plates and vol. 1's badge.
 
 ## Follow-ups (not in this plan)
 
+- **Stretch goal (Gadi, 23 November 2026): the tablet in 3D.** The whole
+  tablet as pyramids in three dimensions, which the reader can zoom and
+  rotate on desktop and phone, with gestures fit for each (drag to
+  rotate, pinch or wheel to zoom, a reset, keyboard controls, reduced
+  motion respected). After the flat tablet-wide drawing (stages 3–4).
 - The alternative colours, with a King-scale colour table.
+- One word for the Kerubic squares in both packages: magick-components'
+  `regionFromPosition` still says `topRow` (and draws
+  `data-region="topRow"`), held to magick-data's `kerubic` by a test;
+  renaming it is a breaking change for the component (stage 1).
 - Symbols on the tablet at large image-route sizes, as the Equinox's
   plates print them.
 - The angels' telesmatic images (the name's letters as head, body and

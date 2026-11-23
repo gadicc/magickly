@@ -456,11 +456,13 @@ describe("the descriptions", () => {
     );
   });
 
-  it("number 347 field paths, the shared English text described once", () => {
+  it("number 368 field paths, the shared English text described once", () => {
     const paths = NAMES.flatMap((table) => fields.tables[table].fields);
     // 347 since the characters' readings kept their curves and marks
-    // (plan 093, K4: `via`, `hook`, `bar`, `rings`, for each reader).
-    expect(paths).toHaveLength(347);
+    // (plan 093, K4: `via`, `hook`, `bar`, `rings`, for each reader); 368
+    // since plan 095 gave the signs and elements `hebrewLetterId` and added
+    // `gdGodForm`'s nineteen.
+    expect(paths).toHaveLength(368);
     expect(
       paths.filter((f) => f.description === "The text in English.").length,
     ).toBeGreaterThan(30);

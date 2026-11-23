@@ -44,6 +44,7 @@ import geomanticHouseRows from "../dist/geomancy/houses.js";
 
 import gdGrade from "../dist/gd/grades.js";
 import gdDegree from "../dist/gd/degrees.js";
+import gdGodForm from "../dist/gd/godForms.js";
 
 import archangel from "../dist/kabbalah/archangels.js";
 import angelicOrder from "../dist/kabbalah/angelicOrders.js";
@@ -94,6 +95,7 @@ const barrel = {
   // GOLDEN DAWN
   gdGrade,
   gdDegree,
+  gdGodForm,
 
   // KABBALAH
   archangel,

@@ -16,7 +16,7 @@ import {
 import { embedSearchInputs } from "../../src/search/embeddings/provider";
 import {
   gatherMatrix,
-  publishMatrix,
+  publishVectors,
   rowSources,
 } from "../../src/search/embeddings/publish";
 import {
@@ -179,20 +179,14 @@ for (const { profile, values, keys, sources } of plans) {
       });
     }
   if (mode === "publish") {
-    // Rows, matrix, manifest and artifact (publish.ts), shared with
+    // Rows, manifest and artifact (publish.ts), shared with
     // search:assemble. The artifact is rebuilt there, not by a trailing
     // `&& pnpm search:build` in package.json, where pnpm would append the
     // profile argument to that last command instead of this script.
-    const published = publishMatrix(
-      root,
-      profile,
-      catalogueDigest(catalogue),
-      keys,
-      bytes,
-    );
+    const published = publishVectors(root, profile, keys, bytes);
     console.log(
       `${profile.key}: wrote ${published.written} rows, pruned ${published.pruned.length}; ` +
-        `${published.file}, removed ${published.removed.join(", ") || "nothing"}`,
+        `record-order sha256 ${published.sha256}`,
     );
   }
   report.push({

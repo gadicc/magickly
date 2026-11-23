@@ -27,6 +27,7 @@ export type TabletWorkId =
   | "equinox1912"
   | "equinox1911no5"
   | "equinox1912no8"
+  | "regardie1937"
   | "regardie1939"
   | "regardie1940"
   | "greer";
@@ -164,6 +165,71 @@ export interface TabletNamesNotes {
   dictionary: DictionaryTabletSpellings;
 }
 
+/**
+ * What a rule of the pyramids covers (`magick-data/enochian/tabletPyramids`):
+ * the sides in general, a region of the tablets, or the gods of the
+ * servient squares.
+ */
+export type TabletPyramidTopic =
+  | "sides"
+  | "greatCross"
+  | "calvaryCross"
+  | "kerubic"
+  | "servient"
+  | "union"
+  | "gods";
+
+/** A rule of the pyramids as one witness gives it, in our words. */
+export interface TabletPyramidRule {
+  topic: TabletPyramidTopic;
+  /** The witness: vol. 4 (`regardie1940`) or the Equinox (`equinox1912`). */
+  witness: TabletWorkId;
+  text: string;
+  sources: readonly TabletSource[];
+}
+
+/**
+ * A place where a witness departs from the pyramids' rules, and whose slip
+ * or change it is: the squares, by tablet and by row and column from 0,
+ * and the side, 1 to 4.
+ */
+export interface TabletPyramidException {
+  id: string;
+  witness: TabletWorkId;
+  /**
+   * The versions in which it departs, where not all: vol. 4's worked
+   * square that fits the Equinox's Calvary bar departs only from the
+   * versions that follow vol. 4's.
+   */
+  versions?: readonly TabletVersionId[];
+  squares: readonly {
+    tablet: EnochianTabletID;
+    row: number;
+    column: number;
+  }[];
+  side: 1 | 2 | 3 | 4;
+  text: string;
+  sources: readonly TabletSource[];
+}
+
+/**
+ * A reading of the pyramids that is ours, or a dispute we settle per
+ * version: the Calvary bar, the sphinx, its tendency, the Children of
+ * Horus, Earth as Saturn, the geomantic figures.
+ */
+export interface TabletPyramidReading {
+  id: string;
+  text: string;
+  sources: readonly TabletSource[];
+}
+
+/** The notes on the pyramids (plan 095). */
+export interface TabletPyramidNotes {
+  rules: readonly TabletPyramidRule[];
+  exceptions: readonly TabletPyramidException[];
+  readings: readonly TabletPyramidReading[];
+}
+
 /** Everything the notes hold. */
 export interface TabletNotes {
   works: Readonly<Record<TabletWorkId, TabletWork>>;
@@ -173,6 +239,7 @@ export interface TabletNotes {
   differences: readonly TabletTopic[];
   tablets: Readonly<Record<EnochianTabletID, TabletNote>>;
   names: TabletNamesNotes;
+  pyramids: TabletPyramidNotes;
   squares: Readonly<Partial<Record<EnochianTabletID, readonly SquareNote[]>>>;
 }
 
@@ -249,6 +316,33 @@ export function dictionarySpellings(
   return tabletNotes.names.dictionary.spellings.filter(
     (each) => each.tablet === tablet && each.id === id,
   );
+}
+
+/**
+ * The rules of the pyramids on one topic, each witness's, vol. 4's first.
+ * None for a topic the notes do not have.
+ */
+export function pyramidRules(topic: string): readonly TabletPyramidRule[] {
+  return tabletNotes.pyramids.rules.filter((rule) => rule.topic === topic);
+}
+
+/**
+ * The places where a witness departs from the pyramids' rules on one
+ * tablet, or on any with none given.
+ */
+export function pyramidExceptions(
+  tablet?: string,
+): readonly TabletPyramidException[] {
+  return tabletNotes.pyramids.exceptions.filter(
+    (exception) =>
+      tablet === undefined ||
+      exception.squares.some((square) => square.tablet === tablet),
+  );
+}
+
+/** One of our readings of the pyramids, by id. */
+export function pyramidReading(id: string): TabletPyramidReading | undefined {
+  return tabletNotes.pyramids.readings.find((reading) => reading.id === id);
 }
 
 /** A source as a line of text: "Regardie 1940 … p.271 (archive.org leaf n263)". */

@@ -1,3 +1,10 @@
+// hebrewLetterId: the mother letter the Golden Dawn gives the element, as
+// the table of attributions by Hebrew letter in Regardie, The Golden Dawn,
+// vol. 4 (Chicago, 1940), p.298 (archive.org
+// IsraelRegardie-TheGoldenDawn-Vol4-1940, leaf n290) has it: Aleph Air,
+// Mem Water, Shin Fire. Earth has none of its own: the table gives Tav,
+// the Universe and Caput Draconis to Saturn with Earth, and Tav is
+// Saturn's letter in planets.json5. Spirit has none.
 {
   earth: {
     id: "earth",
@@ -14,6 +21,7 @@
       en: "Air",
     },
     elementalId: "sylph",
+    hebrewLetterId: "alef",
   },
   water: {
     id: "water",
@@ -22,6 +30,7 @@
       en: "Water",
     },
     elementalId: "undine",
+    hebrewLetterId: "mem",
   },
   fire: {
     id: "fire",
@@ -30,6 +39,7 @@
       en: "Fire",
     },
     elementalId: "salamander",
+    hebrewLetterId: "shin",
   },
   spirit: {
     id: "spirit",

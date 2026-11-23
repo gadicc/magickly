@@ -8,6 +8,12 @@
     schema's description says how the two He's, h and H, are told apart.
     Until magick-data 0.2.1 Cancer had Leo's hvyH and Sagittarius
     Capricorn's Hyhv.
+
+    hebrewLetterId: the simple letter the Golden Dawn gives the sign, as
+    the table of attributions by Hebrew letter in Regardie, The Golden
+    Dawn, vol. 4 (Chicago, 1940), p.298 (archive.org
+    IsraelRegardie-TheGoldenDawn-Vol4-1940, leaf n290) has it, with the
+    trump of the path the letter is on.
   */
   aries: {
     id: "aries",
@@ -29,6 +35,7 @@
     quadruplicity: "cardinal",
     tribeOfIsraelId: "gad",
     tetragrammatonPermutation: "yhvH",
+    hebrewLetterId: "he",
   },
 
   taurus: {
@@ -51,6 +58,7 @@
     quadruplicity: "kerubic",
     tribeOfIsraelId: "ephraim",
     tetragrammatonPermutation: "yhHv",
+    hebrewLetterId: "vav",
   },
 
   gemini: {
@@ -73,6 +81,7 @@
     quadruplicity: "mutable",
     tribeOfIsraelId: "manasseh",
     tetragrammatonPermutation: "yvhH",
+    hebrewLetterId: "zayin",
   },
 
   cancer: {
@@ -95,6 +104,7 @@
     quadruplicity: "cardinal",
     tribeOfIsraelId: "issachar",
     tetragrammatonPermutation: "hvHy",
+    hebrewLetterId: "het",
   },
 
   leo: {
@@ -117,6 +127,7 @@
     quadruplicity: "kerubic",
     tribeOfIsraelId: "judah",
     tetragrammatonPermutation: "hvyH",
+    hebrewLetterId: "tet",
   },
 
   virgo: {
@@ -139,6 +150,7 @@
     quadruplicity: "mutable",
     tribeOfIsraelId: "naphtali",
     tetragrammatonPermutation: "hHvy",
+    hebrewLetterId: "yod",
   },
 
   libra: {
@@ -161,6 +173,7 @@
     quadruplicity: "cardinal",
     tribeOfIsraelId: "asher",
     tetragrammatonPermutation: "vHyh",
+    hebrewLetterId: "lamed",
   },
 
   scorpio: {
@@ -183,6 +196,7 @@
     quadruplicity: "kerubic",
     tribeOfIsraelId: "dan",
     tetragrammatonPermutation: "vHhy",
+    hebrewLetterId: "nun",
   },
 
   sagittarius: {
@@ -205,6 +219,7 @@
     quadruplicity: "mutable",
     tribeOfIsraelId: "benjamin",
     tetragrammatonPermutation: "vyHh",
+    hebrewLetterId: "samekh",
   },
 
   capricorn: {
@@ -227,6 +242,7 @@
     quadruplicity: "cardinal",
     tribeOfIsraelId: "zebulun",
     tetragrammatonPermutation: "Hyhv",
+    hebrewLetterId: "ayin",
   },
 
   aquarius: {
@@ -249,6 +265,7 @@
     quadruplicity: "kerubic",
     tribeOfIsraelId: "reuben",
     tetragrammatonPermutation: "Hyvh",
+    hebrewLetterId: "tsadi",
   },
 
   pisces: {
@@ -271,5 +288,6 @@
     quadruplicity: "mutable",
     tribeOfIsraelId: "simeon",
     tetragrammatonPermutation: "Hhyv",
+    hebrewLetterId: "qof",
   },
 }

@@ -19,8 +19,9 @@
  *    exactly that many errors on exactly those lines;
  * 4. the consumer again under `nodenext`, as an ES module;
  * 5. the barrel, a table, `./tools`, the kameas, the Enochian tablets, their
- *    notes and names, and a JSON subpath loaded in Node, with real values
- *    asserted, and the dictionary refused.
+ *    notes, names and pyramids, the decans, the minor cards, the gods and
+ *    a JSON subpath loaded in Node, with real values asserted, and the
+ *    dictionary refused.
  *
  * Every step throws on failure and the process exits non-zero; the temporary
  * directory is removed either way.
@@ -344,6 +345,14 @@ import {
   citedSpellings,
   type CitedTabletSpelling,
 } from "magick-data/enochian/tabletNotes";
+import {
+  tabletPyramid,
+  type TabletPyramid,
+  type TabletPyramidRegion,
+} from "magick-data/enochian/tabletPyramids";
+import { DECANS, type Decan, type DecanId } from "magick-data/astrology/decans";
+import { minorCard, type MinorCardId } from "magick-data/tarot/minorCards";
+import godForms, { type GDGodFormId } from "magick-data/gd/godForms";
 
 // The barrel, and a four-hop read through it.
 export const roman: string = data.sephirah.hod.name.roman;
@@ -382,6 +391,19 @@ export const cited: readonly CitedTabletSpelling[] = citedSpellings(
   "earth",
   "senior-row-right",
 );
+
+// The tablets' pyramids, the decans, the minor cards and the gods.
+export const pyramid: TabletPyramid | undefined = air
+  ? tabletPyramid(air, { row: 6, column: 0 })
+  : undefined;
+export const region: TabletPyramidRegion | undefined = pyramid?.region;
+export const decan: Decan | undefined = DECANS[0];
+export const decanId: DecanId | undefined = pyramid?.sides[0].attribution.decanId;
+export const card: MinorCardId | undefined = decan?.minorCardId;
+export const cardName: string | undefined = minorCard("ace-wands")?.name;
+export const god: GDGodFormId | undefined = pyramid?.godFormId;
+export const coptic: string = godForms.osiris.coptic;
+export const letter: string = data.zodiac.aries.hebrewLetter?.letter.he ?? "";
 `,
   );
 
@@ -513,6 +535,10 @@ import kameas from "magick-data/astrology/kameas";
 import tablets, { WATCHTOWER_IDS, tabletVersion } from "magick-data/enochian/tablets";
 import { citedSpellings, dictionarySpellings, nameRules, squareNote, versionNote } from "magick-data/enochian/tabletNotes";
 import { TABLET_NAME_IDS, tabletNames, tabletNameVariants } from "magick-data/enochian/tabletNames";
+import { tabletPyramid, tabletPyramids } from "magick-data/enochian/tabletPyramids";
+import { DECANS } from "magick-data/astrology/decans";
+import { MINOR_CARDS } from "magick-data/tarot/minorCards";
+import godForms from "magick-data/gd/godForms";
 import keys, { aethyrCall, aethyrs, checkedText, keyByNumber, keyVersion } from "magick-data/enochian/keys";
 import * as tools from "magick-data/tools";
 import sephirotJson from "magick-data/json/kabbalah/sephirot.json" with { type: "json" };
@@ -562,6 +588,16 @@ assert.equal(tabletNames(tabletVersion(tablets.fire, "dee")).find((name) => name
 assert.deepEqual(tabletNameVariants(tablets.air, "king")[0]?.versions, ["dee", "raphael"]);
 assert.equal(citedSpellings("water", "top-left-cross-column")[0]?.spelling, "OBLGOTCA");
 assert.ok(nameRules("king", "dee").length > 0);
+assert.equal(tabletPyramids(tabletVersion(tablets.air)).length, 156);
+assert.equal(tabletPyramids(tabletVersion(tablets.air, "dee")).length, 0);
+assert.equal(tabletPyramid(tabletVersion(tablets.water), { row: 3, column: 0 })?.godFormId, "ahephi");
+assert.deepEqual(tabletPyramid(tabletVersion(tablets.air), { row: 6, column: 0 })?.sides[0].attribution, { zodiacId: "aquarius", decanId: "aquarius-1", minorCardId: "5-swords" });
+assert.equal(tabletPyramid(tabletVersion(tablets.water, "equinox"), { row: 1, column: 7 })?.sides[3].attribution.sephirahId, "gevurah");
+assert.equal(DECANS.length, 36);
+assert.equal(MINOR_CARDS.length, 56);
+assert.equal(Object.keys(godForms).length, 15);
+assert.equal(data.zodiac.aries.hebrewLetter?.id, "he");
+assert.equal(data.hebrewLetter.alef.element?.id, "air");
 assert.equal(keyByNumber(1)?.key, 1);
 assert.ok(Object.isFrozen(keys[0]));
 assert.equal(keyVersion(keys[0])?.length, keys[0].rows.length);

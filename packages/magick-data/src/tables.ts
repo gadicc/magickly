@@ -28,6 +28,7 @@ import geomanticHouse from "../dist/geomancy/houses.js";
 
 import gdGrade from "../dist/gd/grades.js";
 import gdDegree from "../dist/gd/degrees.js";
+import gdGodForm from "../dist/gd/godForms.js";
 
 import archangel from "../dist/kabbalah/archangels.js";
 import angelicOrder from "../dist/kabbalah/angelicOrders.js";
@@ -75,6 +76,7 @@ export type Tables = {
   geomanticHouse: typeof geomanticHouse;
   gdGrade: typeof gdGrade;
   gdDegree: typeof gdDegree;
+  gdGodForm: typeof gdGodForm;
   archangel: typeof archangel;
   angelicOrder: typeof angelicOrder;
   christianChoir: typeof christianChoir;
@@ -118,6 +120,7 @@ export const tables: Tables = {
   // GOLDEN DAWN
   gdGrade,
   gdDegree,
+  gdGodForm,
 
   // KABBALAH
   archangel,

@@ -41,6 +41,9 @@ export const graph = {
       planetId: { to: "planet", inverse: "zodiacs", inverseMany: true },
       elementId: { to: "element", inverse: "zodiacs", inverseMany: true },
       tribeOfIsraelId: { to: "tribeOfIsrael" },
+      // Singular, so the check proves one sign per letter: the twelve simple
+      // letters carry a sign each (vol. 4, p.298).
+      hebrewLetterId: { to: "hebrewLetter", inverse: "zodiac" },
     },
   },
   astrologicalHouse: {
@@ -123,6 +126,17 @@ export const graph = {
   gdDegree: {
     pending: { pillarId: "pillar" },
   },
+  gdGodForm: {
+    links: {
+      // The elements of the mix the god is given for (vol. 4, p.315).
+      elementIds: {
+        to: "element",
+        many: true,
+        inverse: "gdGodForms",
+        inverseMany: true,
+      },
+    },
+  },
 
   // KABBALAH
   archangel: {
@@ -199,7 +213,13 @@ export const graph = {
   },
   alchemyTerm: {},
   element: {
-    links: { elementalId: { to: "elemental", mirrors: "elementId" } },
+    links: {
+      elementalId: { to: "elemental", mirrors: "elementId" },
+      // Singular, so the check proves one element per letter: three of the
+      // mother letters carry an element (vol. 4, p.298); Earth's comes
+      // through Saturn's.
+      hebrewLetterId: { to: "hebrewLetter", inverse: "element" },
+    },
   },
   elemental: {
     links: { elementId: { to: "element", mirrors: "elementalId" } },
