@@ -272,7 +272,9 @@ Follow-ups are separate from the completed migration work:
   copied with Open in the confirmation, nothing under the box, and
   "Copy page link" replaced by the app bar's Share, which the rose
   sigils, kamea sigils and geomancy reading hand their link (personal
-  pages never write typed text into the URL, plan 027). TODO: PDF as a
+  pages never write typed text into the URL, plan 027); on 24 November
+  a last row in the box, "This page", with the same Share and a hint
+  ("Includes what you entered" on personal pages). TODO: PDF as a
   third row; the candlestick's version in its URL; Share by hand on
   Android, Firefox desktop and Safari
   ([plan 097](097-export-controls.md#follow-ups-not-in-this-plan)).

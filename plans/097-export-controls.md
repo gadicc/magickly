@@ -338,3 +338,35 @@ Where the build departs from the decisions above, or adds to them:
   snackbar then says it could not copy.
 - **Search:** 6 and then 10 records re-embedded (ledger, 23 November:
   $0.0229 and $0.0248 estimated).
+
+### Stage 4, the share row (24 November 2026)
+
+| Commit | What |
+| --- | --- |
+| `979dc9e2` | Decision 7, stage 4 and the share mock-ups |
+| `df6e114a` | The share row: `useSharePage()` in `src/app/pageShare.tsx` now does what Share does for both the app bar and the row; `FileIcon`'s `web` kind; `ExportControls`' `share` and `shareHint` props; per-page hints; translations |
+
+Built by Opus 5.5 at high effort and reviewed by a fresh-context Opus
+5.5 at high effort (no defect above low; three low fixed: the
+translators' context, the row's Share now waits like the other actions
+while one is busy, and the share sheet's title outside the site chrome).
+Checked by hand in a headless Chromium on the dev server: the rose
+sigils, Tree, shewbread, geomancy reading and hall editor at 375 and
+1,440 px, light and dark, against the D5b mock-up; and real clipboard
+reads of the row's Share on the rose sigils, tablets and Tree, plus a
+cleared sigil, each matching the app bar's.
+
+Where the build departs from decision 7, or adds to it:
+
+- **The share sheet's title** comes from the page-share provider (the
+  same site title the app bar passed), since the row has no title of
+  its own.
+- **Before a page registers** (on the server, and until hydration), the
+  hint follows the image contract, so the geomancy reading shows
+  "Includes what you entered" from the first paint; once a page
+  registers, its registration decides.
+- **The row's confirmation** lasts 4 s, as the app bar's does.
+- **During client navigation** from a personal page, the next page's
+  row could in principle show the personal hint for one frame; the
+  review could not reproduce it on the dev server over three
+  navigations, and it would only overstate the warning. Accepted.
