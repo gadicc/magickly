@@ -1,10 +1,11 @@
 # The tablets' pyramids — 23 November 2026
 
-Status: stages 0 to 4 done on 23 November 2026: the sources (see
+Status: done. Stages 0 to 4 on 23 November 2026: the sources (see
 [Stage 0](#stage-0-what-the-sources-show-23-november-2026)), the data,
 the square's detail, the mock-up and the whole tablet drawn as
 pyramids, released as magick-components 0.8.0 on magick-data 0.5.0;
-stage 5, the image route, is next. Drafted
+stage 5, the image route (`enochian-tablet-pyramids`), on 24 November
+2026. The follow-ups remain. Drafted
 23 November 2026, before any code; Gadi answered its first open
 questions the same day; amended the same day after a Fable 5.2 review
 (see [Review](#review-23-november-2026)), which reversed one answer and
@@ -258,6 +259,13 @@ the five tablet images keep their identity and a later rule fix moves
 only the pyramids'. The contract refuses Dee's and Raphael's versions.
 Plan 090's per-tablet identity follow-up need not come first. Until the
 route exists, the page withholds the image link in pyramid mode.
+Built as planned in stage 5 (below): the slug is
+`enochian-tablet-pyramids`, and its inputs hash, besides the letters and
+the zodiac, the other fields the pyramids' rules look up (the Kerubs'
+signs and the Sephiroth's numbers among them), since a drawing that
+fails is a changed drawing, and the fields of the symbols a later
+`symbols` key would draw, ahead of that switch, since the inputs hash is
+one per slug.
 
 ### 6. Search and the page's text
 
@@ -436,6 +444,65 @@ Settled after the review: the Calvary bar, per version (decision 2).
    is dated 2026-11-23, as the release option Gadi chose named it.
 5. **Image route.** The pyramid slug and profile (decision 5). The
    release moved into stage 4 (above).
+   **Built 24 November 2026.** `/api/render/enochian-tablet-pyramids`
+   (`src/render/contracts/enochianTabletPyramids.ts`), under its own
+   profile, `magickli-tablet-pyramids-image-v1`, so that no flat image
+   moves. Its keys are the flat tablet's: `id` (the five tablets),
+   `font` (`latin` or `enochian`) and `version`, here only `gd`,
+   `regardie` and `equinox` (held to magick-data's `CALVARY_BARS` by a
+   test); Dee's and Raphael's are refused with the route's 400, as any
+   invalid choice is. Each key is omitted at its default, so a later
+   `symbols` key, off by default, leaves every existing query and image
+   as it is. The pages and PNG sizes are the flat tablet's (840 × 1188
+   for a Watchtower, 496 × 416 for the Union). The file is named as the
+   flat image, then `-pyramids`
+   (`enochian-air-tablet-regardie-glyphs-pyramids`), which is what the
+   page already named its downloads of the drawing;
+   the page now takes the name from the image, so the two cannot drift.
+   The registration draws `Tablet` with `pyramids` at the top's default
+   half, as the page does, in Enochian Plain for the glyphs.
+   Its inputs are the flat tablet's two groups (each tablet's readings
+   and the version rules) and, for the pyramids' rules, the zodiac's
+   `no`, `elementId` and `quadruplicity` (a Great Cross square's sign and
+   its decans' planets, which colour its sides), plus what the rules look
+   up and fail without: every tablet's `id`, the Union's with the four
+   Watchtowers', the signs', the Calvary planets' and Saturn's and the
+   four elements' `hebrewLetterId`, the four Kerubs' `zodiacId` (a
+   Kerubic square's sign), the `index` of the ten Sephiroth of the
+   Calvary crosses, every row but Da'at's (a Calvary square's number,
+   and so its card), the paths' `hermetic.hebrewLetterId` and the god
+   forms' `mix` and `elementIds`. Last, the fields of the symbols a side carries
+   (`sideSymbol`), hashed ahead of the `symbols` switch that would draw
+   them, since the inputs hash is one per slug and that switch must not
+   move an existing image's identity: the signs' `symbol`, the seven
+   planets' `symbol` (the decans', which hold the Calvary crosses' and
+   Saturn), the Hebrew letters' `letter.he` and the geomantic figures'
+   `rows`; the Sephiroth's numbers are the `index` above. No image draws
+   them yet, so a correction to one re-identifies the images without
+   moving a byte, the safe direction. A scratch run of the render sweep
+   over the nine tables it could change at the time (2,107 changes, not
+   committed) found every change that moves the drawing moving the hash;
+   the colours, the elements of the Name, the quarters and the ranks, and
+   the Calvary bars are code, in the profile. The whole sweep (`RENDER_INPUT_SWEEP=1`) cannot pass as
+   it stands: since stage 4, a sign's `elementId` that is no element
+   stops the decans, and so the registry, from loading, which the sweep
+   does not catch.
+   The page links the pyramids' image while they are drawn, and the
+   flat image otherwise; the note "No image link while the tablet is
+   drawn as pyramids." and its message are gone. A version drawn with
+   pyramids that the image does not take (none today) has its link
+   withheld with a note, never the flat image's in its place. The component
+   explorer offers the image for a pyramid example drawn at the top's
+   default, and none for one with a `pyramidTop` of its own (the
+   Union's quarter top), which the route does not draw;
+   `imageParity.test.tsx` checks each image against its example.
+   The flat tablets' identity: their inputs hash (`d7fd15d8…`) and every
+   byte pin in `registry.test.tsx` are unchanged and pass. New pins: the
+   pyramids' inputs hash; the bytes of Air, Air in glyphs and the Union
+   under the new profile, reviewed as rasterised; and, under the same
+   profile, a digest of the source markup of all five tablets in each of
+   the three versions, so that a rule fix confined to Earth, Water or
+   Fire, or to one version's bar, fails until the profile is bumped.
 
 Each stage a gated commit on a gate branch, by subagents per the model
 policy (data Opus medium; detail and drawing Opus high), reviewed fresh.
@@ -554,6 +621,14 @@ table and by rule), and read the Equinox's plates and vol. 1's badge.
 
 ## Follow-ups (not in this plan)
 
+- **The render sweep and a table that stops the registry loading**
+  (stage 5, 24 November 2026). `dataInputs.sweep.test.ts` loads the
+  registry over each changed table outside its `try`, so a change that
+  makes a module throw as it loads (a sign's `elementId` that is no
+  element, which `astrology/decans` computes from when `Tablet` loads the
+  pyramids' rules) fails the whole sweep instead of counting as a changed
+  drawing. Catch it there as a drawing that threw, for every slug.
+
 - **Stretch goal (Gadi, 23 November 2026): the tablet in 3D.** The whole
   tablet as pyramids in three dimensions, which the reader can zoom and
   rotate on desktop and phone, with gestures fit for each (drag to
@@ -567,12 +642,25 @@ table and by rule), and read the Equinox's plates and vol. 1's badge.
 - **Symbols on the sides (Gadi, 23 November 2026).** A *Symbols on the
   sides* switch beside *Draw as pyramids*, drawing each side's symbol
   as the Squares tab does (its marks moved into magick-components, so
-  both drawings share them) and the top at a quarter, the Equinox's
-  plates' own proportion, so that the reader never sets the size: at a
-  quarter a symbol is about 11 px at 1,440, 14 px at 768 and 5 px on a
-  320 phone (legible pinch-zoomed; the drawing is vector). A mock-up at
-  real sizes first. Also the image route's large sizes, as the plates
-  print them.
+  both drawings share them) and the top at a size the switch sets, so
+  that the reader never sets it. Also the image route's large sizes,
+  as the plates print them, as a `symbols` key on decision 5's slug,
+  whose inputs already hash the symbols' data.
+  **Mock-up and Gadi's choice (24 November 2026).** The Fire tablet at
+  the page's square sizes (21, 25, 54 and 42 px at 320, 375, 768 and
+  1,440), light and dark, phones with a crop pinch-zoomed 3×: A,
+  symbols upright on a quarter top (the Equinox's plates'); B, facing
+  out on a quarter top; C, upright on a third (the Squares tab's top);
+  and the stage 4 drawing. On a quarter top the letter is about 9 px at
+  1,440, on a third about 12.5 px; the symbols are about 8–9 px either
+  way, and every variant needs a pinch-zoom on a phone. The outlines
+  were drawn at half the Squares tab's width, which at full width fill
+  Spirit's wheel. Gadi chose **the top at a third, the symbols facing
+  out from the top by default**, as the Order painted them (vol. 4,
+  p.295) and as the 3D view (stretch goal above) will want them, **with
+  a toggle to turn them upright**. Open: whether the Squares tab's
+  large pyramid, upright by default today, should face out by default
+  too, so that both drawings start alike.
 - **The top's size as a choice.** Gadi asked whether readers should
   pick it, perhaps among advanced options. Recommended on 23 November
   2026, and held there: no picker yet. The page has seven controls with
