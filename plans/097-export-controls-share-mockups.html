@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Share row mock-ups</title>
+<!-- Plan 097, decision 7. A design reference, not app code: open it in a
+     browser. Roboto comes from Google Fonts and falls back to the system's. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; padding: 24px; background: #e9ebef; font-family: Roboto, system-ui, sans-serif; color: #222; }
+h1 { font-size: 20px; font-weight: 500; margin: 0 0 4px; }
+.sub { font-size: 13px; color: #555; margin: 0 0 18px; max-width: 70em; }
+.grid { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+.col { width: 375px; }
+.col h3 { font-size: 15px; font-weight: 500; margin: 0 0 4px; }
+.col p.note { font-size: 12.5px; color: #444; margin: 0 0 10px; line-height: 1.4; min-height: 70px; }
+.frame {
+  --fg: rgba(0,0,0,.87); --fg2: rgba(0,0,0,.6); --pri: #1976d2; --pri-t: rgba(25,118,210,.08); --pri-tt: rgba(25,118,210,.14);
+  --pri-b: rgba(25,118,210,.5); --bg: #fff; --line: rgba(0,0,0,.12); --band-text: #fff;
+  --svg: #c25e00; --png: #2e7d32;
+  width: 375px; padding: 16px; background: var(--bg); color: var(--fg); border-radius: 6px; font-size: 16px; margin-bottom: 18px;
+}
+.frame.dark {
+  --fg: #e4e8ef; --fg2: #a9b2c1; --pri: #8ab4f8; --pri-t: rgba(138,180,248,.10); --pri-tt: rgba(138,180,248,.16);
+  --pri-b: rgba(138,180,248,.5); --bg: #0f141d; --line: rgba(170,190,220,.16); --band-text: #0f141d;
+  --svg: #f5a25d; --png: #81c995;
+}
+.drawing { height: 70px; border-radius: 4px; background: repeating-linear-gradient(45deg, var(--line) 0 1px, transparent 1px 12px); border: 1px solid var(--line); display: grid; place-items: center; color: var(--fg2); font-size: 13px; margin-bottom: 8px; }
+.ctl { font-size: 90%; }
+svg.i { width: 20px; height: 20px; fill: currentColor; flex: none; }
+.frows { border: 1px solid var(--line); border-radius: 12px; max-width: 24rem; margin-inline: auto; margin-top: 8px; overflow: hidden; }
+.frow { display: flex; align-items: center; gap: 10px; padding-block: 4px; padding-inline: 12px 4px; }
+.frow + .frow, .frows > .foot { border-top: 1px solid var(--line); }
+.frow .name { flex: 1; min-width: 0; line-height: 1.25; }
+.frow .name b { font-weight: 500; font-size: 14px; display: block; }
+.frow .name small { font-size: 12px; color: var(--fg2); }
+.acts { display: flex; }
+.ib { font: inherit; background: none; border: 0; color: var(--pri); min-width: 48px; min-height: 52px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11.5px; border-radius: 8px; }
+.below { display: flex; justify-content: center; margin-top: 10px; }
+.btn { font: inherit; font-weight: 500; color: var(--pri); background: none; border: 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 4px; font-size: 14px; }
+.btn.upper { text-transform: uppercase; letter-spacing: .03em; font-size: 13.5px; }
+.btn.out { border: 1px solid var(--pri-b); }
+.btn.tonal { background: var(--pri-tt); width: 100%; max-width: 24rem; border-radius: 12px; min-height: 48px; }
+.btn.pill { border: 1px solid var(--pri-b); border-radius: 22px; padding: 0 18px 0 14px; }
+.btn.text { font-weight: 400; font-size: 14px; }
+.foot { display: flex; justify-content: center; background: var(--pri-t); }
+.foot .btn { width: 100%; border-radius: 0; min-height: 48px; }
+.pageicon { width: 29px; height: 34px; display: grid; place-items: center; color: var(--pri); flex: none; }
+.chev { color: var(--fg2); }
+.after { font-size: 12.5px; color: var(--fg); text-align: center; margin-top: 14px; }
+
+.foot.row { justify-content: flex-start; align-items: center; gap: 10px; padding-block: 6px; padding-inline: 12px 8px; min-height: 52px; color: var(--pri); }
+.foot.row .name { flex: 1; min-width: 0; line-height: 1.25; text-align: start; }
+.foot.row .name b { font-weight: 500; font-size: 14px; display: block; color: var(--pri); }
+.foot.row .name small { font-size: 12px; color: var(--fg2); }
+.foot.row .lead { width: 29px; display: grid; place-items: center; flex: none; }
+.foot.two .btn { flex-direction: column; gap: 0; padding-block: 6px; }
+.foot.two .btn .t { display: inline-flex; align-items: center; gap: 8px; }
+.foot.two .btn small { font-weight: 400; font-size: 12px; color: var(--fg2); }
+.cap { font-size: 11px; color: var(--fg2); margin: 10px 0 4px; font-style: italic; }
+
+.foot.two.b .btn small { font-size: 11px; margin-top: 3px; line-height: 1.2; }
+.foot.two.c .btn small { font-size: 10.5px; margin-top: 5px; line-height: 1.2; letter-spacing: .01em; }
+.frow.tint { background: var(--pri-t); }
+.frow .lead { width: 29px; display: grid; place-items: center; flex: none; color: var(--pri); }
+.frow .lead svg.i { width: 26px; height: 26px; }
+</style>
+</head>
+<body>
+<h1>Share under the export box — round 3 (plan 097, decision 7)</h1>
+<p class="sub">375 px phone frames (16 px gutters, 44 px+ targets), light above dark. Chosen on 24 November 2026: D5b, named "This page". Rounds 1 and 2 (an outlined button, a pill, a full-width tonal button, a tinted footer, a row; hints placed three ways) are described in the plan. Every option taps the same Share as the app bar: the page's own link, the share sheet or a copied link, and on a personal page the same "It includes what you entered here." in the confirmation.</p>
+<div class="grid" id="grid"></div>
+<script>
+const P = {
+  globe: "M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2m6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56M12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56m2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8M12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96M14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2m.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56M16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2z",
+  window: "M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2m0 14H5V8h14z",
+  dl: "M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3zm-1-4-1.41-1.41L13 12.17V4h-2v8.17L8.41 9.59 7 11l5 5z",
+  copy: "M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z",
+  link: "M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5",
+  share: "M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92M18 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1M6 13c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1m12 7.02c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1",
+  chev: "M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z",
+};
+const icon = (k, cls = "") => `<svg class="i ${cls}" viewBox="0 0 24 24"><path d="${P[k]}"/></svg>`;
+const file = (fmt, h) => {
+  const c = `var(--${fmt})`;
+  return `<svg viewBox="0 0 22 26" style="height:${h}px;width:${h*22/26}px;flex:none;overflow:visible">
+    <path d="M3 1h10.5L20 7.5V24a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z" fill="none" stroke="${c}" stroke-width="1.6"/>
+    <path d="M13.5 1v6.5H20" fill="none" stroke="${c}" stroke-width="1.6"/>
+    <rect x="0.5" y="12" width="17" height="9" rx="1.5" fill="${c}"/>
+    <text x="9" y="19" text-anchor="middle" font-family="Roboto" font-weight="700" font-size="6.6" style="fill:var(--band-text)">${fmt.toUpperCase()}</text></svg>`;
+};
+const hint = { svg: "Sharp at any size", png: "Pastes anywhere" };
+const acts = `<div class="acts"><button class="ib">${icon("dl")}Save</button><button class="ib">${icon("copy")}Copy</button><button class="ib">${icon("link")}Link</button></div>`;
+const row = (f) => `<div class="frow">${file(f, 34)}<div class="name"><b>${f.toUpperCase()}</b><small>${hint[f]}</small></div>${acts}</div>`;
+const box = (extra = "") => `<div class="ctl frows">${row("svg")}${row("png")}${extra}</div>`;
+
+const MINE = "Includes what you entered";
+const CHOSEN = "With your chosen options", INCL = "Including your chosen options";
+const two = (cls, h) => `<div class="foot two ${cls}"><button class="btn"><span class="t">${icon("share")}Share this page</span><small>${h}</small></button></div>`;
+// A web page in the file icons' style: the same outline, with WEB in the band, in the link colour.
+const webFile = (h) => `<svg viewBox="0 0 22 26" style="height:${h}px;width:${h*22/26}px;flex:none;overflow:visible">
+    <path d="M3 1h10.5L20 7.5V24a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z" fill="none" stroke="var(--pri)" stroke-width="1.6"/>
+    <path d="M13.5 1v6.5H20" fill="none" stroke="var(--pri)" stroke-width="1.6"/>
+    <rect x="0.5" y="12" width="17" height="9" rx="1.5" fill="var(--pri)"/>
+    <text x="9" y="19" text-anchor="middle" font-family="Roboto" font-weight="700" font-size="6.6" style="fill:var(--band-text)">WEB</text></svg>`;
+const shareAct = `<div class="acts"><button class="ib">${icon("share")}Share</button></div>`;
+const pageRowWith = (lead, name, h, tint = false) => `<div class="frow${tint ? " tint" : ""}">${lead}<div class="name"><b>${name}</b><small>${h}</small></div>${shareAct}</div>`;
+const opts = [
+  ["D4 · As in round 2", "Centred, two lines; the hint at 12 px right under the label.",
+    [box(two("", CHOSEN)), box(two("", MINE))]],
+  ["D4b · Smaller hint, more air", "Hint at 11 px, 3 px below the label, so it clears the icon and runs about the label's width.",
+    [box(two("b", CHOSEN)), box(two("b", MINE))]],
+  ["D4c · Smaller still, your wording", "Hint at 10.5 px, 5 px below. Light frame: “Including your chosen options”, for its width.",
+    [box(two("c", INCL)), box(two("c", MINE))]],
+  ["D5 · A row: web page file icon", "A third row in the rows' own format: a web page drawn as the file icons are (WEB in the band, in the link colour), and Share in the actions' column.",
+    [box(pageRowWith(webFile(34), "Web page", CHOSEN)), box(pageRowWith(webFile(34), "Web page", MINE))]],
+  ["D5b · Chosen: tinted, \u201cThis page\u201d", "D5 on D's tinted strip, so the page row stands apart from the image formats; named \u201cThis page\u201d rather than \u201cWeb page\u201d, which beside SVG and PNG would read as a third file format.",
+    [box(pageRowWith(webFile(34), "This page", CHOSEN, true)), box(pageRowWith(webFile(34), "This page", MINE, true))]],
+  ["D5c · Globe or browser window", "Other web page icons in the lead column, both MUI's: a globe (light) and a browser window (dark).",
+    [box(pageRowWith(`<span class="lead">${icon("globe")}</span>`, "This page", CHOSEN)), box(pageRowWith(`<span class="lead">${icon("window")}</span>`, "This page", MINE))]],
+];
+document.getElementById("grid").innerHTML = opts.map(([t, n, [light, dark]]) =>
+  `<div class="col"><h3>${t}</h3><p class="note">${n}</p>
+   <div class="frame"><div class="drawing">drawing</div>${light}</div>
+   <div class="frame dark"><div class="drawing">drawing</div>${dark}</div></div>`).join("");
+</script>
+</body>
+</html>

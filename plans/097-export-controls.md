@@ -1,13 +1,15 @@
 # The export controls — 23 November 2026
 
-Status: stages 1 and 2 built on 23 November 2026 on
-`gate/export-controls`, each reviewed and checked in the browser (see
-[As built](#as-built-23-november-2026)). Drafted the same day, after two
-rounds of mock-ups on which Gadi chose the layout (decision 1), answered
-the question of what Share sends on the personal pages (decision 3) and
-moved the notes under the box into the confirmations (decision 2). The
-mock-ups are in [097-export-controls-mockups.html](097-export-controls-mockups.html),
-a self-contained page to open in a browser. 096 is the sigil styles, on
+Status: stages 1 and 2 built on 23 November 2026 and on `main`, each
+reviewed and checked in the browser (see
+[As built](#as-built-23-november-2026)). Stage 4, a share row under the
+formats (decision 7), added on 24 November 2026. Drafted on 23 November,
+after two rounds of mock-ups on which Gadi chose the layout (decision 1),
+answered the question of what Share sends on the personal pages
+(decision 3) and moved the notes under the box into the confirmations
+(decision 2). The mock-ups are in
+[097-export-controls-mockups.html](097-export-controls-mockups.html), a
+self-contained page to open in a browser. 096 is the sigil styles, on
 `magickli-gate-styles`.
 
 Gadi's request (23 November 2026): the export block under the drawings
@@ -174,6 +176,42 @@ options, so the choice can be revisited (to save space, say) without
 redrawing them. It loads Roboto from Google Fonts and falls back to the
 system font; it is a design reference, not app code.
 
+### 7. A share row under the formats (24 November 2026)
+
+Gadi, the day after stage 2: Share in the app bar is enough in
+principle, but a labelled place to share right under the export box is
+nicer. The app bar also slides away as the reader scrolls (it hides on
+scroll), so when a sigil or a reading is finished, the icon is usually
+off screen; and it is an icon with no label. Three rounds of mock-ups in
+[097-export-controls-share-mockups.html](097-export-controls-share-mockups.html)
+(round 3; rounds 1 and 2 tried an outlined button, a pill, a full-width
+tonal button, a tinted footer on the box, and a row, with hints placed
+three ways) settled on D5b:
+
+- **A third row in the box, on a tint of the link colour** (the theme's
+  primary at about 8% light, 10% dark), with a rule above it like the
+  rows between formats.
+- **Its lead icon is a web page drawn as the file icons are**: the same
+  outline and band, with WEB in the band, in the link colour.
+- **Its name is "This page"** (Gadi's choice over "Web page"): beside
+  SVG and PNG, "Web page" would read as a third file format, an HTML
+  save; "This page" says it is where the reader is. The band keeps WEB
+  so the icon matches the rows.
+- **Its hint** is "With your chosen options" by default, and a page may
+  override it or turn it off. On a page that hands Share a personal
+  link, it is "Includes what you entered", which puts plan 027's
+  wording before the tap as well as after it. Pages with nothing to keep
+  (the shewbread, the candlestick, whose version is not in its URL yet,
+  and the sigil pages while there is no sigil) show no hint.
+- **One action, Share**, with the share icon and label in the actions'
+  column under Link; its accessible name is "Share this page", which
+  contains the label. It does exactly what the app bar's Share does
+  (decision 3): the page's registered link or its address, the share
+  sheet or a copied link, the same confirmations. One implementation
+  serves both.
+- **The hall editor shows no share row**: it has its own "Copy share
+  link", which carries the hall itself; joining the two is a follow-up.
+
 ## Open questions
 
 1. **Wording.** "Save" rather than "Download" (shorter under an icon),
@@ -198,6 +236,11 @@ system font; it is a design reference, not app code.
 3. **Check and review.** The browser pass below; a fresh-context review
    (`opus-reviewer`) of the whole diff against this plan; the full gate on
    the final candidate.
+4. **The share row** (decision 7; added 24 November 2026, on
+   `gate/export-share-row` from the fast-forwarded `main`). Share's
+   behaviour moved to one place both the app bar and the row call; the
+   row, its icon and hints; per-page hint overrides; translations; tests;
+   then the same review, browser pass and gate. Opus 5.5 high.
 
 Both code stages go on `gate/export-controls`, in a worktree beside the
 main checkout, as gated commits that Gadi fast-forwards.
