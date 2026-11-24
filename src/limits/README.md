@@ -52,6 +52,16 @@ Why these sizes (24 November 2026):
   reading bucket of 10) and 334 `RENDER_POOL`'s. The pools
   bound the cost; they don't keep the feature up for everyone else.
 
+### Other limits
+
+Limits on something other than paid work keep their own counters, beside
+the feature they guard. List each here, so this file finds them all.
+
+- **Failed temple join-code lookups:** `JOIN_FAILURES_PER_DAY` (10 an
+  account a UTC day) in `src/temples/joinAttempts.ts`, table
+  `temple_join_failures` (plan 098, M2). Against guessing codes: only the
+  guessing account is refused, and a matching code gives its lookup back.
+
 ## How a limit works
 
 - **Reserve before the work, and keep it.** A request reserves its units

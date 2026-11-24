@@ -263,7 +263,8 @@ Anything a request can make the site pay for (a model call, an embedding,
 a fresh server render) is capped by a policy in `src/limits/policies.ts`
 and reserved through `src/limits/counters.ts`, before the work starts.
 Read `src/limits/README.md` before adding such a route or changing a
-limit: it lists every policy with its size and reason, the rules (client
+limit, or adding any other rate limit (it lists those too): it lists
+every policy with its size and reason, the rules (client
 bucket and pools reserved together, refusals `no-store`, no address
 stored) and a recipe. A new limit goes in that table; a test fails until
 it does. Firewall rules in Vercel are the owner's and are recorded there.
