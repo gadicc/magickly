@@ -4,6 +4,7 @@ import {
   bigint,
   boolean,
   check,
+  date,
   index,
   integer,
   jsonb,
@@ -140,5 +141,24 @@ export const templeMemberships = pgTable(
     ),
     index("temple_memberships_temple_idx").on(table.templeId),
     check("temple_memberships_grade_nonnegative", sql`${table.grade} >= 0`),
+  ],
+);
+
+/**
+ * Failed join-code lookups (plan 098): one row per account, reused each
+ * UTC day, as `chat_daily_usage` is. An attempt is reserved before the
+ * lookup and given back when the code matched, so the count is of misses.
+ */
+export const templeJoinFailures = pgTable(
+  "temple_join_failures",
+  {
+    userId: uuid("user_id")
+      .primaryKey()
+      .references(() => user.id, { onDelete: "cascade" }),
+    day: date("day").notNull(),
+    failures: integer("failures").notNull(),
+  },
+  (table) => [
+    check("temple_join_failures_positive", sql`${table.failures} > 0`),
   ],
 );

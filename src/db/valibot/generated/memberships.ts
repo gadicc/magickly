@@ -84,6 +84,50 @@ export const templeInvitesUpdate = v.object({
 export type TempleInvitesSelect = v.InferOutput<typeof templeInvitesSelect>;
 export type TempleInvitesInsert = v.InferInput<typeof templeInvitesInsert>;
 export type TempleInvitesUpdate = v.InferInput<typeof templeInvitesUpdate>;
+export const templeJoinFailuresSelect = v.object({
+  userId: v.pipe(v.string(), v.uuid()),
+  day: v.string(),
+  failures: v.pipe(
+    v.number(),
+    v.minValue(-2147483648),
+    v.maxValue(2147483647),
+    v.integer(),
+  ),
+});
+
+export const templeJoinFailuresInsert = v.object({
+  userId: v.pipe(v.string(), v.uuid()),
+  day: v.string(),
+  failures: v.pipe(
+    v.number(),
+    v.minValue(-2147483648),
+    v.maxValue(2147483647),
+    v.integer(),
+  ),
+});
+
+export const templeJoinFailuresUpdate = v.object({
+  userId: v.optional(v.pipe(v.string(), v.uuid())),
+  day: v.optional(v.string()),
+  failures: v.optional(
+    v.pipe(
+      v.number(),
+      v.minValue(-2147483648),
+      v.maxValue(2147483647),
+      v.integer(),
+    ),
+  ),
+});
+
+export type TempleJoinFailuresSelect = v.InferOutput<
+  typeof templeJoinFailuresSelect
+>;
+export type TempleJoinFailuresInsert = v.InferInput<
+  typeof templeJoinFailuresInsert
+>;
+export type TempleJoinFailuresUpdate = v.InferInput<
+  typeof templeJoinFailuresUpdate
+>;
 export const templeMembershipsSelect = v.object({
   id: v.pipe(v.string(), v.uuid()),
   userId: v.pipe(v.string(), v.uuid()),
