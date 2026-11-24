@@ -50,7 +50,8 @@ What it checks, before running anything from the worktree:
 
 - the worktree is one the main checkout has registered (`git worktree list`
   in the main checkout), and not the main checkout itself;
-- the worktree has no `.env*` file of its own, which Next would load;
+- the worktree has no `.env*` file of its own, which Next would load
+  (`.env.ci`, CI's committed placeholders, which Next never reads, is allowed);
 - each shot is a plain name in the worktree's `capture.mts`;
 - the database and storage settings point at this machine.
 

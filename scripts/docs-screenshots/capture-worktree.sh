@@ -43,9 +43,14 @@ done < <(git -C "$main" worktree list --porcelain)
 $registered || fail "not a worktree of $main: $worktree"
 
 # Next and the seed would load a worktree's own .env files, past the
-# settings below. The repository commits none.
+# settings below. The repository commits only .env.ci, CI's placeholders,
+# which neither Next nor `loom env` reads (they load .env, .env.local and
+# .env.<development|production|test>[.local]), so it alone may stay.
 shopt -s nullglob dotglob
-envfiles=("$worktree"/.env*)
+envfiles=()
+for file in "$worktree"/.env*; do
+  [ "${file##*/}" = .env.ci ] || envfiles+=("$file")
+done
 shopt -u nullglob dotglob
 [ ${#envfiles[@]} -eq 0 ] ||
   fail "remove the worktree's own ${envfiles[*]##*/} first"
