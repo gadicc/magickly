@@ -135,6 +135,19 @@ publication started before the deploy and retried after it builds a
 different manifest under the same operation and is refused as an operation
 conflict; starting a new publication resolves that.
 
+### The temple halls
+
+A hall keeps four decimals (its art is scaled by up to 100), which moves a
+point by about 0.004 px at its 1,500 px raster. Even so, rasterised by
+sharp, 1.4–1.9% of its pixel channels change by at least one level, up to
+about 70, against under 1% elsewhere: anti-aliased edges and the faint
+seams of a tiled background, where librsvg responds to tiny changes in
+the coordinates, not shapes that moved. Enlarged 10× at the worst spot,
+the two are the same drawing. `compactHallSvg`'s note recorded that a
+flat thousandth once moved a hall's pixels visibly; with the decimals
+scaled to the art, the owner chose to round the halls with everything
+else (24 November 2026), for 5% of their bytes, 7% compressed.
+
 ## Not done
 
 - The rose sigil's first rose is not shared (above).
