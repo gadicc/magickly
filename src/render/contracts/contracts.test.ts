@@ -10,6 +10,7 @@ import { ROSE_VERSIONS } from "magick-components/gd/roseSigilGeometry";
 import { SIGIL_STYLES } from "magick-components/gd/roseSigilStyles";
 import { CANDLESTICK_VERSIONS } from "magick-components/gd/SevenBranchedCandlestick";
 import { KAMEA_PLANETS } from "magick-data/astrology/kameas";
+import { CALVARY_BARS } from "magick-data/enochian/tabletPyramids";
 import tablets, {
   TABLET_VERSIONS,
   tabletVersion,
@@ -40,6 +41,10 @@ import {
   UNION_IMAGE_VERSIONS,
   UNION_TABLET_VIEWBOX,
 } from "./enochianTablet";
+import {
+  isTabletPyramidImageVersion,
+  TABLET_PYRAMID_IMAGE_VERSIONS,
+} from "./enochianTabletPyramids";
 import {
   COMPONENT_IMAGE_SLUGS,
   CONTRACTS,
@@ -116,6 +121,17 @@ describe("component image contracts", () => {
       "id=union&version=equinox&font=enochian",
       "id=union&width=2000",
       "id=union&height=104",
+    ],
+    "enochian-tablet-pyramids": [
+      "",
+      "id=air",
+      "id=earth&height=600",
+      "font=enochian",
+      "id=water&font=enochian&version=regardie&width=420",
+      "id=fire&version=equinox",
+      "id=union",
+      "id=union&version=equinox&font=enochian",
+      "id=union&width=2000",
     ],
     "seven-branched-candlestick": [
       "",
@@ -374,7 +390,8 @@ describe("component image contracts", () => {
         slug !== "gd-hall" &&
         slug !== "rose-sigil" &&
         slug !== "kamea-sigil" &&
-        slug !== "enochian-tablet",
+        slug !== "enochian-tablet" &&
+        slug !== "enochian-tablet-pyramids",
     )) {
       const contract = CONTRACTS[
         slug
@@ -472,6 +489,111 @@ describe("component image contracts", () => {
         parse("enochian-tablet", "id=fire&version=dee&font=enochian"),
       ),
     ).toBe("enochian-fire-tablet-dee-glyphs");
+  });
+
+  it("draws the tablets as pyramids on the flat tablets' pages and sizes", () => {
+    const flat = CONTRACTS["enochian-tablet"];
+    const pyramids = CONTRACTS["enochian-tablet-pyramids"];
+    for (const id of TABLET_IDS) {
+      const query = `id=${id}`;
+      expect(
+        contractViewBox(pyramids, parse("enochian-tablet-pyramids", query)),
+        id,
+      ).toEqual(contractViewBox(flat, parse("enochian-tablet", query)));
+      expect(
+        contractRasterDefault(
+          pyramids,
+          parse("enochian-tablet-pyramids", query),
+        ),
+        id,
+      ).toEqual(contractRasterDefault(flat, parse("enochian-tablet", query)));
+    }
+    expect(
+      contractViewBox(pyramids, parse("enochian-tablet-pyramids", "id=union")),
+    ).toEqual([0, 0, 124, 104]);
+    expect(
+      contractRasterDefault(
+        pyramids,
+        parse("enochian-tablet-pyramids", "id=union"),
+      ),
+    ).toEqual({ width: 496, height: 416 });
+    // The Union's page against its own shape, as the flat tablet's.
+    expect(
+      parse("enochian-tablet-pyramids", "id=union&width=2000"),
+    ).toMatchObject({ width: 2000 });
+    expect(() =>
+      parse("enochian-tablet-pyramids", "id=earth&width=2000"),
+    ).toThrow(InvalidComponentImageRequest);
+  });
+
+  it("draws pyramids only in the versions that have them, the Golden Dawn's by default", () => {
+    expect([...TABLET_PYRAMID_IMAGE_VERSIONS]).toEqual(
+      TABLET_VERSIONS.filter((version) => CALVARY_BARS[version] !== null),
+    );
+    // Every one has a Tablet of Union.
+    expect([...TABLET_PYRAMID_IMAGE_VERSIONS]).toEqual([
+      ...UNION_IMAGE_VERSIONS,
+    ]);
+    for (const version of TABLET_VERSIONS)
+      expect(isTabletPyramidImageVersion(version)).toBe(
+        CALVARY_BARS[version] !== null,
+      );
+    for (const id of TABLET_IDS) {
+      for (const version of TABLET_PYRAMID_IMAGE_VERSIONS)
+        expect(
+          parse("enochian-tablet-pyramids", `id=${id}&version=${version}`),
+        ).toEqual({ id, font: "latin", version });
+      for (const version of ["dee", "raphael"])
+        expect(() =>
+          parse("enochian-tablet-pyramids", `id=${id}&version=${version}`),
+        ).toThrow(InvalidComponentImageRequest);
+    }
+    expect(parse("enochian-tablet-pyramids")).toEqual({
+      id: "earth",
+      font: "latin",
+      version: "gd",
+    });
+    expect(CONTRACTS["enochian-tablet-pyramids"].keys).toEqual([
+      "id",
+      "font",
+      "version",
+    ]);
+    expect(
+      componentImageQuery({
+        slug: "enochian-tablet-pyramids",
+        props: parse(
+          "enochian-tablet-pyramids",
+          "version=gd&font=latin&id=earth",
+        ),
+      }).toString(),
+    ).toBe("");
+    expect(
+      componentImageQuery({
+        slug: "enochian-tablet-pyramids",
+        props: parse(
+          "enochian-tablet-pyramids",
+          "version=regardie&font=enochian&id=air&height=297",
+        ),
+      }).toString(),
+    ).toBe("id=air&font=enochian&version=regardie&height=297");
+  });
+
+  it("names a pyramids image as the flat one, then -pyramids", () => {
+    const name = (query: string) =>
+      CONTRACTS["enochian-tablet-pyramids"].filename(
+        parse("enochian-tablet-pyramids", query),
+      );
+    expect(name("")).toBe("enochian-earth-tablet-pyramids");
+    expect(name("id=union&version=equinox")).toBe(
+      "enochian-union-tablet-equinox-pyramids",
+    );
+    expect(name("id=fire&version=regardie&font=enochian")).toBe(
+      "enochian-fire-tablet-regardie-glyphs-pyramids",
+    );
+    for (const query of ["", "id=air&font=enochian", "id=water&version=gd"])
+      expect(name(query)).toBe(
+        `${CONTRACTS["enochian-tablet"].filename(parse("enochian-tablet", query))}-pyramids`,
+      );
   });
 
   it("offers the candlestick's versions, the 1909 figure by default", () => {
@@ -794,6 +916,12 @@ describe("component image contracts", () => {
       ["enochian-tablet", "font=hebrew"],
       ["enochian-tablet", "version=Dee"],
       ["enochian-tablet", "version=golden"],
+      ["enochian-tablet-pyramids", "version=dee"],
+      ["enochian-tablet-pyramids", "id=union&version=raphael"],
+      ["enochian-tablet-pyramids", "id=Fire"],
+      ["enochian-tablet-pyramids", "font=hebrew"],
+      ["enochian-tablet-pyramids", "pyramidTop=0.25"],
+      ["enochian-tablet-pyramids", "symbols=true"],
       ["table-of-shewbread", "font=enochian"],
       ["seven-branched-candlestick", "id=earth"],
       ["astro-geomancy-chart", "m=1211111221111212&m=1211111221111212"],

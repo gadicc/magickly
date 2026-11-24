@@ -8,6 +8,13 @@ import SevenBranchedCandlestick, {
 } from "magick-components/gd/SevenBranchedCandlestick";
 import TableOfShewbread from "magick-components/gd/TableOfShewbread";
 import { TreeOfLifeSvg } from "magick-components/kabbalah/TreeOfLife";
+import {
+  CALVARY_BARS,
+  CALVARY_COLUMN,
+  CALVARY_PLANETS,
+  NAME_LETTER_ELEMENTS,
+  PLANET_ELEMENTS,
+} from "magick-data/enochian/tabletPyramids";
 import type { ReactElement } from "react";
 import AstroGeomancyChart from "@/app/geomancy/reading/AstroGeomancyChart";
 import { figuresFromMothers } from "@/app/geomancy/tetragrams";
@@ -60,6 +67,16 @@ export const KAMEA_IMAGE_PROFILE = "magickli-kamea-image-v1";
  * does; the squares' numbers and the planets' names are inputs.
  */
 export const KAMEA_SIGIL_IMAGE_PROFILE = "magickli-kamea-sigil-image-v1";
+
+/**
+ * The renderer's identity for the tablets drawn as pyramids (plan 095,
+ * decision 5): each square's sides in their elements' colours round a
+ * white top, half the square, by `enochian/tabletPyramids`' rules. It
+ * moves when the drawing or the rules do; the letters, the zodiac and what
+ * else the rules look up are inputs (`TABLET_PYRAMIDS_INPUTS`).
+ */
+export const TABLET_PYRAMIDS_IMAGE_PROFILE =
+  "magickli-tablet-pyramids-image-v1";
 
 export { ANGEL_SIGIL_IMAGE_PROFILE };
 
@@ -214,6 +231,108 @@ const KAMEA_INPUTS: DataInputsSpec = [
 ];
 
 /**
+ * What a tablet's image draws from the data. The sigils are drawn in the
+ * component; the letters, which of them are reversed, and the kind that
+ * chooses the page are data: every source's reading, since a version is a
+ * rule over several (the Golden Dawn's takes Regardie's letters, the
+ * Equinox's reversed ones and its `choices`). A field path cannot select
+ * inside an object of readings by version, so they are hashed whole, the
+ * letters no image draws too: correcting one re-identifies the image
+ * without moving a byte, the safe direction.
+ */
+const TABLET_INPUTS: DataInputsSpec = [
+  {
+    table: "enochianTablet",
+    rows: TABLET_IDS,
+    fields: ["kind", "readings", "choices"],
+  },
+  // How a version is read from them, and the revision of the code that
+  // reads it: a rule's change moves the bytes too.
+  {
+    table: "enochianTabletVersion",
+    rows: "*",
+    fields: ["revision", "base", "choices", "variants", "reversedFrom"],
+  },
+];
+
+/**
+ * A tablet drawn as pyramids draws its letters as the flat one does, and
+ * each side in its element's colour. The colours, the Name's letters, the
+ * quarters' and ranks' elements, the planets' elements and the Calvary
+ * bars are code (magick-data's `enochian/tabletPyramids` and the
+ * component), so `TABLET_PYRAMIDS_IMAGE_PROFILE` moves with them. What is
+ * data is the zodiac: a Great Cross square's sign is found by its quality
+ * and element, and the decans' planets, whose elements colour its third
+ * side, by the signs' order (`astrology/decans`).
+ *
+ * The rules also work out what the drawing never shows, every side's
+ * attributions and a servient square's god, and fail outright where a
+ * lookup finds nothing: a Watchtower's own id, a Hebrew letter of a sign,
+ * a planet or an element that no path's trump or geomantic figure has,
+ * a mix of elements no god form takes. A drawing that fails is a changed
+ * drawing (`dataInputs.sweep.test.ts`), so those fields are hashed too;
+ * correcting one that leaves the pyramids drawable re-identifies the
+ * images without moving a byte, the safe direction.
+ *
+ * Last, the symbols a side carries (`sideSymbol`, the tablets page's
+ * `pyramidWords.ts`): a sign's or planet's glyph, a Sephirah's number, a
+ * Hebrew letter, a geomantic figure's rows. No image draws them yet, but
+ * the inputs hash is one per slug, so a later `symbols` key (default off)
+ * could not hash them without moving every existing image's identity.
+ * They are hashed now, ahead of the switch, the same safe direction.
+ */
+const TABLET_PYRAMIDS_INPUTS: DataInputsSpec = [
+  ...TABLET_INPUTS,
+  { table: "enochianTablet", rows: TABLET_IDS, fields: ["id"] },
+  {
+    table: "zodiac",
+    rows: "*",
+    fields: ["no", "elementId", "quadruplicity", "hebrewLetterId"],
+  },
+  {
+    table: "planet",
+    // The Calvary crosses' planets, and Saturn, whose letter Earth takes.
+    rows: [...new Set([...Object.values(CALVARY_PLANETS), "saturn"])],
+    fields: ["hebrewLetterId"],
+  },
+  {
+    table: "element",
+    rows: Object.values(NAME_LETTER_ELEMENTS),
+    fields: ["hebrewLetterId"],
+  },
+  // A Kerubic square's third side takes its Kerub's sign, by the letter's
+  // element.
+  {
+    table: "kerub",
+    rows: Object.values(NAME_LETTER_ELEMENTS),
+    fields: ["zodiacId"],
+  },
+  // A Calvary square's number, which picks its small card: every Sephirah
+  // of a Calvary cross, its column and the versions' bars (all but Da'at).
+  {
+    table: "sephirah",
+    rows: [
+      ...new Set([
+        ...CALVARY_COLUMN,
+        ...Object.values(CALVARY_BARS).flatMap((bar) => bar ?? []),
+      ]),
+    ],
+    fields: ["index"],
+  },
+  { table: "treeOfLifePath", rows: "*", fields: ["hermetic.hebrewLetterId"] },
+  { table: "gdGodForm", rows: "*", fields: ["mix", "elementIds"] },
+  // The symbols, ahead of the switch that draws them (above). A side's
+  // sign is any of the twelve, its planet any of the decans' seven (which
+  // hold the Calvary crosses' and Saturn), its Hebrew letter any the rules
+  // reach through the data, and its figure any of the sixteen. The
+  // Sephiroth's numbers are the `index` hashed above.
+  { table: "zodiac", rows: "*", fields: ["symbol"] },
+  { table: "planet", rows: Object.keys(PLANET_ELEMENTS), fields: ["symbol"] },
+  { table: "hebrewLetter", rows: "*", fields: ["letter.he"] },
+  { table: "tetragram", rows: "*", fields: ["rows"] },
+];
+
+/**
  * The bundled face resvg resolves for the squares' italic numbers: the
  * temple halls' Noto Serif italic, which draws their kameas too.
  */
@@ -293,28 +412,27 @@ export const COMPONENT_IMAGE_REGISTRY: {
     source: (svg) => svg.replace(/^(<svg\b[^>]*?) aria-hidden="true"/, "$1"),
     profile: COMPONENT_IMAGE_PROFILE,
     fonts: ["EnochianPlain.ttf"],
-    // The sigils are drawn in the component; the letters, which of them are
-    // reversed, and the kind that chooses the page are data: every
-    // source's reading, since a version is a rule over several (the Golden
-    // Dawn's takes Regardie's letters, the Equinox's reversed ones and
-    // its `choices`). A field path cannot select inside an object of
-    // readings by version, so they are hashed whole, the letters no image
-    // draws too: correcting one re-identifies the image without moving a
-    // byte, the safe direction.
-    inputs: [
-      {
-        table: "enochianTablet",
-        rows: TABLET_IDS,
-        fields: ["kind", "readings", "choices"],
-      },
-      // How a version is read from them, and the revision of the code
-      // that reads it: a rule's change moves the bytes too.
-      {
-        table: "enochianTabletVersion",
-        rows: "*",
-        fields: ["revision", "base", "choices", "variants", "reversedFrom"],
-      },
-    ],
+    inputs: TABLET_INPUTS,
+  },
+  "enochian-tablet-pyramids": {
+    // As the flat tablet is drawn, and as the page draws it with
+    // *Draw as pyramids*: the top at its default share, a half.
+    render: (props) => (
+      <Tablet
+        tablet={props.id}
+        version={props.version}
+        pyramids
+        label={false}
+        enochianStyle={
+          props.font === "enochian" ? { fontFamily: "Enochian" } : undefined
+        }
+      />
+    ),
+    // No image's root says it is decorative, as the flat tablets' do not.
+    source: (svg) => svg.replace(/^(<svg\b[^>]*?) aria-hidden="true"/, "$1"),
+    profile: TABLET_PYRAMIDS_IMAGE_PROFILE,
+    fonts: ["EnochianPlain.ttf"],
+    inputs: TABLET_PYRAMIDS_INPUTS,
   },
   "seven-branched-candlestick": {
     render: (props) => <SevenBranchedCandlestick version={props.version} />,

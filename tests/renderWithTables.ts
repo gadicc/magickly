@@ -141,6 +141,11 @@ export const DRAWING_QUERIES: Record<ComponentImageSlug, readonly string[]> = {
   ],
   "astro-geomancy-chart": ["", "m=2222111122221111"],
   "enochian-tablet": ["", "id=air", "id=water", "id=fire", "font=enochian"],
+  // Each tablet's sides at the Golden Dawn's version and the default font.
+  // The other versions read the same rows and fields: their letters are
+  // readings hashed whole with these, and the Equinox's bars order the
+  // same Sephiroth. The font draws no data.
+  "enochian-tablet-pyramids": ["", "id=air", "id=water", "id=fire", "id=union"],
   "seven-branched-candlestick": ["", "version=modern"],
   "table-of-shewbread": [""],
   "rose-sigil": ["text=א&rose=false"],

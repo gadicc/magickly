@@ -110,4 +110,45 @@ describe("componentImage", () => {
       "/api/render/table-of-shewbread",
     );
   });
+
+  it("draws a tablet as pyramids with their own image, at the top's default", () => {
+    expect(componentImage("Tablet", { tablet: "fire", pyramids: true })).toBe(
+      "/api/render/enochian-tablet-pyramids?id=fire",
+    );
+    expect(
+      componentImage("Tablet", {
+        tablet: "union",
+        version: "equinox",
+        pyramids: true,
+      }),
+    ).toBe("/api/render/enochian-tablet-pyramids?id=union&version=equinox");
+    // The flat tablet's, with the switch off.
+    expect(componentImage("Tablet", { tablet: "fire", pyramids: false })).toBe(
+      "/api/render/enochian-tablet?id=fire",
+    );
+    // A top of the caller's own, which the image does not draw, even the
+    // default given by hand; and Dee's version, which has no pyramids.
+    for (const pyramidTop of [0.25, 0.5])
+      expect(
+        componentImage("Tablet", {
+          tablet: "union",
+          pyramids: true,
+          pyramidTop,
+        }),
+      ).toBe(null);
+    expect(
+      componentImage("Tablet", {
+        tablet: "fire",
+        version: "dee",
+        pyramids: true,
+      }),
+    ).toBe(null);
+    expect(
+      componentImage("Tablet", {
+        tablet: "earth",
+        pyramids: true,
+        highlights: { squares: [] },
+      }),
+    ).toBe(null);
+  });
 });

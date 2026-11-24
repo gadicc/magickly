@@ -2698,11 +2698,6 @@ msgstr "בלוח האיחוד יש הבדל ב־{squares}: {kinds}."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
-msgid "No image link while the tablet is drawn as pyramids."
-msgstr "אין קישור לתמונה כשהלוח מצויר כפירמידות."
-
-#. js-lingui-explicit-id
-#: src/app/enochian/tablets/tablets.tsx
 msgid "No image link while differences are shown."
 msgstr "אין קישור לתמונה כשמוצגים ההבדלים."
 

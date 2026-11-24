@@ -1,6 +1,7 @@
 import { angelSigil } from "./angelSigil";
 import { astroGeomancyChart } from "./astroGeomancyChart";
 import { enochianTablet } from "./enochianTablet";
+import { enochianTabletPyramids } from "./enochianTabletPyramids";
 import { gdHallImage } from "./gdHall";
 import { kamea } from "./kamea";
 import { kameaSigil } from "./kameaSigil";
@@ -18,6 +19,7 @@ export const CONTRACTS = {
   "tree-of-life": treeOfLife,
   "astro-geomancy-chart": astroGeomancyChart,
   "enochian-tablet": enochianTablet,
+  "enochian-tablet-pyramids": enochianTabletPyramids,
   "seven-branched-candlestick": sevenBranchedCandlestick,
   "table-of-shewbread": tableOfShewbread,
   "rose-sigil": roseSigil,

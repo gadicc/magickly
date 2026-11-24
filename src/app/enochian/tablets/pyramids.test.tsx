@@ -1,15 +1,33 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { componentImageFilename } from "@/render/componentImageUrl";
+import {
+  copiedImageLink,
   imageLinkNote,
   imageLinkOffered,
 } from "../../../../tests/exportControls";
 import Tablets, { downloadName } from "./tablets";
 
+// The downloads' file names, without saving anything.
+const runtime = vi.hoisted(() => ({ downloadBlob: vi.fn() }));
+vi.mock("@/export/exportRuntime", async (original) => ({
+  ...(await original<typeof import("@/export/exportRuntime")>()),
+  downloadBlob: runtime.downloadBlob,
+}));
+
 const PAGE = "/enochian/tablets";
 
-beforeEach(() => window.history.replaceState(null, "", PAGE));
+beforeEach(() => {
+  window.history.replaceState(null, "", PAGE);
+  runtime.downloadBlob.mockClear();
+});
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
@@ -25,6 +43,21 @@ const pyramidsSwitch = () =>
 /** The tablet's pyramids, not the Squares tab's large one. */
 const squares = (container: HTMLElement) =>
   container.querySelectorAll("[data-pyramids] [data-pyramid]").length;
+/** The image links that Link copies, SVG and PNG. */
+const imageHrefs = async () => [
+  await copiedImageLink(0, "SVG"),
+  await copiedImageLink(0, "PNG"),
+];
+
+/** The name the SVG download is saved as, once the button is free. */
+const downloaded = async () => {
+  const button = screen.getAllByRole("button", { name: "Save SVG" })[0];
+  await waitFor(() => expect(button.hasAttribute("disabled")).toBe(false));
+  const calls = runtime.downloadBlob.mock.calls.length;
+  fireEvent.click(button);
+  expect(runtime.downloadBlob).toHaveBeenCalledTimes(calls + 1);
+  return runtime.downloadBlob.mock.lastCall?.[1];
+};
 
 describe("/enochian/tablets drawn as pyramids (plan 095, decision 4)", () => {
   it("draws every square as a pyramid, with a key, and says so in the URL", async () => {
@@ -45,13 +78,17 @@ describe("/enochian/tablets drawn as pyramids (plan 095, decision 4)", () => {
       "Spirit",
       "White, with no element: a Calvary square's lowest side, which carries its Sephirah",
     ]);
-    // Until the image route has a slug of its own (decision 5).
-    expect(imageLinkOffered()).toBe(false);
-    expect(await imageLinkNote()).toBe(
-      "No image link while the tablet is drawn as pyramids.",
-    );
+    // The pyramids' own image (decision 5), the Golden Dawn's Earth.
+    expect(await imageHrefs()).toEqual([
+      "/api/render/enochian-tablet-pyramids",
+      "/api/render/enochian-tablet-pyramids?fmt=png",
+    ]);
     choose("Tablet", "Tablet of Union");
     expect(squares(container)).toBe(20);
+    expect(await imageHrefs()).toEqual([
+      "/api/render/enochian-tablet-pyramids?id=union",
+      "/api/render/enochian-tablet-pyramids?fmt=png&id=union",
+    ]);
     // The params keep the order they were first written in.
     expect(window.location.search).toBe("?pyramids=1&tablet=union");
     fireEvent.click(pyramidsSwitch() as HTMLElement);
@@ -60,6 +97,73 @@ describe("/enochian/tablets drawn as pyramids (plan 095, decision 4)", () => {
     expect(
       screen.queryByRole("list", { name: "The pyramids' colours" }),
     ).toBeNull();
+    // Flat again, the flat image.
+    expect(await imageHrefs()).toEqual([
+      "/api/render/enochian-tablet?id=union",
+      "/api/render/enochian-tablet?fmt=png&id=union",
+    ]);
+  });
+
+  it("links the pyramids' image in the tablet, version and font shown", async () => {
+    render(<Tablets />);
+    choose("Tablet", "Air");
+    choose("Version", "The Equinox's");
+    fireEvent.click(screen.getByRole("button", { name: "enochian" }));
+    fireEvent.click(pyramidsSwitch() as HTMLElement);
+    expect(await imageHrefs()).toEqual([
+      "/api/render/enochian-tablet-pyramids?id=air&font=enochian&version=equinox",
+      "/api/render/enochian-tablet-pyramids?fmt=png&id=air&font=enochian&version=equinox",
+    ]);
+    // Withheld, as for the flat tablet, while the reversed letters are
+    // plain.
+    fireEvent.click(screen.getByRole("switch", { name: "Reversed letters" }));
+    expect(imageLinkOffered()).toBe(false);
+    expect(await imageLinkNote()).toBe(
+      "No image link with second letters shown or reversed letters plain.",
+    );
+  });
+
+  it("withholds the pyramids' image while a name or the regions are shown", async () => {
+    const withheld =
+      "No image link while a name, a square or the regions are shown.";
+    window.history.replaceState(null, "", `${PAGE}?tablet=fire&pyramids=1`);
+    const first = render(<Tablets />);
+    expect(imageLinkOffered()).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: /^Oip\b/ }));
+    expect(squares(first.container)).toBe(156);
+    expect(imageLinkOffered()).toBe(false);
+    expect(await imageLinkNote()).toBe(withheld);
+    cleanup();
+    window.history.replaceState(null, "", `${PAGE}?tablet=fire&pyramids=1`);
+    const second = render(<Tablets />);
+    fireEvent.click(screen.getByRole("switch", { name: "Show the regions" }));
+    expect(squares(second.container)).toBe(156);
+    expect(imageLinkOffered()).toBe(false);
+    expect(await imageLinkNote()).toBe(withheld);
+    fireEvent.click(screen.getByRole("switch", { name: "Show the regions" }));
+    expect(await imageHrefs()).toEqual([
+      "/api/render/enochian-tablet-pyramids?id=fire",
+      "/api/render/enochian-tablet-pyramids?fmt=png&id=fire",
+    ]);
+  });
+
+  it("names its download as the pyramids' image, -pyramids once", async () => {
+    render(<Tablets />);
+    choose("Tablet", "Air");
+    fireEvent.click(pyramidsSwitch() as HTMLElement);
+    expect(await downloaded()).toBe("enochian-air-tablet-pyramids.svg");
+  });
+
+  it("links the flat image in Dee's version with the pyramids remembered", async () => {
+    render(<Tablets />);
+    fireEvent.click(pyramidsSwitch() as HTMLElement);
+    choose("Version", "Dee's, 1584");
+    expect(window.location.search).toBe("?version=dee");
+    expect(await imageHrefs()).toEqual([
+      "/api/render/enochian-tablet?version=dee",
+      "/api/render/enochian-tablet?fmt=png&version=dee",
+    ]);
+    expect(await downloaded()).toBe("enochian-earth-tablet-dee.svg");
   });
 
   it("rests the second letters while pyramids are drawn", () => {
@@ -123,22 +227,28 @@ describe("/enochian/tablets drawn as pyramids (plan 095, decision 4)", () => {
     );
   });
 
-  it("names its downloads with -pyramids", () => {
+  it("names its downloads with -pyramids, as the pyramids' image is named", () => {
+    const air = componentImageFilename({
+      slug: "enochian-tablet-pyramids",
+      props: { id: "air", font: "latin", version: "gd" },
+    });
+    expect(air).toBe("enochian-air-tablet-pyramids");
+    expect(downloadName(air, { alt: false, reversed: true })).toBe(
+      "enochian-air-tablet-pyramids",
+    );
+    // After the version and the glyphs, which the flat image's name has.
+    const earth = componentImageFilename({
+      slug: "enochian-tablet-pyramids",
+      props: { id: "earth", font: "enochian", version: "regardie" },
+    });
+    expect(earth).toBe("enochian-earth-tablet-regardie-glyphs-pyramids");
     expect(
-      downloadName("enochian-air-tablet", {
-        alt: false,
-        reversed: true,
-        pyramids: true,
-      }),
-    ).toBe("enochian-air-tablet-pyramids");
-    expect(
-      downloadName("enochian-earth-tablet-regardie", {
+      downloadName(earth, {
         alt: false,
         reversed: false,
-        pyramids: true,
         name: "king",
         regions: true,
       }),
-    ).toBe("enochian-earth-tablet-regardie-pyramids-plain-king-regions");
+    ).toBe("enochian-earth-tablet-regardie-glyphs-pyramids-plain-king-regions");
   });
 });

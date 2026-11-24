@@ -47,6 +47,7 @@ import { useUiLanguage } from "@/i18n/LocaleProvider";
 import OpenSource from "@/OpenSource";
 import { componentImageFilename } from "@/render/componentImageUrl";
 import { TABLET_IDS } from "@/render/contracts/enochianTablet";
+import { isTabletPyramidImageVersion } from "@/render/contracts/enochianTabletPyramids";
 import useEnochianFont, { EnochianFont } from "../useEnochianFont";
 import type { TabletNameLinks } from "./dictionaryLinks";
 import NamesPanel, { namesToChoose } from "./NamesPanel";
@@ -96,20 +97,17 @@ export interface DrawnState {
   regions?: boolean;
   /** A chosen square, drawn outlined. */
   square?: TabletSquare;
-  /** Every square drawn as a pyramid. */
-  pyramids?: boolean;
 }
 
 /**
- * A download's name, for what is drawn: the image's own name, and what
- * the page adds to it or leaves out ("enochian-fire-tablet-dee-plain",
- * "enochian-earth-tablet-senior-row-left-regions",
- * "enochian-air-tablet-pyramids").
+ * A download's name, for what is drawn: the image's own name, which says
+ * whether the squares are pyramids ("enochian-air-tablet-pyramids"), and
+ * what the page adds to it or leaves out ("enochian-fire-tablet-dee-plain",
+ * "enochian-earth-tablet-senior-row-left-regions").
  */
 export function downloadName(image: string, shown: DrawnState): string {
   return [
     image,
-    shown.pyramids ? "-pyramids" : "",
     shown.alt ? "-second-letters" : "",
     shown.reversed ? "" : "-plain",
     shown.differences ? "-differences" : "",
@@ -586,14 +584,28 @@ export default function Tablets({
   const squarePixels = useSquarePixels(ref, view ? squareShare(id) : 0);
   const layout = React.useRef<HTMLDivElement>(null);
   useLayoutWidth(layout);
-  const link = {
+  const font = enochianFont ? ("enochian" as const) : ("latin" as const);
+  const flatLink = {
     slug: "enochian-tablet" as const,
-    props: {
-      id,
-      font: enochianFont ? ("enochian" as const) : ("latin" as const),
-      version,
-    },
+    props: { id, font, version },
   };
+  // Pyramids have an image of their own (plan 095, decision 5), in the
+  // versions that have them, which are the only ones they are drawn in.
+  // A version drawn with pyramids that the image does not take (none
+  // today: a test holds the image's versions to magick-data's) has its
+  // link withheld below, never the flat image's in its place; its
+  // downloads are named as the image would be.
+  const pyramidsUnlinked = pyramids && !isTabletPyramidImageVersion(version);
+  const link =
+    pyramids && isTabletPyramidImageVersion(version)
+      ? {
+          slug: "enochian-tablet-pyramids" as const,
+          props: { id, font, version },
+        }
+      : flatLink;
+  const imageName = pyramidsUnlinked
+    ? `${componentImageFilename(flatLink)}-pyramids`
+    : componentImageFilename(link);
   const marked = React.useMemo(() => differingSquares(id), [id]);
   const names = view ? tabletNames(view) : [];
   const tradition = TABLET_NAME_TRADITIONS[version];
@@ -631,10 +643,11 @@ export default function Tablets({
   const plainShown =
     !reversed && (view?.marks ?? []).some((mark) => mark.reversed);
   const differencesShown = tab === "differences" && marked.length > 0;
-  // The image link draws the tablet as published: its reversed letters
-  // mirrored, and nothing drawn over it.
-  const linkNote = pyramids
-    ? t(/*i18n*/ "No image link while the tablet is drawn as pyramids.")
+  // The image link draws the tablet as published, flat or as pyramids:
+  // its reversed letters mirrored, and nothing drawn over it.
+  const linkNote = pyramidsUnlinked
+    ? // Unreachable today (above), so not a catalog message.
+      "No image link for this version's pyramids."
     : differencesShown
       ? t(/*i18n*/ "No image link while differences are shown.")
       : onNames && (chosenName || regionsShown || nameSquare)
@@ -769,8 +782,7 @@ export default function Tablets({
       // and with it any "Copied" feedback it is showing.
       key="export"
       target={ref}
-      filename={downloadName(componentImageFilename(link), {
-        pyramids,
+      filename={downloadName(imageName, {
         alt: altShown,
         reversed: !plainShown,
         differences: differencesShown,

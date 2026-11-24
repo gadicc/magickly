@@ -2698,11 +2698,6 @@ msgstr "In the Tablet of Union, {squares} differ: {kinds}."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
-msgid "No image link while the tablet is drawn as pyramids."
-msgstr "No image link while the tablet is drawn as pyramids."
-
-#. js-lingui-explicit-id
-#: src/app/enochian/tablets/tablets.tsx
 msgid "No image link while differences are shown."
 msgstr "No image link while differences are shown."
 

@@ -29,7 +29,8 @@ import { componentImage } from "./images";
  * The kameas' numbers are set in the bundled Noto Serif the route
  * resolves, where the page's are in the browser's serif; and a kamea
  * sigil's image is the one-row `KameaSigilImage` of the figures the
- * explorer's `KameaSigil` wraps.
+ * explorer's `KameaSigil` wraps. A tablet's image is the flat one's or,
+ * drawn as pyramids, the pyramids' own (plan 095, decision 5).
  */
 const CASES: [
   (
@@ -42,28 +43,42 @@ const CASES: [
   ),
   // biome-ignore lint/suspicious/noExplicitAny: each takes its examples' props
   ComponentType<any>,
-  ComponentImageSlug,
+  readonly ComponentImageSlug[],
 ][] = [
-  ["TreeOfLife", TreeOfLife, "tree-of-life"],
-  ["Tablet", Tablet, "enochian-tablet"],
+  ["TreeOfLife", TreeOfLife, ["tree-of-life"]],
+  ["Tablet", Tablet, ["enochian-tablet", "enochian-tablet-pyramids"]],
   [
     "SevenBranchedCandlestick",
     SevenBranchedCandlestick,
-    "seven-branched-candlestick",
+    ["seven-branched-candlestick"],
   ],
-  ["TableOfShewbread", TableOfShewbread, "table-of-shewbread"],
-  ["Kamea", Kamea, "kamea"],
-  ["KameaSigil", KameaSigilImage, "kamea-sigil"],
+  ["TableOfShewbread", TableOfShewbread, ["table-of-shewbread"]],
+  ["Kamea", Kamea, ["kamea"]],
+  ["KameaSigil", KameaSigilImage, ["kamea-sigil"]],
 ];
 
-describe.each(CASES)("%s's image", (name, live, slug) => {
+describe.each(CASES)("%s's image", (name, live, slugs) => {
   const examples = COMPONENT_EXAMPLES[name].examples.filter(
     (example) =>
       componentImage(name, example.props as Record<string, unknown>) !== null,
   );
+  const slugOf = (path: string) =>
+    new URL(path, "https://magick.ly").pathname.replace("/api/render/", "");
 
-  it("is offered for some of its examples", () => {
+  it("is offered for some of its examples, under each of its slugs", () => {
     expect(examples.length).toBeGreaterThan(0);
+    expect(
+      new Set(
+        examples.map((example) =>
+          slugOf(
+            componentImage(
+              name,
+              example.props as Record<string, unknown>,
+            ) as string,
+          ),
+        ),
+      ),
+    ).toEqual(new Set(slugs));
   });
 
   it.each(examples.map((example) => [example.title, example]))(
@@ -74,6 +89,8 @@ describe.each(CASES)("%s's image", (name, live, slug) => {
         unknown
       >;
       const path = componentImage(name, props) as string;
+      const slug = slugOf(path) as ComponentImageSlug;
+      expect(slugs).toContain(slug);
       const query = new URL(path, "https://magick.ly").searchParams;
       const parsed = CONTRACTS[slug].parse(query);
       const registered = COMPONENT_IMAGE_REGISTRY[slug] as {

@@ -16,10 +16,13 @@ import {
 } from "magick-components/sigil/kameaLayout";
 import { sigilFigure } from "magick-components/sigil/SigilImage";
 import type { ReactElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { createRitualSvgValidator } from "@/files/validateRitualSvg";
 import { renderComponentImage } from "./componentImage";
 import { componentImageResponse } from "./componentImageResponse";
 import { COMPONENT_IMAGE_SLUGS, CONTRACTS } from "./contracts";
+import { TABLET_IDS } from "./contracts/enochianTablet";
+import { TABLET_PYRAMID_IMAGE_VERSIONS } from "./contracts/enochianTabletPyramids";
 import type { KameaImagePlanet } from "./contracts/kamea";
 import { contractViewBox } from "./contracts/types";
 import { IMAGE_INPUTS_PROFILE } from "./dataInputs";
@@ -35,6 +38,7 @@ import {
   KAMEA_SIGIL_IMAGE_PROFILE,
   ROSE_SIGIL_IMAGE_PROFILE,
   SIGIL_PLACEMENT_HEADER,
+  TABLET_PYRAMIDS_IMAGE_PROFILE,
 } from "./registry";
 
 const hash = (bytes: Uint8Array) =>
@@ -78,6 +82,14 @@ describe("component image registry", () => {
       ANGEL_SIGIL_IMAGE_PROFILE,
     );
     expect(ANGEL_SIGIL_IMAGE_PROFILE).toBe("magickli-angel-sigil-image-v1");
+    // And the tablets drawn as pyramids (plan 095, decision 5), so that
+    // the flat tablets' images keep theirs.
+    expect(COMPONENT_IMAGE_REGISTRY["enochian-tablet-pyramids"].profile).toBe(
+      TABLET_PYRAMIDS_IMAGE_PROFILE,
+    );
+    expect(TABLET_PYRAMIDS_IMAGE_PROFILE).toBe(
+      "magickli-tablet-pyramids-image-v1",
+    );
     // The other components still publish under the shared profile, so
     // their identities did not move with the sigil's.
     for (const slug of [
@@ -130,6 +142,15 @@ describe("component image registry", () => {
     [
       "enochian-tablet",
       "d7fd15d88d703ff532767e52ad8af72eefd7b1e92f71fccd4de65f21bdc8560f",
+    ],
+    // The flat tablet's letters and version rules, the zodiac the
+    // pyramids' rules find a Great Cross square's sign and decans in, what
+    // their other lookups need to draw at all (the Kerubs' signs and the
+    // Sephiroth's numbers among them), and the symbols a later switch
+    // would draw, hashed ahead of it (plan 095, stage 5).
+    [
+      "enochian-tablet-pyramids",
+      "bef0caccd45b670e5d44856f53f80e81f4c785a5508cd27653cdf119fccc61ee",
     ],
     // a8a08155… until the candlestick drew the Equinox's figure of 1909
     // too (plan 080, "The rose's and the candlestick's versions"): the
@@ -233,6 +254,21 @@ describe("component image registry", () => {
     ["enochian-tablet", "id=union", 496, 416, 40],
     ["enochian-tablet", "id=union&version=equinox&font=enochian", 496, 416, 40],
     ["enochian-tablet", "id=union&width=248", 248, 208, 40],
+    // As pyramids (plan 095, stage 5), on the same pages at the same
+    // sizes: four sides a square, then the letters and the sigil.
+    ["enochian-tablet-pyramids", "", 840, 1188, 1000],
+    ["enochian-tablet-pyramids", "id=air", 840, 1188, 1000],
+    ["enochian-tablet-pyramids", "id=water", 840, 1188, 1000],
+    ["enochian-tablet-pyramids", "id=fire", 840, 1188, 1000],
+    ["enochian-tablet-pyramids", "id=union", 496, 416, 100],
+    ["enochian-tablet-pyramids", "id=fire&version=equinox", 840, 1188, 1000],
+    [
+      "enochian-tablet-pyramids",
+      "id=air&version=regardie&font=enochian&height=594",
+      420,
+      594,
+      1000,
+    ],
     ["seven-branched-candlestick", "", 1024, 1024, 60],
     ["seven-branched-candlestick", "version=modern", 1024, 1024, 60],
     ["table-of-shewbread", "", 1024, 1024, 130],
@@ -324,10 +360,8 @@ describe("component image registry", () => {
       "NotoSerif-Regular-latin1.ttf",
       "FrankRuhlLibre-Bold-letters.ttf",
     ]);
-    expect(await files("enochian-tablet")).toEqual([
-      ...base,
-      "EnochianPlain.ttf",
-    ]);
+    for (const slug of ["enochian-tablet", "enochian-tablet-pyramids"])
+      expect(await files(slug)).toEqual([...base, "EnochianPlain.ttf"]);
     expect(await files("table-of-shewbread")).toEqual([
       ...base,
       "NotoEmoji-Variable.ttf",
@@ -701,6 +735,157 @@ describe("component image registry", () => {
       }
     },
   );
+
+  // The tablets drawn as pyramids, by the profile they were reviewed
+  // under, as the kameas' above: a Watchtower, the Union, and the glyphs.
+  const TABLET_PYRAMIDS_PINS: Record<
+    string,
+    readonly (readonly [query: string, byteSize: number, sha256: string])[]
+  > = {
+    "magickli-tablet-pyramids-image-v1": [
+      // Reviewed as rasterised, 24 November 2026: every square's four
+      // sides in their elements' colours round a white top, half the
+      // square, with its letter, under the flat tablet's sigil.
+      [
+        "id=air",
+        255_309,
+        "2e16e71be6e7a6b756f4a97782c2cffb2fbd3630e78eccad3f94ed996531a339",
+      ],
+      [
+        "id=air&font=enochian",
+        352_394,
+        "0013c6734190eaa3225a76e5803044e801fffb579caa95fc575db8697274a093",
+      ],
+      [
+        "id=union",
+        25_886,
+        "feff338f82551dc0380427fa7581f0a6f7b185053d6a76986d7d886654869830",
+      ],
+    ],
+  };
+
+  it("pins the tablets' pyramids' reviewed bytes under their image profile", async () => {
+    const pins = TABLET_PYRAMIDS_PINS[TABLET_PYRAMIDS_IMAGE_PROFILE];
+    expect(
+      pins,
+      `no reviewed bytes for ${TABLET_PYRAMIDS_IMAGE_PROFILE}: add its set`,
+    ).toBeDefined();
+    for (const [query, byteSize, sha256] of pins) {
+      const image = await render("enochian-tablet-pyramids", query);
+      expect(
+        [image.byteSize, image.sha256],
+        `enochian-tablet-pyramids?${query} draws other bytes than ${TABLET_PYRAMIDS_IMAGE_PROFILE} was reviewed with. ` +
+          "If the drawing changed on purpose, bump the profile in registry.tsx " +
+          "and pin the reviewed bytes under the new profile; never re-pin a shipped profile.",
+      ).toEqual([byteSize, sha256]);
+    }
+  });
+
+  // A digest of every tablet's drawing in every version, as the kamea
+  // sigil's below: the byte pins above cover only Air and the Union, so a
+  // fix to the rules confined to Earth, Water or Fire, or to one version's
+  // bars, would change images without a bump. The source markup, before
+  // outlining, at the default font; the letters are data, so a correction
+  // to one moves this digest and the inputs hash together.
+  const TABLET_PYRAMIDS_DRAWING_DIGESTS: Record<string, string> = {
+    "magickli-tablet-pyramids-image-v1":
+      "c9e913c0848356d6041ba5e2c76be3da06fe0a357260355c899c3e84bfd16946",
+  };
+
+  it("pins a digest of every tablet's pyramids in every version under their image profile", async () => {
+    const registration = COMPONENT_IMAGE_REGISTRY["enochian-tablet-pyramids"];
+    const drawings: string[] = [];
+    for (const version of TABLET_PYRAMID_IMAGE_VERSIONS)
+      for (const id of TABLET_IDS) {
+        const query = `id=${id}&version=${version}`;
+        const markup = renderToStaticMarkup(
+          (await registration.render(
+            CONTRACTS["enochian-tablet-pyramids"].parse(
+              new URLSearchParams(query),
+            ),
+          )) as ReactElement,
+        );
+        drawings.push(`${query}\n${registration.source?.(markup) ?? markup}`);
+      }
+    expect(drawings).toHaveLength(15);
+    expect(
+      createHash("sha256").update(drawings.join("\n\n")).digest("hex"),
+      `the tablets' pyramids draw otherwise than ${TABLET_PYRAMIDS_IMAGE_PROFILE} was reviewed with. ` +
+        "If the drawing changed on purpose, bump TABLET_PYRAMIDS_IMAGE_PROFILE in registry.tsx " +
+        "and record the new digest under the new profile; never re-pin a shipped profile.",
+    ).toBe(TABLET_PYRAMIDS_DRAWING_DIGESTS[TABLET_PYRAMIDS_IMAGE_PROFILE]);
+  }, 60_000);
+
+  it("draws every tablet's squares as pyramids, which the flat image does not", async () => {
+    const source = async (
+      slug: "enochian-tablet" | "enochian-tablet-pyramids",
+      query: string,
+    ) => {
+      const registration = COMPONENT_IMAGE_REGISTRY[slug];
+      return renderToStaticMarkup(
+        (await registration.render(
+          CONTRACTS[slug].parse(new URLSearchParams(query)) as never,
+        )) as ReactElement,
+      );
+    };
+    for (const [id, squares] of [
+      ["earth", 156],
+      ["air", 156],
+      ["water", 156],
+      ["fire", 156],
+      ["union", 20],
+    ] as const) {
+      const markup = await source("enochian-tablet-pyramids", `id=${id}`);
+      expect(markup.match(/<g data-pyramid=/g), id).toHaveLength(squares);
+      expect(markup.match(/<polygon data-side=/g), id).toHaveLength(
+        squares * 4,
+      );
+      // Spirit on every square of the Union, and on a Watchtower's Great
+      // Cross; each Watchtower's own element on its sides.
+      expect(markup, id).toContain('data-element="spirit"');
+      if (id !== "union") expect(markup, id).toContain(`data-element="${id}"`);
+      expect(await source("enochian-tablet", `id=${id}`), id).not.toMatch(
+        /data-pyramid/,
+      );
+      // The route's image and the flat one are not the same bytes.
+      expect(
+        (await render("enochian-tablet-pyramids", `id=${id}`)).sha256,
+      ).not.toBe((await render("enochian-tablet", `id=${id}`)).sha256);
+    }
+  });
+
+  it("reads the flat tablet's data and more, and leaves the flat tablet's alone", () => {
+    const flat = COMPONENT_IMAGE_REGISTRY["enochian-tablet"].inputs;
+    const pyramids =
+      COMPONENT_IMAGE_REGISTRY["enochian-tablet-pyramids"].inputs;
+    // The same letters, so a correction to one re-identifies both.
+    expect(pyramids.slice(0, flat.length)).toEqual(flat);
+    expect(pyramids.map((group) => group.table)).toEqual([
+      "enochianTablet",
+      "enochianTabletVersion",
+      "enochianTablet",
+      "zodiac",
+      "planet",
+      "element",
+      "kerub",
+      "sephirah",
+      "treeOfLifePath",
+      "gdGodForm",
+      // The symbols, hashed ahead of the switch that would draw them.
+      "zodiac",
+      "planet",
+      "hebrewLetter",
+      "tetragram",
+    ]);
+    // The flat tablet still publishes under the shared profile and its
+    // own inputs, pinned above, so its images keep their identity.
+    expect(COMPONENT_IMAGE_REGISTRY["enochian-tablet"].profile).toBe(
+      COMPONENT_IMAGE_PROFILE,
+    );
+    expect(componentInputsHash("enochian-tablet")).not.toBe(
+      componentInputsHash("enochian-tablet-pyramids"),
+    );
+  });
 
   // A digest of the kamea sigil's drawings, as the rose's: every name the
   // planetary names table traces, in its traced spelling (Agrippa 1533's,
