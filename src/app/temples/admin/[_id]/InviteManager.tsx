@@ -76,7 +76,7 @@ export function InviteManager({
   return (
     <Stack spacing={2} sx={touchTargets}>
       <div>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
           <UiText message={/*i18n*/ "Join code"} />
         </Typography>
         <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
