@@ -1,5 +1,6 @@
 import { PLANET_IDS } from "magick-data/astrology/planets";
 import { describe, expect, it, vi } from "vitest";
+import { STUDY_SET_IDS } from "./setIds";
 import getSet, { sets } from "./sets";
 
 // The study API route loads these sets, and Turbopack gives route handlers no
@@ -13,6 +14,14 @@ describe("study sets", () => {
     for (const id of Object.keys(sets))
       expect(Object.keys(getSet(id).data).length, id).toBeGreaterThan(0);
     expect(() => getSet("missing")).toThrow("No such set");
+  });
+
+  it("refuse Object.prototype's keys as set ids", () => {
+    // `/study/constructor` once found Object's constructor and threw while
+    // dealing cards, a 500; now it is no set, and the page answers 404.
+    for (const id of ["constructor", "toString", "__proto__", "hasOwnProperty"])
+      expect(() => getSet(id), id).toThrow("No such set");
+    expect(Object.keys(sets)).toEqual([...STUDY_SET_IDS]);
   });
 
   it("ask the twelve planets' signs, and no sphere of the Tree", () => {

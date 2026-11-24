@@ -8,6 +8,7 @@ import {
   type ToolSet,
   toUIMessageStream,
 } from "ai";
+import { boundedText } from "@/lib/boundedText";
 import { createUuidV7 } from "@/lib/ids";
 import type { ChatMessage, ChatSource } from "./contracts";
 import {
@@ -24,6 +25,17 @@ import {
 import type { ChatAdmission } from "./usage";
 
 export const CHAT_ERROR_MESSAGE = "Error Processing";
+
+/**
+ * The most a chat request body may hold, read before anything else. The v2
+ * client sends each earlier answer back with its retrieved sources (four
+ * passages of about 1,000 characters, with their PDF metadata), which
+ * `readConversation` then drops, so the body runs well past the 32,000
+ * characters of conversation it allows. At an estimated 12 KB an answer, the
+ * 50 answers of a 100-turn conversation come to about 600 KB; a mebibyte
+ * leaves room for that and refuses anything larger before it is parsed.
+ */
+export const MAX_CHAT_BODY_BYTES = 1024 * 1024;
 
 // Apply the same redaction to provider events and merged-stream failures.
 const safeStreamError = () => CHAT_ERROR_MESSAGE;
@@ -108,9 +120,15 @@ export async function respondToChat(
   admit: () => Promise<ChatAdmission>,
 ): Promise<Response> {
   try {
+    const raw = await boundedText(request, MAX_CHAT_BODY_BYTES);
+    if (raw === undefined) {
+      throw new ChatInputError(
+        "Start a new chat; this conversation is too long.",
+      );
+    }
     let body: unknown;
     try {
-      body = await request.json();
+      body = JSON.parse(raw);
     } catch {
       throw new ChatInputError("Invalid conversation.");
     }

@@ -3,6 +3,7 @@ import { readFieldPath } from "magick-components/kabbalah/fieldPath";
 import data from "magick-data";
 import Tetragram from "@/app/geomancy/Tetragram";
 import Ink from "@/drawings/Ink";
+import { isStudySetId, type StudySetId } from "./setIds";
 
 // https://stackoverflow.com/a/56773391/1839099
 function omit(key, obj) {
@@ -149,7 +150,7 @@ function filter<T>(
   return Object.fromEntries(Object.entries(data).filter(func));
 }
 
-const sets: Record<string, StudySetData<unknown>> = {
+const sets: Record<StudySetId, StudySetData<unknown>> = {
   "hebrew-latin": {
     id: "hebrew-latin",
     data: data.hebrewLetter,
@@ -450,7 +451,8 @@ const sets: Record<string, StudySetData<unknown>> = {
 };
 
 function getSet(id: string) {
-  if (!sets[id]) throw new Error("No such set");
+  // A plain lookup would find `constructor` and the rest of Object.prototype.
+  if (!isStudySetId(id)) throw new Error("No such set");
 
   // @ts-expect-error: TODO
   const set: StudySet = {

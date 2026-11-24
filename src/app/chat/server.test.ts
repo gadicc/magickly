@@ -18,6 +18,7 @@ import {
 import {
   CHAT_ERROR_MESSAGE,
   type ChatDependencies,
+  MAX_CHAT_BODY_BYTES,
   prepareAnswer,
   respondToChat as respondWithAdmission,
 } from "./server";
@@ -323,6 +324,48 @@ describe("shared chat generation and protocols", () => {
     );
     expect(response.status).toBe(400);
     expect(factory).not.toHaveBeenCalled();
+  });
+
+  it("stops reading a body past its byte limit, before admission", async () => {
+    // A stream with no Content-Length, of which only the first chunks past
+    // the limit are ever pulled.
+    let pulled = 0;
+    const chunk = new TextEncoder().encode(" ".repeat(64 * 1024));
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        pulled += chunk.byteLength;
+        controller.enqueue(chunk);
+      },
+    });
+    const factory = vi.fn(async () => dependencies());
+    const admitted = vi.fn(admit);
+    const response = await respondWithAdmission(
+      new Request("http://localhost/chat/api/v2", {
+        method: "POST",
+        body,
+        duplex: "half",
+      } as RequestInit),
+      "v2",
+      factory,
+      admitted,
+    );
+    expect(response.status).toBe(400);
+    expect(await response.text()).toMatch(/too long/);
+    expect(pulled).toBeLessThan(MAX_CHAT_BODY_BYTES + 4 * chunk.byteLength);
+    expect(factory).not.toHaveBeenCalled();
+    expect(admitted).not.toHaveBeenCalled();
+
+    // A declared length past the limit is refused unread.
+    const declared = await respondToChat(
+      new Request("http://localhost/chat/api/v2", {
+        method: "POST",
+        body: "{}",
+        headers: { "Content-Length": String(MAX_CHAT_BODY_BYTES + 1) },
+      }),
+      "legacy",
+      factory,
+    );
+    expect(declared.status).toBe(400);
   });
 
   it("masks provider setup and retrieval failures", async () => {

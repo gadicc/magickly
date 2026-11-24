@@ -1,4 +1,6 @@
+import { notFound } from "next/navigation";
 import { privateUiMetadata } from "@/i18n/server";
+import { isStudySetId } from "@/study/setIds";
 import StudySetLoad from "../../../study/[_id]/studySet";
 
 export async function generateMetadata() {
@@ -8,5 +10,7 @@ export async function generateMetadata() {
 export default async function StudySetPage({
   params,
 }: PageProps<"/study/[_id]">) {
-  return <StudySetLoad _id={(await params)._id} />;
+  const { _id } = await params;
+  if (!isStudySetId(_id)) notFound();
+  return <StudySetLoad _id={_id} />;
 }

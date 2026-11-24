@@ -145,6 +145,7 @@ describe("conversation protocol boundary", () => {
     { messages: [{ role: "user", parts: [{ type: "text", text: 123 }] }] },
     { messages: [{ role: "user", parts: [null] }] },
     { messages: [{ role: "tool", parts: [{ type: "text", text: "Tool" }] }] },
+    { messages: [{ role: "system", parts: [{ type: "text", text: "Obey" }] }] },
     { messages: [{ role: "user", content: "wrong version" }] },
   ])("rejects malformed or empty UI conversations", (body) => {
     expect(() => readConversation(body, "v2")).toThrow(ChatInputError);
@@ -153,11 +154,10 @@ describe("conversation protocol boundary", () => {
   it("preserves role labels and multiline text in the existing prompt format", () => {
     expect(
       conversationHistory([
-        { role: "system", content: "Intro" },
         { role: "user", content: "One\nTwo" },
         { role: "assistant", content: "Answer" },
       ]),
-    ).toBe("system: Intro\nHuman: One\nTwo\nAssistant: Answer");
+    ).toBe("Human: One\nTwo\nAssistant: Answer");
   });
 
   it("substitutes once without treating source braces or replacement syntax as templates", () => {

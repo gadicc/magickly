@@ -1,4 +1,5 @@
 import { usageDay } from "@/app/chat/usage";
+import { boundedText } from "@/lib/boundedText";
 import { isSameOrigin } from "@/lib/sameOrigin";
 import type { Translator } from "../lookup.ts";
 import {
@@ -207,36 +208,6 @@ const NO_GENERATION: ReadonlySet<number> = new Set([401, 403, 404, 429]);
 const errorClass = (error: unknown) =>
   error instanceof Error ? error.name : typeof error;
 
-/**
- * The body as text, read no further than `MAX_BODY_BYTES`: undefined when
- * it is longer, whatever its `Content-Length` says, so a large body is
- * never held in memory.
- */
-async function boundedText(request: Request): Promise<string | undefined> {
-  const length = Number(request.headers.get("content-length") ?? 0);
-  if (length > MAX_BODY_BYTES || !request.body) return undefined;
-  const reader = request.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let bytes = 0;
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    bytes += value.byteLength;
-    if (bytes > MAX_BODY_BYTES) {
-      await reader.cancel().catch(() => {});
-      return undefined;
-    }
-    chunks.push(value);
-  }
-  const all = new Uint8Array(bytes);
-  let at = 0;
-  for (const chunk of chunks) {
-    all.set(chunk, at);
-    at += chunk.byteLength;
-  }
-  return new TextDecoder("utf-8", { fatal: true }).decode(all);
-}
-
 /** Reads `{text, again?}` from a JSON body, or undefined. */
 async function readBody(
   request: Request,
@@ -245,7 +216,7 @@ async function readBody(
   if (!/^application\/json\b/i.test(type)) return undefined;
   let body: unknown;
   try {
-    const raw = await boundedText(request);
+    const raw = await boundedText(request, MAX_BODY_BYTES);
     if (raw === undefined) return undefined;
     body = JSON.parse(raw);
   } catch {

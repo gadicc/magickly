@@ -4,7 +4,7 @@ export type ChatProtocol = "legacy" | "v2";
 
 /** Only text crosses from either client protocol into the model prompts. */
 export interface ConversationTurn {
-  role: "user" | "assistant" | "system";
+  role: "user" | "assistant";
   content: string;
 }
 
@@ -52,7 +52,9 @@ export function readConversation(
     if (
       !record(message) ||
       typeof message.role !== "string" ||
-      !["user", "assistant", "system"].includes(message.role)
+      // A client never speaks as the system: no turn of ours is one, and a
+      // "system" line in the history would read to the model as instructions.
+      !["user", "assistant"].includes(message.role)
     ) {
       throw new ChatInputError("Invalid conversation.");
     }
@@ -123,8 +125,7 @@ Question: {question}
 export function conversationHistory(turns: ConversationTurn[]): string {
   return turns
     .map(({ role, content }) => {
-      const speaker =
-        role === "user" ? "Human" : role === "assistant" ? "Assistant" : role;
+      const speaker = role === "user" ? "Human" : "Assistant";
       return `${speaker}: ${content}`;
     })
     .join("\n");
