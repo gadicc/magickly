@@ -93,4 +93,49 @@ describe("roundOutlinedPaths", () => {
         ),
       ).toThrow("Unexpected component image transform");
   });
+
+  it("keeps numbers apart that were written together", () => {
+    // "1.0004.5" is 1.0004 then .5; once the first is 1, ".5" must not join it.
+    expect(roundOutlinedPaths('<path d="M1.0004.5 L2.0001.25"/>', SQUARE)).toBe(
+      '<path d="M1 0.5 L2 0.25"/>',
+    );
+  });
+
+  it("bounds a skew or uneven scale by its largest stretch", () => {
+    // matrix(1 0 3 1): a shear that stretches some direction by about 3.3.
+    expect(
+      roundOutlinedPaths(
+        '<g transform="matrix(1 0 3 1 0 0)"><path d="M 0.123456 0"/></g>',
+        SQUARE,
+      ),
+    ).toContain('d="M 0.1235 0"');
+    // A self-closing element's own transform counts too.
+    expect(
+      roundOutlinedPaths(
+        '<path transform="matrix(20 0 0 20 0 0)" d="M 0.123456 0"/>',
+        SQUARE,
+      ),
+    ).toContain('d="M 0.12346 0"');
+  });
+
+  it("takes a clip's own scale times that of the groups using it", () => {
+    // Drawn in the space of whatever uses it: up to 10 × 10.
+    expect(
+      roundOutlinedPaths(
+        '<defs><clipPath id="c" transform="matrix(10 0 0 10 0 0)"><path d="M 0.1234567 0"/></clipPath></defs><g transform="matrix(10 0 0 10 0 0)"><path d="M 0.5 0"/></g>',
+        SQUARE,
+      ),
+    ).toContain('d="M 0.12346 0"');
+  });
+
+  it("refuses what it cannot bound", () => {
+    for (const body of [
+      '<g transform="translate(5 5) scale(100)"><path d="M 0.5 0"/></g>',
+      '<defs><clipPath id="c" clipPathUnits="objectBoundingBox"><path d="M 0.1 0.1"/></clipPath></defs>',
+      '<defs><pattern id="p" patternContentUnits="objectBoundingBox"><path d="M 0.1 0.1"/></pattern></defs>',
+    ])
+      expect(() => roundOutlinedPaths(body, SQUARE)).toThrow(
+        /Unexpected component image/,
+      );
+  });
 });

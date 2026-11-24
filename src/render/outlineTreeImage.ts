@@ -307,33 +307,64 @@ function topLevelGroups(body: string): TopLevelGroup[] {
  */
 export const OUTLINE_PRECISION = 1e-5;
 
-/** The largest factor any element's transforms, nested, scale it by. */
+/** The largest factor a 2×2 matrix stretches any direction by. */
+function matrixScale(a: number, b: number, c: number, d: number): number {
+  // The larger singular value: exact for a rotation (1), a uniform scale,
+  // and a skew or uneven scale alike.
+  const sum = a * a + b * b + c * c + d * d;
+  const det = a * d - b * c;
+  return Math.sqrt(
+    (sum + Math.sqrt(Math.max(0, sum * sum - 4 * det * det))) / 2,
+  );
+}
+
+/**
+ * The largest factor any element is scaled by, through the transforms of
+ * the groups around it and its own. A paint server's or clip's contents
+ * (in the `<defs>`) are drawn in the space of whatever uses them, so the
+ * largest scale found there is taken times the largest outside. Fails
+ * closed, refusing what it cannot bound: a transform written other than as
+ * `matrix(…)` (resvg writes only that), one that collapses, and contents
+ * in `objectBoundingBox` units, which a bounding box of any size scales.
+ */
 function largestScale(body: string): number {
+  if (
+    /(?:clipPath|pattern|mask)ContentUnits="objectBoundingBox"|clipPathUnits="objectBoundingBox"/.test(
+      body,
+    )
+  )
+    throw new Error("Unexpected component image transform");
   const tag = /<(\/?)([A-Za-z][\w:-]*)\b([^>]*?)(\/?)>/g;
-  const stack: number[] = [1];
-  let largest = 1;
+  const stack: { scale: number; defs: boolean }[] = [{ scale: 1, defs: false }];
+  let outside = 1;
+  let inside = 1;
   for (let match = tag.exec(body); match; match = tag.exec(body)) {
-    const [, closing, , attributes, selfClosing] = match;
+    const [, closing, name, attributes, selfClosing] = match;
     if (closing) {
       if (stack.length > 1) stack.pop();
       continue;
     }
-    let scale = stack[stack.length - 1];
-    for (const [, values] of attributes.matchAll(
-      /\b(?:transform|patternTransform|gradientTransform)="matrix\(([^)]*)\)"/g,
+    const parent = stack[stack.length - 1];
+    const defs = parent.defs || name === "defs";
+    let scale = defs && !parent.defs ? 1 : parent.scale;
+    for (const [, kind, value] of attributes.matchAll(
+      /\b(transform|patternTransform|gradientTransform)="([^"]*)"/g,
     )) {
-      const [a, b, c, d] = values
+      const matrix = /^matrix\(([^)]*)\)$/.exec(value.trim());
+      if (!matrix) throw new Error(`Unexpected component image ${kind}`);
+      const [a, b, c, d] = matrix[1]
         .trim()
         .split(/[\s,]+/)
         .map(Number);
-      scale *= Math.max(Math.hypot(a, b), Math.hypot(c, d));
+      scale *= matrixScale(a, b, c, d);
     }
     if (!Number.isFinite(scale) || scale <= 0)
       throw new Error("Unexpected component image transform");
-    largest = Math.max(largest, scale);
-    if (!selfClosing) stack.push(scale);
+    if (defs) inside = Math.max(inside, scale);
+    else outside = Math.max(outside, scale);
+    if (!selfClosing) stack.push({ scale, defs });
   }
-  return largest;
+  return outside * inside;
 }
 
 /**
@@ -363,11 +394,19 @@ export function roundOutlinedPaths(
     const value = Number(Number(number).toFixed(decimals));
     return Object.is(value, -0) ? "0" : String(value);
   };
-  return body.replace(
-    / d="([^"]*)"/g,
-    (_, d: string) =>
-      ` d="${d.replace(/-?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?/g, round)}"`,
-  );
+  return body.replace(/ d="([^"]*)"/g, (_, d: string) => {
+    const rounded = d.replace(
+      /-?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?/g,
+      (number: string, at: number) => {
+        const out = round(number);
+        // "1.0.5" is two numbers; once the first is "1", ".5" would join it.
+        return d[at + number.length] === "." && !out.includes(".")
+          ? `${out} `
+          : out;
+      },
+    );
+    return ` d="${rounded}"`;
+  });
 }
 
 /**

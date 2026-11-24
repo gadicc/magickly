@@ -99,11 +99,12 @@ export function bareHallFonts(svg: string): string {
 
 /**
  * The outlined SVG without the whitespace resvg indents it with, between
- * tags and around path commands. Exact: the numbers are left as they are,
- * since rounding them, even in path data at a thousandth of a unit,
- * moved antialiased pixels visibly (the glyph outlines are drawn through
- * scaling transforms), and the raster is tested to match the uncompacted
- * one exactly.
+ * tags and around path commands. Exact: it rounds no number, and the
+ * raster is tested to match the uncompacted one exactly. Rounding a hall's
+ * path data at a flat thousandth of a unit once moved antialiased pixels
+ * visibly, since the glyph outlines are drawn through transforms scaling
+ * by up to 100; the outliner's `roundOutlinedPaths` (plan 099) keeps
+ * decimals in proportion to that scale instead, four in a hall.
  */
 export function compactHallSvg(svg: Buffer): Buffer {
   const text = svg
