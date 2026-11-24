@@ -20,6 +20,9 @@ import { decodeRow } from "./embeddings/rowBytes";
 const mocks = vi.hoisted(() => ({ embed: vi.fn(), reserve: vi.fn() }));
 vi.mock("./embeddings/provider", () => ({ embedSearchInputs: mocks.embed }));
 vi.mock("./usage", () => ({ reserveSearchUsage: mocks.reserve }));
+vi.mock("@/limits/request", () => ({
+  requestClientSubject: () => "search-client:test",
+}));
 
 /**
  * `/search/index` and `/api/search` follow one coverage rule (plan 087):
@@ -104,7 +107,10 @@ describe("meaning search availability", () => {
       const response = await api.POST(
         new Request("https://magick.test/api/search", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Sec-Fetch-Site": "same-origin",
+          },
           body: JSON.stringify({ query: "planetary hours" }),
         }),
       );
@@ -122,7 +128,10 @@ describe("meaning search availability", () => {
     const response = await api.POST(
       new Request("https://magick.test/api/search", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Sec-Fetch-Site": "same-origin",
+        },
         body: JSON.stringify({ query: "planetary hours" }),
       }),
     );
