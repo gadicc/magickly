@@ -108,7 +108,10 @@ Follow-ups are separate from the completed migration work:
   6 MB SVG, so a cached hit costs more bandwidth than a fresh render
   costs CPU); audit items L3, L4, L5 and L9. The firewall's render
   rate limits, log-only until then, now return 429 (README, "Outside the
-  app").
+  app"). If crawlers ever reach `render-images`' 600 a minute an
+  address, exempt verified bots from it: we want search engines to index
+  every image (Google holds almost none of ours yet; the SEO work began in
+  earnest in November 2026).
 - 14 November 2026: `magick-data` 0.2.0, with the Moon's
   `intelligenceOfIntelligences`, the tablet notes' Yods and "Bull", and
   the two changed Sources rows signed again; on `gate/data-020`,

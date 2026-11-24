@@ -153,4 +153,6 @@ its counters are per region):
 Two deny rules sit beside them: `render-encoded-path` (a `%` in a render
 path) and `Retire legacy file2 writes`. Crawlers are not exempt; the
 render images they fetch are the closed-input ones, far below 600 a
-minute an address.
+minute an address. We want search engines to index every image, so if
+crawlers ever reach that limit, exempt verified bots from `render-images`
+(a follow-up in `plans/000-current-status.md`) rather than raising it.
