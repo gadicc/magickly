@@ -45,6 +45,9 @@ export default function CandleStickPage() {
           target={ref}
           filename={`SevenBranchedCandleStick-${version === DEFAULT_CANDLESTICK_VERSION ? "magickly-export" : `${version}-magickly-export`}`}
           link={{ slug: "seven-branched-candlestick", props: { version } }}
+          // The version is not in the page's address yet (plan 097,
+          // follow-ups), so a shared link keeps no options.
+          shareHint={null}
         />
         <VersionNote
           note={CANDLESTICK_VERSION_NOTES[version]}

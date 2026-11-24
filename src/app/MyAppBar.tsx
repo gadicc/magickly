@@ -646,7 +646,7 @@ export default function ButtonAppBar() {
               }}
             >
               <SearchButton />
-              <ShareButton title={title} />
+              <ShareButton />
               {userId ? (
                 <span>
                   <IconButton

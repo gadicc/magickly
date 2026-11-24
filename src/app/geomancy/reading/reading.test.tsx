@@ -72,12 +72,18 @@ describe("geomancy reading page", () => {
   // insertion at the same place (before that, 81367 90d5e50d…, 81357
   // f3d03d65… and 81368 42c28fb8…), and when its stage 2 moved the page
   // link to Share, removing only the block's "Copy page link" line (before
-  // that, 92078 ec8a8774…, 92068 a855467e… and 92079 a2bae48b…); the
-  // bytes are otherwise those from before the rekey.
+  // that, 92078 ec8a8774…, 92068 a855467e… and 92079 a2bae48b…), and
+  // when decision 7 added the share row at the end of the block: cut out
+  // that row and its two style tags, one unbroken insertion, and the old
+  // bytes return exactly (before that, 87590 399b85e3…, 87580 e5823b70…
+  // and 87591 29885919…; in its first version, without the row's
+  // `data-share-text` hook for tests, 89972 cc6e7c8a…, 89962 759a05d2…
+  // and 89973 7dde06a2…); the bytes are otherwise those from before the
+  // rekey.
   it.each([
     [
       "1",
-      "87590 399b85e313d99d782171f937802959dea8e95f77024e945001e7887d759b9aa7",
+      "89991 6d50c4c1c46fb72ef5e4b2a9246fd6565603b9655191ddefe313264bf9e103fa",
       [
         "The querent: their life",
         "Good, except in war.",
@@ -87,7 +93,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "7",
-      "87580 e5823b70ebeb6f7a50e27ff20740da5196e036ed9fa03bd3ace526d5d71ae23d",
+      "89981 100981565772630066e2ae0c66ebf1e721c67bc6ffec9e49594f6645c55dc1b7",
       [
         "Marriage and other unions",
         "Indifferent.",
@@ -97,7 +103,7 @@ describe("geomancy reading page", () => {
     ],
     [
       "12",
-      "87591 298859199dd982ac99354d04ed26ba2403bb2efe9fb0828322f6e5da24882cc2",
+      "89992 caccf18b0c9846f09d813c8797db18cf28a52ce2281d6604617b9559a62e8fda",
       [
         "Enemies; servants; imprisonment",
         "Unfavourable generally.",

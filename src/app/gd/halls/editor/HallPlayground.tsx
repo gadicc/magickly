@@ -919,6 +919,8 @@ export default function HallPlayground() {
           filename={exportFilename(preset)}
           prepare={embedGdHallFonts}
           credit={hallArtCredit}
+          // Its own share links below carry the hall itself.
+          share={false}
         />
         <div className={styles.shareButtons}>
           <Button

@@ -391,6 +391,9 @@ export default function KameaSigils({
           }
           link={link}
           linkNote={link ? undefined : t(NO_SIGIL_LINK)}
+          // A sigil's link is personal, and says so; with no text, the
+          // bare page keeps nothing worth a hint.
+          shareHint={null}
         />
         <ReductionTable reduction={reduction} />
       </ToolPanel>

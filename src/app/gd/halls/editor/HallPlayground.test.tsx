@@ -231,6 +231,11 @@ describe("the /gd/halls/editor page", { timeout: 20_000 }, () => {
     expect(screen.getByRole("application")).toBeTruthy();
     expect(titles()).toEqual(["Neophyte Temple", "Neophyte Temple"]);
     expect(screen.queryByRole("button", { name: "Done" })).toBeNull();
+    // Its own share links carry the hall; the box has no share row.
+    expect(screen.getAllByRole("group", { name: /^(SVG|PNG)$/ })).toHaveLength(
+      2,
+    );
+    expect(screen.queryByRole("group", { name: "This page" })).toBeNull();
     expect(screen.getByRole("button", { name: "Undo" })).toHaveProperty(
       "disabled",
       true,

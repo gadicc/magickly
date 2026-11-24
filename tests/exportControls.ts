@@ -77,3 +77,15 @@ export async function imageLinkNote(
   const alerts = screen.getAllByRole("alert");
   return alerts[alerts.length - 1].textContent ?? "";
 }
+
+/**
+ * The export box's share row (plan 097, decision 7) as a reader sees it:
+ * its name and hint, or null when the page shows no share row.
+ */
+export function shareRowText(index = 0): string[] | null {
+  const row = screen.queryAllByRole("group", { name: "This page" })[index];
+  if (!row) return null;
+  return [...(row.querySelector("[data-share-text]")?.children ?? [])].map(
+    (span) => span.textContent ?? "",
+  );
+}

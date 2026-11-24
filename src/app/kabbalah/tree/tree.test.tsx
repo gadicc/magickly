@@ -32,5 +32,9 @@ describe("TreeOfLifeView", () => {
       /<button[^>]*aria-label="Copy SVG image link"[^>]*aria-disabled/,
     );
     expect(html).not.toContain("Copy page link");
+    // Share is also the export box's last row, keeping the settings.
+    expect(html).toMatch(
+      /role="group" aria-label="This page">.*?<span[^>]*>This page<\/span><span[^>]*>With your chosen options<\/span>.*?aria-label="Share this page"/,
+    );
   });
 });

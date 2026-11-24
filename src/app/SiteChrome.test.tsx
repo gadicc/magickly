@@ -12,7 +12,7 @@ vi.mock("./clientProviders", () => ({
 }));
 vi.mock("./MyAppBar", async () => {
   const { default: ShareButton } = await import("./ShareButton");
-  return { default: () => <ShareButton title="Rose Sigils" /> };
+  return { default: () => <ShareButton /> };
 });
 vi.mock("./SiteFooter", () => ({ default: () => null }));
 vi.mock("@/analytics/VercelInsights", () => ({ default: () => null }));

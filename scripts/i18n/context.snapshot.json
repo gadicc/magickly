@@ -1,7 +1,7 @@
 {
   "version": 1,
   "hashing": "sha256-utf8-lf-nfc-v1",
-  "contextHash": "704ca586cdf1a5c926d82dddeea4ccc83a364cdc04313d256d725a1ac3809064",
+  "contextHash": "6ea57c420d95fc56ccc08b55fb61f90d8ccce8fae3442d205a54fb87707bcecd",
   "configHash": "c622469fbb05d642191808ec08843f00e80885dfab9bcb9057aac7d7d47dad9d",
   "scopes": {
     "editor": {
@@ -192,10 +192,10 @@
       }
     },
     "export": {
-      "contextHash": "0a3afb09826a2bd8f585c654451564b399297beeafa4dba13107807595cffec4",
+      "contextHash": "61bbe96904d18d99a99fd041c08cfdba3ef8edc12286e071925e8b44379786da",
       "files": {
-        "src/export/ExportControls.tsx": "bb1f719e648bff8ee89517170cdfa6f1cc6942a132c3401befce9d8228e570d3",
-        "src/export/FileIcon.tsx": "02c69fcc595d757691e5713cb99375b7e29cd32e1cbc887f1161522b43799235",
+        "src/export/ExportControls.tsx": "640dc197ff32b0dc615813fbf56735f463d35bce8dbdae90c7e4449b76c93d2e",
+        "src/export/FileIcon.tsx": "ebd071265f75af333fb93a1aa354b5aa0f4e5d552fcf659a67d1e09e81d8d99e",
         "src/export/exportRuntime.ts": "3df684d7241979c1181fedf5c1c7de4cd0185648eabfa6f0385a3e2e85cfbee5",
         "src/export/formats.ts": "197d0c7c9c05b26d1a7f26f2031ab291f6890d8827ce16759ee6a4b7430d08d0",
         "src/export/pngText.ts": "307370287a3a98b3bad506dc8cb5259a3fe499e8f70a87974ad0137289b60ad9",
@@ -251,11 +251,11 @@
       }
     },
     "shell": {
-      "contextHash": "9abb6efcf6b20a06181400359c2fb1cb983208d320dbe6587f9db5e8889e116a",
+      "contextHash": "d02c15095b0f6c8553af5bdc564e68c115f429a7e59f250fdbf3fba8060834ba",
       "files": {
         "src/app/HomeTiles.tsx": "56a5222b890ad4a683fa2abce5794fba14df2cf55c6375b40127a33a36de342e",
-        "src/app/ShareButton.tsx": "5d71d7807a384054d1976e90efb1866030820666915317f94fda534a4d60abb8",
-        "src/app/pageShare.tsx": "aa95a4c08d0e3142fa50c3499d3d6cd247ebe23f02084b5652dea5e07546297b",
+        "src/app/ShareButton.tsx": "a947effd6bdce05ead8ba655808224e8a7c31873e20f5c58ca6acdba793450e6",
+        "src/app/pageShare.tsx": "859add7f4d7eb6671174685f84eac1f8c81a4fc97a5e3e2ece21394e31d51b2f",
         "src/app/pathnames.ts": "9c0be75d0969dd80642977f7a19f408bcdbe20932f49cac2edc461a5998c4773",
         "src/i18n/AccountLocaleSync.tsx": "e7ddd0d42a6fe4a95dbbe9c816a4feb3d634aefafa42083e8f2f9a60049a729e",
         "src/i18n/EnglishText.tsx": "342223f2f19e8c83e9e05f4f351533c03c4765d4b13c5d939115633d4fda9f17",

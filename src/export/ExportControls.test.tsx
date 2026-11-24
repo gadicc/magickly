@@ -10,9 +10,11 @@ import {
 } from "@testing-library/react";
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { type PageShare, usePageShare } from "@/app/pageShare";
 import LocaleProvider from "@/i18n/LocaleProvider";
 import { messages as hebrew } from "@/locales/he/messages.js";
 import type { AnyComponentImageLink } from "@/render/componentImageUrl";
+import { renderWithShare } from "../../tests/pageShare";
 import ExportControls, { type ExportControlsProps } from "./ExportControls";
 import { type ExportFormat, PNG_FORMAT, SVG_FORMAT } from "./formats";
 import { SvgExportError } from "./svgExport";
@@ -51,7 +53,8 @@ const expectLabelsInNames = () => {
   const buttons = screen
     .getAllByRole("group")
     .flatMap((row) => within(row).getAllByRole("button"));
-  expect(buttons).toHaveLength(6);
+  // Three in each format's row, and the share row's Share.
+  expect(buttons).toHaveLength(7);
   for (const button of buttons) {
     const label = button.textContent ?? "";
     expect(label).not.toBe("");
@@ -203,6 +206,8 @@ describe("ExportControls", () => {
       "Save PNG",
       "Save SVG",
       "Copy SVG to clipboard",
+      // Share too, so its confirmation and the copy's never overlap.
+      "Share this page",
     ])
       expect((screen.getByLabelText(label) as HTMLButtonElement).disabled).toBe(
         true,
@@ -210,6 +215,9 @@ describe("ExportControls", () => {
     resolve(new Blob());
     expect(await screen.findByText("Copied PNG to clipboard")).toBeTruthy();
     expect((copy as HTMLButtonElement).disabled).toBe(false);
+    expect(
+      (screen.getByLabelText("Share this page") as HTMLButtonElement).disabled,
+    ).toBe(false);
   });
 
   it("runs prepare on a clone for the PNG paths only, before rasterising", async () => {
@@ -369,6 +377,7 @@ describe("ExportControls", () => {
     expect(rows.map((row) => row.getAttribute("aria-label"))).toEqual([
       "SVG",
       "PNG",
+      "This page",
     ]);
     for (const [index, format] of ["SVG", "PNG"].entries())
       expect(
@@ -383,10 +392,19 @@ describe("ExportControls", () => {
         [`Copy ${format} to clipboard`, "Copy"],
         [`Copy ${format} image link`, "Link"],
       ]);
+    expect(
+      within(rows[2])
+        .getAllByRole("button")
+        .map((button) => [
+          button.getAttribute("aria-label"),
+          button.textContent,
+        ]),
+    ).toEqual([["Share this page", "Share"]]);
     // So a voice command that says what it sees reaches the button.
     expectLabelsInNames();
     expect(within(rows[0]).getByText("Sharp at any size")).toBeTruthy();
     expect(within(rows[1]).getByText("Pastes anywhere")).toBeTruthy();
+    expect(within(rows[2]).getByText("With your chosen options")).toBeTruthy();
     // The file icons are decorative; the names are beside them.
     expect(
       [...document.querySelectorAll("[data-file-icon]")].map((icon) => [
@@ -397,11 +415,12 @@ describe("ExportControls", () => {
     ).toEqual([
       ["svg", "true", "SVG"],
       ["png", "true", "PNG"],
+      ["web", "true", "WEB"],
     ]);
-    // Nothing to open until a link is copied, and nothing beside the rows:
-    // the page link is Share's, in the app bar (plan 097, decision 3).
+    // Nothing to open until a link is copied, and nothing outside the
+    // rows: the page link is Share's (plan 097, decisions 3 and 7).
     expect(screen.queryAllByRole("link")).toEqual([]);
-    expect(screen.getAllByRole("button")).toHaveLength(6);
+    expect(screen.getAllByRole("button")).toHaveLength(7);
   });
 
   it("copies each format's absolute image link and offers to open it", async () => {
@@ -527,6 +546,7 @@ describe("ExportControls", () => {
       ["שמירה", "שמירה כ־PNG"],
       ["העתקה", "העתקה ללוח כ־PNG"],
       ["קישור", "העתקת קישור לתמונת ה־PNG"],
+      ["שיתוף", "שיתוף העמוד הזה"],
     ]);
   });
 
@@ -610,7 +630,10 @@ describe("ExportControls", () => {
         link={{ slug: "rose-sigil", props: { text: "גדי", rose: true } }}
       />,
     );
-    expect(screen.queryByText(/what you entered/)).toBeNull();
+    // Before the tap, only the share row's hint says so.
+    expect(
+      screen.getAllByText(/what you entered/).map((node) => node.textContent),
+    ).toEqual(["Includes what you entered"]);
     fireEvent.click(
       screen.getByRole("button", { name: "Copy PNG image link" }),
     );
@@ -628,7 +651,7 @@ describe("ExportControls", () => {
 
   it("offers Save and Copy only on a page with no image route", () => {
     render(<Page filename="hall" viewBox="0 0 1 1" />);
-    for (const row of screen.getAllByRole("group"))
+    for (const row of screen.getAllByRole("group").slice(0, 2))
       expect(
         within(row)
           .getAllByRole("button")
@@ -666,8 +689,14 @@ describe("ExportControls", () => {
       "SVG",
       "PNG",
       "PDF",
+      "This page",
     ]);
-    expect(three.slice(0, 2).map((row) => row.outerHTML)).toEqual(two);
+    expect(three.map((row) => row.outerHTML)).toEqual([
+      two[0],
+      two[1],
+      expect.anything(),
+      two[2],
+    ]);
     expect(
       within(three[2])
         .getAllByRole("button")
@@ -690,5 +719,142 @@ describe("ExportControls", () => {
     expect(runtime.copyText).toHaveBeenLastCalledWith(
       `${window.location.origin}/api/render/seven-branched-candlestick?fmt=pdf`,
     );
+  });
+});
+
+describe("ExportControls' share row", () => {
+  const shareRow = () => screen.queryByRole("group", { name: "This page" });
+  /** The row's name and hint, as shown. */
+  const rowText = () =>
+    [...(shareRow()?.querySelector("[data-share-text]")?.children ?? [])].map(
+      (span) => span.textContent,
+    );
+
+  /** A page that registers its link for Share, as the personal ones do. */
+  function Registered({
+    registration,
+    ...rest
+  }: {
+    registration: PageShare | undefined;
+  } & Partial<ExportControlsProps>) {
+    usePageShare(registration);
+    return <Page filename="page" viewBox="0 0 1 1" {...rest} />;
+  }
+  const PERSONAL: PageShare = {
+    url: () => "/gd/sigils?text=x",
+    personal: true,
+  };
+  const BARE: PageShare = { url: () => "/gd/sigils", personal: false };
+
+  it("comes last, after a rule, with the default hint", () => {
+    render(<Page filename="tree" viewBox="0 0 1 1" link={TREE} />);
+    const rows = screen.getAllByRole("group");
+    expect(rows.at(-1)).toBe(shareRow());
+    expect(rowText()).toEqual(["This page", "With your chosen options"]);
+    expect(
+      shareRow()
+        ?.querySelector('[data-file-icon="web"]')
+        ?.getAttribute("aria-hidden"),
+    ).toBe("true");
+  });
+
+  it("takes the page's own hint, or none", () => {
+    render(
+      <Page filename="a" viewBox="0 0 1 1" shareHint="With your colours" />,
+    );
+    expect(rowText()).toEqual(["This page", "With your colours"]);
+    cleanup();
+    render(<Page filename="b" viewBox="0 0 1 1" shareHint={null} />);
+    // The name alone, centred in the row as the others are.
+    expect(rowText()).toEqual(["This page"]);
+  });
+
+  it.each([
+    ["the default", undefined],
+    ["an override", "With your colours"],
+    ["no hint", null],
+  ])(
+    "says a personal registration's link includes what was entered, over %s",
+    (_case, shareHint) => {
+      renderWithShare(
+        <Registered registration={PERSONAL} shareHint={shareHint} />,
+      );
+      expect(rowText()).toEqual(["This page", "Includes what you entered"]);
+    },
+  );
+
+  it("follows the registration as it changes", () => {
+    const { rerender } = renderWithShare(
+      <Registered registration={BARE} shareHint={null} />,
+    );
+    expect(rowText()).toEqual(["This page"]);
+    rerender(<Registered registration={PERSONAL} shareHint={null} />);
+    expect(rowText()).toEqual(["This page", "Includes what you entered"]);
+    rerender(<Registered registration={BARE} shareHint={null} />);
+    expect(rowText()).toEqual(["This page"]);
+  });
+
+  it("goes by the registration over the image contract", () => {
+    // A sigil page with no sigil registers its bare page, which is not
+    // personal, while its last drawing's contract is.
+    renderWithShare(
+      <Registered
+        registration={BARE}
+        shareHint={null}
+        link={{ slug: "rose-sigil", props: { text: "גדי", rose: true } }}
+      />,
+    );
+    expect(rowText()).toEqual(["This page"]);
+  });
+
+  it("goes by the image contract until a page registers, as on the server", () => {
+    render(
+      <Page
+        filename="sigil"
+        viewBox="0 0 1 1"
+        shareHint={null}
+        link={{ slug: "rose-sigil", props: { text: "גדי", rose: true } }}
+      />,
+    );
+    expect(rowText()).toEqual(["This page", "Includes what you entered"]);
+  });
+
+  it("is absent where the page shares by its own means", () => {
+    render(<Page filename="hall" viewBox="0 0 1 1" share={false} />);
+    expect(shareRow()).toBeNull();
+    expect(
+      screen.getAllByRole("group").map((row) => row.getAttribute("aria-label")),
+    ).toEqual(["SVG", "PNG"]);
+    expect(screen.queryByRole("button", { name: /Share/ })).toBeNull();
+    expect(document.querySelector('[data-file-icon="web"]')).toBeNull();
+  });
+
+  it("confirms in the box's own snackbar, and copies the address with nothing registered", async () => {
+    const writeText = vi.fn(async (_text: string) => {});
+    Object.defineProperty(navigator, "share", {
+      configurable: true,
+      value: undefined,
+    });
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    });
+    try {
+      window.history.replaceState(null, "", "/kabbalah/tree?flip=true#x");
+      render(<Page filename="tree" viewBox="0 0 1 1" link={TREE} />);
+      fireEvent.click(screen.getByRole("button", { name: "Share this page" }));
+      expect(writeText).toHaveBeenCalledWith(
+        `${window.location.origin}/kabbalah/tree?flip=true#x`,
+      );
+      expect((await screen.findByRole("alert")).textContent).toBe(
+        "Copied link to this page",
+      );
+    } finally {
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: undefined,
+      });
+      window.history.replaceState(null, "", "/");
+    }
   });
 });

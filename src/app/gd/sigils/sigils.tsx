@@ -304,6 +304,9 @@ export default function Sigils({
           filename={`RoseSigil-${canonical.split(" ").join("-")}${version === DEFAULT_ROSE_VERSION ? "" : `-${version}`}`}
           link={link}
           linkNote={link ? undefined : t(NO_SIGIL_LINK)}
+          // A sigil's link is personal, and says so; with none, the bare
+          // page keeps nothing worth a hint.
+          shareHint={null}
         />
         <VersionNote
           note={ROSE_VERSION_NOTES[version]}

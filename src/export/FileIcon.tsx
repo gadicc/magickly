@@ -17,13 +17,15 @@ export type FileIconType = keyof typeof COLORS;
 /**
  * A page with a folded corner and the extension in a coloured band.
  * Decorative: the format's name is beside it in text. The extension stays
- * in Latin letters, left to right, in every language.
+ * in Latin letters, left to right, in every language. `web` is the page
+ * itself, for the share row (plan 097, decision 7): drawn the same, with
+ * WEB in the band, in the link colour.
  */
 export default function FileIcon({
   type,
   size = 34,
 }: {
-  type: FileIconType;
+  type: FileIconType | "web";
   /** Block size in px; the inline size follows the 22 × 26 page. */
   size?: number;
 }) {
@@ -34,20 +36,25 @@ export default function FileIcon({
       aria-hidden="true"
       focusable="false"
       data-file-icon={type}
-      sx={(theme) => ({
-        // The band's text is white on light, and the page's own background
-        // on dark, where the band is pale.
-        color: COLORS[type].light,
-        "--file-icon-text": "#fff",
-        ...theme.applyStyles("dark", {
-          color: COLORS[type].dark,
-          "--file-icon-text": (theme.vars ?? theme).palette.background.default,
-        }),
-        blockSize: size,
-        inlineSize: (size * 22) / 26,
-        flex: "none",
-        overflow: "visible",
-      })}
+      sx={(theme) => {
+        // The link colour is a theme variable that follows the scheme.
+        const link = (theme.vars ?? theme).palette.primary.main;
+        return {
+          // The band's text is white on light, and the page's own
+          // background on dark, where the band is pale.
+          color: type === "web" ? link : COLORS[type].light,
+          "--file-icon-text": "#fff",
+          ...theme.applyStyles("dark", {
+            color: type === "web" ? link : COLORS[type].dark,
+            "--file-icon-text": (theme.vars ?? theme).palette.background
+              .default,
+          }),
+          blockSize: size,
+          inlineSize: (size * 22) / 26,
+          flex: "none",
+          overflow: "visible",
+        };
+      }}
     >
       <path
         d="M3 1h10.5L20 7.5V24a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"

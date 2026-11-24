@@ -431,6 +431,36 @@ msgstr "Copied {format} image link. It includes what you entered here."
 msgid "Open"
 msgstr "Open"
 
+#. Name of the last row in the export box below a drawing, after the file formats SVG and PNG: the web page the reader is on, which the row's Share sends
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "This page"
+msgstr "This page"
+
+#. Hint under "This page" in the export box: the shared link keeps the settings the reader chose on the page (a colour scale, a font)
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "With your chosen options"
+msgstr "With your chosen options"
+
+#. Hint under "This page" in the export box, on a page made from what the reader typed (a name, a reading): the shared link carries it
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Includes what you entered"
+msgstr "Includes what you entered"
+
+#. Label under the share icon in the export box's "This page" row: shares a link to the page, as the app bar's Share does
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Share"
+msgstr "Share"
+
+#. Accessible name of the Share button in the export box's "This page" row; it contains the visible label Share
+#. js-lingui-explicit-id
+#: src/export/ExportControls.tsx
+msgid "Share this page"
+msgstr "Share this page"
+
 #. js-lingui-explicit-id
 #: src/doc/useRitualEditorLayout.ts
 msgid "Source"
@@ -936,29 +966,6 @@ msgstr "The page is unavailable or does not exist."
 msgid "Return home"
 msgstr "Return home"
 
-#. Confirms that Share, where the browser has no share sheet, copied the page's link
-#. js-lingui-explicit-id
-#: src/app/ShareButton.tsx
-msgid "Copied link to this page"
-msgstr "Copied link to this page"
-
-#. Confirms that Share copied the link to a page made from what the reader typed (a name, a reading), and warns that the link carries it
-#. js-lingui-explicit-id
-#: src/app/ShareButton.tsx
-msgid "Copied link to this page. It includes what you entered here."
-msgstr "Copied link to this page. It includes what you entered here."
-
-#. Shown when Share could neither open the browser's share sheet nor copy the page's link
-#. js-lingui-explicit-id
-#: src/app/ShareButton.tsx
-msgid "Could not copy the link to this page."
-msgstr "Could not copy the link to this page."
-
-#. js-lingui-explicit-id
-#: src/app/ShareButton.tsx
-msgid "Check out \"{title}\" on magick.ly, the open source magick app!"
-msgstr "Check out \"{title}\" on magick.ly, the open source magick app!"
-
 #. js-lingui-explicit-id
 #: src/app/ShareButton.tsx
 msgid "share"
@@ -1019,6 +1026,29 @@ msgstr "Old browser storage could not be verified. Public content and sign-out r
 #: src/app/clientProviders.tsx
 msgid "Checking this browser for offline work before allowing sign-in…"
 msgstr "Checking this browser for offline work before allowing sign-in…"
+
+#. Confirms that Share, where the browser has no share sheet, copied the page's link
+#. js-lingui-explicit-id
+#: src/app/pageShare.tsx
+msgid "Copied link to this page"
+msgstr "Copied link to this page"
+
+#. Confirms that Share copied the link to a page made from what the reader typed (a name, a reading), and warns that the link carries it
+#. js-lingui-explicit-id
+#: src/app/pageShare.tsx
+msgid "Copied link to this page. It includes what you entered here."
+msgstr "Copied link to this page. It includes what you entered here."
+
+#. Shown when Share could neither open the browser's share sheet nor copy the page's link
+#. js-lingui-explicit-id
+#: src/app/pageShare.tsx
+msgid "Could not copy the link to this page."
+msgstr "Could not copy the link to this page."
+
+#. js-lingui-explicit-id
+#: src/app/pageShare.tsx
+msgid "Check out \"{title}\" on magick.ly, the open source magick app!"
+msgstr "Check out \"{title}\" on magick.ly, the open source magick app!"
 
 #. js-lingui-explicit-id
 #: src/app/temples/feedback.ts

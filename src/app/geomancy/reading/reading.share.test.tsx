@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { shareRowText } from "../../../../tests/exportControls";
 import { renderWithShare, tapShare } from "../../../../tests/pageShare";
 import GeomancyReading from "./reading";
 import { readingFromSearchParams, readingSearchParams } from "./readingState";
@@ -48,6 +49,7 @@ describe("the geomancy reading's Share", () => {
     expect(shared()?.url()).toContain("house=7");
     expect(shared()?.url()).toContain("planet=mars");
     expect(shared()?.personal).toBe(true);
+    expect(shareRowText()).toEqual(["This page", "Includes what you entered"]);
   });
 
   it("follows the reading as it changes", async () => {

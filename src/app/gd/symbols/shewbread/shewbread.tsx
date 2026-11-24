@@ -24,6 +24,8 @@ export default function CandleStickPage() {
           target={ref}
           filename="TableOfShewbread-magickly-export"
           link={{ slug: "table-of-shewbread", props: {} }}
+          // No options to keep: the page is the same for everyone.
+          shareHint={null}
         />
         <DrawnAfter name="TableOfShewbread" />
         <OpenSource

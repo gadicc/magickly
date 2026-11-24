@@ -35,7 +35,7 @@
     {
       "id": "export",
       "paths": ["src/export/"],
-      "description": "Save, copy and link controls under a drawing, one row per file format. SVG, PNG and PDF are file formats and stay in Latin letters."
+      "description": "Save, copy and link controls under a drawing, one row per file format, and a last row, 'This page', that shares a link to the page itself. SVG, PNG and PDF are file formats and stay in Latin letters."
     },
     {
       "id": "kabbalah",
@@ -53,7 +53,7 @@
         "src/app/ShareButton.tsx",
         "src/app/pageShare.tsx"
       ],
-      "description": "Shared navigation, language settings, search, the app bar's Share and homepage links."
+      "description": "Shared navigation, language settings, search, Share (the app bar's button and the export box's 'This page' row, which say the same) and homepage links."
     },
     {
       "id": "temples",

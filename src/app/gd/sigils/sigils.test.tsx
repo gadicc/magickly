@@ -5,6 +5,7 @@ import {
   copiedImageLink,
   imageLinkNote,
   imageLinkOffered,
+  shareRowText,
 } from "../../../../tests/exportControls";
 import { renderWithShare, tapShare } from "../../../../tests/pageShare";
 import Sigils from "./sigils";
@@ -167,6 +168,7 @@ describe("/gd/sigils' Share", () => {
     );
     const sigil = (text: string) =>
       `${window.location.origin}/gd/sigils?${new URLSearchParams({ text, rose: "false", version: "regardie1939" })}`;
+    expect(shareRowText()).toEqual(["This page", "Includes what you entered"]);
     expect(await tapShare()).toEqual({
       copied: [sigil("כתר")],
       said: "Copied link to this page. It includes what you entered here.",
@@ -187,6 +189,7 @@ describe("/gd/sigils' Share", () => {
         fireEvent.change(screen.getByPlaceholderText("Sigil text"), {
           target: { value },
         });
+        expect(shareRowText()).toEqual(["This page"]);
         expect(await tapShare()).toEqual({
           copied: [`${window.location.origin}/gd/sigils`],
           said: "Copied link to this page",

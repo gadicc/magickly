@@ -20,9 +20,9 @@ export function renderWithShare(ui: React.ReactElement) {
   }
   const result = render(ui, {
     wrapper: ({ children }) => (
-      <PageShareProvider>
+      <PageShareProvider title="Test page">
         <Probe />
-        <ShareButton title="Test page" />
+        <ShareButton />
         {children}
       </PageShareProvider>
     ),

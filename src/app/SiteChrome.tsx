@@ -7,6 +7,7 @@ import ClientProviders from "./clientProviders";
 import MyAppBar from "./MyAppBar";
 import { PageShareProvider } from "./pageShare";
 import SiteFooter from "./SiteFooter";
+import useSiteNav from "./useSiteNav";
 
 /**
  * The app bar's height as `--app-bar`, from the toolbar's own sizes (56px
@@ -32,17 +33,26 @@ const appBarStyles = (theme: Theme) => ({
   ":root": appBarHeight(theme.mixins.toolbar),
 });
 
+/**
+ * The page-share provider, titled as the app bar titles the page, so the
+ * app bar's Share and the export box's share row send the same sheet.
+ */
+function SharedPage({ children }: { children: ReactNode }) {
+  const { title } = useSiteNav();
+  return <PageShareProvider title={title}>{children}</PageShareProvider>;
+}
+
 /** Ordinary site chrome; keep its browser database and recovery graph out of the private reader's eager entry. */
 export default function SiteChrome({ children }: { children: ReactNode }) {
   return (
     <>
       <ClientProviders>
         <GlobalStyles styles={appBarStyles} />
-        <PageShareProvider>
+        <SharedPage>
           <MyAppBar />
           <div style={{ height: "var(--app-bar, 56px)" }} />
           {children}
-        </PageShareProvider>
+        </SharedPage>
         <SiteFooter />
       </ClientProviders>
       <VercelInsights />

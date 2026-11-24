@@ -11,6 +11,7 @@ import {
   copiedImageLink,
   imageLinkNote,
   imageLinkOffered,
+  shareRowText,
 } from "../../../../../tests/exportControls";
 import { renderWithShare, tapShare } from "../../../../../tests/pageShare";
 import KameaSigils from "./KameaSigils";
@@ -177,6 +178,7 @@ describe("/astrology/kamea/sigils' Share", () => {
     await drawing("Sigil of אלים on the Kamea of the Moon");
     const page = (finals: boolean) =>
       `${window.location.origin}${kameaSigilPagePath({ planet: "luna", text: "אלים", finals })}`;
+    expect(shareRowText()).toEqual(["This page", "Includes what you entered"]);
     expect(await tapShare()).toEqual({
       copied: [page(false)],
       said: "Copied link to this page. It includes what you entered here.",
@@ -207,6 +209,7 @@ describe("/astrology/kamea/sigils' Share", () => {
         fireEvent.change(screen.getByRole("textbox", { name: "Hebrew name" }), {
           target: { value },
         });
+        expect(shareRowText()).toEqual(["This page"]);
         expect(await tapShare()).toEqual({
           copied: [`${window.location.origin}/astrology/kamea/sigils`],
           said: "Copied link to this page",

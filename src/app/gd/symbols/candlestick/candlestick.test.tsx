@@ -1,7 +1,10 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { copiedImageLink } from "../../../../../tests/exportControls";
+import {
+  copiedImageLink,
+  shareRowText,
+} from "../../../../../tests/exportControls";
 import Candlestick from "./candlestick";
 
 afterEach(cleanup);
@@ -30,6 +33,8 @@ describe("/gd/symbols/candlestick's versions", () => {
       "https://archive.org/details/crowley-equinox_202110/The%20Equinox%20Vol.%201%2C%20No.%202/page/n266",
     );
     expect(await copiedImageLink()).not.toContain("version=");
+    // Nor is it in the page's address yet, so Share promises nothing.
+    expect(shareRowText()).toEqual(["This page"]);
   });
 
   it("draws the modern arrangement when chosen, and links its image", async () => {

@@ -14,6 +14,7 @@ import {
   copiedImageLink,
   imageLinkNote,
   imageLinkOffered,
+  shareRowText,
 } from "../../../../tests/exportControls";
 import Tablets, { downloadName } from "./tablets";
 
@@ -91,6 +92,7 @@ describe("/enochian/tablets", () => {
   it("offers the four Watchtowers and the Union by name and draws each", () => {
     const { container } = render(<Tablets />);
     expect(drawn(container).slice(0, 4).join("")).toBe("bOaZ");
+    expect(shareRowText()).toEqual(["This page", "With your chosen options"]);
     const expected = {
       Earth: "bOaZ",
       Air: "rZil",

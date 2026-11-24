@@ -2,8 +2,14 @@
 import ContentCopy from "@mui/icons-material/ContentCopy";
 import FileDownloadOutlined from "@mui/icons-material/FileDownloadOutlined";
 import LinkIcon from "@mui/icons-material/Link";
+import ShareIcon from "@mui/icons-material/Share";
 import { Alert, Box, Button, Snackbar } from "@mui/material";
 import React from "react";
+import {
+  SHARE_CONFIRMATION_MS,
+  useSharedPersonal,
+  useSharePage,
+} from "@/app/pageShare";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
 import type { AnyComponentImageLink } from "@/render/componentImageUrl";
 import { CONTRACTS } from "@/render/contracts";
@@ -89,6 +95,31 @@ const TEXT = {
     comment:
       "Action in the confirmation after copying a drawing's image link, or failing to: opens that image in a new tab",
   },
+  thisPage: /*i18n*/ {
+    id: "This page",
+    comment:
+      "Name of the last row in the export box below a drawing, after the file formats SVG and PNG: the web page the reader is on, which the row's Share sends",
+  },
+  shareHint: /*i18n*/ {
+    id: "With your chosen options",
+    comment:
+      'Hint under "This page" in the export box: the shared link keeps the settings the reader chose on the page (a colour scale, a font)',
+  },
+  sharePersonalHint: /*i18n*/ {
+    id: "Includes what you entered",
+    comment:
+      'Hint under "This page" in the export box, on a page made from what the reader typed (a name, a reading): the shared link carries it',
+  },
+  share: /*i18n*/ {
+    id: "Share",
+    comment:
+      "Label under the share icon in the export box's \"This page\" row: shares a link to the page, as the app bar's Share does",
+  },
+  sharePage: /*i18n*/ {
+    id: "Share this page",
+    comment:
+      'Accessible name of the Share button in the export box\'s "This page" row; it contains the visible label Share',
+  },
 } satisfies Record<string, ExportMessage>;
 
 interface Feedback {
@@ -96,6 +127,8 @@ interface Feedback {
   message: string;
   /** An image the confirmation offers to open. */
   open?: string;
+  /** How long it stays, when not the block's own default. */
+  duration?: number;
 }
 
 /** A confirmation shown; each its own, so its timer starts afresh. */
@@ -135,6 +168,18 @@ export interface ExportControlsProps {
   credit?: { svg: string; xmp: string };
   /** The rows, in order: SVG and PNG unless a test gives others. */
   formats?: readonly ExportFormat[];
+  /**
+   * The share row after the formats (plan 097, decision 7), on by
+   * default; false on a page with its own share links (the hall editor).
+   */
+  share?: boolean;
+  /**
+   * The share row's hint, translated: "With your chosen options" when
+   * left out, `null` for none, on a page with nothing to keep. A page
+   * whose shared link is personal shows "Includes what you entered"
+   * whatever this says.
+   */
+  shareHint?: string | null;
 }
 
 /** Absolute form of a site-relative path for copying. */
@@ -161,6 +206,51 @@ const actionSx = {
   "@media (pointer: coarse)": { minWidth: 48, minHeight: 52 },
 } as const;
 
+// A row: its icon, its name and hint, and its actions at the end.
+const rowSx = {
+  display: "flex",
+  alignItems: "center",
+  gap: 1.25,
+  paddingBlock: "2px",
+  paddingInline: "12px 4px",
+  "@media (pointer: coarse)": { paddingBlock: "4px" },
+} as const;
+
+/** A row's name, with its hint under it when there is one. */
+function RowName({
+  name,
+  hint,
+  ...data
+}: {
+  name: string;
+  hint?: string | null;
+  /** A test's hook, such as the share row's `data-share-text`. */
+  [data: `data-${string}`]: string;
+}) {
+  return (
+    <Box {...data} sx={{ flex: 1, minWidth: 0, lineHeight: 1.25 }}>
+      <Box
+        component="span"
+        sx={{ display: "block", fontWeight: 500, fontSize: "0.875rem" }}
+      >
+        {name}
+      </Box>
+      {hint ? (
+        <Box
+          component="span"
+          sx={{
+            display: "block",
+            fontSize: "0.75rem",
+            color: "text.secondary",
+          }}
+        >
+          {hint}
+        </Box>
+      ) : null}
+    </Box>
+  );
+}
+
 /**
  * Save, copy and link controls for a live SVG, one row per format (plan
  * 097). Each instance owns its feedback, so several can share a page.
@@ -173,8 +263,12 @@ export default function ExportControls({
   prepare,
   credit,
   formats = EXPORT_FORMATS,
+  share = true,
+  shareHint,
 }: ExportControlsProps) {
   const { t } = useUiLanguage();
+  const sharePage = useSharePage();
+  const registeredPersonal = useSharedPersonal();
   const [feedback, setShown] = React.useState<Shown | null>(null);
   const serial = React.useRef(0);
   const setFeedback = (next: Feedback | null) =>
@@ -242,6 +336,14 @@ export default function ExportControls({
   };
 
   const personal = link ? CONTRACTS[link.slug].personal : false;
+  // As the page registered for Share; until it has (on the server, and
+  // before its effects run), its image contract stands in.
+  const hint =
+    (registeredPersonal ?? personal)
+      ? t(TEXT.sharePersonalHint.id)
+      : shareHint === undefined
+        ? t(TEXT.shareHint.id)
+        : shareHint;
   const say = (message: ExportMessage, format: ExportFormat) =>
     t(message.id, { format: format.name });
   const copyLink = (format: ExportFormat, path: string | undefined) => {
@@ -299,38 +401,10 @@ export default function ExportControls({
               key={format.type}
               role="group"
               aria-label={format.name}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1.25,
-                paddingBlock: "2px",
-                paddingInline: "12px 4px",
-                "@media (pointer: coarse)": { paddingBlock: "4px" },
-              }}
+              sx={rowSx}
             >
               <FileIcon type={format.type} />
-              <Box sx={{ flex: 1, minWidth: 0, lineHeight: 1.25 }}>
-                <Box
-                  component="span"
-                  sx={{
-                    display: "block",
-                    fontWeight: 500,
-                    fontSize: "0.875rem",
-                  }}
-                >
-                  {format.name}
-                </Box>
-                <Box
-                  component="span"
-                  sx={{
-                    display: "block",
-                    fontSize: "0.75rem",
-                    color: "text.secondary",
-                  }}
-                >
-                  {t(format.hint.id)}
-                </Box>
-              </Box>
+              <RowName name={format.name} hint={t(format.hint.id)} />
               <Box sx={{ display: "flex", flex: "none" }}>
                 <Button
                   sx={actionSx}
@@ -380,6 +454,62 @@ export default function ExportControls({
             </Box>
           );
         })}
+        {share && (
+          <Box
+            role="group"
+            aria-label={t(TEXT.thisPage.id)}
+            sx={[
+              rowSx,
+              (theme) => ({
+                // A tint of the link colour sets the page apart from the
+                // files (plan 097, decision 7), inside the box's corners.
+                backgroundColor: theme.alpha(
+                  (theme.vars ?? theme).palette.primary.main,
+                  0.08,
+                ),
+                borderEndStartRadius: "11px",
+                borderEndEndRadius: "11px",
+                ...theme.applyStyles("dark", {
+                  backgroundColor: theme.alpha(
+                    (theme.vars ?? theme).palette.primary.main,
+                    0.1,
+                  ),
+                }),
+              }),
+            ]}
+          >
+            <FileIcon type="web" />
+            <RowName
+              name={t(TEXT.thisPage.id)}
+              hint={hint}
+              data-share-text=""
+            />
+            <Box sx={{ display: "flex", flex: "none" }}>
+              <Button
+                sx={actionSx}
+                aria-label={t(TEXT.sharePage.id)}
+                // Like every action here, so its confirmation and an
+                // export's never overlap in the one snackbar.
+                disabled={busy}
+                // Nothing awaited before it: the sheet or the copy starts
+                // inside the tap.
+                onClick={() =>
+                  sharePage().then(
+                    (outcome) =>
+                      outcome &&
+                      setFeedback({
+                        ...outcome,
+                        duration: SHARE_CONFIRMATION_MS,
+                      }),
+                  )
+                }
+              >
+                <ShareIcon />
+                <span>{t(TEXT.share.id)}</span>
+              </Button>
+            </Box>
+          </Box>
+        )}
       </Box>
       <Snackbar
         // A new confirmation is a new snackbar, so its timer restarts.
@@ -387,7 +517,7 @@ export default function ExportControls({
         open={feedback !== null}
         // An action needs time to reach; MUI also pauses while the
         // confirmation is hovered or focused.
-        autoHideDuration={feedback?.open ? 6000 : 2500}
+        autoHideDuration={feedback?.duration ?? (feedback?.open ? 6000 : 2500)}
         onClose={(_event, reason) =>
           reason !== "clickaway" && setFeedback(null)
         }
