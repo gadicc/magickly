@@ -1,4 +1,4 @@
-import { and, eq, lt, or, type SQL, sql } from "drizzle-orm";
+import { and, eq, inArray, lt, or, type SQL, sql } from "drizzle-orm";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { chatDailyUsage } from "@/db/schema/chatUsage";
 import type { ClientPolicy, PoolPolicy } from "./policies.ts";
@@ -100,7 +100,12 @@ export type Reservation = { ok: true } | { ok: false; refused: Bucket };
 /** Postgres's `division_by_zero`, which a refused reservation raises. */
 const REFUSED = "22012";
 
-function isRefusal(error: unknown): boolean {
+/**
+ * Whether a failed reservation was refused: the drivers wrap Postgres's
+ * error (drizzle's `DrizzleQueryError` around `NeonDbError`,
+ * `PostgresError` or PGlite's), so the code is looked for down `cause`.
+ */
+export function isRefusal(error: unknown): boolean {
   for (let at = error; at instanceof Error; at = at.cause)
     if ((at as { code?: unknown }).code === REFUSED) return true;
   return false;
@@ -116,8 +121,13 @@ function isRefusal(error: unknown): boolean {
  *
  * Put the narrowest bucket first (the client's): a client over its own
  * limit never touches a shared pool's row, and every caller locks rows in
- * the same order. Which bucket refused is read afterwards, so under a race
- * it is the best guess, not a guarantee.
+ * the same order. Which bucket refused is read afterwards, in one query,
+ * so under a race it is the best guess, not a guarantee.
+ *
+ * Each subject may appear once (Postgres can't update a row twice in one
+ * statement). Never call it inside a transaction: a refusal is an error,
+ * which aborts the transaction. Every refusal is logged by Postgres as
+ * `division by zero`; that is expected, not a fault.
  */
 export async function reserveTogether(
   db: ReservingDatabase,
@@ -126,6 +136,8 @@ export async function reserveTogether(
   now: Date,
 ): Promise<Reservation> {
   if (buckets.length === 0) return { ok: true };
+  if (new Set(buckets.map((one) => one.subject)).size < buckets.length)
+    throw new Error("reserveTogether: a subject appears more than once");
   const tooMany = buckets.find(
     (one) => !(Number.isInteger(units) && units > 0 && units <= one.limit),
   );
@@ -158,10 +170,25 @@ export async function reserveTogether(
   } catch (error) {
     if (!isRefusal(error)) throw error;
   }
-  for (const one of buckets)
-    if ((await dailyUsageLeft(db, one.subject, one.limit, now)) < units)
-      return { ok: false, refused: one };
-  return { ok: false, refused: buckets[buckets.length - 1] };
+  const rows = await db
+    .select({ subject: t.subject, submissions: t.submissions })
+    .from(t)
+    .where(
+      and(
+        inArray(
+          t.subject,
+          buckets.map((one) => one.subject),
+        ),
+        eq(t.day, day),
+      ),
+    );
+  const used = new Map(rows.map((row) => [row.subject, row.submissions]));
+  return {
+    ok: false,
+    refused:
+      buckets.find((one) => (used.get(one.subject) ?? 0) + units > one.limit) ??
+      buckets[buckets.length - 1],
+  };
 }
 
 /**

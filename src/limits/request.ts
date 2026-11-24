@@ -5,6 +5,8 @@ import { clientSubject } from "./client.ts";
 import { usageDay } from "./counters.ts";
 import type { ClientPolicy } from "./policies.ts";
 
+let secret: string | undefined;
+
 /**
  * The request's client bucket under `policy` for the UTC day `now` falls
  * in: its address as Vercel reports it, keyed by a day's key derived from
@@ -12,8 +14,6 @@ import type { ClientPolicy } from "./policies.ts";
  * read, not the rest of the auth configuration, so a route that counts
  * clients doesn't fail when another auth setting is missing.
  */
-let secret: string | undefined;
-
 export function requestClientSubject(
   request: Request,
   policy: ClientPolicy,

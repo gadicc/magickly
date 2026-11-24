@@ -42,7 +42,7 @@ export async function admitPersonalRender(
   const reserved = await reserveTogether(db, buckets, 1, now);
   if (reserved.ok) return null;
   return new Response(
-    "Too many new images today. Images already made still load; try again after midnight UTC.",
+    "Too many new images today. Try again after midnight UTC.",
     { status: 429, headers: refusalHeaders(usageDay(now).resetAt) },
   );
 }

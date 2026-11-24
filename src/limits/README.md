@@ -47,8 +47,9 @@ Why these sizes (24 November 2026):
   site's readers need. Headers can be forged, so it is fairness, not a
   boundary: the client and site pools are the bound.
 - **What they don't stop.** Someone with many addresses (one IPv6 /48 is
-  65,536 /64 buckets) can use up a shared pool on purpose: about 25
-  clients empty `ANONYMOUS_POOL`'s day and 334 `RENDER_POOL`'s. The pools
+  65,536 /64 buckets) can use up a shared pool on purpose: 17 addresses
+  empty `ANONYMOUS_POOL`'s day (each holds a chat bucket of 20 and a
+  reading bucket of 10) and 334 `RENDER_POOL`'s. The pools
   bound the cost; they don't keep the feature up for everyone else.
 
 ## How a limit works
@@ -64,7 +65,8 @@ Why these sizes (24 November 2026):
   never touches a pool, a pool that refuses leaves the client's bucket as
   it was, and no transaction is needed. Use `@/db/neon` (HTTP, one round
   trip, no connection held), not `@/db/neonFull`, whose direct connections
-  a burst could use up; never call it inside a transaction.
+  a burst could use up; never call it inside a transaction, and name each
+  subject once. A refusal shows in Neon's logs as `division by zero`.
 - **Atomic and day-stamped.** Each counter is one row in
   `chat_daily_usage` (named for its first user), updated with a guarded
   upsert, so concurrent requests on any instance never overshoot, and a

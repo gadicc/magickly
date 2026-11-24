@@ -16,8 +16,8 @@ import type { ReadingDatabase } from "./database.ts";
  * decision 2): its units, from the reader's own allowance when signed in
  * or the anonymous pool when not, the same counters chat uses. A
  * signed-out client may also use at most `READING_CLIENT.limit` a day of
- * the pool; its bucket and the pool are reserved in one transaction, so
- * both are counted or neither (`src/limits`). A reservation is never given
+ * the pool; its bucket and the pool are reserved together, so both are
+ * counted or neither (`reserveTogether`, `src/limits`). A reservation is never given
  * back: a failed call may still have cost.
  */
 
