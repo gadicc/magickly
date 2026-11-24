@@ -328,7 +328,11 @@ export function createSqlTempleReader(
           ),
         );
       if (!temple) return { status: "notFound" };
-      await returnJoinAttempt(database, actorId, attemptedAt);
+      // As in `join`: a failed refund costs the account one attempt and
+      // must not turn a matching code into an error page.
+      await returnJoinAttempt(database, actorId, attemptedAt).catch(
+        () => undefined,
+      );
       const [membership] = await database
         .select({ id: templeMemberships.id })
         .from(templeMemberships)

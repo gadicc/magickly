@@ -32,8 +32,7 @@ each one costs the attacker a Google account.
   hyphens). Admins read it out or print it, and people type it into My
   Temples, so the lookup forgives what people get wrong when typing:
   case, spaces, missing or extra hyphens, and `o`→`0`, `i`/`l`→`1`. A
-  code that does not fit the pattern after that (a legacy one) is
-  compared exactly, as today.
+  code that does not fit the pattern after that is a miss (see 3).
 - `src/temples/joinCode.ts` (new, no database): `generateJoinCode()`,
   `normalizeJoinCode(input)`. Pure functions, unit-tested.
 - The writer drops the free-text `updateInvite` and gains two commands,
@@ -70,8 +69,8 @@ each one costs the attacker a Google account.
   incorrect join codes today. Try again after {time}." Only that account
   is refused, so nobody can lock others out of a temple. No per-temple
   cap, for that reason; with 100-bit codes it would add nothing.
-- `src/temples/joinAttempts.ts` (new) holds reserve and refund; its
-  tests run against PGlite like `sql.test.ts`.
+- `src/temples/joinAttempts.ts` (new) holds reserve and refund; they
+  are tested through the join tests in `sql.test.ts`, against PGlite.
 
 ### 3. Existing temples (decision 3: replace)
 
@@ -136,7 +135,7 @@ generator, so the QR code is the same on every capture; the README's
 
 - `joinCode.test.ts`: length, alphabet, groups, bits drawn from
   `randomBytes`; normalisation of case, spaces, hyphens and the look-alike
-  letters; legacy strings passed through unchanged.
+  letters; anything else (`1234`, a short or long code) refused.
 - `sql.test.ts` (PGlite): regenerate makes a new valid code and the old
   one stops working; disable removes it; non-admins and other temples'
   admins are refused; a global admin may; a code not in the format never
@@ -144,12 +143,13 @@ generator, so the QR code is the same on every capture; the README's
   joins.
 - The migration's SQL, run against PGlite: each row gets a distinct code
   in the format.
-- `joinAttempts.test.ts` and the join tests: misses on the preview and on
+- The join-limit tests in `sql.test.ts`: misses on the preview and on
   `join` both count; the eleventh is refused without a lookup (a correct
   code too); a match costs nothing; the counter resets on a new UTC day;
   parallel reservations never pass ten; one account's limit does not
   affect another's.
-- A render test for `InviteManager` in the three states.
+- A render test for `InviteManager` with and without a code, and its
+  two confirmation dialogs.
 - The browser at 375, 768 and 1,440 px, light and dark, Hebrew, for the
   admin panel and the refusal on the join page.
 

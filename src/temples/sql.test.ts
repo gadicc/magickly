@@ -437,6 +437,10 @@ describe("SQL temple join limits", () => {
     expect(await failures()).toBe(1);
   });
 
+  // PGlite has one connection, so these run one after another: the test
+  // pins the reserve-before-lookup order and the count, not true
+  // concurrency. On PostgreSQL the conditional upsert locks the row and
+  // re-checks `failures < limit` against its latest version.
   it("lets parallel guesses past the limit no further", async () => {
     const results = await Promise.all(
       Array.from({ length: 30 }, (_, i) =>

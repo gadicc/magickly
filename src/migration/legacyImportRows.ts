@@ -28,6 +28,8 @@ export const LEGACY_IMPORT_TABLES = {
   legacy_user_group_grants: schema.legacyUserGroupGrants,
   temple_invites: schema.templeInvites,
   temple_memberships: schema.templeMemberships,
+  // Failed join-code lookups (plan 098) are runtime-only.
+  temple_join_failures: schema.templeJoinFailures,
   rituals: schema.rituals,
   ritual_revisions: schema.ritualRevisions,
   legacy_ritual_compiled_archives: schema.legacyRitualCompiledArchives,
@@ -222,6 +224,7 @@ export function projectLegacyImportRows(
       legacy_user_group_grants: p.memberships.grantEvidence,
       temple_invites: p.memberships.invites,
       temple_memberships: p.memberships.memberships,
+      temple_join_failures: [],
       rituals: p.rituals.rituals,
       ritual_revisions: p.rituals.revisions,
       legacy_ritual_compiled_archives: p.rituals.archives,

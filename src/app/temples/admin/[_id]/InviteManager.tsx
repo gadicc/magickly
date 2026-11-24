@@ -13,6 +13,12 @@ import {
 import { ConfirmAction } from "../../ConfirmAction";
 
 const MASKED_CODE = "•••••-•••••-•••••-•••••";
+/** Buttons are targets of their own on a touch screen (AGENTS.md, Layout). */
+const touchTargets = {
+  "@media (pointer: coarse)": {
+    "& .MuiButtonBase-root": { minBlockSize: 44, minInlineSize: 44 },
+  },
+};
 
 /**
  * The temple's join code, its invitation link and QR code. The server
@@ -40,7 +46,7 @@ export function InviteManager({
 
   if (!joinPass)
     return (
-      <Stack spacing={1} sx={{ alignItems: "flex-start" }}>
+      <Stack spacing={1} sx={{ alignItems: "flex-start", ...touchTargets }}>
         <Typography>
           <UiText
             message={/*i18n*/ "No one can join with a code at the moment."}
@@ -68,7 +74,7 @@ export function InviteManager({
   );
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} sx={touchTargets}>
       <div>
         <Typography variant="body2" color="text.secondary">
           <UiText message={/*i18n*/ "Join code"} />
