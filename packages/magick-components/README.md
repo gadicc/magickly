@@ -858,6 +858,15 @@ repository) and exports `PYRAMID_COLOURS` and `PYRAMID_TOP`. Without
 `pyramids` a tablet draws exactly as before. It depends on magick-data
 0.5.0, the first with `enochian/tabletPyramids`.
 
+0.9.0 adds `pyramidSymbols` to `enochian/Tablet`, which draws each
+side's symbol on the pyramids, facing out from the top or upright, on
+a top a third of the square (`PYRAMID_TOP_SYMBOLS`, exported) unless
+`pyramidTop` says otherwise (see [A tablet as
+pyramids](#a-tablet-as-pyramids), plan 095 in the repository), and a
+new entry, `enochian/pyramidMarks`, with the marks, for drawing one
+square large. Without `pyramidSymbols` a tablet draws exactly as
+before. It depends on magick-data 0.5.0, as 0.8.0 did.
+
 ## Requirements
 
 React 19 and an ES module environment: Node 22 or later (`engines`
