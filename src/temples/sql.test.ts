@@ -588,37 +588,122 @@ describe("SQL temple administration", () => {
   });
 
   it("uses fresh SQL grants for invitation changes and never trusts identity metadata", async () => {
-    const scopedWriter = createSqlTempleWriter(db, async () => ids.scopedAdmin);
-    expect(
-      await scopedWriter.updateInvite({
+    const codes = ["n3wc0-de000-00000-00001", "g10ba-1c0de-00000-00002"];
+    const change = (
+      actorId: string,
+      command: "regenerateInvite" | "disableInvite",
+      extra: Record<string, unknown> = {},
+    ) =>
+      createSqlTempleWriter(db, async () => actorId, {
+        generateJoinCode: () => codes.shift() ?? "unused",
+      })[command]({
         version: 1,
-        expectedActorId: ids.scopedAdmin,
+        expectedActorId: actorId,
         templeId: ids.temple,
-        joinPass: "new-secret",
+        ...extra,
+      });
+    const stored = async () =>
+      (
+        await db
+          .select()
+          .from(templeInvites)
+          .where(eq(templeInvites.templeId, ids.temple))
+      )[0]?.joinPass;
+
+    expect(await change(ids.scopedAdmin, "regenerateInvite")).toMatchObject({
+      ok: true,
+    });
+    expect(await stored()).toBe("n3wc0-de000-00000-00001");
+    expect(
+      await change(ids.scopedAdmin, "regenerateInvite", {
+        joinPass: "chosen-by-hand",
       }),
-    ).toMatchObject({ ok: true });
+    ).toMatchObject({ ok: false, code: "INVALID_REQUEST" });
+    // The old code stops working at once.
+    expect(
+      await createSqlTempleReader(db).getJoinPreview(
+        ids.outsider,
+        "alpha",
+        ALPHA_CODE,
+      ),
+    ).toEqual({ status: "notFound" });
+    expect(await change(ids.member, "regenerateInvite")).toMatchObject({
+      ok: false,
+      code: "NOT_AUTHORIZED",
+    });
+    expect(await change(ids.member, "disableInvite")).toMatchObject({
+      ok: false,
+      code: "NOT_AUTHORIZED",
+    });
     await db
       .update(templeMemberships)
       .set({ admin: false })
       .where(eq(templeMemberships.id, ids.adminMembership));
+    expect(await change(ids.scopedAdmin, "regenerateInvite")).toMatchObject({
+      ok: false,
+      code: "NOT_AUTHORIZED",
+    });
+    expect(await stored()).toBe("n3wc0-de000-00000-00001");
+    expect(await change(ids.globalAdmin, "regenerateInvite")).toMatchObject({
+      ok: true,
+    });
+    expect(await stored()).toBe("g10ba-1c0de-00000-00002");
+    expect(await change(ids.globalAdmin, "disableInvite")).toMatchObject({
+      ok: true,
+    });
+    expect(await stored()).toBeUndefined();
+    // The other temple's code is untouched throughout.
     expect(
-      await scopedWriter.updateInvite({
+      (
+        await db
+          .select()
+          .from(templeInvites)
+          .where(eq(templeInvites.templeId, ids.otherTemple))
+      )[0].joinPass,
+    ).toBe(BETA_CODE);
+  });
+
+  it("creates codes from the system's random source by default", async () => {
+    const writer = createSqlTempleWriter(db, async () => ids.scopedAdmin);
+    const request = {
+      version: 1,
+      expectedActorId: ids.scopedAdmin,
+      templeId: ids.temple,
+    };
+    expect(await writer.disableInvite(request)).toMatchObject({ ok: true });
+    await writer.regenerateInvite(request);
+    const [first] = await db
+      .select()
+      .from(templeInvites)
+      .where(eq(templeInvites.templeId, ids.temple));
+    expect(first.joinPass).toMatch(
+      /^[0-9a-hjkmnp-tv-z]{5}(-[0-9a-hjkmnp-tv-z]{5}){3}$/,
+    );
+    await writer.regenerateInvite(request);
+    const [second] = await db
+      .select()
+      .from(templeInvites)
+      .where(eq(templeInvites.templeId, ids.temple));
+    expect(second.joinPass).not.toBe(first.joinPass);
+    expect(
+      await createSqlTempleReader(db).getJoinPreview(
+        ids.outsider,
+        "alpha",
+        second.joinPass,
+      ),
+    ).toMatchObject({ status: "found" });
+  });
+
+  it("refuses a generator that makes a code in another format", async () => {
+    expect(
+      await createSqlTempleWriter(db, async () => ids.scopedAdmin, {
+        generateJoinCode: () => "1234",
+      }).regenerateInvite({
         version: 1,
         expectedActorId: ids.scopedAdmin,
         templeId: ids.temple,
-        joinPass: "stolen",
       }),
-    ).toMatchObject({ ok: false, code: "NOT_AUTHORIZED" });
-    expect(
-      await createSqlTempleWriter(db, async () => ids.globalAdmin).updateInvite(
-        {
-          version: 1,
-          expectedActorId: ids.globalAdmin,
-          templeId: ids.temple,
-          joinPass: "global-secret",
-        },
-      ),
-    ).toMatchObject({ ok: true });
+    ).toMatchObject({ ok: false, code: "UNAVAILABLE" });
     expect(
       (
         await db
@@ -626,23 +711,7 @@ describe("SQL temple administration", () => {
           .from(templeInvites)
           .where(eq(templeInvites.templeId, ids.temple))
       )[0].joinPass,
-    ).toBe("global-secret");
-    expect(
-      await createSqlTempleWriter(db, async () => ids.globalAdmin).updateInvite(
-        {
-          version: 1,
-          expectedActorId: ids.globalAdmin,
-          templeId: ids.temple,
-          joinPass: "",
-        },
-      ),
-    ).toMatchObject({ ok: true });
-    expect(
-      await db
-        .select()
-        .from(templeInvites)
-        .where(eq(templeInvites.templeId, ids.temple)),
-    ).toEqual([]);
+    ).toBe(ALPHA_CODE);
   });
 });
 

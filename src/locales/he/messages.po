@@ -1483,6 +1483,21 @@ msgid "Disconnect"
 msgstr "ניתוק"
 
 #. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "No one can join with a code at the moment."
+msgstr "כרגע אי אפשר להצטרף באמצעות קוד."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Create join code"
+msgstr "יצירת קוד הצטרפות"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "The current join code, link and QR code stop working at once. Members already in the temple are not affected."
+msgstr "קוד ההצטרפות, הקישור וקוד ה־QR הנוכחיים יפסיקו לפעול מיד. מי שכבר חבר במקדש לא יושפע."
+
+#. js-lingui-explicit-id
 #: src/app/(private)/temples/page.tsx
 #: src/app/temples/admin/[_id]/InviteManager.tsx
 msgid "Join code"
@@ -1500,16 +1515,6 @@ msgstr "הצגת קוד ההצטרפות"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/InviteManager.tsx
-msgid "Save join code"
-msgstr "שמירת קוד ההצטרפות"
-
-#. js-lingui-explicit-id
-#: src/app/temples/admin/[_id]/InviteManager.tsx
-msgid "Clear the code and save to disable new invitations."
-msgstr "כדי לבטל הזמנות חדשות, מחקו את הקוד ושמרו."
-
-#. js-lingui-explicit-id
-#: src/app/temples/admin/[_id]/InviteManager.tsx
 msgid "Join {temple}"
 msgstr "הצטרפות למקדש {temple}"
 
@@ -1520,8 +1525,38 @@ msgstr "העתקת קישור הזמנה"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/InviteManager.tsx
-msgid "Set a join code to create an invitation link."
-msgstr "הגדירו קוד הצטרפות כדי ליצור קישור הזמנה."
+msgid "New join code"
+msgstr "קוד הצטרפות חדש"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Make a new join code?"
+msgstr "ליצור קוד הצטרפות חדש?"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Make new code"
+msgstr "יצירת קוד חדש"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Turn off invitations"
+msgstr "השבתת ההזמנות"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Turn off invitations?"
+msgstr "להשבית את ההזמנות?"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Turn off"
+msgstr "השבתה"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "No one new can join until you create another join code."
+msgstr "אף אחד חדש לא יוכל להצטרף עד שתיצרו קוד הצטרפות אחר."
 
 #. js-lingui-explicit-id
 #: src/app/signin/SignInButton.tsx

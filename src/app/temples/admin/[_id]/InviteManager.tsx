@@ -1,19 +1,24 @@
 "use client";
 
 import { ContentCopy, Visibility, VisibilityOff } from "@mui/icons-material";
-import {
-  Button,
-  IconButton,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Button, IconButton, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { QRCode } from "react-qrcode";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
 import UiText from "@/i18n/UiText";
-import { updateTempleInviteAction } from "../../actions";
+import {
+  disableTempleInviteAction,
+  regenerateTempleInviteAction,
+} from "../../actions";
+import { ConfirmAction } from "../../ConfirmAction";
 
+const MASKED_CODE = "•••••-•••••-•••••-•••••";
+
+/**
+ * The temple's join code, its invitation link and QR code. The server
+ * makes every code (plan 098): the admin can only ask for a new one or
+ * turn invitations off.
+ */
 export function InviteManager({
   actorId,
   templeId,
@@ -28,30 +33,53 @@ export function InviteManager({
   joinPass: string | null;
 }) {
   const { t: translateUi } = useUiLanguage();
-
   const [visible, setVisible] = useState(false);
-  const [joinUrl, setJoinUrl] = useState("");
-  const joinPath = joinPass
-    ? `/temples/join/${encodeURIComponent(slug)}/${encodeURIComponent(joinPass)}`
-    : "";
-  useEffect(() => {
-    setJoinUrl(joinPath ? `${location.origin}${joinPath}` : "");
-  }, [joinPath]);
+  const [origin, setOrigin] = useState("");
+  useEffect(() => setOrigin(location.origin), []);
+  const fields = { expectedActorId: actorId, templeId };
+
+  if (!joinPass)
+    return (
+      <Stack spacing={1} sx={{ alignItems: "flex-start" }}>
+        <Typography>
+          <UiText
+            message={/*i18n*/ "No one can join with a code at the moment."}
+          />
+        </Typography>
+        <form action={regenerateTempleInviteAction}>
+          {Object.entries(fields).map(([name, value]) => (
+            <input key={name} type="hidden" name={name} value={value} />
+          ))}
+          <Button type="submit" variant="outlined">
+            <UiText message={/*i18n*/ "Create join code"} />
+          </Button>
+        </form>
+      </Stack>
+    );
+
+  const slugPath = `/temples/join/${encodeURIComponent(slug)}/`;
+  const joinUrl = origin ? `${origin}${slugPath}${joinPass}` : "";
+  const stopsWorking = (
+    <UiText
+      message={
+        /*i18n*/ "The current join code, link and QR code stop working at once. Members already in the temple are not affected."
+      }
+    />
+  );
 
   return (
     <Stack spacing={2}>
-      <form action={updateTempleInviteAction}>
-        <input type="hidden" name="expectedActorId" value={actorId} />
-        <input type="hidden" name="templeId" value={templeId} />
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
-          <TextField
-            name="joinPass"
-            label={translateUi(/*i18n*/ "Join code")}
-            size="small"
-            type={visible ? "text" : "password"}
-            defaultValue={joinPass ?? ""}
-            slotProps={{ htmlInput: { maxLength: 200, dir: "ltr" } }}
-          />
+      <div>
+        <Typography variant="body2" color="text.secondary">
+          <UiText message={/*i18n*/ "Join code"} />
+        </Typography>
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+          <Typography
+            dir="ltr"
+            sx={{ fontFamily: "monospace", fontSize: "1.125rem" }}
+          >
+            {visible ? joinPass : MASKED_CODE}
+          </Typography>
           <IconButton
             type="button"
             aria-label={translateUi(
@@ -61,18 +89,8 @@ export function InviteManager({
           >
             {visible ? <VisibilityOff /> : <Visibility />}
           </IconButton>
-          <Button type="submit" variant="outlined">
-            <UiText message={/*i18n*/ "Save join code"} />
-          </Button>
         </Stack>
-      </form>
-      <Typography variant="body2">
-        <UiText
-          message={
-            /*i18n*/ "Clear the code and save to disable new invitations."
-          }
-        />
-      </Typography>
+      </div>
       {joinUrl ? (
         <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
           <QRCode
@@ -87,9 +105,7 @@ export function InviteManager({
               dir="ltr"
               sx={{ overflowWrap: "anywhere" }}
             >
-              {visible
-                ? joinUrl
-                : `${location.origin}/temples/join/${slug}/••••`}
+              {visible ? joinUrl : `${origin}${slugPath}${MASKED_CODE}`}
             </Typography>
             <IconButton
               type="button"
@@ -100,13 +116,32 @@ export function InviteManager({
             </IconButton>
           </div>
         </Stack>
-      ) : (
-        <Typography>
+      ) : null}
+      <Stack direction="row" sx={{ flexWrap: "wrap", gap: 1 }}>
+        <ConfirmAction
+          action={regenerateTempleInviteAction}
+          fields={fields}
+          label={translateUi(/*i18n*/ "New join code")}
+          title={translateUi(/*i18n*/ "Make a new join code?")}
+          confirmLabel={translateUi(/*i18n*/ "Make new code")}
+        >
+          {stopsWorking}
+        </ConfirmAction>
+        <ConfirmAction
+          action={disableTempleInviteAction}
+          fields={fields}
+          label={translateUi(/*i18n*/ "Turn off invitations")}
+          title={translateUi(/*i18n*/ "Turn off invitations?")}
+          confirmLabel={translateUi(/*i18n*/ "Turn off")}
+        >
           <UiText
-            message={/*i18n*/ "Set a join code to create an invitation link."}
-          />
-        </Typography>
-      )}
+            message={
+              /*i18n*/ "No one new can join until you create another join code."
+            }
+          />{" "}
+          {stopsWorking}
+        </ConfirmAction>
+      </Stack>
     </Stack>
   );
 }

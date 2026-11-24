@@ -1483,6 +1483,21 @@ msgid "Disconnect"
 msgstr "Disconnect"
 
 #. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "No one can join with a code at the moment."
+msgstr "No one can join with a code at the moment."
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Create join code"
+msgstr "Create join code"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "The current join code, link and QR code stop working at once. Members already in the temple are not affected."
+msgstr "The current join code, link and QR code stop working at once. Members already in the temple are not affected."
+
+#. js-lingui-explicit-id
 #: src/app/(private)/temples/page.tsx
 #: src/app/temples/admin/[_id]/InviteManager.tsx
 msgid "Join code"
@@ -1500,16 +1515,6 @@ msgstr "Show join code"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/InviteManager.tsx
-msgid "Save join code"
-msgstr "Save join code"
-
-#. js-lingui-explicit-id
-#: src/app/temples/admin/[_id]/InviteManager.tsx
-msgid "Clear the code and save to disable new invitations."
-msgstr "Clear the code and save to disable new invitations."
-
-#. js-lingui-explicit-id
-#: src/app/temples/admin/[_id]/InviteManager.tsx
 msgid "Join {temple}"
 msgstr "Join {temple}"
 
@@ -1520,8 +1525,38 @@ msgstr "Copy invitation link"
 
 #. js-lingui-explicit-id
 #: src/app/temples/admin/[_id]/InviteManager.tsx
-msgid "Set a join code to create an invitation link."
-msgstr "Set a join code to create an invitation link."
+msgid "New join code"
+msgstr "New join code"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Make a new join code?"
+msgstr "Make a new join code?"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Make new code"
+msgstr "Make new code"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Turn off invitations"
+msgstr "Turn off invitations"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Turn off invitations?"
+msgstr "Turn off invitations?"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "Turn off"
+msgstr "Turn off"
+
+#. js-lingui-explicit-id
+#: src/app/temples/admin/[_id]/InviteManager.tsx
+msgid "No one new can join until you create another join code."
+msgstr "No one new can join until you create another join code."
 
 #. js-lingui-explicit-id
 #: src/app/signin/SignInButton.tsx

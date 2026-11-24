@@ -306,10 +306,10 @@
         "src/app/temples/ConfirmAction.tsx": "81d7143777b14b2c999f30dc62cc294db55b00b759f0d50afd911f61ca9ad98f",
         "src/app/temples/CreateTempleForm.tsx": "96ccfc9ae02523669372a3f13116c99216b8a23e76cb0ff7470a906e6a0afdfa",
         "src/app/temples/TempleFeedback.tsx": "ee89b3b40ccf869fd89d2d66b85caf69d2c2358be9cfc7b67def7f47378c90bc",
-        "src/app/temples/actions.ts": "95514f9a4af1a5f3a36c9610a5794a804dda07af9b11e1517ba9dfc4f3254592",
+        "src/app/temples/actions.ts": "91cdc5a872efd49cc4ebfe6d10704aa0a3d509e79cec2a940d7c281db0d8f031",
         "src/app/temples/admin/[_id]/DiscourseSyncButton.tsx": "b938ad54d3606cc91cfd99c812578b615580aac6ec224a09dcca264b691ef7cc",
         "src/app/temples/admin/[_id]/ForumSettings.tsx": "6b435bb4acc51b922fa527ca9c5f6e02fc813e1a3e900fa78ef062c4e876350e",
-        "src/app/temples/admin/[_id]/InviteManager.tsx": "9ee2c84b7fe88febe9cafce6c75ac45454325aec50cce78f375c2462fd7763ba",
+        "src/app/temples/admin/[_id]/InviteManager.tsx": "fdf1c7b04573720b4c06c30293044d67f8dcbe2446c28e65d0d93e259396004f",
         "src/app/temples/admin/[_id]/actions.ts": "e7eb52b947cedf0ccc610c7fa4a6e2aec94c0a2ae268acec801479d4de270023",
         "src/app/temples/feedback.ts": "a20ffcf570fec7a28b450e457ce7e3d4778e64d5bf8e04f29d7cabc294c69dc0"
       }

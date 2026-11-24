@@ -188,12 +188,14 @@ export async function seedDocsScreenshotFixtures(
     templeId = created.templeId;
   }
 
-  const adminWriter = createSqlTempleWriter(db, asCreator);
-  const invite = await adminWriter.updateInvite({
+  // A fixed synthetic code, so the QR code is the same on every capture.
+  const adminWriter = createSqlTempleWriter(db, asCreator, {
+    generateJoinCode: () => SCREENSHOT_TEMPLE.joinPass,
+  });
+  const invite = await adminWriter.regenerateInvite({
     version: 1,
     expectedActorId: creator.id,
     templeId,
-    joinPass: SCREENSHOT_TEMPLE.joinPass,
   });
   if (!invite.ok) throw new Error("DOCS_SCREENSHOTS_INVITE");
 

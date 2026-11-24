@@ -82,22 +82,31 @@ export async function joinTempleAction(formData: FormData) {
   );
 }
 
-export async function updateTempleInviteAction(formData: FormData) {
+async function changeTempleInvite(
+  formData: FormData,
+  command: "regenerateInvite" | "disableInvite",
+) {
   const routeTempleId = field(formData, "templeId");
   if (!validRouteValue(routeTempleId)) redirect("/temples/admin");
   const callbackURL = `/temples/admin/${encodeURIComponent(routeTempleId)}`;
   if (!(await getCurrentSqlUserId())) redirect(signInPath(callbackURL));
-  const result = await createSqlTempleWriter(
-    db,
-    getCurrentSqlUserId,
-  ).updateInvite({
+  const result = await createSqlTempleWriter(db, getCurrentSqlUserId)[command]({
     version: 1,
     expectedActorId: field(formData, "expectedActorId"),
     templeId: routeTempleId,
-    joinPass: field(formData, "joinPass"),
   });
   if (!result.ok) redirect(templeErrorPath(callbackURL, result.message));
   redirect(`/temples/admin/${result.templeId}`);
+}
+
+/** Makes a new server-chosen join code; the old link stops working (plan 098). */
+export async function regenerateTempleInviteAction(formData: FormData) {
+  await changeTempleInvite(formData, "regenerateInvite");
+}
+
+/** Removes the join code, so no one new can join until another is made. */
+export async function disableTempleInviteAction(formData: FormData) {
+  await changeTempleInvite(formData, "disableInvite");
 }
 
 export async function updateTempleMembershipAction(formData: FormData) {

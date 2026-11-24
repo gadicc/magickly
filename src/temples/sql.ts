@@ -512,10 +512,57 @@ async function deleteMembership(
 export function createSqlTempleWriter(
   database: TempleDatabase,
   getVerifiedActorId: () => Promise<string | null>,
-  options: { now?: () => Date; generateId?: () => string } = {},
+  options: {
+    now?: () => Date;
+    generateId?: () => string;
+    /** Tests and the screenshot fixture pass a fixed code. */
+    generateJoinCode?: () => string;
+  } = {},
 ) {
   const now = options.now ?? (() => new Date());
   const generateId = options.generateId ?? createUuidV7;
+  const makeJoinCode = options.generateJoinCode ?? generateJoinCode;
+
+  /** The checks every invite change shares: a fresh actor, the temple's row lock, admin rights. */
+  async function changeInvite(
+    input: unknown,
+    change: (tx: Transaction, templeId: string) => Promise<void>,
+  ): Promise<TempleWriteResult> {
+    try {
+      if (!input || typeof input !== "object" || Array.isArray(input))
+        reject("INVALID_REQUEST");
+      const request = input as Record<string, unknown>;
+      if (
+        !ownKeys(request, ["version", "expectedActorId", "templeId"]) ||
+        request.version !== 1 ||
+        !validText(request.templeId, 200)
+      )
+        reject("INVALID_REQUEST");
+      const actorId = await verifiedActor(
+        getVerifiedActorId,
+        request.expectedActorId,
+      );
+      return await database.transaction(async (tx) => {
+        const templeId = await resolveTempleRouteId(
+          tx,
+          "temples",
+          request.templeId as string,
+        );
+        if (!templeId) reject("NOT_FOUND");
+        const [temple] = await tx
+          .select({ id: temples.id })
+          .from(temples)
+          .where(eq(temples.id, templeId))
+          .for("no key update");
+        if (!temple) reject("NOT_FOUND");
+        await lockActorAndAuthorize(tx, actorId, templeId);
+        await change(tx, templeId);
+        return { ok: true as const, templeId };
+      });
+    } catch (error) {
+      return writeFailure(error);
+    }
+  }
 
   return {
     async join(input: unknown): Promise<TempleWriteResult> {
@@ -662,61 +709,32 @@ export function createSqlTempleWriter(
       }
     },
 
-    async updateInvite(input: unknown): Promise<TempleWriteResult> {
-      try {
-        if (!input || typeof input !== "object" || Array.isArray(input))
-          reject("INVALID_REQUEST");
-        const request = input as Record<string, unknown>;
-        if (
-          !ownKeys(request, [
-            "version",
-            "expectedActorId",
-            "templeId",
-            "joinPass",
-          ]) ||
-          request.version !== 1 ||
-          !validText(request.templeId, 200) ||
-          !validText(request.joinPass, 200, true) ||
-          (request.joinPass as string).includes("/")
-        )
-          reject("INVALID_REQUEST");
-        const actorId = await verifiedActor(
-          getVerifiedActorId,
-          request.expectedActorId,
-        );
-        return await database.transaction(async (tx) => {
-          const templeId = await resolveTempleRouteId(
-            tx,
-            "temples",
-            request.templeId as string,
-          );
-          if (!templeId) reject("NOT_FOUND");
-          const [temple] = await tx
-            .select({ id: temples.id })
-            .from(temples)
-            .where(eq(temples.id, templeId))
-            .for("no key update");
-          if (!temple) reject("NOT_FOUND");
-          await lockActorAndAuthorize(tx, actorId, templeId);
-          const joinPass = request.joinPass as string;
-          if (joinPass.length === 0) {
-            await tx
-              .delete(templeInvites)
-              .where(eq(templeInvites.templeId, templeId));
-          } else {
-            await tx
-              .insert(templeInvites)
-              .values({ templeId, joinPass })
-              .onConflictDoUpdate({
-                target: templeInvites.templeId,
-                set: { joinPass },
-              });
-          }
-          return { ok: true as const, templeId };
-        });
-      } catch (error) {
-        return writeFailure(error);
-      }
+    /**
+     * Makes a new join code for a temple, replacing any it had; the old
+     * link and QR code stop working at once (plan 098). Admins never
+     * choose the code.
+     */
+    async regenerateInvite(input: unknown): Promise<TempleWriteResult> {
+      return changeInvite(input, async (tx, templeId) => {
+        const joinPass = makeJoinCode();
+        if (!isJoinCode(joinPass)) reject("UNAVAILABLE");
+        await tx
+          .insert(templeInvites)
+          .values({ templeId, joinPass })
+          .onConflictDoUpdate({
+            target: templeInvites.templeId,
+            set: { joinPass },
+          });
+      });
+    },
+
+    /** Turns invitations off: the temple has no join code until a new one is made. */
+    async disableInvite(input: unknown): Promise<TempleWriteResult> {
+      return changeInvite(input, async (tx, templeId) => {
+        await tx
+          .delete(templeInvites)
+          .where(eq(templeInvites.templeId, templeId));
+      });
     },
 
     async updateMembership(input: unknown): Promise<TempleWriteResult> {
