@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { SIDE_COLOURS } from "./pyramidWords";
+import { PYRAMID_SYMBOL_INKS } from "./pyramidMarks.tsx";
+import { PYRAMID_COLOURS } from "./Tablet.tsx";
 
 /** WCAG's relative luminance of a "#rrggbb" colour. */
 function luminance(hex: string): number {
@@ -21,17 +22,29 @@ function contrast(a: string, b: string): number {
 }
 
 describe("the pyramid's symbols against their sides", () => {
+  it("has inks for every side's colour, and no more", () => {
+    expect(Object.keys(PYRAMID_SYMBOL_INKS).sort()).toEqual(
+      Object.keys(PYRAMID_COLOURS).sort(),
+    );
+  });
+
   it("stand out by their outline at 3:1 or more, whatever their own colour", () => {
-    for (const [side, { fill, outline }] of Object.entries(SIDE_COLOURS))
-      expect(contrast(outline, fill), side).toBeGreaterThanOrEqual(3);
+    for (const [side, { outline }] of Object.entries(PYRAMID_SYMBOL_INKS))
+      expect(
+        contrast(
+          outline,
+          PYRAMID_COLOURS[side as keyof typeof PYRAMID_COLOURS],
+        ),
+        side,
+      ).toBeGreaterThanOrEqual(3);
   });
 
   it("measures the complements the outline makes up for", () => {
     expect(
-      contrast(SIDE_COLOURS.fire.symbol, SIDE_COLOURS.fire.fill),
+      contrast(PYRAMID_SYMBOL_INKS.fire.ink, PYRAMID_COLOURS.fire),
     ).toBeLessThan(3);
     expect(
-      contrast(SIDE_COLOURS.water.symbol, SIDE_COLOURS.water.fill),
+      contrast(PYRAMID_SYMBOL_INKS.water.ink, PYRAMID_COLOURS.water),
     ).toBeLessThan(3);
   });
 });

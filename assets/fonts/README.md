@@ -9,10 +9,10 @@ worker never precaches them. The renderer's shared base fonts stay in
 | File | Used by | Source | SHA-256 |
 | --- | --- | --- | --- |
 | NotoEmoji-Variable.ttf | `table-of-shewbread` (four kerub emoji) | [Noto Emoji `NotoEmoji[wght].ttf`](https://raw.githubusercontent.com/google/fonts/8b0a1d0f5983c89bc2b93f1b5fb55f9e252744b5/ofl/notoemoji/NotoEmoji%5Bwght%5D.ttf) from google/fonts commit `8b0a1d0f5983c89bc2b93f1b5fb55f9e252744b5`, downloaded 2026-09-16 | de6c18832938afc99caf132b39d6a30a19bac7f2e812e28db2535b4608d27551 |
-| EnochianPlain.ttf | `enochian-tablet?font=enochian`, `gd-hall` (the tablets) | See `EnochianPlain-NOTICE.txt` | 82ff69cdfbe0fb8157e400120164cddc7ce6227ef054d86a92efae1340d7be9e |
+| EnochianPlain.ttf | `enochian-tablet?font=enochian`, `enochian-tablet-pyramids?font=enochian`, `gd-hall` (the tablets) | See `EnochianPlain-NOTICE.txt` | 82ff69cdfbe0fb8157e400120164cddc7ce6227ef054d86a92efae1340d7be9e |
 | NotoSerif-Italic-latin1.ttf | `gd-hall` (labels and captions) | `scripts/gd-hall-fonts/build.py`; see below | b17042575847967023a24dba5b9b4b16aa9fe9a627005acfed7b18ca2c48c6b9 |
 | NotoSerif-BoldItalic-compass.ttf | `gd-hall` (the compass labels) | `scripts/gd-hall-fonts/build.py`; see below | d443ee9985cdaf7c3aa1120bfb3971b8f4f1b42896bf2c07cec5833b3336f475 |
-| FrankRuhlLibre-Bold-letters.ttf | `gd-hall` (Hebrew letters: banners, Tarot keys, the Pantacle's ring) | `scripts/gd-hall-fonts/build.py`; see below | 84304f1b7ce5fcce319b52946a714205d158f5a4ebc6050511090c50b41753ae |
+| FrankRuhlLibre-Bold-letters.ttf | `gd-hall` (Hebrew letters: banners, Tarot keys, the Pantacle's ring), the angels' sigil styles, `enochian-tablet-pyramids` (the Hebrew letters on the sides) | `scripts/gd-hall-fonts/build.py`; see below | 84304f1b7ce5fcce319b52946a714205d158f5a4ebc6050511090c50b41753ae |
 | NotoSerif-Regular-latin1.ttf | the angels' sigil styles (plan 096: the talismans' verses, the roman names) | `scripts/gd-hall-fonts/build.py` from [`ofl/notoserif/NotoSerif[wdth,wght].ttf`](https://raw.githubusercontent.com/google/fonts/8b0a1d0f5983c89bc2b93f1b5fb55f9e252744b5/ofl/notoserif/NotoSerif%5Bwdth,wght%5D.ttf) (SHA-256 `4d8e6761424656867019081a1a01336f3cb086982682698714054fc33f782713`), weight 400, width 100, the halls' Latin-1 subset; see below | 1bc1b369b8ada528cc4f20800fc8de34d0b7c27a4dc7a635651c796cc8802322 |
 
 Noto Emoji is the monochrome emoji family, variable weight 300–700 with the

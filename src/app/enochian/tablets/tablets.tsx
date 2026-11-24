@@ -47,7 +47,10 @@ import { useUiLanguage } from "@/i18n/LocaleProvider";
 import OpenSource from "@/OpenSource";
 import { componentImageFilename } from "@/render/componentImageUrl";
 import { TABLET_IDS } from "@/render/contracts/enochianTablet";
-import { isTabletPyramidImageVersion } from "@/render/contracts/enochianTabletPyramids";
+import {
+  isTabletPyramidImageVersion,
+  tabletPyramidsSuffix,
+} from "@/render/contracts/enochianTabletPyramids";
 import useEnochianFont, { EnochianFont } from "../useEnochianFont";
 import type { TabletNameLinks } from "./dictionaryLinks";
 import NamesPanel, { namesToChoose } from "./NamesPanel";
@@ -101,7 +104,8 @@ export interface DrawnState {
 
 /**
  * A download's name, for what is drawn: the image's own name, which says
- * whether the squares are pyramids ("enochian-air-tablet-pyramids"), and
+ * whether the squares are pyramids ("enochian-air-tablet-pyramids") and
+ * with which symbols ("enochian-air-tablet-pyramids-symbols-upright"), and
  * what the page adds to it or leaves out ("enochian-fire-tablet-dee-plain",
  * "enochian-earth-tablet-senior-row-left-regions").
  */
@@ -483,6 +487,8 @@ export default function Tablets({
       tab: tabInUrl,
       square: squareInUrl,
       pyramids: pyramidsInUrl = false,
+      symbols: symbolsInUrl = false,
+      upright: uprightInUrl = false,
     },
     setChoice,
     pushChoice,
@@ -493,6 +499,11 @@ export default function Tablets({
   // version that has them, and remembered across Dee's and Raphael's,
   // whose URL drops it, so that it returns with the Golden Dawn's.
   const [pyramidsWanted, setPyramidsWanted] = React.useState(false);
+  // Their sides' symbols, facing out unless stood upright: the URL's
+  // while their switch shows, and remembered while it does not, as the
+  // pyramids are.
+  const [symbolsWanted, setSymbolsWanted] = React.useState(false);
+  const [uprightWanted, setUprightWanted] = React.useState(false);
   // Names by default, with nothing highlighted (plan 090, decision 2).
   const [tab, setTabShown] = React.useState<PanelTab>("names");
   const [selected, setSelected] = React.useState<TabletSquare>();
@@ -518,17 +529,26 @@ export default function Tablets({
   // to an entry that records the tab it was left from. A URL that names
   // neither leaves them as they are. Whether the tablet is drawn as
   // pyramids is the URL's wherever the version has them, and is kept
-  // across a version without. The first key seen is the default URL's.
-  const urlKey = `${tabInUrl ?? ""} ${squareInUrl ? `${squareInUrl.row},${squareInUrl.column}` : ""} ${version} ${pyramidsInUrl}`;
+  // across a version without; so with their symbols, while the pyramids
+  // are drawn, and their standing upright, while the symbols are. The
+  // first key seen is the default URL's.
+  const urlKey = `${tabInUrl ?? ""} ${squareInUrl ? `${squareInUrl.row},${squareInUrl.column}` : ""} ${version} ${pyramidsInUrl} ${symbolsInUrl} ${uprightInUrl}`;
   const [urlSeen, setUrlSeen] = React.useState(
-    `  ${DEFAULT_TABLET_VERSION} false`,
+    `  ${DEFAULT_TABLET_VERSION} false false false`,
   );
   if (urlSeen !== urlKey) {
     setUrlSeen(urlKey);
     if (tabInUrl) setTabShown(tabInUrl);
     if (squareInUrl) setPyramidSquare(squareInUrl);
-    // Where the version has pyramids the URL says whether they are drawn.
-    if (hasPyramids(version)) setPyramidsWanted(pyramidsInUrl);
+    // Where the version has pyramids the URL says whether they are drawn,
+    // and where they are, whether their symbols are and how they stand.
+    if (hasPyramids(version)) {
+      setPyramidsWanted(pyramidsInUrl);
+      if (pyramidsInUrl) {
+        setSymbolsWanted(symbolsInUrl);
+        if (symbolsInUrl) setUprightWanted(uprightInUrl);
+      }
+    }
   }
   /**
    * A change of the URL's choices, keeping the tab shown and the Squares
@@ -538,6 +558,8 @@ export default function Tablets({
     setChoice({
       tab,
       pyramids: pyramidsWanted,
+      symbols: symbolsWanted,
+      upright: uprightWanted,
       ...(change.tablet && change.tablet !== id
         ? {}
         : { square: pyramidSquare }),
@@ -579,6 +601,12 @@ export default function Tablets({
   const view = viewOf(id, version);
   const pyramidsOffered = hasPyramids(version) && view !== undefined;
   const pyramids = pyramidsWanted && pyramidsOffered;
+  const symbols = pyramids && symbolsWanted;
+  const pyramidSymbols = symbols
+    ? uprightWanted
+      ? ("upright" as const)
+      : ("outward" as const)
+    : undefined;
   // Measured again when a drawing replaces the note of a version with no
   // Tablet of Union.
   const squarePixels = useSquarePixels(ref, view ? squareShare(id) : 0);
@@ -600,11 +628,16 @@ export default function Tablets({
     pyramids && isTabletPyramidImageVersion(version)
       ? {
           slug: "enochian-tablet-pyramids" as const,
-          props: { id, font, version },
+          props: {
+            id,
+            font,
+            version,
+            symbols: pyramidSymbols ?? ("none" as const),
+          },
         }
       : flatLink;
   const imageName = pyramidsUnlinked
-    ? `${componentImageFilename(flatLink)}-pyramids`
+    ? `${componentImageFilename(flatLink)}${tabletPyramidsSuffix(pyramidSymbols ?? "none")}`
     : componentImageFilename(link);
   const marked = React.useMemo(() => differingSquares(id), [id]);
   const names = view ? tabletNames(view) : [];
@@ -863,6 +896,7 @@ export default function Tablets({
           </Box>
           <Box sx={{ display: "flex", flexWrap: "wrap", columnGap: 1 }}>
             <FormControlLabel
+              className={styles.touchable}
               control={
                 <Switch
                   checked={reversed}
@@ -872,6 +906,7 @@ export default function Tablets({
               label="Reversed letters"
             />
             <FormControlLabel
+              className={styles.touchable}
               // None on pyramids, so the switch rests while they are drawn.
               disabled={pyramids}
               control={
@@ -884,16 +919,55 @@ export default function Tablets({
             />
             {pyramidsOffered && (
               <FormControlLabel
+                className={styles.touchable}
                 control={
                   <Switch
                     checked={pyramids}
                     onChange={(event) => {
                       setPyramidsWanted(event.target.checked);
-                      setChoice({ pyramids: event.target.checked });
+                      // The symbols return with the pyramids.
+                      setChoice({
+                        pyramids: event.target.checked,
+                        symbols: symbolsWanted,
+                        upright: uprightWanted,
+                      });
                     }}
                   />
                 }
                 label={t(/*i18n*/ "Draw as pyramids")}
+              />
+            )}
+            {pyramids && (
+              <FormControlLabel
+                className={styles.touchable}
+                control={
+                  <Switch
+                    checked={symbols}
+                    onChange={(event) => {
+                      setSymbolsWanted(event.target.checked);
+                      setChoice({
+                        symbols: event.target.checked,
+                        upright: uprightWanted,
+                      });
+                    }}
+                  />
+                }
+                label={t(/*i18n*/ "Symbols on the sides")}
+              />
+            )}
+            {symbols && (
+              <FormControlLabel
+                className={styles.touchable}
+                control={
+                  <Switch
+                    checked={uprightWanted}
+                    onChange={(event) => {
+                      setUprightWanted(event.target.checked);
+                      setChoice({ upright: event.target.checked });
+                    }}
+                  />
+                }
+                label={t(/*i18n*/ "Stand the symbols upright")}
               />
             )}
           </Box>
@@ -924,6 +998,7 @@ export default function Tablets({
               mirrorReversed={reversed}
               showSecondLetters={alt}
               pyramids={pyramids}
+              pyramidSymbols={pyramidSymbols}
               frame
               enochianStyle={enochianFont ? EnochianFont.style : undefined}
               ref={ref}
@@ -985,6 +1060,8 @@ export default function Tablets({
                   links={links}
                   revealed={revealed}
                   pyramids={pyramids}
+                  symbols={symbols}
+                  upright={symbols && uprightWanted}
                   openSquare={
                     hasPyramids(version)
                       ? (square) => choosePyramid(square, true, "names")

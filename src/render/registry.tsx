@@ -71,9 +71,13 @@ export const KAMEA_SIGIL_IMAGE_PROFILE = "magickli-kamea-sigil-image-v1";
 /**
  * The renderer's identity for the tablets drawn as pyramids (plan 095,
  * decision 5): each square's sides in their elements' colours round a
- * white top, half the square, by `enochian/tabletPyramids`' rules. It
- * moves when the drawing or the rules do; the letters, the zodiac and what
- * else the rules look up are inputs (`TABLET_PYRAMIDS_INPUTS`).
+ * white top, half the square, by `enochian/tabletPyramids`' rules, and
+ * with `symbols` (the follow-up "Symbols on the sides") each side's
+ * symbol round a top a third of the square. It moves when the drawing or
+ * the rules do; the letters, the zodiac and what else the rules look up,
+ * and the symbols' glyphs and figures, are inputs
+ * (`TABLET_PYRAMIDS_INPUTS`). The `symbols` key came under v1: every
+ * image without it draws as before, which its digest pin holds.
  */
 export const TABLET_PYRAMIDS_IMAGE_PROFILE =
   "magickli-tablet-pyramids-image-v1";
@@ -274,12 +278,14 @@ const TABLET_INPUTS: DataInputsSpec = [
  * correcting one that leaves the pyramids drawable re-identifies the
  * images without moving a byte, the safe direction.
  *
- * Last, the symbols a side carries (`sideSymbol`, the tablets page's
- * `pyramidWords.ts`): a sign's or planet's glyph, a Sephirah's number, a
- * Hebrew letter, a geomantic figure's rows. No image draws them yet, but
- * the inputs hash is one per slug, so a later `symbols` key (default off)
- * could not hash them without moving every existing image's identity.
- * They are hashed now, ahead of the switch, the same safe direction.
+ * Last, the symbols a side carries (`sideSymbol`, magick-components'
+ * `enochian/pyramidMarks`): a sign's or planet's glyph, a Sephirah's
+ * number, a Hebrew letter, a geomantic figure's rows. The `symbols` key
+ * draws them; the inputs hash is one per slug, so they were hashed with
+ * the slug, ahead of the key, and the key moved neither the inputs hash
+ * nor the bytes of an image without symbols. The slug's fonts gained
+ * Frank Ruhl Libre with it, which every pyramids image's identity
+ * records.
  */
 const TABLET_PYRAMIDS_INPUTS: DataInputsSpec = [
   ...TABLET_INPUTS,
@@ -321,7 +327,7 @@ const TABLET_PYRAMIDS_INPUTS: DataInputsSpec = [
   },
   { table: "treeOfLifePath", rows: "*", fields: ["hermetic.hebrewLetterId"] },
   { table: "gdGodForm", rows: "*", fields: ["mix", "elementIds"] },
-  // The symbols, ahead of the switch that draws them (above). A side's
+  // The symbols, hashed ahead of the key that draws them (above). A side's
   // sign is any of the twelve, its planet any of the decans' seven (which
   // hold the Calvary crosses' and Saturn), its Hebrew letter any the rules
   // reach through the data, and its figure any of the sixteen. The
@@ -416,12 +422,14 @@ export const COMPONENT_IMAGE_REGISTRY: {
   },
   "enochian-tablet-pyramids": {
     // As the flat tablet is drawn, and as the page draws it with
-    // *Draw as pyramids*: the top at its default share, a half.
+    // *Draw as pyramids*: the top at its default share, a half, or a
+    // third with *Symbols on the sides*.
     render: (props) => (
       <Tablet
         tablet={props.id}
         version={props.version}
         pyramids
+        pyramidSymbols={props.symbols === "none" ? undefined : props.symbols}
         label={false}
         enochianStyle={
           props.font === "enochian" ? { fontFamily: "Enochian" } : undefined
@@ -431,7 +439,10 @@ export const COMPONENT_IMAGE_REGISTRY: {
     // No image's root says it is decorative, as the flat tablets' do not.
     source: (svg) => svg.replace(/^(<svg\b[^>]*?) aria-hidden="true"/, "$1"),
     profile: TABLET_PYRAMIDS_IMAGE_PROFILE,
-    fonts: ["EnochianPlain.ttf"],
+    // The symbols' Hebrew letters in Frank Ruhl Libre, as the page sets
+    // them; the signs and planets are in the base set's Noto Sans Symbols
+    // and Symbols 2.
+    fonts: ["EnochianPlain.ttf", "FrankRuhlLibre-Bold-letters.ttf"],
     inputs: TABLET_PYRAMIDS_INPUTS,
   },
   "seven-branched-candlestick": {

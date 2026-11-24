@@ -37,26 +37,56 @@ export const isTabletPyramidImageVersion = (
 ): version is TabletPyramidImageVersion =>
   (TABLET_PYRAMID_IMAGE_VERSIONS as readonly string[]).includes(version);
 
+/**
+ * The symbols on the pyramids' sides: none (the default), facing out from
+ * the top as the Order painted them, or upright.
+ */
+export const TABLET_PYRAMID_SYMBOLS = ["none", "outward", "upright"] as const;
+
+/** One of `TABLET_PYRAMID_SYMBOLS`. */
+export type TabletPyramidSymbols = (typeof TABLET_PYRAMID_SYMBOLS)[number];
+
 export interface EnochianTabletPyramidsProps extends ImageDimensions {
   id: TabletImageId;
   /** Latin transliteration, or the bundled Enochian Plain glyphs. */
   font: (typeof TABLET_FONTS)[number];
   /** Whose letters: the Golden Dawn's when absent from the query. */
   version: TabletPyramidImageVersion;
+  /**
+   * Each side's symbol drawn on it, facing out or upright, on a top a
+   * third of the square; none, on a top half the square, when absent.
+   */
+  symbols: TabletPyramidSymbols;
 }
+
+/** What the symbols add to an image's file name. */
+const SYMBOLS_NAMES: Readonly<Record<TabletPyramidSymbols, string>> = {
+  none: "",
+  outward: "-symbols",
+  upright: "-symbols-upright",
+};
+
+/**
+ * What a pyramids image's file name adds to the flat tablet's:
+ * "-pyramids", then "-symbols" or "-symbols-upright".
+ */
+export const tabletPyramidsSuffix = (symbols: TabletPyramidSymbols) =>
+  `-pyramids${SYMBOLS_NAMES[symbols]}`;
 
 /**
  * A tablet drawn as the Golden Dawn's truncated pyramids (plan 095,
  * decision 5): each square's four sides in their elements' colours round
- * a white top, half the square, with the letter. A slug of its own, so
+ * a white top, half the square, with the letter; with `symbols`, each
+ * side's symbol on it, facing out (`outward`) or upright, round a top a
+ * third of the square. A slug of its own, so
  * that the flat tablets' images keep their identity and a change to the
  * pyramids' drawing moves only these. The same pages and raster sizes as
  * the flat tablets; Dee's and Raphael's versions, which have no pyramids,
  * are refused.
  *
- * Every key is omitted at its default, so a later key whose default draws
- * what is drawn today (the symbols on the sides, a follow-up) leaves every
- * existing query, and so every existing image, as it is.
+ * Every key is omitted at its default, so `symbols`, which came later
+ * and whose default draws what was drawn before it, left every existing
+ * query, and so every existing image, as it was.
  */
 export const enochianTabletPyramids: ComponentImageContract<EnochianTabletPyramidsProps> =
   {
@@ -65,7 +95,7 @@ export const enochianTabletPyramids: ComponentImageContract<EnochianTabletPyrami
     viewBoxOf: (props) => TABLET_VIEWBOXES[props.id],
     rasterDefault: TABLET_RASTER_DEFAULTS.earth,
     rasterDefaultOf: (props) => TABLET_RASTER_DEFAULTS[props.id],
-    keys: ["id", "font", "version"],
+    keys: ["id", "font", "version", "symbols"],
     personal: false,
     parse(searchParams) {
       const id = choice(searchParams.get("id") || "earth", TABLET_IDS);
@@ -76,6 +106,10 @@ export const enochianTabletPyramids: ComponentImageContract<EnochianTabletPyrami
           searchParams.get("version") || "gd",
           TABLET_PYRAMID_IMAGE_VERSIONS,
         ),
+        symbols: choice(
+          searchParams.get("symbols") || "none",
+          TABLET_PYRAMID_SYMBOLS,
+        ),
         ...parseDimensions(searchParams, TABLET_VIEWBOXES[id]),
       };
     },
@@ -84,9 +118,12 @@ export const enochianTabletPyramids: ComponentImageContract<EnochianTabletPyrami
       if (props.id !== "earth") pairs.push(["id", props.id]);
       if (props.font !== "latin") pairs.push(["font", props.font]);
       if (props.version !== "gd") pairs.push(["version", props.version]);
+      if (props.symbols !== "none") pairs.push(["symbols", props.symbols]);
       return [...pairs, ...canonicalDimensions(props)];
     },
     // The flat image's name with `-pyramids` after it, as the tablets
-    // page names its downloads of the same drawing.
-    filename: (props) => `${enochianTablet.filename(props)}-pyramids`,
+    // page names its downloads of the same drawing, and the symbols after
+    // that: "-symbols", facing out, or "-symbols-upright".
+    filename: (props) =>
+      `${enochianTablet.filename(props)}${tabletPyramidsSuffix(props.symbols)}`,
   };

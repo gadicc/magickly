@@ -12,8 +12,9 @@ import { TABLET_IDS } from "@/render/contracts/enochianTablet";
 /**
  * The tablets page's choices in its URL (plan 090, decision 1, and plan
  * 095, decisions 3 and 4): `?tablet=` and `?version=`, the panel's tab
- * (`?tab=`), the Squares tab's square (`?square=row,column`) and the
- * tablet drawn as pyramids (`?pyramids=1`), so a view can be shared.
+ * (`?tab=`), the Squares tab's square (`?square=row,column`), the
+ * tablet drawn as pyramids (`?pyramids=1`) and their sides' symbols
+ * (`?symbols=1`, standing `?upright=1`), so a view can be shared.
  *
  * Read from `window.location` rather than `useSearchParams`, which would
  * render the page in the browser only and drop it from the prerendered
@@ -54,6 +55,13 @@ export interface TabletChoice {
    * with pyramids, as `square` is: Dee's and Raphael's carry no elements.
    */
   pyramids?: boolean;
+  /**
+   * Each side's symbol drawn on the pyramids (`symbols=1`), facing out
+   * from the top. Only with `pyramids`.
+   */
+  symbols?: boolean;
+  /** The symbols stood upright (`upright=1`). Only with `symbols`. */
+  upright?: boolean;
 }
 
 /** The view a URL without choices shows: Earth, the default version. */
@@ -113,8 +121,9 @@ function squareOf(
 /**
  * The choices in a query string ("?tablet=air&version=dee"); a missing
  * or unknown tablet or version is the default's, and a missing or unknown
- * tab or square is left out, as is a square off the Squares tab, and a
- * square or pyramids in Dee's or Raphael's version.
+ * tab or square is left out, as is a square off the Squares tab, a
+ * square or pyramids in Dee's or Raphael's version, symbols without
+ * pyramids and upright without symbols.
  */
 export function parseTabletQuery(search: string): TabletChoice {
   const params = new URLSearchParams(search);
@@ -125,17 +134,25 @@ export function parseTabletQuery(search: string): TabletChoice {
   const tab = oneOf(params.get("tab"), PANEL_TABS);
   const square = squareOf(params.get("square"), { tablet, version, tab });
   const pyramids = params.get("pyramids") === "1" && hasPyramids(version);
+  const symbols = pyramids && params.get("symbols") === "1";
+  const upright = symbols && params.get("upright") === "1";
   return {
     tablet,
     version,
     ...(tab && tab !== "names" ? { tab } : {}),
     ...(square ? { square } : {}),
     ...(pyramids ? { pyramids } : {}),
+    ...(symbols ? { symbols } : {}),
+    ...(upright ? { upright } : {}),
   };
 }
 
 /** The choices' own params, the defaults left out. */
 function choiceParams(choice: TabletChoice): Record<string, string | null> {
+  // Each switch is written only while it shows: symbols with pyramids,
+  // upright with symbols.
+  const pyramids = Boolean(choice.pyramids) && hasPyramids(choice.version);
+  const symbols = pyramids && Boolean(choice.symbols);
   return {
     tablet: choice.tablet === DEFAULT_CHOICE.tablet ? null : choice.tablet,
     version: choice.version === DEFAULT_CHOICE.version ? null : choice.version,
@@ -144,7 +161,9 @@ function choiceParams(choice: TabletChoice): Record<string, string | null> {
       choice.square && squareFits(choice.square, choice)
         ? `${choice.square.row + 1},${choice.square.column + 1}`
         : null,
-    pyramids: choice.pyramids && hasPyramids(choice.version) ? "1" : null,
+    pyramids: pyramids ? "1" : null,
+    symbols: symbols ? "1" : null,
+    upright: symbols && choice.upright ? "1" : null,
   };
 }
 
@@ -155,7 +174,7 @@ const plainComma = (search: string) =>
 /**
  * The query string for the choices, "" for the default view
  * ("?tablet=air&version=dee", "?version=dee", "?tab=squares&square=7,6",
- * "?tablet=fire&pyramids=1").
+ * "?tablet=fire&pyramids=1", "?pyramids=1&symbols=1&upright=1").
  */
 export function tabletQuery(choice: TabletChoice): string {
   const params = new URLSearchParams();

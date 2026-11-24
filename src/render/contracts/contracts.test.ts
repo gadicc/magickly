@@ -44,6 +44,7 @@ import {
 import {
   isTabletPyramidImageVersion,
   TABLET_PYRAMID_IMAGE_VERSIONS,
+  TABLET_PYRAMID_SYMBOLS,
 } from "./enochianTabletPyramids";
 import {
   COMPONENT_IMAGE_SLUGS,
@@ -132,6 +133,9 @@ describe("component image contracts", () => {
       "id=union",
       "id=union&version=equinox&font=enochian",
       "id=union&width=2000",
+      "symbols=outward",
+      "id=fire&version=regardie&symbols=upright&font=enochian",
+      "id=union&symbols=upright",
     ],
     "seven-branched-candlestick": [
       "",
@@ -542,7 +546,7 @@ describe("component image contracts", () => {
       for (const version of TABLET_PYRAMID_IMAGE_VERSIONS)
         expect(
           parse("enochian-tablet-pyramids", `id=${id}&version=${version}`),
-        ).toEqual({ id, font: "latin", version });
+        ).toEqual({ id, font: "latin", version, symbols: "none" });
       for (const version of ["dee", "raphael"])
         expect(() =>
           parse("enochian-tablet-pyramids", `id=${id}&version=${version}`),
@@ -552,11 +556,13 @@ describe("component image contracts", () => {
       id: "earth",
       font: "latin",
       version: "gd",
+      symbols: "none",
     });
     expect(CONTRACTS["enochian-tablet-pyramids"].keys).toEqual([
       "id",
       "font",
       "version",
+      "symbols",
     ]);
     expect(
       componentImageQuery({
@@ -578,6 +584,31 @@ describe("component image contracts", () => {
     ).toBe("id=air&font=enochian&version=regardie&height=297");
   });
 
+  it("draws the pyramids' symbols on a key of their own, none by default", () => {
+    expect([...TABLET_PYRAMID_SYMBOLS]).toEqual(["none", "outward", "upright"]);
+    for (const symbols of TABLET_PYRAMID_SYMBOLS)
+      expect(
+        parse("enochian-tablet-pyramids", `symbols=${symbols}`).symbols,
+      ).toBe(symbols);
+    for (const query of ["symbols=Outward", "symbols=1", "symbols=inward"])
+      expect(() => parse("enochian-tablet-pyramids", query)).toThrow(
+        InvalidComponentImageRequest,
+      );
+    // Omitted at its default, so no image drawn before the key moved.
+    const query = (search: string) =>
+      componentImageQuery({
+        slug: "enochian-tablet-pyramids",
+        props: parse("enochian-tablet-pyramids", search),
+      }).toString();
+    expect(query("symbols=none&id=air")).toBe("id=air");
+    expect(query("symbols=outward&version=equinox&id=fire")).toBe(
+      "id=fire&version=equinox&symbols=outward",
+    );
+    expect(query("symbols=upright&height=297")).toBe(
+      "symbols=upright&height=297",
+    );
+  });
+
   it("names a pyramids image as the flat one, then -pyramids", () => {
     const name = (query: string) =>
       CONTRACTS["enochian-tablet-pyramids"].filename(
@@ -594,6 +625,14 @@ describe("component image contracts", () => {
       expect(name(query)).toBe(
         `${CONTRACTS["enochian-tablet"].filename(parse("enochian-tablet", query))}-pyramids`,
       );
+    // Then the symbols, facing out or upright.
+    expect(name("symbols=none")).toBe("enochian-earth-tablet-pyramids");
+    expect(name("id=air&symbols=outward")).toBe(
+      "enochian-air-tablet-pyramids-symbols",
+    );
+    expect(name("id=union&version=equinox&font=enochian&symbols=upright")).toBe(
+      "enochian-union-tablet-equinox-glyphs-pyramids-symbols-upright",
+    );
   });
 
   it("offers the candlestick's versions, the 1909 figure by default", () => {

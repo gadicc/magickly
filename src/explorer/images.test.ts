@@ -122,6 +122,32 @@ describe("componentImage", () => {
         pyramids: true,
       }),
     ).toBe("/api/render/enochian-tablet-pyramids?id=union&version=equinox");
+    // With their symbols, facing out or upright.
+    expect(
+      componentImage("Tablet", {
+        tablet: "water",
+        pyramids: true,
+        pyramidSymbols: "outward",
+      }),
+    ).toBe("/api/render/enochian-tablet-pyramids?id=water&symbols=outward");
+    expect(
+      componentImage("Tablet", {
+        tablet: "air",
+        version: "regardie",
+        pyramids: true,
+        pyramidSymbols: "upright",
+      }),
+    ).toBe(
+      "/api/render/enochian-tablet-pyramids?id=air&version=regardie&symbols=upright",
+    );
+    // A value the component draws nothing for, which the image refuses.
+    expect(
+      componentImage("Tablet", {
+        tablet: "air",
+        pyramids: true,
+        pyramidSymbols: "inward",
+      }),
+    ).toBe(null);
     // The flat tablet's, with the switch off.
     expect(componentImage("Tablet", { tablet: "fire", pyramids: false })).toBe(
       "/api/render/enochian-tablet?id=fire",

@@ -135,6 +135,8 @@ export default function NamesPanel({
   revealed,
   openSquare,
   pyramids = false,
+  symbols = false,
+  upright = false,
 }: {
   tablet: EnochianTabletID;
   version: TabletVersionId;
@@ -160,6 +162,10 @@ export default function NamesPanel({
   openSquare?: (square: TabletSquare) => void;
   /** The tablet drawn as pyramids, which a square's link keeps. */
   pyramids?: boolean;
+  /** Their sides' symbols, which a square's link keeps too. */
+  symbols?: boolean;
+  /** The symbols upright, which a square's link keeps too. */
+  upright?: boolean;
 }) {
   const { t } = useUiLanguage();
   const [expanded, setExpanded] = React.useState<ReadonlySet<GroupKey>>(
@@ -380,6 +386,8 @@ export default function NamesPanel({
                           pick={pick}
                           openSquare={openSquare}
                           pyramids={pyramids}
+                          symbols={symbols}
+                          upright={upright}
                           t={t}
                         />
                       )}
@@ -515,6 +523,8 @@ function NameDetail({
   pick,
   openSquare,
   pyramids,
+  symbols,
+  upright,
   t,
 }: {
   name: TabletName;
@@ -526,6 +536,8 @@ function NameDetail({
   pick: (id: TabletNameId) => void;
   openSquare?: (square: TabletSquare) => void;
   pyramids: boolean;
+  symbols: boolean;
+  upright: boolean;
   t: Translate;
 }) {
   const variants = tabletNameVariants(tablets[tablet], name.id, version);
@@ -662,6 +674,8 @@ function NameDetail({
                     tab: "squares",
                     square,
                     pyramids,
+                    symbols,
+                    upright,
                   })}
                   onClick={(event: React.MouseEvent) => {
                     if (event.metaKey || event.ctrlKey || event.shiftKey)

@@ -10,9 +10,15 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  PYRAMID_SYMBOL_INKS,
+  type SideElement,
+  sideSymbol,
+} from "./pyramidMarks.tsx";
 import Tablet, {
   PYRAMID_COLOURS,
   PYRAMID_TOP,
+  PYRAMID_TOP_SYMBOLS,
   type TabletProps,
   type TabletSquare,
 } from "./Tablet.tsx";
@@ -164,8 +170,25 @@ describe("Tablet's pyramids (plan 095, decision 4)", () => {
     );
     const imports = [
       ...drawing.matchAll(/^import (type )?[^;]*?from "([^"]+)";/gms),
-    ].filter(([, , from]) => from === "magick-data/enochian/tabletPyramids");
-    expect(imports.map(([, type]) => type)).toEqual(["type "]);
+    ];
+    expect(
+      imports
+        .filter(([, , from]) => from === "magick-data/enochian/tabletPyramids")
+        .map(([, type]) => type),
+    ).toEqual(["type "]);
+    // Nor the symbols' marks, nor the data they read: the entry passes
+    // the marks in too.
+    expect(
+      imports
+        .map(([, , from]) => from)
+        .filter(
+          (from) =>
+            from.includes("pyramidMarks") ||
+            (from.startsWith("magick-data/") &&
+              from !== "magick-data/enochian/tabletPyramids" &&
+              from !== "magick-data/enochian/tablets"),
+        ),
+    ).toEqual([]);
   });
 
   it("tints the regions over pyramids, and keeps a chosen name's marks", () => {
@@ -183,6 +206,131 @@ describe("Tablet's pyramids (plan 095, decision 4)", () => {
     expect(page.querySelector('[data-highlight="name"]')).not.toBeNull();
     expect(page.querySelector("[data-start]")).not.toBeNull();
     expect(page.querySelector('[data-order="1"]')).not.toBeNull();
+  });
+});
+
+describe("Tablet's pyramids with their symbols (plan 095, Symbols on the sides)", () => {
+  /** The marks drawn, by square and side, with their transforms. */
+  const marks = (page: Element) => [...page.querySelectorAll("[data-symbol]")];
+
+  it("draws nothing different without pyramids, or without the prop", () => {
+    for (const tablet of [...WATCHTOWERS, "union"]) {
+      const plain = drawn({ tablet }).markup;
+      for (const pyramidSymbols of ["outward", "upright"] as const)
+        expect(drawn({ tablet, pyramidSymbols }).markup).toBe(plain);
+      expect(drawn({ tablet, pyramids: true }).markup).not.toContain(
+        "data-symbol",
+      );
+    }
+  });
+
+  it("draws Dee's and Raphael's tables flat, symbols or not", () => {
+    for (const version of ["dee", "raphael"])
+      expect(
+        drawn({
+          tablet: "fire",
+          version,
+          pyramids: true,
+          pyramidSymbols: "outward",
+        }).markup,
+      ).toBe(drawn({ tablet: "fire", version }).markup);
+  });
+
+  it("draws every side's own symbol in its inks, in each version", () => {
+    for (const version of PYRAMID_VERSIONS)
+      for (const tablet of [...WATCHTOWERS, "union"] as const) {
+        const view = tabletVersion(tablets[tablet], version);
+        if (!view) throw new Error(`${tablet} ${version}`);
+        const { page } = drawn({
+          tablet,
+          version,
+          pyramids: true,
+          pyramidSymbols: "upright",
+        });
+        const squares = tablet === "union" ? 20 : 156;
+        expect(marks(page), `${tablet} ${version}`).toHaveLength(squares * 4);
+        // One lookup by square and side, rather than a selector each.
+        const byKey = new Map(
+          marks(page).map((mark) => [
+            `${mark.parentElement?.getAttribute("data-pyramid")}/${mark.getAttribute("data-symbol")}`,
+            mark,
+          ]),
+        );
+        for (const pyramid of tabletPyramids(view)) {
+          pyramid.sides.forEach((side, index) => {
+            const mark = byKey.get(
+              `${pyramid.row},${pyramid.column}/${side.side}`,
+            );
+            const where = `${tablet} ${version} ${pyramid.row},${pyramid.column} ${index + 1}`;
+            expect(mark, where).toBeTruthy();
+            const symbol = sideSymbol(side);
+            const inks =
+              PYRAMID_SYMBOL_INKS[
+                (side.elementId as SideElement | undefined) ?? "none"
+              ];
+            if (symbol.kind === "text")
+              expect(mark?.querySelector("text")?.textContent, where).toBe(
+                symbol.text,
+              );
+            else if (symbol.kind === "figure")
+              expect(mark?.querySelectorAll("circle").length, where).toBe(
+                symbol.rows.reduce((sum, count) => sum + count, 0),
+              );
+            else
+              expect(mark?.querySelector("path, circle"), where).not.toBeNull();
+            expect(mark?.innerHTML.includes(inks.ink), where).toBe(true);
+          });
+        }
+      }
+  });
+
+  it("puts each in the middle of its band, facing out unless upright", () => {
+    const transforms = (pyramidSymbols: "outward" | "upright") =>
+      marks(drawn({ tablet: "air", pyramids: true, pyramidSymbols }).page)
+        .slice(0, 4)
+        .map((mark) => mark.getAttribute("transform"));
+    // The first square's, at the top third's default: its band 6.667 deep
+    // from the square's edge (2, 2 on the grid), the mark's 34 units
+    // scaled to 78% of it.
+    expect(transforms("outward")).toEqual([
+      "translate(5.333 12) scale(0.153) rotate(-90)",
+      "translate(12 5.333) scale(0.153) rotate(0)",
+      "translate(18.667 12) scale(0.153) rotate(90)",
+      "translate(12 18.667) scale(0.153) rotate(180)",
+    ]);
+    expect(transforms("upright")).toEqual([
+      "translate(5.333 12) scale(0.153)",
+      "translate(12 5.333) scale(0.153)",
+      "translate(18.667 12) scale(0.153)",
+      "translate(12 18.667) scale(0.153)",
+    ]);
+  });
+
+  it("draws them over the sides and under the tops, borders and letters", () => {
+    const { markup } = drawn({
+      tablet: "earth",
+      pyramids: true,
+      pyramidSymbols: "outward",
+      highlights: { squares: [], regions: true },
+    });
+    const lastMark = markup.lastIndexOf("data-symbol=");
+    expect(lastMark).toBeGreaterThan(markup.lastIndexOf("<polygon"));
+    expect(lastMark).toBeLessThan(markup.indexOf("data-top"));
+    expect(lastMark).toBeLessThan(markup.indexOf("data-region="));
+  });
+
+  it("makes the top a third by default with symbols, unless pyramidTop says", () => {
+    const topOf = (props: Partial<TabletProps>) =>
+      Number(
+        drawn({ tablet: "air", pyramids: true, ...props })
+          .page.querySelector("[data-top]")
+          ?.getAttribute("width"),
+      );
+    expect(PYRAMID_TOP_SYMBOLS).toBe(1 / 3);
+    expect(topOf({ pyramidSymbols: "outward" })).toBe(6.667);
+    expect(topOf({ pyramidSymbols: "upright" })).toBe(6.667);
+    expect(topOf({ pyramidSymbols: "upright", pyramidTop: 0.25 })).toBe(5);
+    expect(topOf({})).toBe(10);
   });
 });
 

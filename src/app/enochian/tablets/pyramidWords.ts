@@ -1,4 +1,4 @@
-import { PYRAMID_COLOURS } from "magick-components/enochian/Tablet";
+import type { SideElement } from "magick-components/enochian/pyramidMarks";
 import planets, { type PlanetId } from "magick-data/astrology/planets";
 import zodiac from "magick-data/astrology/zodiac";
 import type {
@@ -24,60 +24,15 @@ import { ELEMENT_WORDS, groupLabel, type Translate } from "./nameWords";
  * language; the elements are the page's own messages.
  */
 
-/** An element of a side: the four and Spirit. */
-export type SideElement = "fire" | "water" | "air" | "earth" | "spirit";
-
 /** Each element by name, Spirit with the four. */
 export const SIDE_ELEMENT_WORDS: Readonly<Record<SideElement, string>> = {
   ...(ELEMENT_WORDS as Record<Exclude<SideElement, "spirit">, string>),
   spirit: /*i18n*/ "Spirit",
 };
 
-/**
- * Each element's colour on a side, and the colour of a symbol painted on
- * it, its complement (Regardie, vol. 4, pp.294–295): Fire red with green,
- * Water blue with orange, Air yellow with violet, Earth black with white,
- * Spirit white with black. The sides' colours are the tablet's own
- * pyramids' (`PYRAMID_COLOURS`, magick-components), the green and orange
- * those the tablets' angles are lettered in. A complement can be close
- * to its ground in lightness (the green on red, the orange on blue), so
- * every symbol is drawn with a thin `outline`, dark on a light ground
- * and light on a dark one, which stands out from the ground by at least
- * 3:1 (`pyramidColours.test.ts`).
- */
-export const SIDE_COLOURS: Readonly<
-  Record<
-    SideElement | "white",
-    { fill: string; symbol: string; outline: string }
-  >
-> = {
-  fire: { fill: PYRAMID_COLOURS.fire, symbol: "#22bb22", outline: "#000000" },
-  water: { fill: PYRAMID_COLOURS.water, symbol: "#ff8800", outline: "#000000" },
-  air: { fill: PYRAMID_COLOURS.air, symbol: "#7b1fa2", outline: "#000000" },
-  earth: { fill: PYRAMID_COLOURS.earth, symbol: "#ffffff", outline: "#ffffff" },
-  spirit: {
-    fill: PYRAMID_COLOURS.spirit,
-    symbol: "#000000",
-    outline: "#000000",
-  },
-  // A Calvary square's fourth side, which carries its Sephirah and no
-  // element: white, as the source allows (or the Sephirah's colour).
-  white: { fill: PYRAMID_COLOURS.none, symbol: "#000000", outline: "#000000" },
-};
-
-/**
- * Text presentation for a symbol that may otherwise be drawn as an emoji:
- * the zodiac's carry U+FE0E in the data, the planets' and Spirit's wheel
- * do not.
- */
-export const asText = (symbol: string) =>
-  symbol.endsWith("\uFE0E") ? symbol : `${symbol}\uFE0E`;
-
-/** A Hebrew letter's glyph and name, by its id. */
+/** A Hebrew letter's name, by its id. */
 const letterOf = (id: string) =>
-  (hebrewLetters as Record<string, { letter: { he: string; name: string } }>)[
-    id
-  ]?.letter;
+  (hebrewLetters as Record<string, { letter: { name: string } }>)[id]?.letter;
 
 /** A planet's everyday English name: "Sun", "Moon", "Mars". */
 export const planetName = (id: PlanetId) => {
@@ -87,41 +42,6 @@ export const planetName = (id: PlanetId) => {
   };
   return planet.commonName ?? planet.name.en.en;
 };
-
-/** What a side's symbol is, for the drawing. */
-export type SideSymbol =
-  | { kind: "text"; text: string; hebrew?: boolean }
-  | { kind: "element"; element: SideElement }
-  | { kind: "figure"; rows: readonly number[] };
-
-/**
- * The symbol painted on a side: its sign, planet, Sephirah's number,
- * Hebrew letter or geomantic figure, and where the side carries none of
- * these (Spirit, an element alone, a card or a trump), its element's.
- * Ours: the sources paint a symbol of each kind, and the drawing shows
- * the one a reader is most likely to know.
- */
-export function sideSymbol(side: TabletPyramidSide): SideSymbol {
-  const { attribution: a } = side;
-  if (a.zodiacId)
-    return { kind: "text", text: asText(zodiac[a.zodiacId].symbol) };
-  if (a.sephirahId)
-    return { kind: "text", text: String(sephirot[a.sephirahId].index) };
-  if (a.planetId)
-    return { kind: "text", text: asText(planets[a.planetId].symbol) };
-  if (a.hebrewLetterId)
-    return {
-      kind: "text",
-      text: letterOf(a.hebrewLetterId)?.he ?? "",
-      hebrew: true,
-    };
-  if (a.tetragramId)
-    return { kind: "figure", rows: tetragrams[a.tetragramId].rows };
-  return {
-    kind: "element",
-    element: (a.elementId ?? side.elementId ?? "spirit") as SideElement,
-  };
-}
 
 /** The attributions of a side, by name, in the order the data gives them. */
 export function attributionNames(

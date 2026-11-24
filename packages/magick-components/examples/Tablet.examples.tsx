@@ -30,6 +30,15 @@ export const Tablet: ComponentExamples<ComponentProps<typeof TabletComponent>> =
         props: { tablet: "fire", pyramids: true, frame: true },
       },
       {
+        title: "Water as pyramids, with their symbols",
+        props: {
+          tablet: "water",
+          pyramids: true,
+          pyramidSymbols: "outward",
+          frame: true,
+        },
+      },
+      {
         title: "The Tablet of Union as pyramids, a quarter top",
         props: {
           tablet: "union",

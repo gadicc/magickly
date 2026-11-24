@@ -24,6 +24,7 @@
     "src/astrology/PlanetarySeal.tsx",
     "src/astrology/PlanetarySpirit.tsx",
     "src/chakras/Chakras.tsx",
+    "src/enochian/pyramidMarks.tsx",
     "src/enochian/Tablet.tsx",
     "src/gd/FylfotCross.tsx",
     "src/gd/GradeTree.tsx",

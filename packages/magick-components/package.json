@@ -48,6 +48,7 @@
     "./astrology/PlanetarySeal": "./src/astrology/PlanetarySeal.tsx",
     "./astrology/PlanetarySpirit": "./src/astrology/PlanetarySpirit.tsx",
     "./chakras/Chakras": "./src/chakras/Chakras.tsx",
+    "./enochian/pyramidMarks": "./src/enochian/pyramidMarks.tsx",
     "./enochian/Tablet": "./src/enochian/Tablet.tsx",
     "./gd/FylfotCross": "./src/gd/FylfotCross.tsx",
     "./gd/GradeTree": "./src/gd/GradeTree.tsx",
@@ -111,6 +112,10 @@
       "./chakras/Chakras": {
         "types": "./lib/chakras/Chakras.d.ts",
         "default": "./lib/chakras/Chakras.js"
+      },
+      "./enochian/pyramidMarks": {
+        "types": "./lib/enochian/pyramidMarks.d.ts",
+        "default": "./lib/enochian/pyramidMarks.js"
       },
       "./enochian/Tablet": {
         "types": "./lib/enochian/Tablet.d.ts",

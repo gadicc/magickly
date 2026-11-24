@@ -1,7 +1,8 @@
 import { Box, Typography } from "@mui/material";
+import type { SideElement } from "magick-components/enochian/pyramidMarks";
 import { PYRAMID_COLOURS } from "magick-components/enochian/Tablet";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
-import { SIDE_ELEMENT_WORDS, type SideElement } from "./pyramidWords";
+import { SIDE_ELEMENT_WORDS } from "./pyramidWords";
 
 /** The elements in the key's order, the Order's (vol. 4, p.294). */
 const ELEMENTS: readonly SideElement[] = [

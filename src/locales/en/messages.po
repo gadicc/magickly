@@ -2728,6 +2728,16 @@ msgstr "Draw as pyramids"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
+msgid "Symbols on the sides"
+msgstr "Symbols on the sides"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "Stand the symbols upright"
+msgstr "Stand the symbols upright"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
 msgid "What the panel shows"
 msgstr "What the panel shows"
 

@@ -230,7 +230,7 @@ describe("/enochian/tablets drawn as pyramids (plan 095, decision 4)", () => {
   it("names its downloads with -pyramids, as the pyramids' image is named", () => {
     const air = componentImageFilename({
       slug: "enochian-tablet-pyramids",
-      props: { id: "air", font: "latin", version: "gd" },
+      props: { id: "air", font: "latin", version: "gd", symbols: "none" },
     });
     expect(air).toBe("enochian-air-tablet-pyramids");
     expect(downloadName(air, { alt: false, reversed: true })).toBe(
@@ -239,7 +239,12 @@ describe("/enochian/tablets drawn as pyramids (plan 095, decision 4)", () => {
     // After the version and the glyphs, which the flat image's name has.
     const earth = componentImageFilename({
       slug: "enochian-tablet-pyramids",
-      props: { id: "earth", font: "enochian", version: "regardie" },
+      props: {
+        id: "earth",
+        font: "enochian",
+        version: "regardie",
+        symbols: "none",
+      },
     });
     expect(earth).toBe("enochian-earth-tablet-regardie-glyphs-pyramids");
     expect(
@@ -250,5 +255,156 @@ describe("/enochian/tablets drawn as pyramids (plan 095, decision 4)", () => {
         regions: true,
       }),
     ).toBe("enochian-earth-tablet-regardie-glyphs-pyramids-plain-king-regions");
+  });
+});
+
+describe("/enochian/tablets with the pyramids' symbols (plan 095, Symbols on the sides)", () => {
+  const symbolsSwitch = () =>
+    screen.queryByRole("switch", { name: "Symbols on the sides" });
+  const uprightSwitch = () =>
+    screen.queryByRole("switch", { name: "Stand the symbols upright" });
+  /** The tablet's marks, and how many face out (turned). */
+  const marks = (container: HTMLElement) => {
+    const all = [
+      ...container.querySelectorAll("[data-pyramids] [data-symbol]"),
+    ];
+    return {
+      count: all.length,
+      turned: all.filter((mark) =>
+        mark.getAttribute("transform")?.includes("rotate("),
+      ).length,
+    };
+  };
+  /** The tablet's flat tops' width, a share of the 20-unit square. */
+  const topWidth = (container: HTMLElement) =>
+    container
+      .querySelector("[data-pyramids] [data-top]")
+      ?.getAttribute("width");
+
+  it("draws each side's symbol facing out, or upright, and says so in the URL and the image", async () => {
+    const { container } = render(<Tablets />);
+    expect(symbolsSwitch()).toBeNull();
+    fireEvent.click(pyramidsSwitch() as HTMLElement);
+    expect(marks(container).count).toBe(0);
+    expect(uprightSwitch()).toBeNull();
+    fireEvent.click(symbolsSwitch() as HTMLElement);
+    expect(marks(container)).toEqual({ count: 624, turned: 624 });
+    expect(topWidth(container)).toBe("6.667");
+    expect(window.location.search).toBe("?pyramids=1&symbols=1");
+    expect(await imageHrefs()).toEqual([
+      "/api/render/enochian-tablet-pyramids?symbols=outward",
+      "/api/render/enochian-tablet-pyramids?fmt=png&symbols=outward",
+    ]);
+    expect(await downloaded()).toBe(
+      "enochian-earth-tablet-pyramids-symbols.svg",
+    );
+    fireEvent.click(uprightSwitch() as HTMLElement);
+    expect(marks(container)).toEqual({ count: 624, turned: 0 });
+    expect(window.location.search).toBe("?pyramids=1&symbols=1&upright=1");
+    // Once the save has let the buttons go.
+    await waitFor(() =>
+      expect(
+        screen
+          .getAllByRole("button", { name: "Copy SVG image link" })[0]
+          .hasAttribute("disabled"),
+      ).toBe(false),
+    );
+    expect(await imageHrefs()).toEqual([
+      "/api/render/enochian-tablet-pyramids?symbols=upright",
+      "/api/render/enochian-tablet-pyramids?fmt=png&symbols=upright",
+    ]);
+    expect(await downloaded()).toBe(
+      "enochian-earth-tablet-pyramids-symbols-upright.svg",
+    );
+    // Off again: the half top, and no switch to stand them.
+    fireEvent.click(symbolsSwitch() as HTMLElement);
+    expect(marks(container).count).toBe(0);
+    expect(topWidth(container)).toBe("10");
+    expect(uprightSwitch()).toBeNull();
+    expect(window.location.search).toBe("?pyramids=1");
+  });
+
+  it("remembers the symbols while the pyramids are off, and in Dee's version", () => {
+    const { container } = render(<Tablets />);
+    fireEvent.click(pyramidsSwitch() as HTMLElement);
+    fireEvent.click(symbolsSwitch() as HTMLElement);
+    fireEvent.click(uprightSwitch() as HTMLElement);
+    fireEvent.click(pyramidsSwitch() as HTMLElement);
+    expect(symbolsSwitch()).toBeNull();
+    expect(uprightSwitch()).toBeNull();
+    expect(window.location.search).toBe("");
+    fireEvent.click(pyramidsSwitch() as HTMLElement);
+    expect(marks(container)).toEqual({ count: 624, turned: 0 });
+    expect(window.location.search).toBe("?pyramids=1&symbols=1&upright=1");
+    choose("Version", "Dee's, 1584");
+    expect(marks(container).count).toBe(0);
+    expect(window.location.search).toBe("?version=dee");
+    choose("Version", "The Equinox's");
+    expect(marks(container)).toEqual({ count: 624, turned: 0 });
+    expect(window.location.search).toBe(
+      "?version=equinox&pyramids=1&symbols=1&upright=1",
+    );
+    expect((uprightSwitch() as HTMLInputElement).checked).toBe(true);
+  });
+
+  it("opens with the symbols from a link, only with the switches they hang on", () => {
+    window.history.replaceState(
+      null,
+      "",
+      `${PAGE}?tablet=union&pyramids=1&symbols=1&upright=1`,
+    );
+    const first = render(<Tablets />);
+    expect(marks(first.container)).toEqual({ count: 80, turned: 0 });
+    expect((symbolsSwitch() as HTMLInputElement).checked).toBe(true);
+    expect((uprightSwitch() as HTMLInputElement).checked).toBe(true);
+    cleanup();
+    window.history.replaceState(null, "", `${PAGE}?symbols=1&upright=1`);
+    const second = render(<Tablets />);
+    expect(squares(second.container)).toBe(0);
+    expect(symbolsSwitch()).toBeNull();
+    cleanup();
+    window.history.replaceState(null, "", `${PAGE}?pyramids=1&upright=1`);
+    const third = render(<Tablets />);
+    expect(marks(third.container).count).toBe(0);
+    expect((symbolsSwitch() as HTMLInputElement).checked).toBe(false);
+    expect(uprightSwitch()).toBeNull();
+  });
+
+  it("keeps the symbols in a name's links to its squares", () => {
+    window.history.replaceState(
+      null,
+      "",
+      `${PAGE}?tablet=fire&pyramids=1&symbols=1&upright=1`,
+    );
+    render(<Tablets />);
+    fireEvent.click(screen.getByRole("button", { name: /^Oip\b/ }));
+    const links = screen
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("href")?.includes("tab=squares"));
+    expect(links.length).toBeGreaterThan(0);
+    for (const link of links)
+      expect(link.getAttribute("href")).toMatch(
+        /&pyramids=1&symbols=1&upright=1$/,
+      );
+  });
+
+  it("names its downloads as the symbols' image is named", () => {
+    const fire = componentImageFilename({
+      slug: "enochian-tablet-pyramids",
+      props: {
+        id: "fire",
+        font: "enochian",
+        version: "equinox",
+        symbols: "upright",
+      },
+    });
+    expect(fire).toBe(
+      "enochian-fire-tablet-equinox-glyphs-pyramids-symbols-upright",
+    );
+    expect(
+      downloadName(fire, { alt: false, reversed: false, regions: true }),
+    ).toBe(
+      "enochian-fire-tablet-equinox-glyphs-pyramids-symbols-upright-plain-regions",
+    );
   });
 });

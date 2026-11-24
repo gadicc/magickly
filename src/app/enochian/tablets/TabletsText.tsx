@@ -1,4 +1,5 @@
 import { H2, List, PageText } from "@/app/PageText";
+import Cite from "@/sources/Cite";
 import Link from "@/ui/Link";
 
 /**
@@ -14,26 +15,29 @@ export default function TabletsText() {
         letters, and show the reversed letters and the second letters some
         squares carry. In the Golden Dawn&apos;s versions,{" "}
         <i>Draw as pyramids</i> draws every square as its pyramid, each side in
-        its element&apos;s colour, with a key to the colours. Beside the tablet,
-        or under it on a phone, are three tabs. <i>Names</i> lists the names
-        read off the tablet, grouped as it is built: the three holy names, the
-        King and the six Seniors on the Great Cross, then each quarter&apos;s
-        names, and in the Golden Dawn&apos;s versions its Kerubic archangel and
-        servient angels, which put a letter of the Tablet of Union before their
-        names. The Tablet of Union is a tablet of its own here, with its four
-        lines and its first column; Dee and Raphael have none. Choose a name to
-        see its squares on the tablet, from its first, with how the other
-        versions and the sources spell it, where it is read and its dictionary
-        entry; tap a square to find the names through it, or turn on{" "}
-        <i>Show the regions</i> to tint the crosses and the top rows.{" "}
-        <i>Differences</i> marks every square where the versions disagree: tap
-        one to see what each version and source has there, and why.{" "}
-        <i>Squares</i> shows a square as the Golden Dawn&apos;s truncated
-        pyramid: tap a square, or choose its row and square, or follow a square
-        from a name&apos;s detail. Each version comes with its sources and page
-        references, and with how it differs from the others. Download the tablet
-        as SVG or PNG as it is shown, and use the share button at the top of the
-        page to send a link with the tablet, version, tab and square you chose.
+        its element&apos;s colour, with a key to the colours;{" "}
+        <i>Symbols on the sides</i> then paints each side&apos;s symbol on it,
+        facing out from the top, and <i>Stand the symbols upright</i> turns them
+        all to be read. Beside the tablet, or under it on a phone, are three
+        tabs. <i>Names</i> lists the names read off the tablet, grouped as it is
+        built: the three holy names, the King and the six Seniors on the Great
+        Cross, then each quarter&apos;s names, and in the Golden Dawn&apos;s
+        versions its Kerubic archangel and servient angels, which put a letter
+        of the Tablet of Union before their names. The Tablet of Union is a
+        tablet of its own here, with its four lines and its first column; Dee
+        and Raphael have none. Choose a name to see its squares on the tablet,
+        from its first, with how the other versions and the sources spell it,
+        where it is read and its dictionary entry; tap a square to find the
+        names through it, or turn on <i>Show the regions</i> to tint the crosses
+        and the top rows. <i>Differences</i> marks every square where the
+        versions disagree: tap one to see what each version and source has
+        there, and why. <i>Squares</i> shows a square as the Golden Dawn&apos;s
+        truncated pyramid: tap a square, or choose its row and square, or follow
+        a square from a name&apos;s detail. Each version comes with its sources
+        and page references, and with how it differs from the others. Download
+        the tablet as SVG or PNG as it is shown, and use the share button at the
+        top of the page to send a link with the tablet, version, tab and square
+        you chose.
       </p>
       <H2 id="tablets-pyramids">The squares as pyramids</H2>
       <p>
@@ -61,17 +65,24 @@ export default function TabletsText() {
         against the squares, tables and plates the sources print, and every rule
         is shown with the pages it comes from. The drawing is ours: the Order
         painted the tablets flat and made a pyramid of card for one square at a
-        time, and it painted the symbols facing outward, where ours stand
-        upright unless you turn them. So is a whole tablet drawn in pyramids,
-        after the Order&apos;s rule for one square: the sides in their
-        elements&apos; colours without their symbols, and the letter on a flat
-        top half as wide as the square, where the Equinox&apos;s plates draw the
-        top about a quarter of the square to leave the sides room for the
-        symbols. Some readings are ours too, and labelled so: where the sources
-        do not say which of a sphinx&apos;s left and right sides gives which
-        part, the Kerubs are listed by side rather than drawn as one figure;
-        where a sphinx has two active sides and two passive, no tendency is
-        given; and the Children of Horus are given by the three elements
+        time, and it painted the symbols facing outward, away from the top (vol.
+        4, p.
+        <Cite work="regardie1940" leaf={287} plain rel="noreferrer">
+          295
+        </Cite>
+        ), where the Squares tab&apos;s stand upright unless you turn them. So
+        is a whole tablet drawn in pyramids, after the Order&apos;s rule for one
+        square: the sides in their elements&apos; colours, and the letter on a
+        flat top half as wide as the square, or a third with the symbols on the
+        sides, which face outward as the Order painted them unless you stand
+        them upright. The Equinox&apos;s plates draw the top about a quarter of
+        the square, to leave the sides room for the symbols; ours keeps the
+        letter large enough to read, and shows one symbol a side where the
+        sources list several. Some readings are ours too, and labelled so: where
+        the sources do not say which of a sphinx&apos;s left and right sides
+        gives which part, the Kerubs are listed by side rather than drawn as one
+        figure; where a sphinx has two active sides and two passive, no tendency
+        is given; and the Children of Horus are given by the three elements
         present, as the gods&apos; table and its one worked example of the kind
         have them. Dee&apos;s and Raphael&apos;s tables carry no elements, so
         their versions have no pyramids.

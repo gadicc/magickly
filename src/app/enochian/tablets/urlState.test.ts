@@ -248,3 +248,67 @@ describe("the tablets page's pyramids in its URL (plan 095, decision 4)", () => 
         ).toBe(version === "dee" || version === "raphael" ? undefined : true);
   });
 });
+
+describe("the pyramids' symbols in the tablets page's URL (plan 095, Symbols on the sides)", () => {
+  it("reads symbols=1 with pyramids, and upright=1 with symbols", () => {
+    expect(parseTabletQuery("?pyramids=1&symbols=1")).toEqual({
+      ...DEFAULT_CHOICE,
+      pyramids: true,
+      symbols: true,
+    });
+    expect(parseTabletQuery("?pyramids=1&symbols=1&upright=1")).toEqual({
+      ...DEFAULT_CHOICE,
+      pyramids: true,
+      symbols: true,
+      upright: true,
+    });
+    // Each only with the switch it hangs on.
+    expect(parseTabletQuery("?symbols=1&upright=1")).toEqual(DEFAULT_CHOICE);
+    expect(parseTabletQuery("?pyramids=1&upright=1")).toEqual({
+      ...DEFAULT_CHOICE,
+      pyramids: true,
+    });
+    expect(
+      parseTabletQuery("?version=dee&pyramids=1&symbols=1&upright=1"),
+    ).toEqual({ ...DEFAULT_CHOICE, version: "dee" });
+    for (const value of ["0", "true", ""])
+      expect(parseTabletQuery(`?pyramids=1&symbols=${value}`)).toEqual({
+        ...DEFAULT_CHOICE,
+        pyramids: true,
+      });
+  });
+
+  it("writes each only while its switch shows", () => {
+    expect(
+      tabletQuery({ ...DEFAULT_CHOICE, pyramids: true, symbols: true }),
+    ).toBe("?pyramids=1&symbols=1");
+    expect(
+      tabletQuery({
+        ...DEFAULT_CHOICE,
+        pyramids: true,
+        symbols: true,
+        upright: true,
+      }),
+    ).toBe("?pyramids=1&symbols=1&upright=1");
+    expect(
+      tabletQuery({ ...DEFAULT_CHOICE, symbols: true, upright: true }),
+    ).toBe("");
+    expect(
+      tabletQuery({
+        ...DEFAULT_CHOICE,
+        pyramids: true,
+        symbols: false,
+        upright: true,
+      }),
+    ).toBe("?pyramids=1");
+    expect(
+      tabletQuery({
+        tablet: "air",
+        version: "raphael",
+        pyramids: true,
+        symbols: true,
+        upright: true,
+      }),
+    ).toBe("?tablet=air&version=raphael");
+  });
+});

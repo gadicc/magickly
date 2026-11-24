@@ -1,10 +1,10 @@
-import type { TabletPyramid } from "magick-data/enochian/tabletPyramids";
 import {
-  SIDE_COLOURS,
-  type SideElement,
-  type SideSymbol,
+  inksOf,
+  SideMark,
   sideSymbol,
-} from "./pyramidWords";
+} from "magick-components/enochian/pyramidMarks";
+import { PYRAMID_COLOURS } from "magick-components/enochian/Tablet";
+import type { TabletPyramid } from "magick-data/enochian/tabletPyramids";
 
 /**
  * One square of a tablet drawn large as the Golden Dawn's truncated
@@ -12,9 +12,11 @@ import {
  * holds the square's letter, each side in its element's colour with its
  * symbol in the complementary colour (Regardie, vol. 4, pp.293–296). The
  * symbols stand upright, to be read, unless `outward` turns each to face
- * out from the top, as the Order painted them (p.295). The app's own drawing, not the tablet's: stage 4 decides
- * how a whole tablet is drawn so. Its words are in the list beside it, so
- * the drawing is hidden from screen readers.
+ * out from the top, as the Order painted them (p.295). The app's own
+ * drawing of one square; its marks are magick-components', which the
+ * whole tablet draws with `pyramidSymbols`, here at their large outlines.
+ * Its words are in the list beside it, so the drawing is hidden from
+ * screen readers.
  */
 
 const SIZE = 240;
@@ -46,114 +48,6 @@ const SIDES = [
   },
 ] as const;
 
-/** The fonts a sign's or planet's symbol is drawn in, as text. */
-const SYMBOL_FONTS =
-  '"Segoe UI Symbol", "Noto Sans Symbols 2", "Noto Sans Symbols", "DejaVu Sans", sans-serif';
-
-/** A symbol's inks: its colour, and the outline that sets it off its side. */
-interface Inks {
-  ink: string;
-  outline: string;
-}
-
-/** An element's triangle's or Spirit's wheel's strokes, centred on 0, 0. */
-function ElementStrokes({ element }: { element: SideElement }) {
-  if (element === "spirit")
-    return (
-      <>
-        <circle r={13} />
-        {[0, 45, 90, 135].map((angle) => (
-          <line key={angle} x1={-13} x2={13} transform={`rotate(${angle})`} />
-        ))}
-      </>
-    );
-  const up = element === "fire" || element === "air";
-  const tip = up ? -15 : 15;
-  const base = up ? 9 : -9;
-  return (
-    <>
-      <path d={`M0 ${tip}L14 ${base}L-14 ${base}Z`} />
-      {(element === "air" || element === "earth") && <line x1={-12} x2={12} />}
-    </>
-  );
-}
-
-/** An element's mark: its strokes over a wider stroke of the outline. */
-function ElementMark({
-  element,
-  ink,
-  outline,
-}: { element: SideElement } & Inks) {
-  const stroke = (colour: string, width: number) => ({
-    fill: "none",
-    stroke: colour,
-    strokeWidth: width,
-    strokeLinejoin: "round" as const,
-    strokeLinecap: "round" as const,
-  });
-  return (
-    <>
-      <g style={stroke(outline, 6)} data-outline="">
-        <ElementStrokes element={element} />
-      </g>
-      <g style={stroke(ink, 3)}>
-        <ElementStrokes element={element} />
-      </g>
-    </>
-  );
-}
-
-/** A geomantic figure: a row of one or two dots for each of its four. */
-function Figure({ rows, ink, outline }: { rows: readonly number[] } & Inks) {
-  const dots = rows.flatMap((count, row) =>
-    (count === 1 ? [0] : [-6, 6]).map((cx) => ({ cx, cy: (row - 1.5) * 8 })),
-  );
-  return (
-    <g
-      style={{
-        fill: ink,
-        stroke: outline,
-        strokeWidth: 1.5,
-        paintOrder: "stroke",
-      }}
-      data-outline=""
-    >
-      {dots.map(({ cx, cy }) => (
-        <circle key={`${cx},${cy}`} cx={cx} cy={cy} r={2.8} />
-      ))}
-    </g>
-  );
-}
-
-function SideMark({ symbol, ink, outline }: { symbol: SideSymbol } & Inks) {
-  if (symbol.kind === "element")
-    return <ElementMark element={symbol.element} ink={ink} outline={outline} />;
-  if (symbol.kind === "figure")
-    return <Figure rows={symbol.rows} ink={ink} outline={outline} />;
-  return (
-    <text
-      y={11}
-      data-outline=""
-      style={{
-        fill: ink,
-        // The outline under the glyph, not over it.
-        stroke: outline,
-        strokeWidth: 3,
-        strokeLinejoin: "round",
-        paintOrder: "stroke",
-        fontSize: symbol.hebrew ? 34 : 32,
-        fontFamily: symbol.hebrew
-          ? '"Frank Ruhl Libre", "Noto Sans Hebrew", serif'
-          : SYMBOL_FONTS,
-        textAnchor: "middle",
-      }}
-      {...(symbol.hebrew ? { direction: "rtl" } : {})}
-    >
-      {symbol.text}
-    </text>
-  );
-}
-
 export default function PyramidDrawing({
   pyramid,
   letter,
@@ -175,23 +69,22 @@ export default function PyramidDrawing({
       style={{ display: "block", maxWidth: SIZE, margin: "0 auto" }}
     >
       {pyramid.sides.map((side, index) => {
-        const colours =
-          SIDE_COLOURS[(side.elementId as SideElement | undefined) ?? "white"];
+        const fill =
+          PYRAMID_COLOURS[
+            (side.elementId as keyof typeof PYRAMID_COLOURS | undefined) ??
+              "none"
+          ];
         const { points, at, turn } = SIDES[index];
         return (
           <g key={side.side} data-side={side.side}>
             <polygon
               points={points}
-              style={{ fill: colours.fill, stroke: "#777", strokeWidth: 1.5 }}
+              style={{ fill, stroke: "#777", strokeWidth: 1.5 }}
             />
             <g
               transform={`translate(${at[0]} ${at[1]})${outward ? ` rotate(${turn})` : ""}`}
             >
-              <SideMark
-                symbol={sideSymbol(side)}
-                ink={colours.symbol}
-                outline={colours.outline}
-              />
+              <SideMark symbol={sideSymbol(side)} {...inksOf(side)} />
             </g>
           </g>
         );

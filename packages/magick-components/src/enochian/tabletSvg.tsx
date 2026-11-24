@@ -4,7 +4,10 @@
  * hall's art draws it unnamed.
  */
 
-import type { TabletPyramid } from "magick-data/enochian/tabletPyramids";
+import type {
+  TabletPyramid,
+  TabletPyramidSide,
+} from "magick-data/enochian/tabletPyramids";
 import enochianTablets, {
   DEFAULT_TABLET_VERSION,
   type EnochianTablet,
@@ -14,7 +17,7 @@ import enochianTablets, {
   type TabletView,
   tabletVersion,
 } from "magick-data/enochian/tablets";
-import React, { type CSSProperties } from "react";
+import React, { type CSSProperties, type ReactNode } from "react";
 import { EquinoxSigils, Sigils, VERSION_NAMES } from "./tabletSigils.tsx";
 
 /** A tablet's page, as its `<svg>`'s viewBox: x, y, width, height. */
@@ -766,6 +769,14 @@ function OutlinedSquares({
  */
 export const PYRAMID_TOP = 0.5;
 
+/**
+ * The flat top's share of a square by default when the sides carry their
+ * symbols (`pyramidSymbols`): a third, which leaves the sides room for
+ * them and the letter still legible (Gadi's choice of 24 November 2026,
+ * plan 095's follow-up "Symbols on the sides").
+ */
+export const PYRAMID_TOP_SYMBOLS = 1 / 3;
+
 /** The flat top's least and greatest share of a square. */
 const PYRAMID_TOP_RANGE = [0.2, 0.8] as const;
 
@@ -790,30 +801,56 @@ export const PYRAMID_COLOURS = Object.freeze({
  */
 const PYRAMID_LINE = "#888";
 
-/** A top share the drawing can hold: the default where none is given. */
-function pyramidTopOf(top: number | undefined): number {
-  if (top === undefined || !Number.isFinite(top)) return PYRAMID_TOP;
+/** A top share the drawing can hold: `fallback` where none is given. */
+function pyramidTopOf(top: number | undefined, fallback: number): number {
+  if (top === undefined || !Number.isFinite(top)) return fallback;
   return Math.min(PYRAMID_TOP_RANGE[1], Math.max(PYRAMID_TOP_RANGE[0], top));
 }
 
 const unit = (value: number) => Math.round(value * 1000) / 1000;
 
+/** The symbols on a pyramid's sides, where they are drawn. */
+interface SymbolPlan {
+  /** A side's mark, centred on 0, 0 in a box of about 34 units. */
+  markOf: (side: TabletPyramidSide) => ReactNode;
+  /** Each turned to face out from the top, as the Order painted them. */
+  outward: boolean;
+}
+
+/**
+ * How each side's symbol is turned to face out from the top: side 1's
+ * foot on the left, 2's at the top, 3's on the right, 4's at the bottom.
+ */
+const OUTWARD_TURNS = [-90, 0, 90, 180] as const;
+
+/**
+ * How much of a side's depth, from the square's edge to its top's, its
+ * symbol's box fills.
+ */
+const SYMBOL_FILL = 0.78;
+
+/** The box a side's mark is drawn in, about 34 units a side. */
+const MARK_BOX = 34;
+
 /**
  * A square's four sides round its flat top, in their elements' colours,
  * with a thin line where two sides meet: side 1 on the left, 2 at the
- * top, 3 on the right, 4 at the bottom (vol. 4, p.293).
+ * top, 3 on the right, 4 at the bottom (vol. 4, p.293). With `symbols`,
+ * each side's mark in the middle of its band, scaled to it.
  */
 function PyramidSides({
   pyramid,
   left,
   top,
   inset,
+  symbols,
 }: {
   pyramid: TabletPyramid;
   left: number;
   top: number;
   /** The distance from the square's edge to its flat top's. */
   inset: number;
+  symbols?: SymbolPlan;
 }) {
   const near = inset;
   const far = SQUARE - inset;
@@ -848,6 +885,27 @@ function PyramidSides({
         d={`M${at(0, 0)}L${at(near, near)}M${at(SQUARE, 0)}L${at(far, near)}M${at(SQUARE, SQUARE)}L${at(far, far)}M${at(0, SQUARE)}L${at(near, far)}`}
         style={{ fill: "none", stroke: PYRAMID_LINE, strokeWidth: 0.5 }}
       />
+      {symbols &&
+        pyramid.sides.map((side, index) => {
+          const middle = near / 2;
+          const [x, y] = [
+            [middle, SQUARE / 2],
+            [SQUARE / 2, middle],
+            [SQUARE - middle, SQUARE / 2],
+            [SQUARE / 2, SQUARE - middle],
+          ][index] ?? [0, 0];
+          const scale = unit((near * SYMBOL_FILL) / MARK_BOX);
+          const turn = symbols.outward ? OUTWARD_TURNS[index] : undefined;
+          return (
+            <g
+              key={`s-${side.side}`}
+              data-symbol={side.side}
+              transform={`translate(${at(x, y).replace(",", " ")}) scale(${scale})${turn === undefined ? "" : ` rotate(${turn})`}`}
+            >
+              {symbols.markOf(side)}
+            </g>
+          );
+        })}
     </g>
   );
 }
@@ -866,6 +924,7 @@ function PyramidSquares({
   options,
   enochianStyle,
   top: share,
+  symbols,
   regions = false,
 }: {
   tablet: TabletView;
@@ -875,6 +934,8 @@ function PyramidSquares({
   enochianStyle?: CSSProperties;
   /** The flat top's share of a square. */
   top: number;
+  /** The sides' symbols, drawn over them before the tops. */
+  symbols?: SymbolPlan;
   regions?: boolean;
 }) {
   const byKey = new Map(pyramids.map((each) => [squareKey(each), each]));
@@ -899,6 +960,7 @@ function PyramidSquares({
               left={squareX(x, grid)}
               top={squareY(y, grid)}
               inset={inset}
+              symbols={symbols}
             />
           )
         );
@@ -956,10 +1018,14 @@ function PyramidSquares({
   );
 }
 
-/** A grid's pyramids and the share of a square their tops take. */
+/**
+ * A grid's pyramids, the share of a square their tops take, and their
+ * sides' symbols where they are drawn.
+ */
 interface PyramidPlan {
   pyramids: readonly TabletPyramid[];
   top: number;
+  symbols?: SymbolPlan;
 }
 
 function Grid({
@@ -1063,6 +1129,7 @@ function Grid({
           options={options}
           enochianStyle={enochianStyle}
           top={pyramids.top}
+          symbols={pyramids.symbols}
           regions={regions}
         />
       ) : regions ? (
@@ -1162,6 +1229,7 @@ function UnionGrid({
           options={options}
           enochianStyle={enochianStyle}
           top={pyramids.top}
+          symbols={pyramids.symbols}
         />
       ) : (
         tablet.grid
@@ -1338,9 +1406,19 @@ export interface TabletProps {
   pyramids?: boolean;
   /**
    * The flat top's side as a share of a square's, from 0.2 to 0.8
-   * (default `PYRAMID_TOP`, a half). With `pyramids` only.
+   * (default `PYRAMID_TOP`, a half, or `PYRAMID_TOP_SYMBOLS`, a third,
+   * with `pyramidSymbols`). With `pyramids` only.
    */
   pyramidTop?: number;
+  /**
+   * Draw each side's symbol on it (default none), in the side's
+   * complementary colour with a thin outline: its sign, Sephirah's
+   * number, planet, Hebrew letter or geomantic figure, else its element's
+   * mark (`enochian/pyramidMarks`). `outward` turns each to face out from
+   * the top, as the Order painted them (Regardie, vol. 4, p.295);
+   * `upright` stands them all up to be read. With `pyramids` only.
+   */
+  pyramidSymbols?: "outward" | "upright";
 }
 
 /**
@@ -1361,6 +1439,8 @@ export function TabletSvg({
   ref,
   pyramidsOf,
   pyramidTop,
+  pyramidSymbols,
+  pyramidMarkOf,
   role,
   "aria-label": ariaLabel,
   "aria-hidden": ariaHidden,
@@ -1370,6 +1450,11 @@ export function TabletSvg({
    * hall's art, which draws none, does not load the rules behind them.
    */
   pyramidsOf?: (view: TabletView) => readonly TabletPyramid[];
+  /**
+   * A side's mark, for `pyramidSymbols`: given by the entry, as
+   * `pyramidsOf` is, so that the data the symbols read loads with it.
+   */
+  pyramidMarkOf?: (side: TabletPyramidSide) => ReactNode;
   role?: "img";
   "aria-label"?: string;
   "aria-hidden"?: true;
@@ -1385,8 +1470,20 @@ export function TabletSvg({
       : undefined;
   const drawn = pyramidsOf && tablet ? pyramidsOf(tablet) : [];
   // None in Dee's and Raphael's versions, which are then drawn flat.
+  const symbols: SymbolPlan | undefined =
+    pyramidMarkOf &&
+    (pyramidSymbols === "outward" || pyramidSymbols === "upright")
+      ? { markOf: pyramidMarkOf, outward: pyramidSymbols === "outward" }
+      : undefined;
   const pyramids: PyramidPlan | undefined = drawn.length
-    ? { pyramids: drawn, top: pyramidTopOf(pyramidTop) }
+    ? {
+        pyramids: drawn,
+        top: pyramidTopOf(
+          pyramidTop,
+          symbols ? PYRAMID_TOP_SYMBOLS : PYRAMID_TOP,
+        ),
+        ...(symbols && { symbols }),
+      }
     : undefined;
   const options = {
     reversed: mirrorReversed,

@@ -146,8 +146,9 @@ describe("component image registry", () => {
     // The flat tablet's letters and version rules, the zodiac the
     // pyramids' rules find a Great Cross square's sign and decans in, what
     // their other lookups need to draw at all (the Kerubs' signs and the
-    // Sephiroth's numbers among them), and the symbols a later switch
-    // would draw, hashed ahead of it (plan 095, stage 5).
+    // Sephiroth's numbers among them), and the symbols the `symbols` key
+    // draws, hashed ahead of it (plan 095, stage 5), so that the key moved
+    // nothing here.
     [
       "enochian-tablet-pyramids",
       "bef0caccd45b670e5d44856f53f80e81f4c785a5508cd27653cdf119fccc61ee",
@@ -269,6 +270,10 @@ describe("component image registry", () => {
       594,
       1000,
     ],
+    // With their symbols (plan 095, "Symbols on the sides"): a mark a
+    // side, a glyph, a figure's dots or an element's strokes, besides.
+    ["enochian-tablet-pyramids", "id=fire&symbols=outward", 840, 1188, 1600],
+    ["enochian-tablet-pyramids", "id=union&symbols=upright", 496, 416, 160],
     ["seven-branched-candlestick", "", 1024, 1024, 60],
     ["seven-branched-candlestick", "version=modern", 1024, 1024, 60],
     ["table-of-shewbread", "", 1024, 1024, 130],
@@ -360,8 +365,18 @@ describe("component image registry", () => {
       "NotoSerif-Regular-latin1.ttf",
       "FrankRuhlLibre-Bold-letters.ttf",
     ]);
-    for (const slug of ["enochian-tablet", "enochian-tablet-pyramids"])
-      expect(await files(slug)).toEqual([...base, "EnochianPlain.ttf"]);
+    expect(await files("enochian-tablet")).toEqual([
+      ...base,
+      "EnochianPlain.ttf",
+    ]);
+    // The symbols' Hebrew letters too, with or without symbols: the
+    // fonts are the slug's.
+    for (const query of ["", "symbols=outward"])
+      expect(await files("enochian-tablet-pyramids", query)).toEqual([
+        ...base,
+        "EnochianPlain.ttf",
+        "FrankRuhlLibre-Bold-letters.ttf",
+      ]);
     expect(await files("table-of-shewbread")).toEqual([
       ...base,
       "NotoEmoji-Variable.ttf",
@@ -761,6 +776,21 @@ describe("component image registry", () => {
         25_886,
         "feff338f82551dc0380427fa7581f0a6f7b185053d6a76986d7d886654869830",
       ],
+      // With their symbols (plan 095, "Symbols on the sides"), reviewed as
+      // rasterised, 24 November 2026: each side's sign, planet, number,
+      // Hebrew letter, figure or element facing out from a top a third of
+      // the square, the Hebrew in Frank Ruhl Libre and the signs and
+      // planets in Noto Sans Symbols and Symbols 2, U+FE0E drawing nothing.
+      [
+        "id=fire&symbols=outward",
+        1_135_168,
+        "6d41a1431e03a21e91d9b63779a97083f2e06efdb69d30b3d3e5f4c1d10130da",
+      ],
+      [
+        "id=union&symbols=upright",
+        159_476,
+        "e4b5851954848e9a561de0029ddf1bf3a4198508dd7ab8dad1fb393baa2c4607",
+      ],
     ],
   };
 
@@ -814,6 +844,39 @@ describe("component image registry", () => {
         "If the drawing changed on purpose, bump TABLET_PYRAMIDS_IMAGE_PROFILE in registry.tsx " +
         "and record the new digest under the new profile; never re-pin a shipped profile.",
     ).toBe(TABLET_PYRAMIDS_DRAWING_DIGESTS[TABLET_PYRAMIDS_IMAGE_PROFILE]);
+  }, 60_000);
+
+  // The same over the drawings with symbols (plan 095, "Symbols on the
+  // sides"), facing out and upright, which came under the same profile:
+  // the digest above holds every drawing without them unmoved.
+  const TABLET_PYRAMIDS_SYMBOLS_DIGESTS: Record<string, string> = {
+    "magickli-tablet-pyramids-image-v1":
+      "59057dbbb22c9cd431c4aba876ba5b84234c879f7a1ff32a77a45d0d9202b229",
+  };
+
+  it("pins a digest of every tablet's pyramids with their symbols under their image profile", async () => {
+    const registration = COMPONENT_IMAGE_REGISTRY["enochian-tablet-pyramids"];
+    const drawings: string[] = [];
+    for (const symbols of ["outward", "upright"])
+      for (const version of TABLET_PYRAMID_IMAGE_VERSIONS)
+        for (const id of TABLET_IDS) {
+          const query = `id=${id}&version=${version}&symbols=${symbols}`;
+          const markup = renderToStaticMarkup(
+            (await registration.render(
+              CONTRACTS["enochian-tablet-pyramids"].parse(
+                new URLSearchParams(query),
+              ),
+            )) as ReactElement,
+          );
+          drawings.push(`${query}\n${registration.source?.(markup) ?? markup}`);
+        }
+    expect(drawings).toHaveLength(30);
+    expect(
+      createHash("sha256").update(drawings.join("\n\n")).digest("hex"),
+      `the tablets' pyramids with their symbols draw otherwise than ${TABLET_PYRAMIDS_IMAGE_PROFILE} was reviewed with. ` +
+        "If the drawing changed on purpose, bump TABLET_PYRAMIDS_IMAGE_PROFILE in registry.tsx " +
+        "and record the new digests under the new profile; never re-pin a shipped profile.",
+    ).toBe(TABLET_PYRAMIDS_SYMBOLS_DIGESTS[TABLET_PYRAMIDS_IMAGE_PROFILE]);
   }, 60_000);
 
   it("draws every tablet's squares as pyramids, which the flat image does not", async () => {

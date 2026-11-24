@@ -2728,6 +2728,16 @@ msgstr "ציור כפירמידות"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
+msgid "Symbols on the sides"
+msgstr "סמלים על הצלעות"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "Stand the symbols upright"
+msgstr "העמדת הסמלים זקופים"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
 msgid "What the panel shows"
 msgstr "מה מוצג בחלונית"
 
