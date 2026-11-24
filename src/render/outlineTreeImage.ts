@@ -15,9 +15,14 @@ import { IMAGE_INPUTS_PROFILE } from "./dataInputs";
  * profile carried both, and a data fix was published by bumping it by hand,
  * which re-identified every image under it (plan 028).
  */
-export const TREE_IMAGE_PROFILE = "magickli-tree-image-outlines-v4";
-/** The other registered components share the same fonts and normalisation. */
-export const COMPONENT_IMAGE_PROFILE = "magickli-component-image-outlines-v1";
+export const TREE_IMAGE_PROFILE = "magickli-tree-image-outlines-v5";
+/**
+ * The other registered components share the same fonts and normalisation.
+ * v2, as the Tree's v5 and every image profile's bump that day
+ * (24 November 2026): coordinates rounded to `OUTLINE_PRECISION` of the
+ * drawing (`roundOutlinedPaths`).
+ */
+export const COMPONENT_IMAGE_PROFILE = "magickli-component-image-outlines-v2";
 
 /**
  * Fonts every registry component may use; the Tree's identity lists exactly
@@ -295,6 +300,77 @@ function topLevelGroups(body: string): TopLevelGroup[] {
 }
 
 /**
+ * How finely `roundOutlinedPaths` keeps a coordinate: a hundred-thousandth
+ * of the drawing's larger side (24 November 2026). On a sigil's 100-unit
+ * square that is 0.001, half a micron if a word is printed 10 cm wide:
+ * far below what a screen, a printer, a laser or a 3D printer resolves.
+ */
+export const OUTLINE_PRECISION = 1e-5;
+
+/** The largest factor any element's transforms, nested, scale it by. */
+function largestScale(body: string): number {
+  const tag = /<(\/?)([A-Za-z][\w:-]*)\b([^>]*?)(\/?)>/g;
+  const stack: number[] = [1];
+  let largest = 1;
+  for (let match = tag.exec(body); match; match = tag.exec(body)) {
+    const [, closing, , attributes, selfClosing] = match;
+    if (closing) {
+      if (stack.length > 1) stack.pop();
+      continue;
+    }
+    let scale = stack[stack.length - 1];
+    for (const [, values] of attributes.matchAll(
+      /\b(?:transform|patternTransform|gradientTransform)="matrix\(([^)]*)\)"/g,
+    )) {
+      const [a, b, c, d] = values
+        .trim()
+        .split(/[\s,]+/)
+        .map(Number);
+      scale *= Math.max(Math.hypot(a, b), Math.hypot(c, d));
+    }
+    if (!Number.isFinite(scale) || scale <= 0)
+      throw new Error("Unexpected component image transform");
+    largest = Math.max(largest, scale);
+    if (!selfClosing) stack.push(scale);
+  }
+  return largest;
+}
+
+/**
+ * The outlined body with every path's coordinates rounded to the decimals
+ * that keep `OUTLINE_PRECISION` of the drawing's larger side, more where
+ * a transform scales a group up (a temple hall's art is drawn small and
+ * scaled by up to 100): one count of decimals for the whole image, the
+ * finest any of its parts needs. resvg writes six or more, which no
+ * reader sees and every download carries. Its paths are absolute, so no
+ * error accumulates, and a point several paths share rounds the same in
+ * each. Exported for its tests.
+ */
+export function roundOutlinedPaths(
+  body: string,
+  viewBox: readonly [number, number, number, number],
+): string {
+  const side = Math.max(Math.abs(viewBox[2]), Math.abs(viewBox[3]));
+  const step = (side * OUTLINE_PRECISION) / largestScale(body);
+  // resvg writes a matrix in single precision, so a rotation's scale is 1
+  // give or take a few parts in ten million (0.62348396, 0.78183615 is
+  // 1.00000005), which must not cost a decimal.
+  const decimals = Math.min(
+    8,
+    Math.max(0, Math.ceil(-Math.log10(step) - 1e-6)),
+  );
+  const round = (number: string) => {
+    const value = Number(Number(number).toFixed(decimals));
+    return Object.is(value, -0) ? "0" : String(value);
+  };
+  return body.replace(
+    / d="([^"]*)"/g,
+    (_, d: string) =>
+      ` d="${d.replace(/-?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?/g, round)}"`,
+  );
+}
+
+/**
  * Outline trusted registry JSX output only. Never pass uploaded/arbitrary SVG.
  * All font input is bundled; WASM has no filesystem/network font fallback.
  */
@@ -344,6 +420,7 @@ export async function outlineComponentImage(
     // references it now; display:none preserves its non-rendering behavior in
     // the existing closed SVG profile, which does not admit visibility.
     body = body.replace(/ visibility="hidden"/g, ' display="none"');
+    body = roundOutlinedPaths(body, options.viewBox);
     if (options.reuse) {
       const kept = paintServers?.idPrefix;
       const shared = options.reuse.idPrefix;

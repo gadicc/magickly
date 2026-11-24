@@ -32,9 +32,10 @@ import {
 /**
  * The renderer's identity for the halls' images; moves only when it does.
  * v2: Hebrew in Frank Ruhl Libre Bold instead of Noto Serif Hebrew Bold
- * (11 November 2026).
+ * (11 November 2026). v3 (24 November 2026): coordinates rounded to `OUTLINE_PRECISION` of the drawing,
+ * finer inside the art's scaled groups (`roundOutlinedPaths`).
  */
-export const GD_HALL_IMAGE_PROFILE = "magickli-gd-hall-image-v2";
+export const GD_HALL_IMAGE_PROFILE = "magickli-gd-hall-image-v3";
 
 /**
  * The art the images draw with: the package's, the tablets in the bundled

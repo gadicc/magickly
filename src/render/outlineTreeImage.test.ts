@@ -33,22 +33,24 @@ const source = (text: string, width = "100%") =>
 describe("bundled Tree of Life outlines", () => {
   // These pin accepted shaping, not just nonempty output (which could hide a
   // missing symbol or a .notdef box). Font/engine upgrades require visual review.
+  // Every hash moved, and no glyph, when outlined coordinates were rounded to
+  // OUTLINE_PRECISION (24 November 2026, profile v5); each gives its value before.
   it.each([
     [
       "Hello אבג",
-      "507d2e0050c55115bfd40f36540f050cec126584167e3f72bbe764cef87f95ba",
+      "0afa87e6a8553db4eccfc9469d8fa2939b0a4f9f180d6ca9b510163661c66fdc", // was 507d2e00…
     ],
     [
       "मूलाधार",
-      "ae43899790627ec4222a2798c8020f8f8b5125c16aea6d31c9e7c396b65572bc",
+      "fef97f3b02d0bf829414f62a131e4a87f1b7bf1af063ee3ec246ffba53d3f671", // was ae438997…
     ],
     [
       "🜁🜂🜃🜄",
-      "2aedd75512c8ce7dace858621f94f8ed4d1e0f8bc93b36f576fb7a10d5c919d0",
+      "dfaeedae84316d0b4c9a3a37459e6b59174a9f8b1c2d54b6221e0edddce50743", // was 2aedd755…
     ],
     [
       "☉☾☿♀♁♂♃♄",
-      "3eacec02c87dd7ae5adfaedc95be3f21383d6d8359c720ef15628f9f06930d4b",
+      "96ddc36d908fd17823a0f703dd400f1a3e01f761d34cf0915e4c49c540242b05", // was 3eacec02…
     ],
   ])(
     "outlines the existing non-Latin field glyphs: %s",

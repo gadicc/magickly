@@ -19,10 +19,13 @@ const sha256 = (bytes: Uint8Array | string) =>
  * nothing. The registry's `ROSE_SIGIL_PINS` hold four texts' bytes and
  * `ROSE_SIGIL_DRAWING_DIGESTS` the path data; this holds the 72 files
  * themselves, through the route that serves them. A correction to a
- * name's Hebrew moves it, as it moves that angel's file.
+ * name's Hebrew moves it, as it moves that angel's file. It was
+ * 89dac30f… until outlined coordinates were rounded to `OUTLINE_PRECISION`
+ * (24 November 2026), the drawing unchanged; the hash is now under
+ * `magickli-rose-sigil-image-v3`.
  */
 const ANGEL_ROSE_SVGS_SHA256 =
-  "89dac30f98c3a7d55a90398e1a7233ea9d882f8347252a6b1a1528df4c953d2e";
+  "1e19240c45cf4bcc7cb421339316e97cc5fb06b669042a92cb36ec25ea25f38d";
 
 describe("the 72 angels' rose sigil files", () => {
   it("draw the bytes main drew", async () => {

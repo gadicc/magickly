@@ -25,7 +25,7 @@ import {
 } from "./angelSigilImage";
 import { renderComponentImage } from "./componentImage";
 import { ANGEL_SIGIL_SLUGS, type AngelSigilSlug } from "./contracts/angelSigil";
-import { outlineComponentImage } from "./outlineTreeImage";
+import { outlineComponentImage, roundOutlinedPaths } from "./outlineTreeImage";
 import { componentInputsHash } from "./registry";
 
 const DRAWN: readonly DrawnSigilStyle[] = ["band", "bare", "talisman"];
@@ -98,7 +98,7 @@ const pathData = (svg: string) =>
 
 describe("the angels' sigil styles (plan 096)", () => {
   it("publishes under a profile of its own, with the styles' faces", async () => {
-    expect(ANGEL_SIGIL_IMAGE_PROFILE).toBe("magickli-angel-sigil-image-v1");
+    expect(ANGEL_SIGIL_IMAGE_PROFILE).toBe("magickli-angel-sigil-image-v2");
     expect([...ANGEL_SIGIL_FONTS]).toEqual([
       FACE_FILES.roman,
       FACE_FILES.hebrew,
@@ -222,7 +222,9 @@ describe("the angels' sigil styles (plan 096)", () => {
           },
         });
         try {
-          const face = pathData(alone.toString());
+          // Rounded as the outliner rounds every image (`roundOutlinedPaths`),
+          // so a fallback face still differs by whole glyphs, not digits.
+          const face = pathData(roundOutlinedPaths(alone.toString(), box));
           expect(face.length, `${slug} ${style} ${run}`).toBeGreaterThan(0);
           expect(
             pathData(drawn.bytes.toString()),
@@ -303,6 +305,54 @@ describe("the angels' sigil styles (plan 096)", () => {
           "angel=jabamiah&style=talisman",
           50_882,
           "986a6e8920539fe1e60385086fc9ecdd4336255b0eebe10cd41f052caf1dc155",
+        ],
+      ],
+    },
+    // Coordinates rounded to OUTLINE_PRECISION (24 November 2026), drawing unchanged.
+    "magickli-angel-sigil-image-v2": {
+      inputs:
+        "25d38e34e607cd2be8980d1f20fa9363da42358a3d99e7a76af8820ea8404b9a",
+      pins: [
+        // The default style.
+        [
+          "angel=vehuiah",
+          14_490,
+          "8f90f624d1291b7ee0cff0a4f333e6353e90378c2ef16c71b5fb6eebb947c641",
+        ],
+        // The longest verse (#47).
+        [
+          "angel=asaliah&style=talisman",
+          97_660,
+          "9039e68d5cb45e7c4d5e72f3f1710f1a081f86a3943ac9bb83cb53d5567c3746",
+        ],
+        // The smallest capitals (#31).
+        [
+          "angel=lecabel&style=talisman",
+          95_113,
+          "b3aaa89e19da693ccc06e9f64c3c5eccfad6e13aef7904c83affbca8578721d4",
+        ],
+        // æ, once misread as œ (#43), and Æ (#55).
+        [
+          "angel=veualiah&style=talisman",
+          53_953,
+          "cd991c736ba86518c795d72f8c4bc0a091fcd452b7966aed26991b5e1051a68d",
+        ],
+        [
+          "angel=mebahiah&style=talisman",
+          66_263,
+          "fb2bd81135de50d6c1828521e3ff78478988b2c2da271e1e691c9d4dd07381dd",
+        ],
+        // The longest roman name, hyphened (#25).
+        [
+          "angel=nith-haiah&style=bare",
+          9_364,
+          "c5d660016f44c346ab7b41c26ff8ad0b8616e8bc8272a10528e3b364a48a26ab",
+        ],
+        // Genesis 1:1 in the Vulgate's Latin (#70, decision 8).
+        [
+          "angel=jabamiah&style=talisman",
+          41_548,
+          "f31229eaabeb92dbdb17332561a6c1adf15c1e1515bb2854cc101f3439d1460a",
         ],
       ],
     },
@@ -707,6 +757,9 @@ describe("the angels' sigil styles (plan 096)", () => {
   ];
   const ANGEL_SIGIL_DRAWING_DIGESTS: Record<string, string> = {
     "magickli-angel-sigil-image-v1":
+      "9b8355c9d2bae054bc1a057cac4882192252f3491dc9d4b60c9ad542fe9740b1",
+    // Coordinates rounded to OUTLINE_PRECISION (24 November 2026), drawing unchanged.
+    "magickli-angel-sigil-image-v2":
       "9b8355c9d2bae054bc1a057cac4882192252f3491dc9d4b60c9ad542fe9740b1",
   };
 

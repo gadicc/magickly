@@ -52,15 +52,19 @@ import {
  * sigil planned and placed by rule, with each word its own sigil. v2
  * (24 November 2026) draws a rose repeated under several words once and
  * places it with `<use>` (`reuse`); a one-word sigil's bytes are v1's.
+ * v3 (24 November 2026): coordinates rounded to `OUTLINE_PRECISION` of the drawing
+ * (`roundOutlinedPaths`).
  */
-export const ROSE_SIGIL_IMAGE_PROFILE = "magickli-rose-sigil-image-v2";
+export const ROSE_SIGIL_IMAGE_PROFILE = "magickli-rose-sigil-image-v3";
 
 /**
  * The renderer's identity for the bare kameas (plan 093): the square, its
  * rules and its numbers in Noto Serif italic, outlined. It moves only when
- * the drawing does; the numbers are inputs (`KAMEA_INPUTS`).
+ * the drawing does; the numbers are inputs (`KAMEA_INPUTS`). v2
+ * (24 November 2026): coordinates rounded to `OUTLINE_PRECISION` of the drawing
+ * (`roundOutlinedPaths`).
  */
-export const KAMEA_IMAGE_PROFILE = "magickli-kamea-image-v1";
+export const KAMEA_IMAGE_PROFILE = "magickli-kamea-image-v2";
 
 /**
  * The renderer's identity for a name's sigil on its kamea (plan 093, K3):
@@ -70,8 +74,10 @@ export const KAMEA_IMAGE_PROFILE = "magickli-kamea-image-v1";
  * (24 November 2026) draws the square once however many words stand on
  * it, placed with `<use>` (`reuse`): 32 one-letter words on the Moon's
  * square were 6 MB as v1, 0.2 MB as v2. A one-word sigil's bytes are v1's.
+ * v3 (24 November 2026): coordinates rounded to `OUTLINE_PRECISION` of the drawing
+ * (`roundOutlinedPaths`).
  */
-export const KAMEA_SIGIL_IMAGE_PROFILE = "magickli-kamea-sigil-image-v2";
+export const KAMEA_SIGIL_IMAGE_PROFILE = "magickli-kamea-sigil-image-v3";
 
 /**
  * The renderer's identity for the tablets drawn as pyramids (plan 095,
@@ -82,10 +88,12 @@ export const KAMEA_SIGIL_IMAGE_PROFILE = "magickli-kamea-sigil-image-v2";
  * the rules do; the letters, the zodiac and what else the rules look up,
  * and the symbols' glyphs and figures, are inputs
  * (`TABLET_PYRAMIDS_INPUTS`). The `symbols` key came under v1: every
- * image without it draws as before, which its digest pin holds.
+ * image without it draws as before, which its digest pin holds. v2
+ * (24 November 2026): coordinates rounded to `OUTLINE_PRECISION` of the
+ * drawing (`roundOutlinedPaths`).
  */
 export const TABLET_PYRAMIDS_IMAGE_PROFILE =
-  "magickli-tablet-pyramids-image-v1";
+  "magickli-tablet-pyramids-image-v2";
 
 export { ANGEL_SIGIL_IMAGE_PROFILE };
 

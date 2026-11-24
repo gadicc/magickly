@@ -306,17 +306,18 @@ Follow-ups are separate from the completed migration work:
   together. Migration 0030 replaces every existing code, so links and QR
   codes handed out before the release stop working. TODO: tell the
   admins of production temples to hand out their new links.
-- TODO: rate limiting for the public component image routes
-  (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through
-  WASM on request, and `/api/render/rose-sigil` takes up to about 160 ms
-  of CPU for a 32-letter text chosen to stress its placement by rule
-  (18 November, plan 088), so the edge cache offers no protection against
-  varied requests. `/api/render/kamea-sigil` (plan 093, 21 November) is
-  far costlier: a word placement cannot clear takes about 4 s of CPU
-  (main search and fallback) for each distinct canonical URL on each
-  instance, 33 ms once that instance has placed it; a non-canonical query
-  redirects to the canonical one, so the CDN keeps one key a figure. Nothing in the app rate-limits today; see
-  [plan 027](027-component-exports.md#adversarial-review).
+- Rate limiting for the public component image routes, the TODO from
+  plans 027, 088 and 093, done 24 November 2026: personal images
+  (`kamea-sigil`, `rose-sigil`, `astro-geomancy-chart`) count against
+  daily per-client and site limits on each fresh render (`src/limits`),
+  and the Vercel Firewall allows 20 a minute an address on them and 600
+  on the other render routes ([limits README](../src/limits/README.md)).
+- Outlined image size ([plan 099](099-outlined-image-size.md)), 24
+  November 2026: a sigil's repeated square or rose is drawn once and
+  reused (the Moon's 32 one-letter words, 6 MB to 0.2 MB), and every
+  outlined image's coordinates are rounded to a hundred-thousandth of the
+  drawing, so every image profile moved. Published offline bundles keep
+  their bytes; each ritual's next publication draws the new images.
 - 10 November 2026: Bing Webmaster Tools has magick.ly (and the old
   magick.li); each production release tells IndexNow (Bing, Yandex and
   the other participating engines; not Google) which pages changed:

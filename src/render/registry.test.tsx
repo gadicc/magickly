@@ -63,7 +63,7 @@ describe("component image registry", () => {
     // optimiser (plan 088), and the inputs hash cannot move (it reads no
     // table), so the profile must: an offline copy or catalog entry made
     // under the optimiser's drawing must not pass for the new one.
-    expect(ROSE_SIGIL_IMAGE_PROFILE).toBe("magickli-rose-sigil-image-v2");
+    expect(ROSE_SIGIL_IMAGE_PROFILE).toBe("magickli-rose-sigil-image-v3");
     expect(COMPONENT_IMAGE_REGISTRY["rose-sigil"].profile).toBe(
       ROSE_SIGIL_IMAGE_PROFILE,
     );
@@ -71,24 +71,24 @@ describe("component image registry", () => {
     // The kameas publish under profiles of their own from the start
     // (plan 093, K3), so that their pins move with their drawings alone.
     expect(COMPONENT_IMAGE_REGISTRY.kamea.profile).toBe(KAMEA_IMAGE_PROFILE);
-    expect(KAMEA_IMAGE_PROFILE).toBe("magickli-kamea-image-v1");
+    expect(KAMEA_IMAGE_PROFILE).toBe("magickli-kamea-image-v2");
     expect(COMPONENT_IMAGE_REGISTRY["kamea-sigil"].profile).toBe(
       KAMEA_SIGIL_IMAGE_PROFILE,
     );
-    expect(KAMEA_SIGIL_IMAGE_PROFILE).toBe("magickli-kamea-sigil-image-v2");
+    expect(KAMEA_SIGIL_IMAGE_PROFILE).toBe("magickli-kamea-sigil-image-v3");
     // So do the angels' sigil styles (plan 096); the rose's files stay
     // rose-sigil's.
     expect(COMPONENT_IMAGE_REGISTRY["angel-sigil"].profile).toBe(
       ANGEL_SIGIL_IMAGE_PROFILE,
     );
-    expect(ANGEL_SIGIL_IMAGE_PROFILE).toBe("magickli-angel-sigil-image-v1");
+    expect(ANGEL_SIGIL_IMAGE_PROFILE).toBe("magickli-angel-sigil-image-v2");
     // And the tablets drawn as pyramids (plan 095, decision 5), so that
     // the flat tablets' images keep theirs.
     expect(COMPONENT_IMAGE_REGISTRY["enochian-tablet-pyramids"].profile).toBe(
       TABLET_PYRAMIDS_IMAGE_PROFILE,
     );
     expect(TABLET_PYRAMIDS_IMAGE_PROFILE).toBe(
-      "magickli-tablet-pyramids-image-v1",
+      "magickli-tablet-pyramids-image-v2",
     );
     // The other components still publish under the shared profile, so
     // their identities did not move with the sigil's.
@@ -231,10 +231,12 @@ describe("component image registry", () => {
     // (plans/030). It
     // was 150,736 bytes, 96516a75…, until the ritual's god names spelt
     // Tzva'ot צבאות (plan 036): a data fix, which moves the inputs hash and
-    // the bytes together under the same profile.
-    expect(image.byteSize).toBe(150_785);
+    // the bytes together under the same profile. v4 was 150,785 bytes,
+    // a1fe82b8…. v5 (24 November 2026): outlined coordinates rounded to
+    // OUTLINE_PRECISION, the drawing unchanged, 124,411 bytes.
+    expect(image.byteSize).toBe(124_411);
     expect(image.sha256).toBe(
-      "a1fe82b8007671767c635763bbe47ad0a15ac4663c78650386d6bc803233176f",
+      "3410d1acdb7ff9af525a162c6268430448739a5d24fc7a07d1202d6dc832f9b3",
     );
     expect(await validate(image.bytes)).toMatchObject({ status: "validated" });
   });
@@ -424,7 +426,10 @@ describe("component image registry", () => {
   // resvg falls back to the default family with only a log line when a font
   // is missing, and path counts do not change under that fallback. These
   // pins were taken after visual review of the rasterised output; a font or
-  // engine change needs a new review before they move.
+  // engine change needs a new review before they move. Every pin moved, and
+  // no drawing, when outlined coordinates were rounded to OUTLINE_PRECISION
+  // (24 November 2026, COMPONENT_IMAGE_PROFILE v2 and the Tree's v5); each
+  // line gives its value before.
   it.each([
     // 124,838 bytes, 5ed3a569…, and 223,771, 53514ca8…, until Air drew
     // the Golden Dawn's letters, with its O and A reversed (plan 061,
@@ -440,14 +445,14 @@ describe("component image registry", () => {
     [
       "enochian-tablet",
       "id=air",
-      124_796,
-      "dcced8d14f168184211314c9226a675b997a755abe8606eade54acd3f2054253",
+      119_538, // was 124_796, dcced8d1…
+      "fbe055347de41ebccc97c4aecabdc8e679c47e5a74884bddac06426ce29688b7",
     ],
     [
       "enochian-tablet",
       "id=air&font=enochian",
-      220_135,
-      "48c4507e88fd7567bc76be2727fac48cafa74edc39fa4d58896d151d01b33b26",
+      186_287, // was 220_135, 48c4507e…
+      "6c3d5837511ed4a9b6bf0e5c59cc3c688f1859579ecbb034b6bd1016b42a47f4",
     ],
     // One tablet in each other version, reviewed as rasterised (plan 061,
     // "Tablet versions"): Regardie's sigil, the Equinox's in black, and
@@ -457,32 +462,32 @@ describe("component image registry", () => {
     [
       "enochian-tablet",
       "id=union",
-      11_406,
-      "885d2e093bbf48815ca277ca0f5f30065fe4c07b08bccedca200bd18d839a19e",
+      10_778, // was 11_406, 885d2e09…
+      "3fb6dbcd6b09c1c90851dcbfa59ba99602c59fc9bc4e5ab6afe0291bdcfcab87",
     ],
     [
       "enochian-tablet",
       "id=fire&version=regardie",
-      129_479,
-      "41657fe69438e1b3d39045e6a8e106d6b33163ac8c656943eed667f7bfd422e8",
+      123_974, // was 129_479, 41657fe6…
+      "99dd01e164eee1d5d6e34c1fb985593700935fd709e498ada370c3f73f2a1443",
     ],
     [
       "enochian-tablet",
       "id=fire&version=equinox",
-      129_492,
-      "36552c46496b0c69fa208559bb6cae0bd587cd2263ff33cb5fbd4b2b7e034315",
+      124_005, // was 129_492, 36552c46…
+      "8d3afa6bb27c0afa073b446f8871547238729b7e830031d501aefae85a80fdd4",
     ],
     [
       "enochian-tablet",
       "id=fire&version=dee",
-      196_786,
-      "54f3e8a9a8adb89898a5767995cdf88b995e161cbdfbbfa5bd8a564474b6dae0",
+      176_844, // was 196_786, 54f3e8a9…
+      "70b84a492a1c967a137895eb55169871cec6de7a37d04a9e474b1f0216e62e21",
     ],
     [
       "enochian-tablet",
       "id=fire&version=raphael",
-      201_612,
-      "7996e0277aa287e480ac1aa396c1e75c86c2e200b57e84885df9808490b0a56b",
+      181_528, // was 201_612, 7996e027…
+      "d67b8963e0bdc8f9f7a13494e3f6c66acdbebc8fc50de201ef179b5e6493f303",
     ],
     // 136,294 bytes and df3c3791… until Manasseh's Hebrew name stopped being
     // Benjamin's; the Gemini branch is one glyph shorter and one wider.
@@ -493,8 +498,8 @@ describe("component image registry", () => {
     [
       "table-of-shewbread",
       "",
-      126_699,
-      "5226c936496d6417ff0890865e1ce489d07f9d11b3f7ab553c5bad3df97574ee",
+      94_793, // was 126_699, 5226c936…
+      "86bee00e2e55b5d9decb3ef75f0b12de570408b35bf1cd1f2f62d888f7a58009",
     ],
     // The Equinox's figure of 1909, the default since 14 November 2026
     // (plan 080, "The rose's and the candlestick's versions"), reviewed
@@ -503,28 +508,28 @@ describe("component image registry", () => {
     [
       "seven-branched-candlestick",
       "",
-      87_746,
-      "f20b1474e88bacdfdd0a221af664a60858a90fadf1f65c81abfd4025a294a5a7",
+      68_598, // was 87_746, f20b1474…
+      "f0ad70f031eff7e50961236e0659a66273333233d221cc67a1def2a026db2cc3",
     ],
     [
       "seven-branched-candlestick",
       "version=modern",
-      52_363,
-      "5d8b637f7ceb159014b1bf7322b51456a8bd2b730bdb699883288ed6bf063331",
+      39_934, // was 52_363, 5d8b637f…
+      "4642bb2940c4f12fe4ca7c43d5e8709aaa535710001383b87d03963139e1b2e2",
     ],
     [
       "astro-geomancy-chart",
       "",
-      52_476,
-      "eb2f1b6fe2fef2f563ee164de6e403ca9f398ec4706c9ad331195bc34286bffa",
+      45_104, // was 52_476, eb2f1b6f…
+      "5e2246a8a50a25d530b0b89711edc9b0a9c360e0c4fa6b7c0355659b667b1f58",
     ],
     // Pinned before the outliner learned to keep the halls' paint servers
     // (plan 062), so all six slugs prove that change left them alone.
     [
       "tree-of-life",
       "",
-      44_251,
-      "a6f69235cd10092063a5a24572819d6bb7fecc489560f6f6b8a2b99ed91fa557",
+      38_117, // was 44_251, a6f69235…
+      "c95c465ded71a527d18fefdc744412f64d43e133ee874e8c158b775a656eb071",
     ],
   ] as const)(
     "pins the reviewed bytes of %s?%s so a silent font fallback fails",
@@ -606,6 +611,34 @@ describe("component image registry", () => {
         `text=${Array(16).fill("אב").join(" ")}`,
         36_595,
         "d4cd9209cdb8aabe7e8cea778e4db2ebe2ff78dcb493daa21ed789e3130af2ea",
+      ],
+    ],
+    // Coordinates rounded to OUTLINE_PRECISION (24 November 2026), drawing unchanged.
+    "magickli-rose-sigil-image-v3": [
+      [
+        "text=גדי",
+        10_957,
+        "11243a68995852af22ab42f14e6976c7bd3fcfdd2dc9511ac6c12eb118e276dd",
+      ],
+      [
+        "text=שלום&rose=false",
+        495,
+        "c72c36fb8e366016fa7fe4c168c984219bcb3a1bafa4385f75cc3a679d348df5",
+      ],
+      [
+        "text=שבתאי&version=regardie1939",
+        11_124,
+        "d6901d0a30f41296d13bd73ee2e62bc3d673a4b99d707c4707a9b07cb58216a1",
+      ],
+      [
+        "text=יהוה אלהים",
+        22_569,
+        "c12c94969affb8e78d5c9e8384016683f2fc51386344faebc7b4e2a856105525",
+      ],
+      [
+        `text=${Array(16).fill("אב").join(" ")}`,
+        29_657,
+        "c36bbbf3953d097d04b970e3116bfc3f56c8d54cffd7714e5f99e62a733181fe",
       ],
     ],
   };
@@ -734,6 +767,9 @@ describe("component image registry", () => {
     // v2 shares a repeated rose through <use>; the figures are v1's.
     "magickli-rose-sigil-image-v2":
       "3bb33e8655f61909a89ea3f9afad456c68a7f12a8553ceeda0a475ffc077a1ef",
+    // Coordinates rounded to OUTLINE_PRECISION (24 November 2026), drawing unchanged.
+    "magickli-rose-sigil-image-v3":
+      "3bb33e8655f61909a89ea3f9afad456c68a7f12a8553ceeda0a475ffc077a1ef",
   };
 
   it("pins a digest of the rose sigil's drawings under its image profile", () => {
@@ -775,6 +811,19 @@ describe("component image registry", () => {
         "planet=luna",
         186_103,
         "e9c15fd6e676df65a569e12ea1a2d5ef1d0b0adb4752254bdbc7a6efcb04d2d9",
+      ],
+    ],
+    // Coordinates rounded to OUTLINE_PRECISION (24 November 2026), drawing unchanged.
+    "magickli-kamea-image-v2": [
+      [
+        "planet=saturn",
+        9_578,
+        "6f30a6c41f99ece3346dd34731dc440e8e5bfba8fb97dd9084089d0945a5f91d",
+      ],
+      [
+        "planet=luna",
+        145_019,
+        "b996f7c482f6b15dc50c66a752b563e9e3e6089d661d3f0c9d48113e7443cf74",
       ],
     ],
   };
@@ -825,6 +874,29 @@ describe("component image registry", () => {
         `planet=luna&text=${Array(32).fill("ת").join(" ")}`,
         203_668,
         "a525608e860e7d7111a632be04da670caf68548fbbbd5583621dd1e96bb7a97b",
+      ],
+    ],
+    // Coordinates rounded to OUTLINE_PRECISION (24 November 2026), drawing unchanged.
+    "magickli-kamea-sigil-image-v3": [
+      [
+        "planet=saturn&text=אגיאל",
+        10_439,
+        "6350e64ef0f71fd8999baf6b8282668916295c12fea7c9b3e02ff8daac81e2de",
+      ],
+      [
+        "planet=venus&text=בני שרפים",
+        87_475,
+        "ccc6c844ed625a7b0eba5bec04ba9615c6d0817130901c5e3f53f2d7df74ff79",
+      ],
+      [
+        "planet=luna&text=אלים&finals=true",
+        146_820,
+        "60332abcf5907d8475f87ad51840dc6464b1173ff03cac4a519b0bdd3233205c",
+      ],
+      [
+        `planet=luna&text=${Array(32).fill("ת").join(" ")}`,
+        142_635,
+        "b9612c7c1f0e0b67d350b93a27d71ea1ae29cdb7227df98f5c93c16725d6faaa",
       ],
     ],
   };
@@ -893,6 +965,34 @@ describe("component image registry", () => {
         "e4b5851954848e9a561de0029ddf1bf3a4198508dd7ab8dad1fb393baa2c4607",
       ],
     ],
+    // Coordinates rounded to OUTLINE_PRECISION (24 November 2026), drawing unchanged.
+    "magickli-tablet-pyramids-image-v2": [
+      [
+        "id=air",
+        246_374,
+        "5b75566aacb3fa661bb29af36cf1545129a4c5930c257b815ddde048fe3fe6cb",
+      ],
+      [
+        "id=air&font=enochian",
+        312_844,
+        "47583452b3e0423792759cb85af937248e64ebcc1e459fe27dde2a24ac8a07a4",
+      ],
+      [
+        "id=union",
+        25_210,
+        "1b045b10630a83fd356fcc656a9a6dd5b908cd7c5a5f52e1c041b7a1d3957004",
+      ],
+      [
+        "id=fire&symbols=outward",
+        1_020_768,
+        "cb6c9c650a806b0bd81565159f22adefc4660c9ba11cfbe4b2fb15ce163037f6",
+      ],
+      [
+        "id=union&symbols=upright",
+        155_690,
+        "158c10abcc067c78bb98a96618c4359dee9953336ab0a3c5fa32dd9a9b025e2d",
+      ],
+    ],
   };
 
   it("pins the tablets' pyramids' reviewed bytes under their image profile", async () => {
@@ -920,6 +1020,9 @@ describe("component image registry", () => {
   // to one moves this digest and the inputs hash together.
   const TABLET_PYRAMIDS_DRAWING_DIGESTS: Record<string, string> = {
     "magickli-tablet-pyramids-image-v1":
+      "c9e913c0848356d6041ba5e2c76be3da06fe0a357260355c899c3e84bfd16946",
+    // Coordinates rounded to OUTLINE_PRECISION (24 November 2026), drawing unchanged.
+    "magickli-tablet-pyramids-image-v2":
       "c9e913c0848356d6041ba5e2c76be3da06fe0a357260355c899c3e84bfd16946",
   };
 
@@ -952,6 +1055,9 @@ describe("component image registry", () => {
   // the digest above holds every drawing without them unmoved.
   const TABLET_PYRAMIDS_SYMBOLS_DIGESTS: Record<string, string> = {
     "magickli-tablet-pyramids-image-v1":
+      "59057dbbb22c9cd431c4aba876ba5b84234c879f7a1ff32a77a45d0d9202b229",
+    // Coordinates rounded to OUTLINE_PRECISION (24 November 2026), drawing unchanged.
+    "magickli-tablet-pyramids-image-v2":
       "59057dbbb22c9cd431c4aba876ba5b84234c879f7a1ff32a77a45d0d9202b229",
   };
 
@@ -1109,6 +1215,9 @@ describe("component image registry", () => {
       "802fea6392e7d6a55d935f38093107a4df5de7a59c767d90ec9f26e45a056ba9",
     // v2 shares a repeated square through <use>; the figures are v1's.
     "magickli-kamea-sigil-image-v2":
+      "802fea6392e7d6a55d935f38093107a4df5de7a59c767d90ec9f26e45a056ba9",
+    // Coordinates rounded to OUTLINE_PRECISION (24 November 2026), drawing unchanged.
+    "magickli-kamea-sigil-image-v3":
       "802fea6392e7d6a55d935f38093107a4df5de7a59c767d90ec9f26e45a056ba9",
   };
 

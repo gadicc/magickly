@@ -20,9 +20,10 @@ import type { ServerFontFile } from "./outlineTreeImage";
  * the bare sigil and the talisman, drawn by magick-components'
  * `StyledRoseSigilImage` over the rose's engine, lettered in the faces
  * below. It moves only when the drawing does; the names and verses are
- * inputs (`ANGEL_SIGIL_INPUTS`).
+ * inputs (`ANGEL_SIGIL_INPUTS`). v2 (24 November 2026): coordinates rounded to `OUTLINE_PRECISION` of the drawing
+ * (`roundOutlinedPaths`).
  */
-export const ANGEL_SIGIL_IMAGE_PROFILE = "magickli-angel-sigil-image-v1";
+export const ANGEL_SIGIL_IMAGE_PROFILE = "magickli-angel-sigil-image-v2";
 
 /**
  * The faces the lettering asks for (`SIGIL_STYLE_FONTS`): the upright Noto
