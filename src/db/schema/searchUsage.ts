@@ -1,7 +1,12 @@
 import { sql } from "drizzle-orm";
 import { check, date, integer, pgTable, text } from "drizzle-orm/pg-core";
 
-/** One reusable global UTC-day allowance for hosted site-search queries. */
+/**
+ * The hosted site search's first daily counter. No longer written: since
+ * 24 November 2026 the counter is `SEARCH_POOL` in `chat_daily_usage`
+ * (`src/limits`). Kept until a later migration drops it, so a deployment
+ * still running the old code keeps working while the new one rolls out.
+ */
 export const siteSearchUsage = pgTable(
   "site_search_usage",
   {

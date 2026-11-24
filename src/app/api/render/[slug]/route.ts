@@ -1,12 +1,18 @@
 import angels from "magick-data/kabbalah/seventyTwoAngels";
+import { db } from "@/db/neonFull";
+import { isSameOrigin } from "@/lib/sameOrigin";
+import { RENDER_CLIENT } from "@/limits/policies";
+import { requestClientSubject } from "@/limits/request";
 import {
   InvalidComponentImageRequest,
   parseComponentImageRequest,
 } from "@/render/componentImageRequest";
 import { componentImageResponse } from "@/render/componentImageResponse";
 import { componentImageQuery } from "@/render/componentImageUrl";
+import { CONTRACTS, isComponentImageSlug } from "@/render/contracts";
 import { ANGEL_SIGIL_SLUGS } from "@/render/contracts/angelSigil";
 import { gdHall } from "@/render/contracts/gdHall";
+import { admitPersonalRender } from "@/render/renderAllowance";
 import { angelSigilStyleFiles } from "@/seo/angelSigilFiles";
 import { hallFiles } from "@/seo/halls";
 
@@ -108,6 +114,45 @@ function kameaSigilRedirect(request: Request): Response | null {
   });
 }
 
+/**
+ * A backstop on one render's time (seconds): placement's own budget keeps
+ * the worst measured kamea sigil near 2 s (24 November 2026), so a render
+ * still running at 15 s is stuck, and is stopped rather than billed on.
+ */
+export const maxDuration = 15;
+
+/**
+ * The 429 for a fresh personal render past its daily limits
+ * (`renderAllowance.ts`), or null to draw it. Only a personal contract's
+ * images are counted: their free text makes every request a possible new
+ * CDN key, while every other image has a closed set of inputs the CDN
+ * soon holds. A query the contract refuses is never counted; the route
+ * answers it with its usual 400.
+ */
+async function personalRenderRefusal(
+  slug: string,
+  request: Request,
+): Promise<Response | null> {
+  if (!isComponentImageSlug(slug) || !CONTRACTS[slug].personal) return null;
+  const query = new URL(request.url).searchParams;
+  query.delete("download");
+  try {
+    parseComponentImageRequest(slug, query);
+  } catch (error) {
+    if (error instanceof InvalidComponentImageRequest) return null;
+    throw error;
+  }
+  const now = new Date();
+  return admitPersonalRender(
+    db,
+    {
+      client: requestClientSubject(request, RENDER_CLIENT, now),
+      sameOrigin: isSameOrigin(request),
+    },
+    now,
+  );
+}
+
 export async function GET(
   request: Request,
   context: RouteContext<"/api/render/[slug]">,
@@ -119,5 +164,7 @@ export async function GET(
     const redirect = kameaSigilRedirect(request);
     if (redirect) return redirect;
   }
+  const refusal = await personalRenderRefusal(slug, request);
+  if (refusal) return refusal;
   return componentImageResponse(slug, request);
 }

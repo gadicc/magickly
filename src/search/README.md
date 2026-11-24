@@ -163,16 +163,21 @@ running server.
 
 ## HTTP and release
 
-`POST /api/search` accepts one 2–300-character query in at most 4 KiB of JSON.
-It rejects mismatched browser origins, reserves persistent capacity, embeds
-once with cancellation and a 15-second signal, and returns public grouped
-results with `no-store`. It logs no query text or provider error details.
+`POST /api/search` accepts one 2–300-character query in at most 4 KiB of JSON
+from the site's own pages (`isSameOrigin`: a request that names no origin is
+refused), reserves capacity, embeds once with cancellation and a 15-second
+signal, and returns public grouped results with `no-store`. It logs no query
+text or provider error details.
 
-Migration `0020_site_search_usage` adds the separate shared daily counter.
-The initial allowance is 10,000 hosted queries per UTC day across all visitors;
-it is a request allowance, not an account-level dollar spending cap. Text
-search is unlimited and does not consume chat allowance. Missing quota storage,
-provider failure and exhaustion leave local text search working.
+Capacity is two daily counters reserved together (`src/limits/README.md`):
+`SEARCH_POOL`, 10,000 hosted queries per UTC day across all visitors, and
+`SEARCH_CLIENT`, 100 per client. They are request allowances, not an
+account-level dollar spending cap. Text search is unlimited and does not
+consume chat allowance. Missing quota storage, provider failure and
+exhaustion leave local text search working. Migration `0020_site_search_usage`
+added the counter's first table, `site_search_usage`; since 24 November 2026
+the counters are in `chat_daily_usage` with every other limit, and that table
+is no longer written (dropping it is a follow-up).
 
 Use the existing staged release workflow to apply the migration before
 promoting the app. No deployment, production migration or provider setting is

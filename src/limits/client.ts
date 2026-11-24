@@ -1,18 +1,14 @@
 import { createHmac, hkdfSync } from "node:crypto";
 import { isIPv4, isIPv6 } from "node:net";
+import type { ClientPolicy } from "./policies.ts";
 
 /**
- * The signed-out client's bucket for the AI reading's per-client cap (plan
- * 081, S4): an HMAC of its IP address, under a key derived for the UTC day
- * from a server secret, so the counters never hold an address and a day's
- * buckets can't be matched with another's. The key itself is never stored.
+ * A signed-out client's bucket for a per-client daily cap (first built for
+ * plan 081, S4): an HMAC of its IP address, under a key derived for the
+ * UTC day and the policy from a server secret, so the counters never hold
+ * an address and a day's or a purpose's buckets can't be matched with
+ * another's. The key itself is never stored.
  */
-
-/** HKDF's salt: this purpose alone, so the key is no other use's. */
-const LABEL = "magickli/enochian-reading/client-cap/v1";
-
-/** The bucket every request with no usable address shares. */
-export const NO_ADDRESS_SUBJECT = "reading-client:none";
 
 /**
  * The address as bucketed: IPv4 whole; IPv6 cut to its /64, the block one
@@ -48,25 +44,36 @@ export function bucketAddress(address: string | null | undefined) {
     .join(":")}::/64`;
 }
 
-/** The day's key: HKDF-SHA-256 of the secret, for this purpose and day. */
-export function clientKey(secret: string, day: string): Buffer {
-  return Buffer.from(hkdfSync("sha256", secret, LABEL, `day:${day}`, 32));
+/** The day's key: HKDF-SHA-256 of the secret, for this policy and day. */
+export function clientKey(
+  secret: string,
+  policy: ClientPolicy,
+  day: string,
+): Buffer {
+  return Buffer.from(
+    hkdfSync("sha256", secret, policy.label, `day:${day}`, 32),
+  );
 }
+
+/** The bucket every request with no usable address shares. */
+export const noAddressSubject = (policy: ClientPolicy) =>
+  `${policy.prefix}:none`;
 
 /**
  * The counter subject for a signed-out client on `day` ("2026-11-17"): an
- * HMAC of its bucketed address under the day's key, or the shared bucket
- * when there is no usable address.
+ * HMAC of its bucketed address under the day's key for `policy`, or the
+ * policy's shared bucket when there is no usable address.
  */
 export function clientSubject(
   secret: string,
+  policy: ClientPolicy,
   address: string | null | undefined,
   day: string,
 ): string {
   const bucket = bucketAddress(address);
-  if (!bucket) return NO_ADDRESS_SUBJECT;
-  const mac = createHmac("sha256", clientKey(secret, day))
+  if (!bucket) return noAddressSubject(policy);
+  const mac = createHmac("sha256", clientKey(secret, policy, day))
     .update(bucket)
     .digest("hex");
-  return `reading-client:${mac}`;
+  return `${policy.prefix}:${mac}`;
 }

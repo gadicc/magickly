@@ -15,9 +15,10 @@ import {
   enochianReadingSwitch,
   enochianReadings,
 } from "@/db/schema/enochianReadings";
+import { clientSubject } from "@/limits/client";
+import { READING_CLIENT } from "@/limits/policies";
 import { buildKeysTable } from "../keysTable.ts";
 import { createTranslator } from "../lookup.ts";
-import { clientSubject } from "./client.ts";
 import type { ReadingDatabase } from "./database.ts";
 import { DAILY_CEILING_MICRO_USD } from "./ledger.ts";
 import {
@@ -116,7 +117,12 @@ function setup(over: Partial<ReadingDependencies> = {}) {
     prompt: () => prompt,
     userId: async () => null,
     clientSubject: (request, day) =>
-      clientSubject(secret, request.headers.get("x-real-ip"), day),
+      clientSubject(
+        secret,
+        READING_CLIENT,
+        request.headers.get("x-real-ip"),
+        day,
+      ),
     model,
     waitUntil: (one) => {
       work.push(one);
@@ -820,7 +826,12 @@ describe("the review's scenarios (2D review)", () => {
           .values({ id: "readings", off: true })
           .onConflictDoNothing()
           .then(() => {});
-        return clientSubject(secret, request.headers.get("x-real-ip"), day);
+        return clientSubject(
+          secret,
+          READING_CLIENT,
+          request.headers.get("x-real-ip"),
+          day,
+        );
       },
     });
     const { events } = await send({ text: LONG }, run);
@@ -868,7 +879,12 @@ describe("the review's scenarios (2D review)", () => {
       db: flaky,
       clientSubject: (request, day) => {
         armed = true;
-        return clientSubject(secret, request.headers.get("x-real-ip"), day);
+        return clientSubject(
+          secret,
+          READING_CLIENT,
+          request.headers.get("x-real-ip"),
+          day,
+        );
       },
     });
     const { events } = await send({ text: TWO }, run);

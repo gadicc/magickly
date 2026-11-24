@@ -1,17 +1,14 @@
 import { createMemoryPgliteHarness } from "@gadicc/loom/db/testing";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { reserveDailyChatUsage } from "@/app/chat/usage";
 import { chatDailyUsage } from "@/db/schema/chatUsage";
 import {
   enochianReadingSpend,
   enochianReadingSwitch,
   enochianReadings,
 } from "@/db/schema/enochianReadings";
-import { reserveDailyChatUsage } from "../../../chat/usage";
-import {
-  CLIENT_DAILY_UNITS,
-  reserveReading,
-  returnReading,
-} from "./allowance.ts";
+import { READING_CLIENT } from "@/limits/policies";
+import { reserveReading, returnReading } from "./allowance.ts";
 import type { ReadingDatabase } from "./database.ts";
 import {
   DAILY_CEILING_MICRO_USD,
@@ -21,7 +18,7 @@ import {
 } from "./ledger.ts";
 import { purgeReadings } from "./purge.ts";
 
-vi.mock("@/db/neon", () => ({
+vi.mock("@/db/neonFull", () => ({
   get db() {
     return harness.db;
   },
@@ -70,7 +67,15 @@ describe("a reading's reservation (plan 081, S4)", () => {
       resetAt: new Date("2026-11-18T00:00:00Z"),
     });
     // Chat still reserves one a submission from the same counter.
-    expect((await reserveDailyChatUsage("u1", now)).allowed).toBe(false);
+    expect(
+      (
+        await reserveDailyChatUsage(
+          { userId: "u1", client: () => "unused" },
+          now,
+          db,
+        )
+      ).allowed,
+    ).toBe(false);
     expect(await counters()).toEqual({ "user:u1": 100 });
   });
 
@@ -82,7 +87,7 @@ describe("a reading's reservation (plan 081, S4)", () => {
       ok: false,
       scope: "client",
       left: 0,
-      limit: CLIENT_DAILY_UNITS,
+      limit: READING_CLIENT.limit,
     });
     // Another client is its own bucket in the same pool.
     expect(

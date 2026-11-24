@@ -1,3 +1,6 @@
+import { boundedText } from "@/lib/boundedText";
+import { isSameOrigin } from "@/lib/sameOrigin";
+import { refusalHeaders } from "@/limits/counters";
 import type { SearchResult } from "./types";
 
 /** Server dependencies allow the admission and failure boundaries to be tested. */
@@ -7,32 +10,11 @@ export interface SemanticSearchHttp {
   search(query: string, signal: AbortSignal): Promise<SearchResult[]>;
 }
 
+/** The request's query, trimmed: 2 to 300 characters, in at most 4 KiB. */
 async function readQuery(request: Request): Promise<string> {
-  if (!request.body) throw new Error("Invalid input");
-  const reader = request.body.getReader();
-  let length = 0;
-  const chunks: Uint8Array[] = [];
-  try {
-    for (;;) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      length += value.byteLength;
-      if (length > 4096) {
-        await reader.cancel();
-        throw new Error("Invalid input");
-      }
-      chunks.push(value);
-    }
-  } finally {
-    reader.releaseLock();
-  }
-  const bytes = new Uint8Array(length);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.length;
-  }
-  const body: unknown = JSON.parse(new TextDecoder().decode(bytes));
+  const raw = await boundedText(request, 4096);
+  if (raw === undefined) throw new Error("Invalid input");
+  const body: unknown = JSON.parse(raw);
   if (
     !body ||
     typeof body !== "object" ||
@@ -59,24 +41,10 @@ export async function respondToSemanticSearch(
       status,
       headers: { "Cache-Control": "no-store", ...headers },
     });
-  const origin = request.headers.get("origin");
-  if (origin) {
-    // Next may construct request.url with an internal hostname. The Host
-    // header is the browser's actual request target; do not trust a caller's
-    // arbitrary x-forwarded-host value for this check.
-    const host = request.headers.get("host") ?? new URL(request.url).host;
-    let allowed = false;
-    try {
-      const parsed = new URL(origin);
-      allowed =
-        ["http:", "https:"].includes(parsed.protocol) &&
-        parsed.origin === origin &&
-        parsed.host.toLowerCase() === host.toLowerCase();
-    } catch {
-      /* Opaque and malformed origins are rejected. */
-    }
-    if (!allowed) return reply({ message: "Search request rejected." }, 403);
-  }
+  // Only the site's own pages may spend the allowance (`isSameOrigin`); a
+  // request that says nothing of where it comes from is refused.
+  if (!isSameOrigin(request))
+    return reply({ message: "Search request rejected." }, 403);
   let query: string;
   try {
     query = await readQuery(request);
@@ -101,7 +69,7 @@ export async function respondToSemanticSearch(
             "Search by meaning has reached today's limit. Text results are still shown.",
         },
         429,
-        { "Retry-After": admission.resetAt.toUTCString() },
+        refusalHeaders(admission.resetAt),
       );
     const signal = AbortSignal.any([
       request.signal,

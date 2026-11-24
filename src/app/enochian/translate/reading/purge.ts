@@ -1,10 +1,10 @@
 import { lt } from "drizzle-orm";
-import { usageDay } from "@/app/chat/usage";
 import { chatDailyUsage } from "@/db/schema/chatUsage";
 import {
   enochianReadingSpend,
   enochianReadings,
 } from "@/db/schema/enochianReadings";
+import { usageDay } from "@/limits/counters";
 import type { ReadingSql } from "./database.ts";
 import { expiredReadings } from "./store.ts";
 

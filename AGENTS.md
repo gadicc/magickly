@@ -257,6 +257,17 @@ day's estimates before starting: if the day's total is $11 or more, or a run
 would take it to $12 or more, ask the operator first. Any other paid
 embedding work (a new profile, `search:compare`) is the operator's.
 
+## Daily limits on paid work
+
+Anything a request can make the site pay for (a model call, an embedding,
+a fresh server render) is capped by a policy in `src/limits/policies.ts`
+and reserved through `src/limits/counters.ts`, before the work starts.
+Read `src/limits/README.md` before adding such a route or changing a
+limit: it lists every policy with its size and reason, the rules (client
+bucket and pools reserved together, refusals `no-store`, no address
+stored) and a recipe. A new limit goes in that table; a test fails until
+it does. Firewall rules in Vercel are the owner's and are recorded there.
+
 ## Heavy tasks share the machine's CPUs
 
 `test`, `test:coverage`, `test:chat-research`, `build` and

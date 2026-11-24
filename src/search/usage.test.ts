@@ -1,46 +1,62 @@
 import { createMemoryPgliteHarness } from "@gadicc/loom/db/testing";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { siteSearchUsage } from "@/db/schema/searchUsage";
-import { DAILY_SEMANTIC_SEARCH_LIMIT, reserveSearchUsage } from "./usage";
+import { chatDailyUsage } from "@/db/schema/chatUsage";
+import type { TransactionalUsageDatabase } from "@/limits/counters";
+import { SEARCH_CLIENT, SEARCH_POOL } from "@/limits/policies";
+import { reserveSearchUsage } from "./usage";
 
-vi.mock("@/db/neon", () => ({
-  get db() {
-    return db;
-  },
-}));
-const harness = await createMemoryPgliteHarness({
-  schema: { siteSearchUsage },
-});
-const { db } = harness;
+// The database is passed in; the deployment's client is never opened.
+vi.mock("@/db/neonFull", () => ({ db: {} }));
+const harness = await createMemoryPgliteHarness({ schema: { chatDailyUsage } });
+const db = harness.db as unknown as TransactionalUsageDatabase;
 afterAll(() => harness.client.close());
-beforeEach(() => db.delete(siteSearchUsage));
+beforeEach(() => harness.db.delete(chatDailyUsage));
 
-describe("shared hosted-search allowance", () => {
-  it("admits only the remaining requests across concurrent callers", async () => {
-    await db.insert(siteSearchUsage).values({
-      id: "global",
+const now = new Date("2026-11-09T23:59:59Z");
+const reserve = (client: string, at = now) =>
+  reserveSearchUsage(`search-client:${client}`, at, db);
+const counters = async () =>
+  Object.fromEntries(
+    (await harness.db.select().from(chatDailyUsage)).map((row) => [
+      row.subject,
+      row.submissions,
+    ]),
+  );
+
+describe("hosted-search allowance", () => {
+  it("admits only what is left of the site's pool across concurrent callers", async () => {
+    await harness.db.insert(chatDailyUsage).values({
+      subject: SEARCH_POOL.subject,
       day: "2026-11-09",
-      queries: DAILY_SEMANTIC_SEARCH_LIMIT - 2,
+      submissions: SEARCH_POOL.limit - 2,
     });
     const results = await Promise.all(
-      Array.from({ length: 5 }, () =>
-        reserveSearchUsage(new Date("2026-11-09T23:59:59Z")),
-      ),
+      ["a", "b", "c", "d", "e"].map((client) => reserve(client)),
     );
     expect(results.filter((result) => result.allowed)).toHaveLength(2);
-    expect((await db.select().from(siteSearchUsage))[0].queries).toBe(
-      DAILY_SEMANTIC_SEARCH_LIMIT,
-    );
+    expect(results[0].resetAt).toEqual(new Date("2026-11-10T00:00:00Z"));
+    expect((await counters()).search).toBe(SEARCH_POOL.limit);
   });
-  it("resets one row at midnight and never rolls the date back", async () => {
-    expect(
-      (await reserveSearchUsage(new Date("2026-11-10T00:00:00Z"))).allowed,
-    ).toBe(true);
-    expect(
-      (await reserveSearchUsage(new Date("2026-11-09T23:59:59Z"))).allowed,
-    ).toBe(false);
-    expect(await db.select().from(siteSearchUsage)).toEqual([
-      { id: "global", day: "2026-11-10", queries: 1 },
-    ]);
+
+  it("gives each client at most its own share (L7)", async () => {
+    const results = await Promise.all(
+      Array.from({ length: SEARCH_CLIENT.limit + 2 }, () => reserve("a")),
+    );
+    expect(results.filter((result) => result.allowed)).toHaveLength(
+      SEARCH_CLIENT.limit,
+    );
+    expect(await counters()).toEqual({
+      "search-client:a": SEARCH_CLIENT.limit,
+      search: SEARCH_CLIENT.limit,
+    });
+    expect((await reserve("b")).allowed).toBe(true);
+  });
+
+  it("resets at midnight and never rolls the date back", async () => {
+    expect((await reserve("a", new Date("2026-11-10T00:00:00Z"))).allowed).toBe(
+      true,
+    );
+    expect((await reserve("a")).allowed).toBe(false);
+    expect(await counters()).toEqual({ "search-client:a": 1, search: 1 });
   });
 });

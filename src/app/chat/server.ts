@@ -10,6 +10,7 @@ import {
 } from "ai";
 import { boundedText } from "@/lib/boundedText";
 import { createUuidV7 } from "@/lib/ids";
+import { refusalHeaders } from "@/limits/counters";
 import type { ChatMessage, ChatSource } from "./contracts";
 import {
   ANSWER_TEMPLATE,
@@ -117,7 +118,7 @@ export async function respondToChat(
   request: Request,
   protocol: ChatProtocol,
   dependencies: () => Promise<ChatDependencies>,
-  admit: () => Promise<ChatAdmission>,
+  admit: (request: Request) => Promise<ChatAdmission>,
 ): Promise<Response> {
   try {
     const raw = await boundedText(request, MAX_CHAT_BODY_BYTES);
@@ -134,14 +135,11 @@ export async function respondToChat(
     }
     const turns = readConversation(body, protocol);
     request.signal.throwIfAborted();
-    const admission = await admit();
+    const admission = await admit(request);
     request.signal.throwIfAborted();
     if (!admission.allowed) {
       const message = "Daily chat limit reached. Try again after midnight UTC.";
-      const headers = {
-        "Retry-After": admission.resetAt.toUTCString(),
-        "Cache-Control": "no-store",
-      };
+      const headers = refusalHeaders(admission.resetAt);
       return protocol === "legacy"
         ? Response.json({ message }, { status: 429, headers })
         : new Response(message, { status: 429, headers });

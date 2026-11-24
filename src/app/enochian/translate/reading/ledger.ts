@@ -1,9 +1,9 @@
 import { eq, sql } from "drizzle-orm";
-import { usageDay } from "@/app/chat/usage";
 import {
   enochianReadingSpend,
   enochianReadingSwitch,
 } from "@/db/schema/enochianReadings";
+import { usageDay } from "@/limits/counters";
 import type { ReadingSql } from "./database.ts";
 
 /**

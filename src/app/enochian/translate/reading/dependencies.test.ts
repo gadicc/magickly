@@ -1,7 +1,8 @@
 import dictionary from "magick-data/enochian/dictionary";
 import keys from "magick-data/enochian/keys";
 import { describe, expect, it, vi } from "vitest";
-import { clientSubject, NO_ADDRESS_SUBJECT } from "./client.ts";
+import { clientSubject } from "@/limits/client";
+import { READING_CLIENT } from "@/limits/policies";
 import { GRAMMAR } from "./grammar.generated.ts";
 import { gatewayReadingModel } from "./model.ts";
 import { admitReading } from "./passage.ts";
@@ -53,9 +54,11 @@ describe("the reading route's real dependencies", () => {
       new Request("https://magick.ly/api/enochian/read", { headers });
     expect(
       deps.clientSubject(request({ "x-real-ip": "203.0.113.5" }), "2026-11-17"),
-    ).toBe(clientSubject(fakes.secret, "203.0.113.5", "2026-11-17"));
+    ).toBe(
+      clientSubject(fakes.secret, READING_CLIENT, "203.0.113.5", "2026-11-17"),
+    );
     expect(deps.clientSubject(request({}), "2026-11-17")).toBe(
-      NO_ADDRESS_SUBJECT,
+      "reading-client:none",
     );
   });
 

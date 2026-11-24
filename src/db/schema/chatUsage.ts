@@ -1,7 +1,11 @@
 import { sql } from "drizzle-orm";
 import { check, date, integer, pgTable, text } from "drizzle-orm/pg-core";
 
-/** One reusable UTC-day counter per user, plus one shared anonymous counter. */
+/**
+ * Every daily limit's counters (`src/limits/README.md`): one row a subject
+ * (a user, a client's HMAC bucket or a shared pool) for the UTC day it was
+ * last reserved on. The name is from when chat was its only user.
+ */
 export const chatDailyUsage = pgTable(
   "chat_daily_usage",
   {

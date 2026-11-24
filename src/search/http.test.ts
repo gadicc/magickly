@@ -16,7 +16,11 @@ function setup() {
   ) =>
     new Request("https://magick.test/api/search", {
       method: "POST",
-      headers: { origin, "Content-Type": "application/json" },
+      headers: {
+        origin,
+        host: "magick.test",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(body),
     });
   return { dependencies, request };
@@ -69,6 +73,34 @@ describe("hosted semantic search admission", () => {
     expect(dependencies.reserve).not.toHaveBeenCalled();
     expect(dependencies.search).not.toHaveBeenCalled();
   });
+  it("refuses a request that names no origin, or says it is cross-site (L8)", async () => {
+    const { dependencies } = setup();
+    const post = (headers: Record<string, string>) =>
+      new Request("https://magick.test/api/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...headers },
+        body: JSON.stringify({ query: "Tree of Life" }),
+      });
+    const refused: Record<string, string>[] = [
+      {},
+      { host: "magick.test" },
+      { "sec-fetch-site": "cross-site", origin: "https://magick.test" },
+      { "sec-fetch-site": "none" },
+    ];
+    for (const headers of refused)
+      expect(
+        (await respondToSemanticSearch(post(headers), dependencies)).status,
+      ).toBe(403);
+    expect(
+      (
+        await respondToSemanticSearch(
+          post({ "sec-fetch-site": "same-origin" }),
+          dependencies,
+        )
+      ).status,
+    ).toBe(200);
+    expect(dependencies.reserve).toHaveBeenCalledTimes(1);
+  });
   it("does not consume capacity when the index is absent or stale", async () => {
     const { dependencies, request } = setup();
     dependencies.available.mockResolvedValue(false);
@@ -88,6 +120,7 @@ describe("hosted semantic search admission", () => {
     expect(response.headers.get("Retry-After")).toBe(
       "Tue, 10 Nov 2026 00:00:00 GMT",
     );
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(dependencies.search).not.toHaveBeenCalled();
   });
   it("reserves once and returns a noncached result", async () => {

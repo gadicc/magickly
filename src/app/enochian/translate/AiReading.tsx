@@ -2,9 +2,9 @@
 
 import { Box } from "@mui/material";
 import * as React from "react";
-import { USER_DAILY_CHAT_LIMIT } from "@/app/chat/limits";
 import { useSession } from "@/auth/client";
 import { DARK_SELECTOR } from "@/colorScheme";
+import { CHAT_USER, READING_CLIENT } from "@/limits/policies";
 import { visuallyHidden } from "@/ui/visuallyHidden";
 import { LABELS } from "./labels";
 import { TRANSLATOR_LIMITATIONS } from "./limitations";
@@ -14,7 +14,7 @@ import type {
   CheckedWord,
   ReadingSource,
 } from "./reading/check";
-import { CLIENT_DAILY_UNITS, READING_DEADLINE_MS } from "./reading/limits";
+import { READING_DEADLINE_MS } from "./reading/limits";
 import {
   type Admitted,
   admitReading,
@@ -514,13 +514,7 @@ function Reading({
   const uses = (units: number, atMost = false) =>
     signedIn === undefined
       ? undefined
-      : L.uses(
-          units,
-          signedIn,
-          USER_DAILY_CHAT_LIMIT,
-          CLIENT_DAILY_UNITS,
-          atMost,
-        );
+      : L.uses(units, signedIn, CHAT_USER.limit, READING_CLIENT.limit, atMost);
 
   // In the page from the start, empty and in the same place whether the
   // offer or the card shows, so its first words are spoken.
@@ -605,7 +599,7 @@ function Reading({
           <p className="ai-foot">
             {went ? L.went(read.length > 0, !routing) : L.fromStore}{" "}
             {signedIn !== undefined &&
-              L.used(run.done?.units ?? 0, signedIn, USER_DAILY_CHAT_LIMIT)}
+              L.used(run.done?.units ?? 0, signedIn, CHAT_USER.limit)}
           </p>
         )}
         {retryRefusal && (

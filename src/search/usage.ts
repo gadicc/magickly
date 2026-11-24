@@ -1,32 +1,30 @@
-import { and, eq, lt, or, sql } from "drizzle-orm";
-import { db } from "@/db/neon";
-import { siteSearchUsage } from "@/db/schema/searchUsage";
+import { db } from "@/db/neonFull";
+import {
+  clientBucket,
+  poolBucket,
+  reserveTogether,
+  type TransactionalUsageDatabase,
+  usageDay,
+} from "@/limits/counters";
+import { SEARCH_CLIENT, SEARCH_POOL } from "@/limits/policies";
 
-// Shared across visitors/instances; text search consumes no hosted capacity.
-export const DAILY_SEMANTIC_SEARCH_LIMIT = 10_000;
-
-/** Reserves before provider work; cancellation/failure may already incur usage. */
-export async function reserveSearchUsage(now = new Date()) {
-  const day = now.toISOString().slice(0, 10);
-  const resetAt = new Date(`${day}T00:00:00Z`);
-  resetAt.setUTCDate(resetAt.getUTCDate() + 1);
-  const rows = await db
-    .insert(siteSearchUsage)
-    .values({ id: "global", day, queries: 1 })
-    .onConflictDoUpdate({
-      target: siteSearchUsage.id,
-      set: {
-        day,
-        queries: sql`case when ${siteSearchUsage.day} = ${day}::date then ${siteSearchUsage.queries} + 1 else 1 end`,
-      },
-      setWhere: or(
-        lt(siteSearchUsage.day, day),
-        and(
-          eq(siteSearchUsage.day, day),
-          lt(siteSearchUsage.queries, DAILY_SEMANTIC_SEARCH_LIMIT),
-        ),
-      ),
-    })
-    .returning({ id: siteSearchUsage.id });
-  return { allowed: rows.length === 1, resetAt };
+/**
+ * Reserves one search by meaning before its embedding call, from the
+ * client's bucket (`client`, from `requestClientSubject` under
+ * `SEARCH_CLIENT`) and the site's daily pool together (`src/limits`).
+ * Text search uses no hosted capacity and is never counted. A cancelled or
+ * failed search stays counted: it may already have cost.
+ */
+export async function reserveSearchUsage(
+  client: string,
+  now = new Date(),
+  database: TransactionalUsageDatabase = db,
+) {
+  const reserved = await reserveTogether(
+    database,
+    [clientBucket(SEARCH_CLIENT, client), poolBucket(SEARCH_POOL)],
+    1,
+    now,
+  );
+  return { allowed: reserved.ok, resetAt: usageDay(now).resetAt };
 }

@@ -1,6 +1,6 @@
-import { usageDay } from "@/app/chat/usage";
 import { boundedText } from "@/lib/boundedText";
 import { isSameOrigin } from "@/lib/sameOrigin";
+import { usageDay } from "@/limits/counters";
 import type { Translator } from "../lookup.ts";
 import {
   type AllowanceScope,

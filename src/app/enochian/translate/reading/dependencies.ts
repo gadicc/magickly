@@ -6,9 +6,10 @@ import { after } from "next/server";
 import { sqlAuthOptions } from "@/auth/runtime";
 import { getCurrentSqlUserId } from "@/auth/session";
 import { db } from "@/db/neonFull";
+import { clientSubject } from "@/limits/client";
+import { READING_CLIENT } from "@/limits/policies";
 import { buildKeysTable } from "../keysTable.ts";
 import { createTranslator, type Translator } from "../lookup.ts";
-import { clientSubject } from "./client.ts";
 import { GRAMMAR } from "./grammar.generated.ts";
 import { gatewayReadingModel } from "./model.ts";
 import { rowsFromKeys } from "./prompt.ts";
@@ -43,7 +44,12 @@ export const readingDependencies: ReadingDependencies = {
   },
   userId: getCurrentSqlUserId,
   clientSubject: (request, day) =>
-    clientSubject(sqlAuthOptions.secret, ipAddress(request), day),
+    clientSubject(
+      sqlAuthOptions.secret,
+      READING_CLIENT,
+      ipAddress(request),
+      day,
+    ),
   model: gatewayReadingModel,
   waitUntil: (work) => after(() => work),
 };

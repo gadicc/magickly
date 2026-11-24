@@ -99,6 +99,15 @@ Follow-ups are separate from the completed migration work:
   [October dependency refresh](066-october-dependency-refresh.md), with the
   remaining exact-pin zod, glob and minimatch advisories, the deferred Biome
   2.6 and identity-bound packages, and their follow-ups.
+- 24 November 2026, input audit: every daily limit on paid work is now a
+  policy in `src/limits` ([README](../src/limits/README.md)): per-client
+  buckets for chat (20), search (100) and fresh personal renders (60), with
+  the site pools, and a 15 s `maxDuration` on the render API. Follow-ups:
+  drop the unused `site_search_usage` table once no deployment writes it;
+  cap a sigil's response size (32 one-letter words on the Moon give a
+  6 MB SVG, so a cached hit costs more bandwidth than a fresh render
+  costs CPU); a Vercel Firewall rule for `/api/render/*` (the owner's);
+  audit items L3, L4, L5 and L9.
 - 14 November 2026: `magick-data` 0.2.0, with the Moon's
   `intelligenceOfIntelligences`, the tablet notes' Yods and "Bull", and
   the two changed Sources rows signed again; on `gate/data-020`,

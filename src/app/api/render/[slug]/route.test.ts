@@ -1,8 +1,32 @@
-import { describe, expect, it, vi } from "vitest";
+import { createMemoryPgliteHarness } from "@gadicc/loom/db/testing";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { chatDailyUsage } from "@/db/schema/chatUsage";
+import { RENDER_CLIENT } from "@/limits/policies";
 
 vi.mock("server-only", () => ({}));
+vi.mock("@/db/neonFull", () => ({
+  get db() {
+    return harness.db;
+  },
+}));
+// The client's bucket by a header, without the deployment's secret.
+vi.mock("@/limits/request", () => ({
+  requestClientSubject: (request: Request) =>
+    `render-client:${request.headers.get("x-real-ip") ?? "none"}`,
+}));
 
-import { GET } from "./route";
+const harness = await createMemoryPgliteHarness({ schema: { chatDailyUsage } });
+afterAll(() => harness.client.close());
+beforeEach(() => harness.db.delete(chatDailyUsage));
+const counters = async () =>
+  Object.fromEntries(
+    (await harness.db.select().from(chatDailyUsage)).map((row) => [
+      row.subject,
+      row.submissions,
+    ]),
+  );
+
+const { GET, maxDuration } = await import("./route");
 
 const get = (slug: string, query = "") =>
   GET(new Request(`https://magick.ly/api/render/${slug}${query}`), {
@@ -150,5 +174,49 @@ describe("/api/render/[slug]", () => {
     const response = await get("seven-branched-candlestick");
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toBe("image/svg+xml");
+  });
+
+  describe("the daily limit on fresh personal renders (M4)", () => {
+    const rose = (headers: Record<string, string>) =>
+      GET(
+        new Request(
+          `https://magick.ly/api/render/rose-sigil?${new URLSearchParams({ text: "אגיאל" })}`,
+          { headers },
+        ),
+        { params: Promise.resolve({ slug: "rose-sigil" }) },
+      );
+
+    it("counts a personal render, and nothing else", async () => {
+      const mine = { "x-real-ip": "a", "sec-fetch-site": "same-origin" };
+      expect((await rose(mine)).status).toBe(200);
+      expect((await rose({ "x-real-ip": "b" })).status).toBe(200);
+      // Neither a closed-input image nor a refused query is counted.
+      expect((await get("seven-branched-candlestick")).status).toBe(200);
+      expect((await get("rose-sigil", "?text=abc")).status).toBe(400);
+      expect(await counters()).toEqual({
+        "render-client:a": 1,
+        "render-client:b": 1,
+        // Only the request not from the site's pages used the cross-site pool.
+        "render-cross-site": 1,
+        render: 2,
+      });
+    });
+
+    it("refuses a client past its limit with an uncached 429", async () => {
+      await harness.db.insert(chatDailyUsage).values({
+        subject: "render-client:a",
+        day: new Date().toISOString().slice(0, 10),
+        submissions: RENDER_CLIENT.limit,
+      });
+      const response = await rose({ "x-real-ip": "a" });
+      expect(response.status).toBe(429);
+      expect(response.headers.get("cache-control")).toBe("no-store");
+      expect(response.headers.get("retry-after")).toMatch(/00:00:00 GMT$/);
+      expect((await rose({ "x-real-ip": "b" })).status).toBe(200);
+    });
+
+    it("stops a render that runs past 15 s", () => {
+      expect(maxDuration).toBe(15);
+    });
   });
 });

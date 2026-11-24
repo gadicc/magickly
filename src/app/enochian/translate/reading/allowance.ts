@@ -1,25 +1,24 @@
 import {
-  ANONYMOUS_DAILY_CHAT_LIMIT,
+  clientBucket,
   dailyUsageLeft,
+  poolBucket,
   reserveDailyUsage,
+  reserveTogether,
   returnDailyUsage,
-  USER_DAILY_CHAT_LIMIT,
   usageDay,
-  usageSubject,
-} from "@/app/chat/usage";
+  userSubject,
+} from "@/limits/counters";
+import { ANONYMOUS_POOL, CHAT_USER, READING_CLIENT } from "@/limits/policies";
 import type { ReadingDatabase } from "./database.ts";
-import { CLIENT_DAILY_UNITS } from "./limits.ts";
-
-export { CLIENT_DAILY_UNITS };
 
 /**
  * What a reading reserves from the daily allowance (plan 081, S4, and
  * decision 2): its units, from the reader's own allowance when signed in
  * or the anonymous pool when not, the same counters chat uses. A
- * signed-out client may also use at most `CLIENT_DAILY_UNITS` a day of the
- * pool; its bucket and the pool are reserved in one transaction, so both
- * are counted or neither. A reservation is never given back: a failed call
- * may still have cost.
+ * signed-out client may also use at most `READING_CLIENT.limit` a day of
+ * the pool; its bucket and the pool are reserved in one transaction, so
+ * both are counted or neither (`src/limits`). A reservation is never given
+ * back: a failed call may still have cost.
  */
 
 /** Whose allowance a refusal ran out of. */
@@ -40,13 +39,6 @@ export type AllowanceOutcome =
   | { ok: true; scope: "user" | "anonymous"; resetAt: Date }
   | AllowanceRefusal;
 
-/** Thrown inside the transaction to roll back the client's reservation. */
-class Refused extends Error {
-  constructor(readonly scope: "client" | "anonymous") {
-    super(scope);
-  }
-}
-
 /**
  * Reserves a reading's units: the user's, or the client's and the pool's
  * together (`client` is its bucket, `clientSubject`).
@@ -59,59 +51,33 @@ export async function reserveReading(
 ): Promise<AllowanceOutcome> {
   const { resetAt } = usageDay(now);
   if (who.userId) {
-    const subject = usageSubject(who.userId);
-    if (await reserveDailyUsage(db, subject, USER_DAILY_CHAT_LIMIT, units, now))
+    const subject = userSubject(who.userId);
+    if (await reserveDailyUsage(db, subject, CHAT_USER.limit, units, now))
       return { ok: true, scope: "user", resetAt };
     return {
       ok: false,
       scope: "user",
-      left: await dailyUsageLeft(db, subject, USER_DAILY_CHAT_LIMIT, now),
-      limit: USER_DAILY_CHAT_LIMIT,
+      left: await dailyUsageLeft(db, subject, CHAT_USER.limit, now),
+      limit: CHAT_USER.limit,
       resetAt,
     };
   }
-  const pool = usageSubject(null);
-  try {
-    await db.transaction(async (tx) => {
-      if (
-        !(await reserveDailyUsage(
-          tx,
-          who.client,
-          CLIENT_DAILY_UNITS,
-          units,
-          now,
-        ))
-      )
-        throw new Refused("client");
-      if (
-        !(await reserveDailyUsage(
-          tx,
-          pool,
-          ANONYMOUS_DAILY_CHAT_LIMIT,
-          units,
-          now,
-        ))
-      )
-        throw new Refused("anonymous");
-    });
-    return { ok: true, scope: "anonymous", resetAt };
-  } catch (error) {
-    if (!(error instanceof Refused)) throw error;
-    const [client, shared] = await Promise.all([
-      dailyUsageLeft(db, who.client, CLIENT_DAILY_UNITS, now),
-      dailyUsageLeft(db, pool, ANONYMOUS_DAILY_CHAT_LIMIT, now),
-    ]);
-    return {
-      ok: false,
-      scope: error.scope,
-      left: Math.min(client, shared),
-      limit:
-        error.scope === "client"
-          ? CLIENT_DAILY_UNITS
-          : ANONYMOUS_DAILY_CHAT_LIMIT,
-      resetAt,
-    };
-  }
+  const client = clientBucket(READING_CLIENT, who.client);
+  const pool = poolBucket(ANONYMOUS_POOL);
+  const reserved = await reserveTogether(db, [client, pool], units, now);
+  if (reserved.ok) return { ok: true, scope: "anonymous", resetAt };
+  const scope = reserved.refused === client ? "client" : "anonymous";
+  const [clientLeft, poolLeft] = await Promise.all([
+    dailyUsageLeft(db, client.subject, client.limit, now),
+    dailyUsageLeft(db, pool.subject, pool.limit, now),
+  ]);
+  return {
+    ok: false,
+    scope,
+    left: Math.min(clientLeft, poolLeft),
+    limit: reserved.refused.limit,
+    resetAt,
+  };
 }
 
 /**
@@ -128,10 +94,10 @@ export async function returnReading(
   // One transaction, each counter locked as it is changed.
   await db.transaction(async (tx) => {
     if (who.userId) {
-      await returnDailyUsage(tx, usageSubject(who.userId), units, now);
+      await returnDailyUsage(tx, userSubject(who.userId), units, now);
       return;
     }
     await returnDailyUsage(tx, who.client, units, now);
-    await returnDailyUsage(tx, usageSubject(null), units, now);
+    await returnDailyUsage(tx, ANONYMOUS_POOL.subject, units, now);
   });
 }
