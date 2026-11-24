@@ -139,3 +139,18 @@ A Vercel Firewall rate-limit rule is the only thing that sees requests the
 CDN answers from cache, so it is what stops someone hammering a cached URL
 for bandwidth. It is configured in Vercel, not here, and changing it is the
 owner's call. Record any such rule in this section when it is added.
+
+The project's rate-limit rules (Vercel Firewall, per IP, fixed 60 s
+window; the firewall counts every matching request, cached or not, and
+its counters are per region):
+
+| Rule | Paths | A minute | Over the limit |
+|---|---|---|---|
+| `render-sigil` | `/api/render/rose-sigil`, `kamea-sigil`, `astro-geomancy-chart` | 20 | 429 (enforced 24 November 2026) |
+| `render-images` | every other `/api/render/*`, and `/api/treeOfLife` | 600 | 429 (enforced 24 November 2026) |
+| `chat` | `/chat/api*` | 20 | logged only |
+
+Two deny rules sit beside them: `render-encoded-path` (a `%` in a render
+path) and `Retire legacy file2 writes`. Crawlers are not exempt; the
+render images they fetch are the closed-input ones, far below 600 a
+minute an address.

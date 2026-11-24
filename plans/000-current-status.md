@@ -106,8 +106,9 @@ Follow-ups are separate from the completed migration work:
   drop the unused `site_search_usage` table once no deployment writes it;
   cap a sigil's response size (32 one-letter words on the Moon give a
   6 MB SVG, so a cached hit costs more bandwidth than a fresh render
-  costs CPU); a Vercel Firewall rule for `/api/render/*` (the owner's);
-  audit items L3, L4, L5 and L9.
+  costs CPU); audit items L3, L4, L5 and L9. The firewall's render
+  rate limits, log-only until then, now return 429 (README, "Outside the
+  app").
 - 14 November 2026: `magick-data` 0.2.0, with the Moon's
   `intelligenceOfIntelligences`, the tablet notes' Yods and "Bull", and
   the two changed Sources rows signed again; on `gate/data-020`,
