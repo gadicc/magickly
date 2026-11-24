@@ -1,4 +1,4 @@
-import { and, eq, lt, or, sql } from "drizzle-orm";
+import { and, eq, lt, or, type SQL, sql } from "drizzle-orm";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { chatDailyUsage } from "@/db/schema/chatUsage";
 import type { ClientPolicy, PoolPolicy } from "./policies.ts";
@@ -7,7 +7,8 @@ import type { ClientPolicy, PoolPolicy } from "./policies.ts";
  * The daily counters every policy in `policies.ts` is kept in: one row a
  * subject in `chat_daily_usage`, for the UTC day it was last reserved on.
  * A reservation is atomic, so concurrent requests on any instance can't
- * overshoot a limit; `reserveTogether` takes several counters or none.
+ * overshoot a limit; `reserveTogether` takes several counters or none, in
+ * one statement.
  */
 
 /** Where a reservation runs: the database, or a transaction on it. */
@@ -17,11 +18,13 @@ export type UsageDatabase = Pick<
 >;
 
 /**
- * A database that can run a transaction (`@/db/neonFull`'s; the HTTP
- * client `@/db/neon` can't), for counters reserved together.
+ * A database `reserveTogether` can run its one statement on: either
+ * client, `@/db/neon`'s HTTP one (preferred: no connection held) or
+ * `@/db/neonFull`'s, but never a transaction, which its refusal would
+ * abort.
  */
-export interface TransactionalUsageDatabase extends UsageDatabase {
-  transaction<T>(work: (tx: UsageDatabase) => Promise<T>): Promise<T>;
+export interface ReservingDatabase extends UsageDatabase {
+  execute(query: SQL): PromiseLike<unknown>;
 }
 
 /** One counter to reserve from: its subject and its daily limit. */
@@ -91,38 +94,74 @@ export async function reserveDailyUsage(
   return rows.length === 1;
 }
 
-/** Thrown inside the transaction to roll back the buckets already taken. */
-class Refused extends Error {
-  constructor(readonly bucket: Bucket) {
-    super(bucket.subject);
-  }
-}
-
 /** Taken from every bucket, or refused by the first that was full. */
 export type Reservation = { ok: true } | { ok: false; refused: Bucket };
 
+/** Postgres's `division_by_zero`, which a refused reservation raises. */
+const REFUSED = "22012";
+
+function isRefusal(error: unknown): boolean {
+  for (let at = error; at instanceof Error; at = at.cause)
+    if ((at as { code?: unknown }).code === REFUSED) return true;
+  return false;
+}
+
 /**
- * Reserves `units` from every bucket in one transaction, in order, so all
- * are counted or none is: put the narrowest first (the client's), so a
- * client over its own limit never touches a shared pool's row.
+ * Reserves `units` from every bucket, so all are counted or none is, in a
+ * single statement: one guarded upsert a bucket (as `reserveDailyUsage`'s),
+ * each run only when the one before it took its units, then a division by
+ * the last one's count, which fails the statement, and so undoes every
+ * upsert in it, when any bucket was full. One statement needs no
+ * transaction, so it runs over the HTTP driver in one round trip.
+ *
+ * Put the narrowest bucket first (the client's): a client over its own
+ * limit never touches a shared pool's row, and every caller locks rows in
+ * the same order. Which bucket refused is read afterwards, so under a race
+ * it is the best guess, not a guarantee.
  */
 export async function reserveTogether(
-  db: TransactionalUsageDatabase,
+  db: ReservingDatabase,
   buckets: readonly Bucket[],
   units: number,
   now: Date,
 ): Promise<Reservation> {
+  if (buckets.length === 0) return { ok: true };
+  const tooMany = buckets.find(
+    (one) => !(Number.isInteger(units) && units > 0 && units <= one.limit),
+  );
+  if (tooMany) return { ok: false, refused: tooMany };
+  const { day } = usageDay(now);
+  const t = chatDailyUsage;
+  const steps = buckets.map((one, at) => {
+    const row = sql`${one.subject}::text, ${day}::date, ${units}::int`;
+    const source =
+      at === 0
+        ? sql`values (${row})`
+        : sql`select ${row} where exists (select from ${sql.raw(`taken${at - 1}`)})`;
+    return sql`${sql.raw(`taken${at}`)} as (
+      insert into ${t} (subject, day, submissions) ${source}
+      on conflict (subject) do update set
+        day = excluded.day,
+        submissions = case when ${t.day} = ${day}::date
+          then ${t.submissions} + ${units}::int else ${units}::int end
+      where ${t.day} < ${day}::date
+        or (${t.day} = ${day}::date
+          and ${t.submissions} + ${units}::int <= ${one.limit}::int)
+      returning 1)`;
+  });
+  const last = sql.raw(`taken${buckets.length - 1}`);
   try {
-    await db.transaction(async (tx) => {
-      for (const one of buckets)
-        if (!(await reserveDailyUsage(tx, one.subject, one.limit, units, now)))
-          throw new Refused(one);
-    });
+    await db.execute(
+      sql`with ${sql.join(steps, sql`, `)} select 1 / (select count(*)::int from ${last})`,
+    );
     return { ok: true };
   } catch (error) {
-    if (error instanceof Refused) return { ok: false, refused: error.bucket };
-    throw error;
+    if (!isRefusal(error)) throw error;
   }
+  for (const one of buckets)
+    if ((await dailyUsageLeft(db, one.subject, one.limit, now)) < units)
+      return { ok: false, refused: one };
+  return { ok: false, refused: buckets[buckets.length - 1] };
 }
 
 /**

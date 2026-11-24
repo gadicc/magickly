@@ -37,13 +37,19 @@ Why these sizes (24 November 2026):
   `rose-sigil`, `astro-geomancy-chart`) are counted: their free text makes
   every request a possible new CDN key. Every other image has a closed set
   of inputs the CDN soon holds. A CDN hit never reaches the function, so
-  only fresh renders count. The worst kamea sigil measured took about 2 s
+  only fresh renders count; personal images are sent without
+  stale-while-revalidate, so no background refresh (from the CDN, not a
+  reader) is counted either. The worst kamea sigil measured took about 2 s
   (about $0.00012 at Vercel's London prices), so 20,000 bounds a day at
   about $2.40; the generators draw in the browser and call the API only to
   export or share, so 60 a client is a busy reader's day. The cross-site
   pool keeps link previews, hotlinks and scripts from using up what the
   site's readers need. Headers can be forged, so it is fairness, not a
   boundary: the client and site pools are the bound.
+- **What they don't stop.** Someone with many addresses (one IPv6 /48 is
+  65,536 /64 buckets) can use up a shared pool on purpose: about 25
+  clients empty `ANONYMOUS_POOL`'s day and 334 `RENDER_POOL`'s. The pools
+  bound the cost; they don't keep the feature up for everyone else.
 
 ## How a limit works
 
@@ -51,11 +57,14 @@ Why these sizes (24 November 2026):
   before it calls the provider or renders; a call that fails may still
   have cost, so it stays counted. Only work that provably never started
   is given back (`returnDailyUsage`, as the reading does).
-- **Narrowest first, all or none.** `reserveTogether` takes every bucket
-  in one transaction, in order, so a client over its own limit never
-  touches a pool, and a pool that refuses leaves the client's bucket as it
-  was. It needs a database that runs transactions: `@/db/neonFull`, not
-  `@/db/neon`.
+- **Narrowest first, all or none, one statement.** `reserveTogether`
+  takes every bucket in a single SQL statement, in order: each guarded
+  upsert runs only if the one before took its units, and a refusal fails
+  the statement, which undoes the others. So a client over its own limit
+  never touches a pool, a pool that refuses leaves the client's bucket as
+  it was, and no transaction is needed. Use `@/db/neon` (HTTP, one round
+  trip, no connection held), not `@/db/neonFull`, whose direct connections
+  a burst could use up; never call it inside a transaction.
 - **Atomic and day-stamped.** Each counter is one row in
   `chat_daily_usage` (named for its first user), updated with a guarded
   upsert, so concurrent requests on any instance never overshoot, and a
@@ -74,8 +83,12 @@ Why these sizes (24 November 2026):
   that aren't from the site's own pages (`src/lib/sameOrigin.ts`). Renders
   can't: an image is loaded without an `Origin`, and shared links must
   work, so they use the cross-site pool instead.
-- **Fail closed.** If the counters can't be reached, the request is
-  refused (search answers 503 and text search carries on).
+- **Fail closed.** If the counters can't be reached, the request fails
+  (search answers 503 and text search carries on).
+- **Only where it's needed.** Load the database and the secret only on the
+  path that counts (the render route imports `@/db/neon` inside it), so a
+  route's uncounted requests don't depend on them. `requestClientSubject`
+  reads the auth secret alone, not the rest of the auth configuration.
 
 ## Adding a limit
 
@@ -87,7 +100,7 @@ Why these sizes (24 November 2026):
    ```ts
    const now = new Date();
    const reserved = await reserveTogether(
-     db, // @/db/neonFull
+     db, // @/db/neon
      [
        clientBucket(MY_CLIENT, requestClientSubject(request, MY_CLIENT, now)),
        poolBucket(MY_POOL),
@@ -103,7 +116,8 @@ Why these sizes (24 November 2026):
    ```
 
    Take the database as a parameter where you can, so a test passes
-   PGlite's (`createMemoryPgliteHarness({ schema: { chatDailyUsage } })`).
+   PGlite's (`createMemoryPgliteHarness({ schema: { chatDailyUsage } })`),
+   and mock `@/limits/request` there, which needs the deployment's secret.
 3. Add the policy's row to the table above, with why it is that size.
    `policies.test.ts` fails until every policy is in this file.
 

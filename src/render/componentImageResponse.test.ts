@@ -8,6 +8,7 @@ import { parseComponentImageRequest } from "./componentImageRequest";
 import {
   COMPONENT_IMAGE_CACHE_CONTROL,
   componentImageResponse,
+  PERSONAL_IMAGE_CACHE_CONTROL,
 } from "./componentImageResponse";
 
 function rendered(
@@ -124,6 +125,10 @@ describe("component image responses", () => {
       "attachment; filename=\"rose-sigil-___.png\"; filename*=UTF-8''rose-sigil-%D7%92%D7%93%D7%99.png",
     );
     expect(response.headers.get("x-robots-tag")).toBe("noindex");
+    // No background refresh, which a render limit could not attribute.
+    expect(response.headers.get("cache-control")).toBe(
+      PERSONAL_IMAGE_CACHE_CONTROL,
+    );
     expect(response.headers.get("content-type")).toBe("image/png");
     expect(mocks.render.mock.calls[0][1].toString()).toBe(
       "fmt=png&text=%D7%92%D7%93%D7%99",

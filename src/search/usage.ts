@@ -1,9 +1,9 @@
-import { db } from "@/db/neonFull";
+import { db } from "@/db/neon";
 import {
   clientBucket,
   poolBucket,
+  type ReservingDatabase,
   reserveTogether,
-  type TransactionalUsageDatabase,
   usageDay,
 } from "@/limits/counters";
 import { SEARCH_CLIENT, SEARCH_POOL } from "@/limits/policies";
@@ -18,7 +18,7 @@ import { SEARCH_CLIENT, SEARCH_POOL } from "@/limits/policies";
 export async function reserveSearchUsage(
   client: string,
   now = new Date(),
-  database: TransactionalUsageDatabase = db,
+  database: ReservingDatabase = db,
 ) {
   const reserved = await reserveTogether(
     database,

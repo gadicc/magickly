@@ -4,7 +4,7 @@ import { chatDailyUsage } from "@/db/schema/chatUsage";
 import { RENDER_CLIENT } from "@/limits/policies";
 
 vi.mock("server-only", () => ({}));
-vi.mock("@/db/neonFull", () => ({
+vi.mock("@/db/neon", () => ({
   get db() {
     return harness.db;
   },
@@ -192,7 +192,13 @@ describe("/api/render/[slug]", () => {
       expect((await rose({ "x-real-ip": "b" })).status).toBe(200);
       // Neither a closed-input image nor a refused query is counted.
       expect((await get("seven-branched-candlestick")).status).toBe(200);
-      expect((await get("rose-sigil", "?text=abc")).status).toBe(400);
+      const text = encodeURIComponent("אגיאל");
+      for (const query of [
+        "?text=abc",
+        `?text=${text}&download=2`,
+        `?text=${text}&download=1&download=1`,
+      ])
+        expect((await get("rose-sigil", query)).status).toBe(400);
       expect(await counters()).toEqual({
         "render-client:a": 1,
         "render-client:b": 1,

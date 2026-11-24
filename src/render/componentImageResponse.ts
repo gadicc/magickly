@@ -14,6 +14,16 @@ import { CONTRACTS } from "./contracts";
 export const COMPONENT_IMAGE_CACHE_CONTROL =
   "public, max-age=0, must-revalidate, s-maxage=86400, stale-while-revalidate=604800";
 
+/**
+ * A personal image's (`personal: true`): the same, without
+ * stale-while-revalidate, whose background refresh would reach the
+ * function from the CDN rather than the reader and be counted against a
+ * render limit nobody can attribute (`src/limits/README.md`). Past a day,
+ * the next reader's request draws it, and is counted as theirs.
+ */
+export const PERSONAL_IMAGE_CACHE_CONTROL =
+  "public, max-age=0, must-revalidate, s-maxage=86400";
+
 function badRequest() {
   return new Response("Unsupported component image request", {
     status: 400,
@@ -52,7 +62,9 @@ export async function componentImageResponse(slug: string, request: Request) {
       ),
       "Content-Type": image.contentType,
       "X-Content-Type-Options": "nosniff",
-      "Cache-Control": COMPONENT_IMAGE_CACHE_CONTROL,
+      "Cache-Control": contract.personal
+        ? PERSONAL_IMAGE_CACHE_CONTROL
+        : COMPONENT_IMAGE_CACHE_CONTROL,
       ETag: etag,
       "Content-Disposition": contentDisposition(
         download ? "attachment" : "inline",

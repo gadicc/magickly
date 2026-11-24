@@ -18,7 +18,7 @@ import {
 } from "./ledger.ts";
 import { purgeReadings } from "./purge.ts";
 
-vi.mock("@/db/neonFull", () => ({
+vi.mock("@/db/neon", () => ({
   get db() {
     return harness.db;
   },

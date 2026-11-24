@@ -1,5 +1,4 @@
 import angels from "magick-data/kabbalah/seventyTwoAngels";
-import { db } from "@/db/neonFull";
 import { isSameOrigin } from "@/lib/sameOrigin";
 import { RENDER_CLIENT } from "@/limits/policies";
 import { requestClientSubject } from "@/limits/request";
@@ -126,8 +125,8 @@ export const maxDuration = 15;
  * (`renderAllowance.ts`), or null to draw it. Only a personal contract's
  * images are counted: their free text makes every request a possible new
  * CDN key, while every other image has a closed set of inputs the CDN
- * soon holds. A query the contract refuses is never counted; the route
- * answers it with its usual 400.
+ * soon holds. A query the route refuses is never counted; it answers it
+ * with its usual 400.
  */
 async function personalRenderRefusal(
   slug: string,
@@ -135,6 +134,9 @@ async function personalRenderRefusal(
 ): Promise<Response | null> {
   if (!isComponentImageSlug(slug) || !CONTRACTS[slug].personal) return null;
   const query = new URL(request.url).searchParams;
+  const download = query.getAll("download");
+  if (download.length > 1 || (download.length === 1 && download[0] !== "1"))
+    return null;
   query.delete("download");
   try {
     parseComponentImageRequest(slug, query);
@@ -143,6 +145,8 @@ async function personalRenderRefusal(
     throw error;
   }
   const now = new Date();
+  // Loaded here, so the images nobody counts never need the database.
+  const { db } = await import("@/db/neon");
   return admitPersonalRender(
     db,
     {

@@ -1,10 +1,10 @@
-import { db } from "@/db/neonFull";
+import { db } from "@/db/neon";
 import {
   clientBucket,
   poolBucket,
+  type ReservingDatabase,
   reserveDailyUsage,
   reserveTogether,
-  type TransactionalUsageDatabase,
   usageDay,
   userSubject,
 } from "@/limits/counters";
@@ -24,7 +24,7 @@ export interface ChatAdmission {
 export async function reserveDailyChatUsage(
   who: { userId: string | null; client: () => string },
   now = new Date(),
-  database: TransactionalUsageDatabase = db,
+  database: ReservingDatabase = db,
 ): Promise<ChatAdmission> {
   const { resetAt } = usageDay(now);
   const allowed = who.userId

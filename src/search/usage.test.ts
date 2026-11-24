@@ -1,14 +1,14 @@
 import { createMemoryPgliteHarness } from "@gadicc/loom/db/testing";
 import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { chatDailyUsage } from "@/db/schema/chatUsage";
-import type { TransactionalUsageDatabase } from "@/limits/counters";
+import type { ReservingDatabase } from "@/limits/counters";
 import { SEARCH_CLIENT, SEARCH_POOL } from "@/limits/policies";
 import { reserveSearchUsage } from "./usage";
 
 // The database is passed in; the deployment's client is never opened.
-vi.mock("@/db/neonFull", () => ({ db: {} }));
+vi.mock("@/db/neon", () => ({ db: {} }));
 const harness = await createMemoryPgliteHarness({ schema: { chatDailyUsage } });
-const db = harness.db as unknown as TransactionalUsageDatabase;
+const db = harness.db as unknown as ReservingDatabase;
 afterAll(() => harness.client.close());
 beforeEach(() => harness.db.delete(chatDailyUsage));
 

@@ -2,9 +2,9 @@ import {
   type Bucket,
   clientBucket,
   poolBucket,
+  type ReservingDatabase,
   refusalHeaders,
   reserveTogether,
-  type TransactionalUsageDatabase,
   usageDay,
 } from "@/limits/counters";
 import {
@@ -32,7 +32,7 @@ export interface RenderRequester {
  * together. Null when admitted; otherwise the 429 to send.
  */
 export async function admitPersonalRender(
-  db: TransactionalUsageDatabase,
+  db: ReservingDatabase,
   who: RenderRequester,
   now: Date,
 ): Promise<Response | null> {
