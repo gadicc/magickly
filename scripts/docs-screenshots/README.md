@@ -9,8 +9,8 @@ changes, and they can never contain real people.
 
 - **Synthetic data only.** Temple "Example", members "Synthetic Member A–D",
   Creator and Reader (the local test sign-ins), mottos such as "Fiat Pax", the join
-  code `example-join-code`. Never a real temple, member, email or invitation.
-  Ritual titles are fine. Add people to `fixtures.ts`, not to a screenshot step.
+  code `exa3p-1ej01-nc0de-00000` (fixed in `fixtures.ts`). Never a real temple,
+  member, email or invitation. Ritual titles are fine. Add people to `fixtures.ts`, not to a screenshot step.
 - **No dev furniture.** The Next dev overlay is removed before every capture. Do not
   crop in a way that shows other fixtures from the local database (for example
   `Fixture Temple`); clip to the elements you mean to show.

@@ -217,9 +217,9 @@ export default function TemplesGuide() {
 
       <h2 id="invite">Inviting people</h2>
       <p>
-        Members join themselves. A temple has a <strong>slug</strong> and an
-        optional <strong>join code</strong>. Anyone signed in who is given both
-        can join, either by typing them into{" "}
+        Members join themselves. A temple has a <strong>slug</strong> and, once
+        an administrator creates one, a <strong>join code</strong>. Anyone
+        signed in who is given both can join, either by typing them into{" "}
         <Link href="/temples">My Temples</Link> or by opening the invitation
         link, which the admin page also shows as a QR code to scan or print.
         Joining always shows the temple’s name and asks for confirmation first,
@@ -227,16 +227,28 @@ export default function TemplesGuide() {
       </p>
       <Figure
         image={joinCode}
-        alt="The join information panel: the temple slug, a masked join code with a show button and a Save join code button, and a QR code with a copy-link button."
+        alt="The join information panel: the temple slug, a masked join code with a show button, a QR code with a copy-link button, and New join code and Turn off invitations buttons."
       >
-        The join code is hidden until you reveal it. Clear it and save to stop
-        new people joining; members already in are not affected, and changing
-        the code does not remove anyone.
+        The join code is hidden until you reveal it.{" "}
+        <strong>New join code</strong> replaces it and{" "}
+        <strong>Turn off invitations</strong> removes it; both ask first.
+        Members already in are not affected either way.
       </Figure>
       <p>
-        Treat the code like a password for the door: change it if it has been
-        shared too widely, and change or clear it when you remove someone who
-        still has it, because they can use it to rejoin (at grade 0).
+        Magick.ly makes the code: twenty letters and digits in four groups, such
+        as <code>7kq2m-dx9vt-a4hr0-nweb3</code>, too many to guess. Capitals,
+        spaces and missing hyphens don’t matter when someone types it, and an O
+        or an I or L is read as 0 or 1. An account that enters ten wrong codes
+        in a day is stopped until the next day, so the code can’t be found by
+        trying. Codes that administrators typed in themselves, before Magick.ly
+        made them, were all replaced at that change: the admin page has the new
+        link and QR code to hand out.
+      </p>
+      <p>
+        Treat the code like a password for the door: make a new one if it has
+        been shared too widely, and make a new one or turn invitations off when
+        you remove someone who still has it, because they can use it to rejoin
+        (at grade 0). A new code stops the old link and QR code at once.
       </p>
 
       <h2 id="rituals">Private rituals and grade gating</h2>

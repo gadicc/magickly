@@ -1,6 +1,7 @@
 # Temple join codes — 24 November 2026
 
-Status: drafted and agreed on 24 November 2026. Gadi took the
+Status: built on 24 November 2026 on `gate/098-temple-join-codes` (see
+[As built](#as-built-24-november-2026)). Drafted and agreed the same day. Gadi took the
 recommended code format and limit (decisions 1 and 2) and chose to
 replace every existing code in the migration (decision 3, option b). Closes finding M2 of the input audit of 24 November 2026
 (read-only Opus review; notes kept outside the repository).
@@ -172,6 +173,28 @@ on local `main` per AGENTS.md. Pushing stays Gadi's.
 The join code also sits in the URL path, so it reaches browser history
 and server logs (audit, Info). That is the nature of an invitation link;
 a regenerated code is the remedy when one leaks. Not changed here.
+
+## As built, 24 November 2026
+
+- As planned, with these differences: no `generated_at` column (all old
+  codes are replaced, so none is needed); the refusal says "Try again
+  tomorrow" rather than a time, as the server does not know the
+  reader's time zone; the failures table's check allows zero, because a
+  matched lookup gives its reservation back with one `UPDATE` rather
+  than deleting the row; the join page treats a signed-in account the
+  database does not know as "no temple matches".
+- Checked in the browser on a dev server for this worktree (local
+  database, test sign-in): 375 px dark, 768 px Hebrew and desktop; a
+  new code made through the dialog; a typed code in capitals without
+  hyphens found; ten wrong codes, then the refusal (English and Hebrew)
+  even for the right code.
+- The local development database is not kept on drizzle's migration
+  journal (21 of 31 recorded), so 0030's statements were applied to it
+  by hand, with Gadi's agreement, before capturing `join-code`.
+  `magickli-docs-capture` refuses any `.env*` in the worktree, and
+  `.env.ci` is now tracked, so it was moved aside for each capture and
+  put back; the script's check could skip `.env.ci`.
+- Site search: 15 records re-keyed and published (3,265 tokens).
 
 ## Decisions
 

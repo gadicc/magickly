@@ -285,6 +285,14 @@ Follow-ups are separate from the completed migration work:
   third row; the candlestick's version in its URL; Share by hand on
   Android, Firefox desktop and Safari
   ([plan 097](097-export-controls.md#follow-ups-not-in-this-plan)).
+- Temple join codes ([plan 098](098-temple-join-codes.md)), 24 November
+  2026, on `gate/098-temple-join-codes`, closing input-audit finding M2:
+  the server makes every code (20 Crockford base32 characters, 100 bits)
+  and admins can only make a new one or turn invitations off; each
+  account may miss ten lookups a UTC day, on the join page and the join
+  together. Migration 0030 replaces every existing code, so links and QR
+  codes handed out before the release stop working. TODO: tell the
+  admins of production temples to hand out their new links.
 - TODO: rate limiting for the public component image routes
   (`/api/render/*`, `/api/treeOfLife`). Each distinct query renders through
   WASM on request, and `/api/render/rose-sigil` takes up to about 160 ms

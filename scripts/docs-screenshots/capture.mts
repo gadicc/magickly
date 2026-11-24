@@ -115,7 +115,7 @@ const shots: Shot[] = [
     name: "join-code",
     persona: "creator",
     open: async (b) => b.goto(base + (await templeAdminPath(b))),
-    clip: `[...byTextAll('h6', 'Join information'), document.querySelector('canvas, svg[aria-label^="Join"], img[aria-label^="Join"]')]`,
+    clip: `[...byTextAll('h6', 'Join information'), document.querySelector('canvas, svg[aria-label^="Join"], img[aria-label^="Join"]'), ...byTextAll('button', 'Turn off invitations')]`,
   },
   {
     name: "edit-member",
