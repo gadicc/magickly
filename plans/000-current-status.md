@@ -264,8 +264,15 @@ Follow-ups are separate from the completed migration work:
   (`Tablet`'s `pyramids`), published by CI when `main` is pushed; the
   image route draws them under a slug and profile of their own
   (`enochian-tablet-pyramids`), linked from the page and the component
-  explorer, the flat tablets' images unmoved. TODO: the follow-ups
-  (symbols on the sides, the tablets in image search).
+  explorer, the flat tablets' images unmoved. On 24 November:
+  *Symbols on the sides* draws each side's
+  symbol on the whole tablet, facing out from a top a third of the
+  square, with a switch to stand them upright, in the URL, the
+  downloads and the image (`symbols` on the same slug and profile),
+  released as magick-components 0.9.0 (`Tablet`'s `pyramidSymbols`,
+  `enochian/pyramidMarks`). TODO: whether the Squares tab's large
+  pyramid faces its symbols out by default too (Gadi); the follow-ups (the
+  tablets in image search, the tablet in 3D).
 - The export controls ([plan 097](097-export-controls.md)), 23 November
   2026, on `gate/export-controls`: one row per format under every
   drawing (SVG and PNG, each with Save, Copy and Link), image links

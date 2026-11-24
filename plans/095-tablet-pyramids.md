@@ -5,7 +5,8 @@ Status: done. Stages 0 to 4 on 23 November 2026: the sources (see
 the square's detail, the mock-up and the whole tablet drawn as
 pyramids, released as magick-components 0.8.0 on magick-data 0.5.0;
 stage 5, the image route (`enochian-tablet-pyramids`), on 24 November
-2026. The follow-ups remain. Drafted
+2026, and the follow-up "Symbols on the sides" the same day, released
+as magick-components 0.9.0. The other follow-ups remain. Drafted
 23 November 2026, before any code; Gadi answered its first open
 questions the same day; amended the same day after a Fable 5.2 review
 (see [Review](#review-23-november-2026)), which reversed one answer and
@@ -661,6 +662,58 @@ table and by rule), and read the Equinox's plates and vol. 1's badge.
   a toggle to turn them upright**. Open: whether the Squares tab's
   large pyramid, upright by default today, should face out by default
   too, so that both drawings start alike.
+  **Built 24 November 2026** (`6522cb23`, released in `26536c05`) on
+  `gate/095-pyramid-symbols`. The marks moved into magick-components as
+  a new entry, `enochian/pyramidMarks`: `sideSymbol`, `asText`, the
+  symbols' inks (`PYRAMID_SYMBOL_INKS`, keyed as `PYRAMID_COLOURS`;
+  `pyramidColours.test.ts` moved with them), and `SideMark`, each mark
+  centred on 0, 0 in a box of about 34 units, its outline widths a
+  parameter: the Squares tab's (`MARK_OUTLINES`: element 6 under 3,
+  figure 1.5, text 3) and the mock-up's thinner ones on the tablet
+  (`TABLET_MARK_OUTLINES`: 4.5, 1 and 1.5). The Squares tab's drawing
+  imports them and is unchanged byte for byte, which a digest of every
+  square of the three versions, upright and facing out, pinned before
+  the move, holds (`PyramidDrawing.test.tsx`). `Tablet` takes
+  `pyramidSymbols` (`"outward" | "upright"`, with `pyramids` only):
+  each mark in the middle of its band, its box scaled to 78% of the
+  band's depth, turned −90°, 0°, 90° and 180° on sides 1 to 4 unless
+  upright, drawn after the sides and before the tops, borders, tints
+  and letters, on a top a third of the square by default
+  (`PYRAMID_TOP_SYMBOLS`, exported; `pyramidTop` still overrides). The
+  entry passes the marks in as it passes the rules, so the halls' art
+  loads none of their data (a test reads `tabletSvg.tsx`'s imports).
+  Without the prop every drawing is as before.
+  The page: *Symbols on the sides* (`symbols=1`) while pyramids are
+  drawn, and *Stand the symbols upright* (`upright=1`) while symbols
+  are, each remembered while hidden and written to the URL only while
+  it shows, kept in a name's square links; the switches' row has 44 px
+  targets. The image link and the downloads follow
+  (`…-pyramids-symbols`, `…-pyramids-symbols-upright`). The Squares
+  tab is unchanged. The page's text says what the symbols are and how
+  they face, citing vol. 4 p.295 by leaf through `<Cite>`; its
+  embeddings were published with the change (9 passages, 1,981
+  tokens, about $0.02). Checked in the browser at
+  320, 375, 768 and 1,440 px, light and dark: no sideways scroll, the
+  switches wrapping under the others on a phone.
+  The image: `enochian-tablet-pyramids` takes `symbols` (`none`, the
+  default, omitted | `outward` | `upright`) under the same profile,
+  `magickli-tablet-pyramids-image-v1`, with the filenames above. Its
+  inputs hash (`bef0cacc…`), the 15-drawing digest (`c9e913c0…`) and
+  the three byte pins are unchanged and pass. New pins: a digest of
+  the 30 drawings with symbols (5 tablets × 3 versions × 2 facings,
+  `59057dbb…`) and the bytes of Fire facing out (1,135,168 bytes,
+  `6d41a143…`) and the Union upright (159,476, `e4b58519…`), reviewed
+  as rasterised. `FrankRuhlLibre-Bold-letters.ttf` joined the slug's
+  fonts for the Hebrew letters, which resvg then sets in it (the
+  outlines differ from Noto Sans Hebrew's); the signs and planets come
+  from the base Noto Sans Symbols and Symbols 2, the Sun among them;
+  U+FE0E draws nothing (ten glyphs outline identically with and
+  without it). The fonts are part of every pyramids image's recorded
+  identity, so that list moved for the images without symbols too,
+  though not their bytes. The component explorer gains Water with its
+  symbols, its image checked against the component. Released as
+  magick-components 0.9.0 on magick-data 0.5.0, which already
+  publishes every entry the marks read.
 - **The top's size as a choice.** Gadi asked whether readers should
   pick it, perhaps among advanced options. Recommended on 23 November
   2026, and held there: no picker yet. The page has seven controls with
