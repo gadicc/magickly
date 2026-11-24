@@ -323,6 +323,34 @@ none of which wait for CPUs. Both are `scripts/gate.mjs`.
   `gate-logs/push.tsv`. Never use `--no-verify`: it also skips the
   private-history guard in `.git/hooks/pre-push`.
 
-Which gate a change needs before it lands is still the verification policy
-in the Loom skill. The quick tier isn't in use yet (Loom
-`docs/landing.md`, on the `design/landing` branch).
+## Landing
+
+magickli has opted into Loom's tiered landing. The Loom skill's
+`references/landing.md` has the rules; this section fills in magickli's
+part.
+
+- **The gates:** the full gate is `pnpm gate`, the quick gate
+  `pnpm gate:quick`. Run both in your own worktree; `pnpm gate --rc` is the
+  owner's. The push check has been enforcing in the main checkout since
+  24 November 2026.
+- **Land without asking** (owner's standing authorization, 23 November
+  2026): once the work is finished, reviews included, land on local `main`
+  from your own worktree as soon as the gates pass, unless told to wait.
+  After a quick-tier landing, run `pnpm gate` on the landed commit. Pushing
+  stays the owner's.
+- **Hot files** and their resolution, then `git add` what changed before
+  `git rebase --continue`:
+  - `plans/000-current-status.md`: keep both sides' entries;
+  - `src/locales/en/messages.po` and `src/locales/he/messages.po`: keep
+    both sides' entries, then run `pnpm i18n:extract` and
+    `pnpm i18n:check`. Both sides changing the same message is not a hot
+    conflict;
+  - `src/search/embeddings/manifest.json` and `search-vectors/`: resolve
+    the manifest, then run `pnpm search:assemble
+    gemini-embedding-2-768-search-v1`, which makes no paid call, and stage
+    the rewritten manifest and pruned rows. If it reports a missing row, the
+    conflict is not hot.
+- **Direct work** (reaching `main` without a full gate before the landing)
+  only when the owner says so in the chat. Several sessions land here at
+  once, so it isn't the default.
+- **No land task yet:** take the landing steps by hand.
