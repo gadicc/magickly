@@ -211,6 +211,17 @@ describe("paint servers kept for the temple halls (plan 062)", () => {
     );
   });
 
+  it("refuses a reuse prefix that could meet the paint servers' ids", async () => {
+    for (const idPrefix of ["gdhall-", "gd", "gdhall-shared-"])
+      await expect(
+        outlineComponentImage(PAINTED, {
+          ...options,
+          paintServers: { idPrefix: "gdhall-" },
+          reuse: { idPrefix },
+        }),
+      ).rejects.toThrow("distinct id prefixes");
+  });
+
   it("keeps each url(#id), renumbered, resolving to its paint server", async () => {
     const result = await outlineComponentImage(PAINTED, {
       ...options,
@@ -355,6 +366,14 @@ describe("paint servers kept for the temple halls (plan 062)", () => {
         `<defs><linearGradient id="gdhall-0"/><g id="square-0">${square}</g></defs>` +
           '<use xlink:href="#square-0"/>' +
           '<use xlink:href="#square-0" transform="matrix(1 0 0 1 -100 0)"/>',
+      );
+    });
+
+    it("copies the groups' text as it is, never as a replacement pattern", () => {
+      const odd = '<path d="M0 0"/><desc>$& $\' $`</desc>';
+      const body = `<defs/><g>${odd}</g><g transform="matrix(1 0 0 1 -100 0)">${odd}</g>`;
+      expect(reuseRepeatedGroups(body, "square-")).toContain(
+        `<defs><g id="square-0">${odd}</g></defs>`,
       );
     });
 

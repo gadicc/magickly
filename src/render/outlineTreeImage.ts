@@ -146,7 +146,11 @@ export interface OutlineOptions {
    * Draw each top-level group that repeats another byte for byte once, in
    * the `<defs>`, and place it with `<use>` (`reuseRepeatedGroups`): the
    * sigils, whose square or rose stands under every word. Its links are
-   * the only ones the output may hold.
+   * the only ones the output may hold. Its ids are the same in every
+   * image (`square-0`), so two such images pasted into one document (as
+   * `scripts/home-tile` pastes component bodies) would share the first
+   * one's group: give each its own prefix there. It may not share or
+   * extend `paintServers`' prefix.
    */
   reuse?: { idPrefix: string };
 }
@@ -203,8 +207,8 @@ export function keepPaintServers(body: string, idPrefix: string): string {
 /**
  * The outlined body with every top-level group that repeats another's
  * contents byte for byte drawn once, in the `<defs>`, and placed with
- * `<use>` at each place it stood (24 November 2026). resvg expands every `<use>`
- * a component writes into a full copy, so a sigil's square or rose,
+ * `<use>` at each place it stood (24 November 2026). resvg expands
+ * every `<use>` a component writes into a full copy, so a sigil's square or rose,
  * repeated under each word, would otherwise be outlined and sent once a
  * word. Only a group whose opening tag is a bare `<g>` or carries nothing
  * but a `transform` is shared; the `<use>` carries that transform, which
@@ -238,9 +242,11 @@ export function reuseRepeatedGroups(body: string, idPrefix: string): string {
     out.match(/^\s*<defs\/>/) ?? out.match(/^\s*<defs>[\s\S]*?<\/defs>/);
   if (!defs) throw new Error("Unexpected component image structure");
   const [whole] = defs;
+  // Sliced, not `replace`d: the groups' text must never be read as a
+  // replacement pattern (`$&`).
   const merged = whole.endsWith("<defs/>")
-    ? whole.replace("<defs/>", `<defs>${shared.join("")}</defs>`)
-    : whole.replace(/<\/defs>$/, `${shared.join("")}</defs>`);
+    ? `${whole.slice(0, -"<defs/>".length)}<defs>${shared.join("")}</defs>`
+    : `${whole.slice(0, -"</defs>".length)}${shared.join("")}</defs>`;
   return merged + out.slice(whole.length);
 }
 
@@ -338,7 +344,13 @@ export async function outlineComponentImage(
     // references it now; display:none preserves its non-rendering behavior in
     // the existing closed SVG profile, which does not admit visibility.
     body = body.replace(/ visibility="hidden"/g, ' display="none"');
-    if (options.reuse) body = reuseRepeatedGroups(body, options.reuse.idPrefix);
+    if (options.reuse) {
+      const kept = paintServers?.idPrefix;
+      const shared = options.reuse.idPrefix;
+      if (kept && (kept.startsWith(shared) || shared.startsWith(kept)))
+        throw new Error("reuse and paintServers need distinct id prefixes");
+      body = reuseRepeatedGroups(body, shared);
+    }
     if (options.flip)
       body = `<g transform="scale(-1 1)">${body.replace(/<\/svg>\s*$/, "</g></svg>")}`;
     const bytes = Buffer.from(originalRoot + body);

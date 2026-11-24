@@ -300,6 +300,15 @@ describe("component image registry", () => {
       2508,
       400,
     ],
+    // 32 one-letter words: one square in the <defs>, 32 uses (`reuse`).
+    [
+      "kamea-sigil",
+      `planet=luna&text=${Array(32).fill("ת").join(" ")}`,
+      4096,
+      128,
+      2000,
+    ],
+    ["rose-sigil", `text=${Array(16).fill("אב").join(" ")}`, 4096, 256, 100],
     // The angels' styles (plan 096): the band's rings, name and sigil; the
     // bare sigil and its name; a talisman's verse a path a letter.
     ["angel-sigil", "angel=vehuiah", 1024, 1024, 15],
@@ -326,6 +335,10 @@ describe("component image registry", () => {
       for (const [, id] of links) {
         expect(reuse && id.startsWith(reuse.idPrefix), id).toBe(true);
         expect(text.split(`<g id="${id}">`).length, id).toBe(2);
+        expect(
+          text.match(/<defs>[\s\S]*?<\/defs>/)?.[0] ?? "",
+          `${id} is shared from the <defs>`,
+        ).toContain(`<g id="${id}">`);
       }
       expect(text.replace(/<use xlink:href="#[^"]+"/g, "<use")).not.toMatch(
         /<text|<style|href=|font-family|<image/,
