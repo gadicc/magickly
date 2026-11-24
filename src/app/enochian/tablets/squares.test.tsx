@@ -730,14 +730,14 @@ describe("/enochian/tablets' pyramid symbols", () => {
   const orientation = (container: HTMLElement) =>
     container.querySelector("[data-orientation] p")?.textContent;
 
-  it("stands them upright, and turns them outward for the session", () => {
+  it("faces them outward, and stands them upright for the session", () => {
     window.history.replaceState(null, "", `${PAGE}?tab=squares&square=3,1`);
     const { container } = render(<Tablets links={LINKS} />);
     const svg = () => container.querySelector("[data-pyramid]");
-    expect(svg()?.getAttribute("data-symbols")).toBe("upright");
-    expect(turns(container)).toEqual(["0", "0", "0", "0"]);
+    expect(svg()?.getAttribute("data-symbols")).toBe("outward");
+    expect(turns(container)).toEqual(["-90", "0", "90", "180"]);
     expect(orientation(container)).toBe(
-      "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, a.",
+      "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, a.",
     );
     // Cited to the page that says so.
     expect(
@@ -747,28 +747,27 @@ describe("/enochian/tablets' pyramid symbols", () => {
     ).toBe(
       "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol4-1940/page/n287/mode/1up",
     );
-    // A switch, by keyboard as by pointer.
-    const outward = screen.getByRole("switch", {
-      name: "Face the symbols outward, as the Order painted them",
-    });
-    expect(outward.tagName).toBe("INPUT");
-    fireEvent.click(outward);
-    expect(svg()?.getAttribute("data-symbols")).toBe("outward");
-    expect(turns(container)).toEqual(["-90", "0", "90", "180"]);
+    // A switch, by keyboard as by pointer, named apart from the whole
+    // tablet's, which the URL keeps.
+    const upright = () =>
+      screen.getByRole("switch", {
+        name: "Stand this pyramid's symbols upright",
+      });
+    expect(upright().tagName).toBe("INPUT");
+    fireEvent.click(upright());
+    expect(svg()?.getAttribute("data-symbols")).toBe("upright");
+    expect(turns(container)).toEqual(["0", "0", "0", "0"]);
     expect(orientation(container)).toBe(
-      "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, a.",
+      "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, a.",
     );
+    expect(window.location.search).not.toMatch(/upright/);
     // Kept for another square, and across the tabs.
     fireEvent.click(squareOn(container, 6, 0));
-    expect(svg()?.getAttribute("data-symbols")).toBe("outward");
+    expect(svg()?.getAttribute("data-symbols")).toBe("upright");
     fireEvent.click(screen.getByRole("tab", { name: "Names" }));
     openSquares();
-    expect(svg()?.getAttribute("data-symbols")).toBe("outward");
-    fireEvent.click(
-      screen.getByRole("switch", {
-        name: "Face the symbols outward, as the Order painted them",
-      }),
-    );
     expect(svg()?.getAttribute("data-symbols")).toBe("upright");
+    fireEvent.click(upright());
+    expect(svg()?.getAttribute("data-symbols")).toBe("outward");
   });
 });

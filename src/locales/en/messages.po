@@ -2587,8 +2587,8 @@ msgstr "Its sphinx"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/PyramidDetail.tsx
-msgid "Face the symbols outward, as the Order painted them"
-msgstr "Face the symbols outward, as the Order painted them"
+msgid "Stand this pyramid's symbols upright"
+msgstr "Stand this pyramid's symbols upright"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/PyramidDetail.tsx
@@ -2597,13 +2597,13 @@ msgstr "Its four sides"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/PyramidDetail.tsx
-msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, {letter}."
-msgstr "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, {letter}."
+msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, {letter}."
+msgstr "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, {letter}."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/PyramidDetail.tsx
-msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, {letter}."
-msgstr "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, {letter}."
+msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, {letter}."
+msgstr "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, {letter}."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/PyramidDetail.tsx

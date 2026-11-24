@@ -11,8 +11,8 @@ import type { TabletPyramid } from "magick-data/enochian/tabletPyramids";
  * pyramid (plan 095, decision 3): four sides round a white flat top that
  * holds the square's letter, each side in its element's colour with its
  * symbol in the complementary colour (Regardie, vol. 4, pp.293–296). The
- * symbols stand upright, to be read, unless `outward` turns each to face
- * out from the top, as the Order painted them (p.295). The app's own
+ * symbols face out from the top, as the Order painted them (p.295),
+ * unless `upright` stands each to be read. The app's own
  * drawing of one square; its marks are magick-components', which the
  * whole tablet draws with `pyramidSymbols`, here at their large outlines.
  * Its words are in the list beside it, so the drawing is hidden from
@@ -51,13 +51,13 @@ const SIDES = [
 export default function PyramidDrawing({
   pyramid,
   letter,
-  outward = false,
+  upright = false,
 }: {
   pyramid: TabletPyramid;
   /** The square's letter in the chosen version, for the flat top. */
   letter: string;
-  /** Turn each symbol to face out from the top, as the Order painted them. */
-  outward?: boolean;
+  /** Stand each symbol upright, to be read, rather than facing out. */
+  upright?: boolean;
 }) {
   return (
     <svg
@@ -65,7 +65,7 @@ export default function PyramidDrawing({
       width="100%"
       aria-hidden
       data-pyramid={`${pyramid.row},${pyramid.column}`}
-      data-symbols={outward ? "outward" : "upright"}
+      data-symbols={upright ? "upright" : "outward"}
       style={{ display: "block", maxWidth: SIZE, margin: "0 auto" }}
     >
       {pyramid.sides.map((side, index) => {
@@ -82,7 +82,7 @@ export default function PyramidDrawing({
               style={{ fill, stroke: "#777", strokeWidth: 1.5 }}
             />
             <g
-              transform={`translate(${at[0]} ${at[1]})${outward ? ` rotate(${turn})` : ""}`}
+              transform={`translate(${at[0]} ${at[1]})${upright ? "" : ` rotate(${turn})`}`}
             >
               <SideMark symbol={sideSymbol(side)} {...inksOf(side)} />
             </g>

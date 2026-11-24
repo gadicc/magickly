@@ -33,8 +33,8 @@ export default function SquaresPanel({
   focusDetail,
   focused,
   announce,
-  outward,
-  setOutward,
+  upright,
+  setUpright,
 }: {
   tablet: string;
   version: TabletVersionId;
@@ -56,9 +56,9 @@ export default function SquaresPanel({
    * its heading, which says it.
    */
   announce: boolean;
-  /** Whether the pyramid's symbols face outward, kept for the session. */
-  outward: boolean;
-  setOutward: (outward: boolean) => void;
+  /** Whether the pyramid's symbols stand upright, kept for the session. */
+  upright: boolean;
+  setUpright: (upright: boolean) => void;
 }) {
   const { t } = useUiLanguage();
   const heading = React.useRef<HTMLHeadingElement>(null);
@@ -181,8 +181,8 @@ export default function SquaresPanel({
             pyramid={pyramid}
             letter={versionLetter(view, pyramid.row, pyramid.column)}
             heading={heading}
-            outward={outward}
-            setOutward={setOutward}
+            upright={upright}
+            setUpright={setUpright}
           />
         )}
       </div>

@@ -2587,8 +2587,8 @@ msgstr "הספינקס שלה"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/PyramidDetail.tsx
-msgid "Face the symbols outward, as the Order painted them"
-msgstr "הפניית הסמלים החוצה, כפי שהמסדר צייר אותם"
+msgid "Stand this pyramid's symbols upright"
+msgstr "העמדת הסמלים של הפירמידה הזו זקופים"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/PyramidDetail.tsx
@@ -2597,13 +2597,13 @@ msgstr "ארבע הצלעות שלה"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/PyramidDetail.tsx
-msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, {letter}."
-msgstr "כל צלע מצוירת בצבע היסוד שלה, והסמל שלה בצבע המשלים, פונה החוצה, כפי שהמסדר צייר אותם. הפסגה נושאת את אות המשבצת, {letter}."
+msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, {letter}."
+msgstr "כל צלע מצוירת בצבע היסוד שלה, והסמל שלה בצבע המשלים, זקוף כדי שאפשר יהיה לקרוא אותו; המסדר צייר את הסמלים פונים החוצה. הפסגה נושאת את אות המשבצת, {letter}."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/PyramidDetail.tsx
-msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, {letter}."
-msgstr "כל צלע מצוירת בצבע היסוד שלה, והסמל שלה בצבע המשלים, זקוף כדי שאפשר יהיה לקרוא אותו; המסדר צייר את הסמלים פונים החוצה. הפסגה נושאת את אות המשבצת, {letter}."
+msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, {letter}."
+msgstr "כל צלע מצוירת בצבע היסוד שלה, והסמל שלה בצבע המשלים, פונה החוצה, כפי שהמסדר צייר אותם. הפסגה נושאת את אות המשבצת, {letter}."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/PyramidDetail.tsx

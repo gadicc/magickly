@@ -576,9 +576,10 @@ export default function Tablets({
   const [focusPyramid, setFocusPyramid] = React.useState(false);
   const [announcePyramid, setAnnouncePyramid] = React.useState(false);
   const pyramidFocused = React.useCallback(() => setFocusPyramid(false), []);
-  // The pyramid's symbols upright, or facing outward as the Order painted
-  // them: the page's for the session, across squares and tabs.
-  const [outward, setOutward] = React.useState(false);
+  // The large pyramid's symbols facing outward, as the Order painted
+  // them, or upright: the page's for the session, across squares and
+  // tabs, and apart from the whole tablet's, which the URL keeps.
+  const [squareUpright, setSquareUpright] = React.useState(false);
   // The Names tab: a chosen name and one previewed, by id, which is the
   // same on every tablet and in every version, and the regions.
   const [chosenId, setChosenId] = React.useState<TabletNameId>();
@@ -1084,8 +1085,8 @@ export default function Tablets({
                   focusDetail={focusPyramid}
                   focused={pyramidFocused}
                   announce={announcePyramid}
-                  outward={outward}
-                  setOutward={setOutward}
+                  upright={squareUpright}
+                  setUpright={setSquareUpright}
                 />
               ) : (
                 <SquaresSection

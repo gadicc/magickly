@@ -13,7 +13,8 @@ describe("the Squares tab's large pyramid", () => {
   // and facing out: the drawing as reviewed on 23 November 2026 (plan
   // 095, stage 2). Its marks moved into magick-components for the whole
   // tablet's symbols (the follow-up "Symbols on the sides") without
-  // moving a byte here; a change on purpose records a new digest.
+  // moving a byte here, and facing out became the default without
+  // moving one either; a change on purpose records a new digest.
   it("draws every square as it was reviewed", () => {
     const hash = createHash("sha256");
     let drawn = 0;
@@ -22,14 +23,14 @@ describe("the Squares tab's large pyramid", () => {
         const view = tabletVersion(tablets[id], version);
         if (!view) throw new Error(`${id} ${version}`);
         for (const pyramid of tabletPyramids(view))
-          for (const outward of [false, true]) {
+          for (const upright of [true, false]) {
             const letter = view.grid[pyramid.row]?.[pyramid.column] ?? "";
             hash.update(
               renderToStaticMarkup(
                 <PyramidDrawing
                   pyramid={pyramid}
                   letter={letter}
-                  outward={outward}
+                  upright={upright}
                 />,
               ),
             );

@@ -659,11 +659,11 @@ table and by rule), and read the Equinox's plates and vol. 1's badge.
   Spirit's wheel. Gadi chose **the top at a third, the symbols facing
   out from the top by default**, as the Order painted them (vol. 4,
   p.295) and as the 3D view (stretch goal above) will want them, **with
-  a toggle to turn them upright**. Open: whether the Squares tab's
-  large pyramid, upright by default today, should face out by default
-  too, so that both drawings start alike.
-  **Built 24 November 2026** (`6522cb23`, released in `26536c05`) on
-  `gate/095-pyramid-symbols`. The marks moved into magick-components as
+  a toggle to turn them upright**. Asked then whether the Squares
+  tab's large pyramid, upright by default, should face out by default
+  too, so that both drawings start alike, Gadi chose to face it out
+  (24 November 2026; see below).
+  **Built 24 November 2026** (`3616fd73`, released in `57b3f598`). The marks moved into magick-components as
   a new entry, `enochian/pyramidMarks`: `sideSymbol`, `asText`, the
   symbols' inks (`PYRAMID_SYMBOL_INKS`, keyed as `PYRAMID_COLOURS`;
   `pyramidColours.test.ts` moved with them), and `SideMark`, each mark
@@ -714,6 +714,15 @@ table and by rule), and read the Equinox's plates and vol. 1's badge.
   symbols, its image checked against the component. Released as
   magick-components 0.9.0 on magick-data 0.5.0, which already
   publishes every entry the marks read.
+  **The Squares tab faces out too** (24 November 2026, Gadi's choice):
+  its large pyramid starts with the symbols facing out, and its switch,
+  *Stand this pyramid's symbols upright*, stands them to be read for
+  the session, across squares and tabs. It is named apart from the
+  whole tablet's *Stand the symbols upright*, as both show at once
+  with the pyramids drawn, and stays out of the URL as before; the
+  two do not move each other. `PyramidDrawing` takes `upright` for
+  `outward`; its digest of every square, both ways, is unchanged. The
+  page's text says both drawings face out unless stood upright.
 - **The top's size as a choice.** Gadi asked whether readers should
   pick it, perhaps among advanced options. Recommended on 23 November
   2026, and held there: no picker yet. The page has seven controls with

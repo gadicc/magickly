@@ -70,22 +70,21 @@ export default function TabletsText() {
         <Cite work="regardie1940" leaf={287} plain rel="noreferrer">
           295
         </Cite>
-        ), where the Squares tab&apos;s stand upright unless you turn them. So
-        is a whole tablet drawn in pyramids, after the Order&apos;s rule for one
-        square: the sides in their elements&apos; colours, and the letter on a
-        flat top half as wide as the square, or a third with the symbols on the
-        sides, which face outward as the Order painted them unless you stand
-        them upright. The Equinox&apos;s plates draw the top about a quarter of
-        the square, to leave the sides room for the symbols; ours keeps the
-        letter large enough to read, and shows one symbol a side where the
-        sources list several. Some readings are ours too, and labelled so: where
-        the sources do not say which of a sphinx&apos;s left and right sides
-        gives which part, the Kerubs are listed by side rather than drawn as one
-        figure; where a sphinx has two active sides and two passive, no tendency
-        is given; and the Children of Horus are given by the three elements
-        present, as the gods&apos; table and its one worked example of the kind
-        have them. Dee&apos;s and Raphael&apos;s tables carry no elements, so
-        their versions have no pyramids.
+        ), as ours face unless you stand them upright. So is a whole tablet
+        drawn in pyramids, after the Order&apos;s rule for one square: the sides
+        in their elements&apos; colours, and the letter on a flat top half as
+        wide as the square, or a third with the symbols on the sides. The
+        Equinox&apos;s plates draw the top about a quarter of the square, to
+        leave the sides room for the symbols; ours keeps the letter large enough
+        to read, and shows one symbol a side where the sources list several.
+        Some readings are ours too, and labelled so: where the sources do not
+        say which of a sphinx&apos;s left and right sides gives which part, the
+        Kerubs are listed by side rather than drawn as one figure; where a
+        sphinx has two active sides and two passive, no tendency is given; and
+        the Children of Horus are given by the three elements present, as the
+        gods&apos; table and its one worked example of the kind have them.
+        Dee&apos;s and Raphael&apos;s tables carry no elements, so their
+        versions have no pyramids.
       </p>
       <p>
         One thing is disputed: the order of the four Sephiroth on a Calvary

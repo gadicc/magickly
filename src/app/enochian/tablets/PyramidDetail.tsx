@@ -338,8 +338,8 @@ export default function PyramidDetail({
   pyramid,
   letter,
   heading,
-  outward,
-  setOutward,
+  upright,
+  setUpright,
 }: {
   tablet: string;
   version: TabletVersionId;
@@ -348,9 +348,9 @@ export default function PyramidDetail({
   letter: string;
   /** The detail's heading, which a choice made by keyboard focuses. */
   heading: React.RefObject<HTMLHeadingElement | null>;
-  /** Whether the symbols face outward, as the Order painted them. */
-  outward: boolean;
-  setOutward: (outward: boolean) => void;
+  /** Whether the symbols stand upright, rather than facing outward. */
+  upright: boolean;
+  setUpright: (upright: boolean) => void;
 }) {
   const { t, locale } = useUiLanguage();
   const list = listWords(locale);
@@ -390,19 +390,17 @@ export default function PyramidDetail({
         {regionInWords(pyramid, tablet, t)}
       </Typography>
       <Box className={`${plateClass} ${styles.pyramid}`} sx={{ my: 1.5 }}>
-        <PyramidDrawing pyramid={pyramid} letter={letter} outward={outward} />
+        <PyramidDrawing pyramid={pyramid} letter={letter} upright={upright} />
       </Box>
       <FormControlLabel
         className={styles.touchable}
         control={
           <Switch
-            checked={outward}
-            onChange={(event) => setOutward(event.target.checked)}
+            checked={upright}
+            onChange={(event) => setUpright(event.target.checked)}
           />
         }
-        label={t(
-          /*i18n*/ "Face the symbols outward, as the Order painted them",
-        )}
+        label={t(/*i18n*/ "Stand this pyramid's symbols upright")}
       />
       <Heading>{t(/*i18n*/ "Its four sides")}</Heading>
       <Typography
@@ -417,13 +415,13 @@ export default function PyramidDetail({
       </Typography>
       <Box sx={{ mt: 0.5 }} data-orientation="">
         <Typography variant="body2">
-          {outward
+          {upright
             ? t(
-                /*i18n*/ "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, {letter}.",
+                /*i18n*/ "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, {letter}.",
                 { letter },
               )
             : t(
-                /*i18n*/ "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, {letter}.",
+                /*i18n*/ "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, {letter}.",
                 { letter },
               )}
         </Typography>
