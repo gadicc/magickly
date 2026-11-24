@@ -15,8 +15,13 @@ import {
 } from "../db/schema/memberships";
 import { userAccess, userProfile } from "../db/schema/userProfile";
 import { createUuidV7, isUuidV7 } from "../lib/ids";
+import { reserveJoinAttempt, returnJoinAttempt } from "./joinAttempts";
+import { generateJoinCode, isJoinCode, normalizeJoinCode } from "./joinCode";
 
-type SelectDatabase = Pick<PgDatabase<PgQueryResultHKT>, "select" | "insert">;
+type SelectDatabase = Pick<
+  PgDatabase<PgQueryResultHKT>,
+  "select" | "insert" | "update"
+>;
 type Transaction = Pick<
   PgDatabase<PgQueryResultHKT>,
   "select" | "insert" | "update" | "delete"
@@ -97,13 +102,24 @@ export interface TempleAdminView extends TempleAdminListItem {
   members: TempleAdminMember[];
 }
 
+/** What the join page may show for a slug and code (plan 098). */
+export type TempleJoinPreview =
+  | { status: "found"; temple: TempleAdminListItem; alreadyMember: boolean }
+  | { status: "notFound" }
+  /** This account has used up today's failed lookups; nothing was looked up. */
+  | { status: "limited" };
+
 export interface TempleMembershipAdminView {
   temple: TempleAdminListItem;
   membership: TempleAdminMember;
 }
 
 /** SQL projections for temple pages; privileged columns are selected only after access checks. */
-export function createSqlTempleReader(database: TempleDatabase) {
+export function createSqlTempleReader(
+  database: TempleDatabase,
+  options: { now?: () => Date } = {},
+) {
+  const now = options.now ?? (() => new Date());
   return {
     async getMyTemples(actorId: string | null): Promise<TempleListItem[]> {
       if (!actorId || !(await loadIdentity(database, actorId))) return [];
@@ -202,7 +218,9 @@ export function createSqlTempleReader(database: TempleDatabase) {
           .orderBy(desc(templeMemberships.addedAt), asc(templeMemberships.id));
         return {
           ...temple,
-          joinPass: temple.joinPass ?? null,
+          // A stored code in another format (only a rerun of the legacy
+          // import could write one) can never match, so it is no code.
+          joinPass: isJoinCode(temple.joinPass) ? temple.joinPass : null,
           members: members.map(
             ({ accountName, profileName, ...membership }) => ({
               ...membership,
@@ -283,20 +301,22 @@ export function createSqlTempleReader(database: TempleDatabase) {
       });
     },
 
+    /**
+     * Looks up a slug and join code for the join page. Every lookup is
+     * counted against the account's daily misses first and given back
+     * when the code matched, so the page cannot be used to guess codes.
+     */
     async getJoinPreview(
       actorId: string | null,
       slug: string,
       joinPass: string,
-    ): Promise<{
-      temple: TempleAdminListItem;
-      alreadyMember: boolean;
-    } | null> {
-      if (
-        !actorId ||
-        !(await loadIdentity(database, actorId)) ||
-        !validJoinCredential(slug, joinPass)
-      )
-        return null;
+    ): Promise<TempleJoinPreview | null> {
+      if (!actorId || !(await loadIdentity(database, actorId))) return null;
+      const attemptedAt = now();
+      if (!(await reserveJoinAttempt(database, actorId, attemptedAt)))
+        return { status: "limited" };
+      const code = normalizeJoinCode(joinPass);
+      if (!code || !validSlug(slug)) return { status: "notFound" };
       const [temple] = await database
         .select({ id: temples.id, name: temples.name, slug: temples.slug })
         .from(temples)
@@ -304,10 +324,11 @@ export function createSqlTempleReader(database: TempleDatabase) {
         .where(
           and(
             sql`lower(btrim(${temples.slug})) = lower(btrim(${slug}))`,
-            eq(templeInvites.joinPass, joinPass),
+            eq(templeInvites.joinPass, code),
           ),
         );
-      if (!temple) return null;
+      if (!temple) return { status: "notFound" };
+      await returnJoinAttempt(database, actorId, attemptedAt);
       const [membership] = await database
         .select({ id: templeMemberships.id })
         .from(templeMemberships)
@@ -317,7 +338,7 @@ export function createSqlTempleReader(database: TempleDatabase) {
             eq(templeMemberships.userId, actorId),
           ),
         );
-      return { temple, alreadyMember: Boolean(membership) };
+      return { status: "found", temple, alreadyMember: Boolean(membership) };
     },
   };
 }
@@ -329,6 +350,7 @@ type FailureCode =
   | "NOT_AUTHORIZED"
   | "NOT_FOUND"
   | "INVALID_INVITE"
+  | "TOO_MANY_ATTEMPTS"
   | "LAST_ADMIN"
   | "UNAVAILABLE";
 const failureMessages: Record<FailureCode, string> = {
@@ -338,6 +360,8 @@ const failureMessages: Record<FailureCode, string> = {
   NOT_AUTHORIZED: "You do not have permission to manage this temple.",
   NOT_FOUND: "The temple or membership was not found.",
   INVALID_INVITE: "No temple matches that slug and join code.",
+  TOO_MANY_ATTEMPTS:
+    "Too many incorrect join codes from your account today. Try again tomorrow.",
   LAST_ADMIN:
     "A temple needs an administrator. Make another member an administrator first.",
   UNAVAILABLE: "The temple service is temporarily unavailable. Try again.",
@@ -383,13 +407,8 @@ function validText(value: unknown, max: number, allowEmpty = false) {
     value.isWellFormed()
   );
 }
-function validJoinCredential(slug: unknown, joinPass: unknown) {
-  return (
-    validText(slug, 200) &&
-    validText(joinPass, 200) &&
-    !(slug as string).includes("/") &&
-    !(joinPass as string).includes("/")
-  );
+function validSlug(slug: unknown): slug is string {
+  return validText(slug, 200) && !(slug as string).includes("/");
 }
 function writeFailure(error: unknown): TempleWriteResult {
   const code = error instanceof TempleFailure ? error.code : "UNAVAILABLE";
@@ -512,111 +531,132 @@ export function createSqlTempleWriter(
             "joinPass",
           ]) ||
           request.version !== 1 ||
-          !validJoinCredential(request.slug, request.joinPass)
+          !validSlug(request.slug) ||
+          !validText(request.joinPass, 200)
         )
           reject("INVALID_REQUEST");
+        const slug = request.slug;
         const actorId = await verifiedActor(
           getVerifiedActorId,
           request.expectedActorId,
         );
-        return await database.transaction(async (tx) => {
-          const [candidate] = await tx
-            .select({ id: temples.id })
-            .from(temples)
-            .innerJoin(templeInvites, eq(templeInvites.templeId, temples.id))
-            .where(
-              and(
-                sql`lower(btrim(${temples.slug})) = lower(btrim(${request.slug as string}))`,
-                eq(templeInvites.joinPass, request.joinPass as string),
-              ),
-            );
-          if (!candidate) reject("INVALID_INVITE");
-          const [temple] = await tx
-            .select({ id: temples.id })
-            .from(temples)
-            .where(eq(temples.id, candidate.id))
-            .for("no key update");
-          if (!temple) reject("INVALID_INVITE");
-          const [invite] = await tx
-            .select({ templeId: templeInvites.templeId })
-            .from(templeInvites)
-            .where(
-              and(
-                eq(templeInvites.templeId, temple.id),
-                eq(templeInvites.joinPass, request.joinPass as string),
-              ),
-            );
-          if (!invite) reject("INVALID_INVITE");
-          const [identity] = await tx
-            .select({ id: user.id })
-            .from(user)
-            .where(eq(user.id, actorId))
-            .for("key share");
-          if (!identity) reject("NOT_AUTHENTICATED");
-          const [existing] = await tx
-            .select({ id: templeMemberships.id })
-            .from(templeMemberships)
-            .where(
-              and(
-                eq(templeMemberships.templeId, temple.id),
-                eq(templeMemberships.userId, actorId),
-              ),
-            );
-          if (existing)
+        // Counted before the lookup and given back if the code matched,
+        // as on the join page (plan 098).
+        const attemptedAt = now();
+        if (!(await reserveJoinAttempt(database, actorId, attemptedAt)))
+          reject("TOO_MANY_ATTEMPTS");
+        const code = normalizeJoinCode(request.joinPass);
+        if (!code) reject("INVALID_INVITE");
+        let matched = false;
+        try {
+          return await database.transaction(async (tx) => {
+            const [candidate] = await tx
+              .select({ id: temples.id })
+              .from(temples)
+              .innerJoin(templeInvites, eq(templeInvites.templeId, temples.id))
+              .where(
+                and(
+                  sql`lower(btrim(${slug})) = lower(btrim(${temples.slug}))`,
+                  eq(templeInvites.joinPass, code),
+                ),
+              );
+            if (!candidate) reject("INVALID_INVITE");
+            matched = true;
+            const [temple] = await tx
+              .select({ id: temples.id })
+              .from(temples)
+              .where(eq(temples.id, candidate.id))
+              .for("no key update");
+            if (!temple) reject("INVALID_INVITE");
+            const [invite] = await tx
+              .select({ templeId: templeInvites.templeId })
+              .from(templeInvites)
+              .where(
+                and(
+                  eq(templeInvites.templeId, temple.id),
+                  eq(templeInvites.joinPass, code),
+                ),
+              );
+            if (!invite) reject("INVALID_INVITE");
+            const [identity] = await tx
+              .select({ id: user.id })
+              .from(user)
+              .where(eq(user.id, actorId))
+              .for("key share");
+            if (!identity) reject("NOT_AUTHENTICATED");
+            const [existing] = await tx
+              .select({ id: templeMemberships.id })
+              .from(templeMemberships)
+              .where(
+                and(
+                  eq(templeMemberships.templeId, temple.id),
+                  eq(templeMemberships.userId, actorId),
+                ),
+              );
+            if (existing)
+              return {
+                ok: true as const,
+                templeId: temple.id,
+                membershipId: existing.id,
+                alreadyMember: true,
+              };
+            const membershipId = generateId();
+            const createdAt = now();
+            if (
+              !canonical(membershipId) ||
+              !(createdAt instanceof Date) ||
+              !Number.isFinite(createdAt.getTime())
+            )
+              reject("UNAVAILABLE");
+            const [inserted] = await tx
+              .insert(templeMemberships)
+              .values({
+                id: membershipId,
+                templeId: temple.id,
+                userId: actorId,
+                grade: 0,
+                admin: false,
+                addedAt: createdAt,
+                createdAt,
+                updatedAt: createdAt,
+              })
+              .onConflictDoNothing({
+                target: [templeMemberships.userId, templeMemberships.templeId],
+              })
+              .returning({ id: templeMemberships.id });
+            if (inserted)
+              return {
+                ok: true as const,
+                templeId: temple.id,
+                membershipId: inserted.id,
+                alreadyMember: false,
+              };
+            const [concurrent] = await tx
+              .select({ id: templeMemberships.id })
+              .from(templeMemberships)
+              .where(
+                and(
+                  eq(templeMemberships.templeId, temple.id),
+                  eq(templeMemberships.userId, actorId),
+                ),
+              );
+            if (!concurrent) reject("UNAVAILABLE");
             return {
               ok: true as const,
               templeId: temple.id,
-              membershipId: existing.id,
+              membershipId: concurrent.id,
               alreadyMember: true,
             };
-          const membershipId = generateId();
-          const createdAt = now();
-          if (
-            !canonical(membershipId) ||
-            !(createdAt instanceof Date) ||
-            !Number.isFinite(createdAt.getTime())
-          )
-            reject("UNAVAILABLE");
-          const [inserted] = await tx
-            .insert(templeMemberships)
-            .values({
-              id: membershipId,
-              templeId: temple.id,
-              userId: actorId,
-              grade: 0,
-              admin: false,
-              addedAt: createdAt,
-              createdAt,
-              updatedAt: createdAt,
-            })
-            .onConflictDoNothing({
-              target: [templeMemberships.userId, templeMemberships.templeId],
-            })
-            .returning({ id: templeMemberships.id });
-          if (inserted)
-            return {
-              ok: true as const,
-              templeId: temple.id,
-              membershipId: inserted.id,
-              alreadyMember: false,
-            };
-          const [concurrent] = await tx
-            .select({ id: templeMemberships.id })
-            .from(templeMemberships)
-            .where(
-              and(
-                eq(templeMemberships.templeId, temple.id),
-                eq(templeMemberships.userId, actorId),
-              ),
+          });
+        } finally {
+          // Outside the transaction, so a later rollback cannot keep a
+          // matched code counted as a miss. A failed refund costs the
+          // account one attempt and must not turn a join into an error.
+          if (matched)
+            await returnJoinAttempt(database, actorId, attemptedAt).catch(
+              () => undefined,
             );
-          if (!concurrent) reject("UNAVAILABLE");
-          return {
-            ok: true as const,
-            templeId: temple.id,
-            membershipId: concurrent.id,
-            alreadyMember: true,
-          };
-        });
+        }
       } catch (error) {
         return writeFailure(error);
       }

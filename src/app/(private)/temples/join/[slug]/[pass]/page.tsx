@@ -43,23 +43,31 @@ export default async function TemplesJoinPage({
         </Typography>
       </Container>
     );
-  const preview = await createSqlTempleReader(db).getJoinPreview(
+  const preview = (await createSqlTempleReader(db).getJoinPreview(
     actorId,
     slug,
     joinPass,
-  );
+  )) ?? { status: "notFound" };
   const query = await searchParams;
   return (
     <Container sx={{ my: 2 }}>
       <Typography variant="h5">
         <UiText message={/*i18n*/ "Join Temple"} />
       </Typography>
-      {query.error ? (
+      {query.error && preview.status !== "limited" ? (
         <Typography color="error" role="alert" sx={{ my: 2 }}>
           <TempleFeedback text={query.error} />
         </Typography>
       ) : null}
-      {!preview ? (
+      {preview.status === "limited" ? (
+        <Typography color="error" role="alert" sx={{ my: 2 }}>
+          <UiText
+            message={
+              /*i18n*/ "Too many incorrect join codes from your account today. Try again tomorrow."
+            }
+          />
+        </Typography>
+      ) : preview.status === "notFound" ? (
         <Typography sx={{ my: 2 }}>
           <UiText
             message={/*i18n*/ "No temple matches that slug and join code."}
@@ -108,7 +116,7 @@ export default async function TemplesJoinPage({
           </form>
         </>
       )}
-      {!preview || preview.alreadyMember ? (
+      {preview.status !== "found" || preview.alreadyMember ? (
         <Link href="/temples">
           <UiText message={/*i18n*/ "Back to temples"} />
         </Link>

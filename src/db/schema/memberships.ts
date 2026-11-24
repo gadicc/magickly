@@ -147,7 +147,8 @@ export const templeMemberships = pgTable(
 /**
  * Failed join-code lookups (plan 098): one row per account, reused each
  * UTC day, as `chat_daily_usage` is. An attempt is reserved before the
- * lookup and given back when the code matched, so the count is of misses.
+ * lookup and given back when the code matched, so the count is of misses
+ * and may fall back to zero.
  */
 export const templeJoinFailures = pgTable(
   "temple_join_failures",
@@ -159,6 +160,6 @@ export const templeJoinFailures = pgTable(
     failures: integer("failures").notNull(),
   },
   (table) => [
-    check("temple_join_failures_positive", sql`${table.failures} > 0`),
+    check("temple_join_failures_nonnegative", sql`${table.failures} >= 0`),
   ],
 );

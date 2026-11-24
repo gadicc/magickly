@@ -7,6 +7,7 @@ const FIXED = new Set([
   /*i18n*/ "You do not have permission to manage this temple.",
   /*i18n*/ "The temple or membership was not found.",
   /*i18n*/ "No temple matches that slug and join code.",
+  /*i18n*/ "Too many incorrect join codes from your account today. Try again tomorrow.",
   /*i18n*/ "A temple needs an administrator. Make another member an administrator first.",
   /*i18n*/ "The temple service is temporarily unavailable. Try again.",
   /*i18n*/ "Enter a valid slug and join code.",

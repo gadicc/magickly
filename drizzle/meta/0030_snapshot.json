@@ -3306,9 +3306,9 @@
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {
-        "temple_join_failures_positive": {
-          "name": "temple_join_failures_positive",
-          "value": "\"temple_join_failures\".\"failures\" > 0"
+        "temple_join_failures_nonnegative": {
+          "name": "temple_join_failures_nonnegative",
+          "value": "\"temple_join_failures\".\"failures\" >= 0"
         }
       },
       "isRLSEnabled": false

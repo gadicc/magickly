@@ -2,7 +2,7 @@ CREATE TABLE "temple_join_failures" (
 	"user_id" uuid PRIMARY KEY NOT NULL,
 	"day" date NOT NULL,
 	"failures" integer NOT NULL,
-	CONSTRAINT "temple_join_failures_positive" CHECK ("temple_join_failures"."failures" > 0)
+	CONSTRAINT "temple_join_failures_nonnegative" CHECK ("temple_join_failures"."failures" >= 0)
 );
 --> statement-breakpoint
 ALTER TABLE "temple_join_failures" ADD CONSTRAINT "temple_join_failures_user_id_auth_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."auth_user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

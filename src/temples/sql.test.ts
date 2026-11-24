@@ -6,6 +6,7 @@ import { user } from "../db/schema/auth";
 import { legacyIdAliases, legacyIdType } from "../db/schema/legacyIds";
 import {
   templeInvites,
+  templeJoinFailures,
   templeMemberships,
   temples,
   userGroupGrants,
@@ -15,6 +16,11 @@ import { userAccess, userProfile } from "../db/schema/userProfile";
 import { getRitualAccess, type RitualPolicy } from "../doc/access";
 import { loadSqlRitualPrincipal } from "../doc/sqlPolicy";
 import { createUuidV7 } from "../lib/ids";
+import {
+  JOIN_FAILURES_PER_DAY,
+  reserveJoinAttempt,
+  returnJoinAttempt,
+} from "./joinAttempts";
 import {
   createSqlTempleReader,
   createSqlTempleWriter,
@@ -31,6 +37,7 @@ const schema = {
   legacyIdAliases,
   temples,
   templeInvites,
+  templeJoinFailures,
   templeMemberships,
   userGroups,
   userGroupGrants,
@@ -51,6 +58,8 @@ const ids = {
   globalMembership: createUuidV7(),
 };
 const when = new Date("2026-09-13T10:00:00.000Z");
+const ALPHA_CODE = "a1pha-5ecre-t0000-00001";
+const BETA_CODE = "beta0-5ecre-t0000-00002";
 
 async function membership(
   values: Partial<typeof templeMemberships.$inferInsert> & {
@@ -70,6 +79,7 @@ async function membership(
 }
 
 beforeEach(async () => {
+  await db.delete(templeJoinFailures);
   await db.delete(templeMemberships);
   await db.delete(templeInvites);
   await db.delete(temples);
@@ -126,8 +136,8 @@ beforeEach(async () => {
     },
   ]);
   await db.insert(templeInvites).values([
-    { templeId: ids.temple, joinPass: "alpha-secret" },
-    { templeId: ids.otherTemple, joinPass: "beta-secret" },
+    { templeId: ids.temple, joinPass: ALPHA_CODE },
+    { templeId: ids.otherTemple, joinPass: BETA_CODE },
   ]);
   await membership({
     id: ids.adminMembership,
@@ -161,7 +171,7 @@ describe("SQL temple reads", () => {
         membership: { id: ids.memberMembership, grade: 2, admin: false },
       },
     ]);
-    expect(JSON.stringify(result)).not.toContain("secret");
+    expect(JSON.stringify(result)).not.toContain(ALPHA_CODE);
     expect(JSON.stringify(result)).not.toContain("example.test");
     expect(
       await createSqlTempleReader(db).getAdminTemple(ids.member, ids.temple),
@@ -173,7 +183,7 @@ describe("SQL temple reads", () => {
       ids.scopedAdmin,
       ids.temple,
     );
-    expect(scoped?.joinPass).toBe("alpha-secret");
+    expect(scoped?.joinPass).toBe(ALPHA_CODE);
     expect(scoped?.members).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -254,7 +264,7 @@ describe("SQL temple joins", () => {
       version: 1,
       expectedActorId: ids.outsider,
       slug: " ALPHA ",
-      joinPass: "alpha-secret",
+      joinPass: ALPHA_CODE,
     };
     const first = await writer.join(request);
     expect(first).toMatchObject({
@@ -297,7 +307,7 @@ describe("SQL temple joins", () => {
         version: 1,
         expectedActorId: ids.member,
         slug: "alpha",
-        joinPass: "alpha-secret",
+        joinPass: ALPHA_CODE,
       }),
     ).toMatchObject({ ok: false, code: "ACCOUNT_CHANGED" });
     expect(
@@ -305,7 +315,7 @@ describe("SQL temple joins", () => {
         version: 1,
         expectedActorId: ids.outsider,
         slug: "alpha",
-        joinPass: "alpha-secret",
+        joinPass: ALPHA_CODE,
         admin: true,
       }),
     ).toMatchObject({ ok: false, code: "INVALID_REQUEST" });
@@ -315,6 +325,138 @@ describe("SQL temple joins", () => {
         .from(templeMemberships)
         .where(eq(templeMemberships.userId, ids.outsider)),
     ).toEqual([]);
+  });
+});
+
+describe("SQL temple join limits", () => {
+  const at = (time: string) => new Date(`2026-11-24T${time}Z`);
+  const reader = (now = at("12:00:00")) =>
+    createSqlTempleReader(db, { now: () => now });
+  const writer = (actorId = ids.outsider, now = at("12:00:00")) =>
+    createSqlTempleWriter(db, async () => actorId, { now: () => now });
+  const join = (joinPass: string, actorId = ids.outsider, now?: Date) =>
+    writer(actorId, now).join({
+      version: 1,
+      expectedActorId: actorId,
+      slug: "alpha",
+      joinPass,
+    });
+  const failures = async (userId = ids.outsider) =>
+    (
+      await db
+        .select({ failures: templeJoinFailures.failures })
+        .from(templeJoinFailures)
+        .where(eq(templeJoinFailures.userId, userId))
+    )[0]?.failures ?? 0;
+
+  it("accepts a code typed with other case and spacing", async () => {
+    expect(
+      await reader().getJoinPreview(
+        ids.outsider,
+        "Alpha",
+        "A1PHA 5ECRE T0000 0000l",
+      ),
+    ).toMatchObject({ status: "found", temple: { id: ids.temple } });
+    expect(await join("a1pha5ecret000000001")).toMatchObject({ ok: true });
+    expect(await failures()).toBe(0);
+  });
+
+  it("never matches a stored code that is not in the format", async () => {
+    await db
+      .update(templeInvites)
+      .set({ joinPass: "1234" })
+      .where(eq(templeInvites.templeId, ids.temple));
+    expect(
+      await reader().getJoinPreview(ids.outsider, "alpha", "1234"),
+    ).toEqual({ status: "notFound" });
+    expect(await join("1234")).toMatchObject({ code: "INVALID_INVITE" });
+    expect(
+      (await reader().getAdminTemple(ids.scopedAdmin, ids.temple))?.joinPass,
+    ).toBeNull();
+    expect(await failures()).toBe(2);
+  });
+
+  it("counts misses on the page and the join, then refuses even the right code", async () => {
+    for (let i = 0; i < JOIN_FAILURES_PER_DAY / 2; i++) {
+      expect(
+        await reader().getJoinPreview(ids.outsider, "alpha", BETA_CODE),
+      ).toEqual({ status: "notFound" });
+      expect(await join(`wrong-${i}`)).toMatchObject({
+        code: "INVALID_INVITE",
+      });
+    }
+    expect(await failures()).toBe(JOIN_FAILURES_PER_DAY);
+    expect(
+      await reader().getJoinPreview(ids.outsider, "alpha", ALPHA_CODE),
+    ).toEqual({ status: "limited" });
+    expect(await join(ALPHA_CODE)).toMatchObject({
+      ok: false,
+      code: "TOO_MANY_ATTEMPTS",
+    });
+    expect(
+      await db
+        .select()
+        .from(templeMemberships)
+        .where(eq(templeMemberships.userId, ids.outsider)),
+    ).toEqual([]);
+    expect(await failures()).toBe(JOIN_FAILURES_PER_DAY);
+    // Another account is not affected.
+    expect(
+      await reader().getJoinPreview(ids.globalAdmin, "alpha", ALPHA_CODE),
+    ).toMatchObject({ status: "found" });
+    // The next UTC day starts again.
+    expect(
+      await reader(new Date("2026-11-25T00:00:00Z")).getJoinPreview(
+        ids.outsider,
+        "alpha",
+        ALPHA_CODE,
+      ),
+    ).toMatchObject({ status: "found", alreadyMember: false });
+    expect(await failures()).toBe(0);
+  });
+
+  it("gives back every lookup whose code matched", async () => {
+    for (let i = 0; i < JOIN_FAILURES_PER_DAY * 2; i++) {
+      expect(
+        await reader().getJoinPreview(ids.outsider, "alpha", ALPHA_CODE),
+      ).toMatchObject({ status: "found" });
+      expect(await join(ALPHA_CODE)).toMatchObject({ ok: true });
+    }
+    expect(await failures()).toBe(0);
+    for (let i = 0; i < JOIN_FAILURES_PER_DAY; i++)
+      expect(await join(BETA_CODE)).toMatchObject({ code: "INVALID_INVITE" });
+    expect(await join(BETA_CODE)).toMatchObject({ code: "TOO_MANY_ATTEMPTS" });
+  });
+
+  it("gives back a lookup only to the day it was counted in", async () => {
+    expect(
+      await reserveJoinAttempt(db, ids.outsider, new Date("2026-11-25T08:00Z")),
+    ).toBe(true);
+    // A lookup reserved just before midnight, given back just after it.
+    await returnJoinAttempt(db, ids.outsider, at("23:59:59"));
+    expect(await failures()).toBe(1);
+  });
+
+  it("lets parallel guesses past the limit no further", async () => {
+    const results = await Promise.all(
+      Array.from({ length: 30 }, (_, i) =>
+        reader().getJoinPreview(ids.outsider, "alpha", `guess-${i}`),
+      ),
+    );
+    expect(results.filter((r) => r?.status === "limited")).toHaveLength(
+      30 - JOIN_FAILURES_PER_DAY,
+    );
+    expect(await failures()).toBe(JOIN_FAILURES_PER_DAY);
+  });
+
+  it("refuses a stale request from before midnight without resetting the new day", async () => {
+    expect(
+      await reserveJoinAttempt(db, ids.outsider, new Date("2026-11-25T08:00Z")),
+    ).toBe(true);
+    expect(await reserveJoinAttempt(db, ids.outsider, at("23:59:59"))).toBe(
+      false,
+    );
+    expect(await failures()).toBe(1);
   });
 });
 
@@ -550,7 +692,7 @@ describe("SQL temple removal and leaving", () => {
       version: 1,
       expectedActorId: ids.member,
       slug: "alpha",
-      joinPass: "alpha-secret",
+      joinPass: ALPHA_CODE,
     });
     expect(rejoined).toMatchObject({ ok: true, alreadyMember: false });
     const [again] = await db

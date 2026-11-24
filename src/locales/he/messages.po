@@ -1082,6 +1082,12 @@ msgid "No temple matches that slug and join code."
 msgstr "לא נמצא מקדש התואם למזהה ולקוד ההצטרפות."
 
 #. js-lingui-explicit-id
+#: src/app/(private)/temples/join/[slug]/[pass]/page.tsx
+#: src/app/temples/feedback.ts
+msgid "Too many incorrect join codes from your account today. Try again tomorrow."
+msgstr "הוזנו היום מהחשבון שלך יותר מדי קודי הצטרפות שגויים. אפשר לנסות שוב מחר."
+
+#. js-lingui-explicit-id
 #: src/app/temples/feedback.ts
 msgid "A temple needs an administrator. Make another member an administrator first."
 msgstr "מקדש חייב להיות מנוהל בידי מנהל. יש למנות חבר אחר למנהל תחילה."

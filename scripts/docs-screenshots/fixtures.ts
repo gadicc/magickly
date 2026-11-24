@@ -36,7 +36,7 @@ import {
 export const SCREENSHOT_TEMPLE = {
   name: "Example",
   slug: "example",
-  joinPass: "example-join-code",
+  joinPass: "exa3p-1ej01-nc0de-00000",
   operationId: "019a0000-0000-7000-8000-000000000140",
 } as const;
 
