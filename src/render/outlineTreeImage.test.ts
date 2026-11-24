@@ -13,6 +13,7 @@ import {
   keepPaintServers,
   outlineTreeImage as outline,
   outlineComponentImage,
+  reuseRepeatedGroups,
   TREE_IMAGE_PROFILE,
 } from "./outlineTreeImage";
 
@@ -325,6 +326,72 @@ describe("paint servers kept for the temple halls (plan 062)", () => {
       ).toBe(
         '<defs><linearGradient id="gdhall-0"><stop offset="0"/></linearGradient><filter/></defs><path fill="url(#gdhall-0)" stroke="url(#gdhall-0)"/>',
       );
+    });
+  });
+
+  describe("reuseRepeatedGroups", () => {
+    const square = '<path d="M0 0L1 1"/><g><path d="M2 2"/></g>';
+    const word = (at: number) =>
+      at === 0
+        ? `<g>${square}</g>`
+        : `<g transform="matrix(1 0 0 1 ${-100 * at} 0)">${square}</g>`;
+
+    it("draws a repeated group once and places it with <use>", () => {
+      const body = `\n<defs/>${word(0)}${word(1)}${word(2)}<g><path d="M9 9"/></g></svg>`;
+      expect(reuseRepeatedGroups(body, "square-")).toBe(
+        `\n<defs><g id="square-0">${square}</g></defs>` +
+          '<use xlink:href="#square-0"/>' +
+          '<use xlink:href="#square-0" transform="matrix(1 0 0 1 -100 0)"/>' +
+          '<use xlink:href="#square-0" transform="matrix(1 0 0 1 -200 0)"/>' +
+          '<g><path d="M9 9"/></g></svg>',
+      );
+    });
+
+    it("adds to the paint servers' defs, after them", () => {
+      const defs = '<defs><linearGradient id="gdhall-0"/></defs>';
+      expect(
+        reuseRepeatedGroups(`${defs}${word(0)}${word(1)}`, "square-"),
+      ).toBe(
+        `<defs><linearGradient id="gdhall-0"/><g id="square-0">${square}</g></defs>` +
+          '<use xlink:href="#square-0"/>' +
+          '<use xlink:href="#square-0" transform="matrix(1 0 0 1 -100 0)"/>',
+      );
+    });
+
+    it("leaves a drawing with nothing repeated as it was", () => {
+      const body = `<defs/>${word(0)}<g>${square}<path d="M5 5"/></g></svg>`;
+      expect(reuseRepeatedGroups(body, "square-")).toBe(body);
+    });
+
+    it("shares only a top-level group that is bare or only moved", () => {
+      // The same contents under an opacity, or nested a level down, draw
+      // differently or are already inside a shared group: left alone.
+      const faded = `<g opacity="0.5">${square}</g>`;
+      const nested = `<g><g>${square}</g><g>${square}</g></g>`;
+      for (const body of [
+        `<defs/>${word(0)}${faded}</svg>`,
+        `<defs/>${nested}</svg>`,
+      ])
+        expect(reuseRepeatedGroups(body, "square-")).toBe(body);
+    });
+
+    it("draws the same pixels, and passes the ritual image validator", async () => {
+      const svg = (body: string) =>
+        `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-250 -50 300 100" width="300" height="100">${body}`;
+      const red = '<rect x="-40" y="-40" width="80" height="30" fill="red"/>';
+      const body = `<defs/><g>${red}</g><g transform="matrix(1 0 0 1 -100 0)">${red}</g><g transform="matrix(1 0 0 1 -200 0)">${red}</g></svg>`;
+      const shared = reuseRepeatedGroups(body, "square-");
+      expect(shared).toContain("<use");
+      const { default: sharp } = await import("sharp");
+      const pixels = async (text: string) =>
+        (await sharp(Buffer.from(text)).raw().toBuffer()).toString("hex");
+      expect(await pixels(svg(shared))).toBe(await pixels(svg(body)));
+      expect(
+        await createRitualSvgValidator().validate(
+          Buffer.from(svg(shared)),
+          new AbortController().signal,
+        ),
+      ).toMatchObject({ status: "validated" });
     });
   });
 });

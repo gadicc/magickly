@@ -49,9 +49,11 @@ import {
  * The renderer's identity for the rose sigil's images; moves only when the
  * drawing does. Until plan 088 the sigil was drawn through COBYLA's points
  * and published under the shared `COMPONENT_IMAGE_PROFILE`; v1 is the
- * sigil planned and placed by rule, with each word its own sigil.
+ * sigil planned and placed by rule, with each word its own sigil. v2
+ * (24 November 2026) draws a rose repeated under several words once and
+ * places it with `<use>` (`reuse`); a one-word sigil's bytes are v1's.
  */
-export const ROSE_SIGIL_IMAGE_PROFILE = "magickli-rose-sigil-image-v1";
+export const ROSE_SIGIL_IMAGE_PROFILE = "magickli-rose-sigil-image-v2";
 
 /**
  * The renderer's identity for the bare kameas (plan 093): the square, its
@@ -64,9 +66,12 @@ export const KAMEA_IMAGE_PROFILE = "magickli-kamea-image-v1";
  * The renderer's identity for a name's sigil on its kamea (plan 093, K3):
  * the square under each word's figure, placed by the rose's rules under
  * `KAMEA_SIGIL_PROFILE`. The engine is code, so this moves when a figure
- * does; the squares' numbers and the planets' names are inputs.
+ * does; the squares' numbers and the planets' names are inputs. v2
+ * (24 November 2026) draws the square once however many words stand on
+ * it, placed with `<use>` (`reuse`): 32 one-letter words on the Moon's
+ * square were 6 MB as v1, 0.2 MB as v2. A one-word sigil's bytes are v1's.
  */
-export const KAMEA_SIGIL_IMAGE_PROFILE = "magickli-kamea-sigil-image-v1";
+export const KAMEA_SIGIL_IMAGE_PROFILE = "magickli-kamea-sigil-image-v2";
 
 /**
  * The renderer's identity for the tablets drawn as pyramids (plan 095,
@@ -119,6 +124,8 @@ export interface ComponentImageRegistration<S extends ComponentImageSlug> {
   source?(svg: string): string;
   /** Keep the local paint servers (see `outlineComponentImage`). */
   paintServers?: { idPrefix: string };
+  /** Share repeated groups through `<use>` (see `outlineComponentImage`). */
+  reuse?: { idPrefix: string };
   /** Rewrites the outlined SVG before any PNG is drawn from it. */
   outlined?(svg: Buffer): Buffer;
   /** Quantise PNGs to a palette (libimagequant), as the social cards do. */
@@ -467,6 +474,7 @@ export const COMPONENT_IMAGE_REGISTRY: {
       />
     ),
     profile: ROSE_SIGIL_IMAGE_PROFILE,
+    reuse: { idPrefix: "rose-" },
     // The rose's letters are geometry, written out in roseSigilGeometry.ts
     // for each version; this image reads no table, and no data edit can
     // move its identity. The drawing's rules are code, so the profile
@@ -502,6 +510,7 @@ export const COMPONENT_IMAGE_REGISTRY: {
         ? { [SIGIL_PLACEMENT_HEADER]: "failed" }
         : {},
     profile: KAMEA_SIGIL_IMAGE_PROFILE,
+    reuse: { idPrefix: "square-" },
     fonts: ["NotoSerif-Italic-latin1.ttf"],
     inputs: KAMEA_INPUTS,
   },

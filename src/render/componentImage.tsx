@@ -66,6 +66,7 @@ export async function renderComponentImage(
     flip: registration.flip?.(request.props as never) ?? false,
     fonts: registration.fonts,
     paintServers: registration.paintServers,
+    reuse: registration.reuse,
   });
   let bytes = (registration.outlined?.(outlined.bytes) ??
     outlined.bytes) as Buffer<ArrayBuffer>;

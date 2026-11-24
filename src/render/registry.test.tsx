@@ -63,7 +63,7 @@ describe("component image registry", () => {
     // optimiser (plan 088), and the inputs hash cannot move (it reads no
     // table), so the profile must: an offline copy or catalog entry made
     // under the optimiser's drawing must not pass for the new one.
-    expect(ROSE_SIGIL_IMAGE_PROFILE).toBe("magickli-rose-sigil-image-v1");
+    expect(ROSE_SIGIL_IMAGE_PROFILE).toBe("magickli-rose-sigil-image-v2");
     expect(COMPONENT_IMAGE_REGISTRY["rose-sigil"].profile).toBe(
       ROSE_SIGIL_IMAGE_PROFILE,
     );
@@ -75,7 +75,7 @@ describe("component image registry", () => {
     expect(COMPONENT_IMAGE_REGISTRY["kamea-sigil"].profile).toBe(
       KAMEA_SIGIL_IMAGE_PROFILE,
     );
-    expect(KAMEA_SIGIL_IMAGE_PROFILE).toBe("magickli-kamea-sigil-image-v1");
+    expect(KAMEA_SIGIL_IMAGE_PROFILE).toBe("magickli-kamea-sigil-image-v2");
     // So do the angels' sigil styles (plan 096); the rose's files stay
     // rose-sigil's.
     expect(COMPONENT_IMAGE_REGISTRY["angel-sigil"].profile).toBe(
@@ -317,10 +317,35 @@ describe("component image registry", () => {
         sha256: componentInputsHash(slug),
       });
       const text = svg.bytes.toString();
-      expect(text).not.toMatch(/<text|<style|href=|font-family|<image/);
-      expect((text.match(/<path/g) ?? []).length).toBeGreaterThanOrEqual(
-        minimumPaths,
+      // The only links an image holds are its shared groups' (`reuse`),
+      // each to a group in its own <defs>.
+      const { reuse } = COMPONENT_IMAGE_REGISTRY[slug] as {
+        reuse?: { idPrefix: string };
+      };
+      const links = [...text.matchAll(/<use xlink:href="#([^"]+)"/g)];
+      for (const [, id] of links) {
+        expect(reuse && id.startsWith(reuse.idPrefix), id).toBe(true);
+        expect(text.split(`<g id="${id}">`).length, id).toBe(2);
+      }
+      expect(text.replace(/<use xlink:href="#[^"]+"/g, "<use")).not.toMatch(
+        /<text|<style|href=|font-family|<image/,
       );
+      // Paths as drawn: a shared group's once for each <use> of it.
+      const paths = (markup: string) => (markup.match(/<path/g) ?? []).length;
+      // Outlined ids are stripped, so a `<g id=` in the <defs> starts a
+      // shared group, and runs to the next one or the end of the <defs>.
+      const defs = text.match(/<defs>([\s\S]*?)<\/defs>/)?.[1] ?? "";
+      const shared = new Map(
+        defs.split(/(?=<g id=")/).flatMap((part) => {
+          const id = part.match(/^<g id="([^"]+)"/)?.[1];
+          return id ? [[id, paths(part)] as const] : [];
+        }),
+      );
+      const drawn =
+        paths(text) -
+        [...shared.values()].reduce((sum, n) => sum + n, 0) +
+        links.reduce((sum, [, id]) => sum + (shared.get(id) ?? 0), 0);
+      expect(drawn).toBeGreaterThanOrEqual(minimumPaths);
       expect(text).toContain(
         `viewBox="${contractViewBox(CONTRACTS[slug] as never, svg.request.props).join(" ")}"`,
       );
@@ -535,6 +560,41 @@ describe("component image registry", () => {
         "5fa3648ec5ce8299b372cecd626e7bdab9e0ab155a5bf7b1dd6ee5e2f765979d",
       ],
     ],
+    "magickli-rose-sigil-image-v2": [
+      // v1's bytes for each of v1's texts: two words have one rose to
+      // share, which `reuse` leaves; it shares the rose from the second
+      // word on, the first standing ungrouped on its own coordinates.
+      [
+        "text=גדי",
+        12_640,
+        "1d88b4f13ccfdecc093c69df7cc6bca8fa116220f44888f14a17eded3997d051",
+      ],
+      [
+        "text=שלום&rose=false",
+        565,
+        "ea40b3f05b58d8ebc825d38cbe85bffd37269807bcecf2f2a0b3c3d1f6056f58",
+      ],
+      // Shabbathai on Regardie's rose of 1939, through Tau where Kaph is
+      // on the default rose (plan 080, "The rose's and the candlestick's
+      // versions").
+      [
+        "text=שבתאי&version=regardie1939",
+        12_795,
+        "ab82d970a69cb2ce9ae79a86bb74740e604fe105b1e06d8a3eff30bfb055d5c2",
+      ],
+      // Two words, two sigils, right to left (R2).
+      [
+        "text=יהוה אלהים",
+        26_089,
+        "5fa3648ec5ce8299b372cecd626e7bdab9e0ab155a5bf7b1dd6ee5e2f765979d",
+      ],
+      // Sixteen words: the rose under words 2 to 16 drawn once.
+      [
+        `text=${Array(16).fill("אב").join(" ")}`,
+        36_595,
+        "d4cd9209cdb8aabe7e8cea778e4db2ebe2ff78dcb493daa21ed789e3130af2ea",
+      ],
+    ],
   };
 
   it("pins the rose sigil's reviewed bytes under its image profile", async () => {
@@ -658,6 +718,9 @@ describe("component image registry", () => {
   const ROSE_SIGIL_DRAWING_DIGESTS: Record<string, string> = {
     "magickli-rose-sigil-image-v1":
       "3bb33e8655f61909a89ea3f9afad456c68a7f12a8553ceeda0a475ffc077a1ef",
+    // v2 shares a repeated rose through <use>; the figures are v1's.
+    "magickli-rose-sigil-image-v2":
+      "3bb33e8655f61909a89ea3f9afad456c68a7f12a8553ceeda0a475ffc077a1ef",
   };
 
   it("pins a digest of the rose sigil's drawings under its image profile", () => {
@@ -724,6 +787,31 @@ describe("component image registry", () => {
         "planet=luna&text=אלים&finals=true",
         188_096,
         "19d5943430e46ac4505173c71826c87771b1c54a4c29c722ddb8314a8af56e50",
+      ],
+    ],
+    "magickli-kamea-sigil-image-v2": [
+      // The square drawn once however many words stand on it (`reuse`):
+      // one word's bytes are v1's, two words' about half, and 32
+      // one-letter words on the Moon's, 6 MB as v1, about 0.2 MB.
+      [
+        "planet=saturn&text=אגיאל",
+        13_378,
+        "ea4fe040183d2d440ce1507cbf630f14228200747b024049e6bc7b8285c4b008",
+      ],
+      [
+        "planet=venus&text=בני שרפים",
+        118_423,
+        "49c0ae6a2c55f01ed1b710259cf973ea4eeeb134ace168074af0e4cbb5f39283",
+      ],
+      [
+        "planet=luna&text=אלים&finals=true",
+        188_096,
+        "19d5943430e46ac4505173c71826c87771b1c54a4c29c722ddb8314a8af56e50",
+      ],
+      [
+        `planet=luna&text=${Array(32).fill("ת").join(" ")}`,
+        203_668,
+        "a525608e860e7d7111a632be04da670caf68548fbbbd5583621dd1e96bb7a97b",
       ],
     ],
   };
@@ -1005,6 +1093,9 @@ describe("component image registry", () => {
   ];
   const KAMEA_SIGIL_DRAWING_DIGESTS: Record<string, string> = {
     "magickli-kamea-sigil-image-v1":
+      "802fea6392e7d6a55d935f38093107a4df5de7a59c767d90ec9f26e45a056ba9",
+    // v2 shares a repeated square through <use>; the figures are v1's.
+    "magickli-kamea-sigil-image-v2":
       "802fea6392e7d6a55d935f38093107a4df5de7a59c767d90ec9f26e45a056ba9",
   };
 

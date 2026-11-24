@@ -142,6 +142,13 @@ export interface OutlineOptions {
    * and anything else still refused. Only the temple halls set it.
    */
   paintServers?: { idPrefix: string };
+  /**
+   * Draw each top-level group that repeats another byte for byte once, in
+   * the `<defs>`, and place it with `<use>` (`reuseRepeatedGroups`): the
+   * sigils, whose square or rose stands under every word. Its links are
+   * the only ones the output may hold.
+   */
+  reuse?: { idPrefix: string };
 }
 
 /** The elements a kept `url(#id)` may name. */
@@ -194,6 +201,94 @@ export function keepPaintServers(body: string, idPrefix: string): string {
 }
 
 /**
+ * The outlined body with every top-level group that repeats another's
+ * contents byte for byte drawn once, in the `<defs>`, and placed with
+ * `<use>` at each place it stood (24 November 2026). resvg expands every `<use>`
+ * a component writes into a full copy, so a sigil's square or rose,
+ * repeated under each word, would otherwise be outlined and sent once a
+ * word. Only a group whose opening tag is a bare `<g>` or carries nothing
+ * but a `transform` is shared; the `<use>` carries that transform, which
+ * draws the same as the group did. The links it writes are the only ones
+ * in the output: `xlink:href="#<idPrefix><n>"`, each to a group it put in
+ * the `<defs>`. Exported for its tests.
+ */
+export function reuseRepeatedGroups(body: string, idPrefix: string): string {
+  const children = topLevelGroups(body);
+  const counts = new Map<string, number>();
+  for (const child of children)
+    counts.set(child.inner, (counts.get(child.inner) ?? 0) + 1);
+  const ids = new Map<string, string>();
+  for (const [inner, count] of counts)
+    if (count > 1) ids.set(inner, `${idPrefix}${ids.size}`);
+  if (ids.size === 0) return body;
+  let out = "";
+  let at = 0;
+  for (const child of children) {
+    const id = ids.get(child.inner);
+    if (id === undefined) continue;
+    out += body.slice(at, child.start);
+    out += child.transform
+      ? `<use xlink:href="#${id}" transform="${child.transform}"/>`
+      : `<use xlink:href="#${id}"/>`;
+    at = child.end;
+  }
+  out += body.slice(at);
+  const shared = [...ids].map(([inner, id]) => `<g id="${id}">${inner}</g>`);
+  const defs =
+    out.match(/^\s*<defs\/>/) ?? out.match(/^\s*<defs>[\s\S]*?<\/defs>/);
+  if (!defs) throw new Error("Unexpected component image structure");
+  const [whole] = defs;
+  const merged = whole.endsWith("<defs/>")
+    ? whole.replace("<defs/>", `<defs>${shared.join("")}</defs>`)
+    : whole.replace(/<\/defs>$/, `${shared.join("")}</defs>`);
+  return merged + out.slice(whole.length);
+}
+
+interface TopLevelGroup {
+  start: number;
+  end: number;
+  transform: string | undefined;
+  inner: string;
+}
+
+/** The body's top-level `<g>`s that are bare or carry only a transform. */
+function topLevelGroups(body: string): TopLevelGroup[] {
+  const groups: TopLevelGroup[] = [];
+  const tag = /<(\/?)([A-Za-z][\w:-]*)\b[^>]*?(\/?)>/g;
+  let depth = 0;
+  let open: { start: number; contentStart: number; transform?: string } | null =
+    null;
+  let eligible = false;
+  for (let match = tag.exec(body); match; match = tag.exec(body)) {
+    const [text, closing, name, selfClosing] = match;
+    if (closing) {
+      depth--;
+      if (depth === 0 && name === "g" && open && eligible)
+        groups.push({
+          start: open.start,
+          end: match.index + text.length,
+          transform: open.transform,
+          inner: body.slice(open.contentStart, match.index),
+        });
+      if (depth === 0) open = null;
+      continue;
+    }
+    if (depth === 0 && name === "g" && !selfClosing) {
+      const bare = /^<g>$/.test(text);
+      const moved = /^<g transform="([^"]*)">$/.exec(text);
+      eligible = bare || moved !== null;
+      open = {
+        start: match.index,
+        contentStart: match.index + text.length,
+        transform: moved?.[1],
+      };
+    }
+    if (!selfClosing) depth++;
+  }
+  return groups;
+}
+
+/**
  * Outline trusted registry JSX output only. Never pass uploaded/arbitrary SVG.
  * All font input is bundled; WASM has no filesystem/network font fallback.
  */
@@ -243,6 +338,7 @@ export async function outlineComponentImage(
     // references it now; display:none preserves its non-rendering behavior in
     // the existing closed SVG profile, which does not admit visibility.
     body = body.replace(/ visibility="hidden"/g, ' display="none"');
+    if (options.reuse) body = reuseRepeatedGroups(body, options.reuse.idPrefix);
     if (options.flip)
       body = `<g transform="scale(-1 1)">${body.replace(/<\/svg>\s*$/, "</g></svg>")}`;
     const bytes = Buffer.from(originalRoot + body);
