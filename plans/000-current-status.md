@@ -103,15 +103,24 @@ Follow-ups are separate from the completed migration work:
   policy in `src/limits` ([README](../src/limits/README.md)): per-client
   buckets for chat (20), search (100) and fresh personal renders (60), with
   the site pools, and a 15 s `maxDuration` on the render API. Follow-ups:
-  drop the unused `site_search_usage` table once no deployment writes it;
-  cap a sigil's response size (32 one-letter words on the Moon give a
-  6 MB SVG, so a cached hit costs more bandwidth than a fresh render
-  costs CPU); audit items L3, L4, L5 and L9. The firewall's render
-  rate limits, log-only until then, now return 429 (README, "Outside the
-  app"). If crawlers ever reach `render-images`' 600 a minute an
-  address, exempt verified bots from it: we want search engines to index
-  every image (Google holds almost none of ours yet; the SEO work began in
-  earnest in November 2026).
+  drop the unused `site_search_usage` table (its schema, generated types and
+  legacy-import entry) in the push after the one that ships this, since a
+  release migrates before it promotes and the live deployment still writes
+  the table until then. The audit's open items: L2, bound a ritual's
+  `minGrade` to 0–6 (`src/doc/access.ts`); L3, throttle the temple forum's
+  saves, cap their bodies and encode usernames (`src/temples/forum.ts`); L4,
+  starting an upload reveals whether a file with that SHA-256 exists
+  anywhere on the site (409 DUPLICATE, `src/files/sqlRitualUploads.ts`); L5,
+  finishing an upload may decode up to 64 Mpx
+  (`src/files/validateRitualImage.ts`); L9, every search builds excerpts for
+  all ~3,300 records (`src/search/embeddings/rank.ts`). A sigil's response
+  size, once 6 MB for 32 words on the Moon, is about 200 KB since its
+  repeated square is drawn once ([plan 099](099-outlined-image-size.md)).
+  The firewall's render rate limits, log-only until then, now return 429
+  (README, "Outside the app"). If crawlers ever reach `render-images`' 600 a
+  minute an address, exempt verified bots from it: we want search engines to
+  index every image (Google holds almost none of ours yet; the SEO work
+  began in earnest in November 2026).
 - 14 November 2026: `magick-data` 0.2.0, with the Moon's
   `intelligenceOfIntelligences`, the tablet notes' Yods and "Bull", and
   the two changed Sources rows signed again; on `gate/data-020`,
