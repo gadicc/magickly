@@ -830,7 +830,10 @@ table and by rule), and read the Equinox's plates and vol. 1's badge.
   choices, which would be thin near-duplicates. Per-tablet pages
   (`/enochian/tablets/fire`), carrying plan 090's notes and names, would
   rank better than the one hub whose variants are query parameters. A
-  plan of its own after stage 5.
+  plan of its own after stage 5. Done in
+  [plan 100](100-tablet-pages-and-images.md), 26 November 2026: five
+  pages, each tablet flat and as pyramids in the Golden Dawn's version
+  only, since the other versions differ in at most 12 squares.
 - The angels' telesmatic images (the name's letters as head, body and
   limbs, with AL added, p.311), from the Order's telesmatic attributions.
 - The Golden Dawn's pronunciation of the names (vol. 4 pp.297–298).

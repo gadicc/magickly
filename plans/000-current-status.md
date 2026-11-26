@@ -293,14 +293,25 @@ Follow-ups are separate from the completed migration work:
   downloads and the image (`symbols` on the same slug and profile),
   released as magick-components 0.9.0 (`Tablet`'s `pyramidSymbols`,
   `enochian/pyramidMarks`). The Squares tab's large pyramid starts
-  outward too (Gadi, 24 November). TODO: the follow-ups (the tablets in
-  image search, the tablet in 3D).
+  outward too (Gadi, 24 November). TODO: the tablet in 3D (its own plan,
+  started in another session).
   Corrected 26 November 2026: "outward" now stands each symbol on its
   side's outer edge, head toward the top, as Regardie's drawings (vol.
   4, pp.294 and 296) have them, where it had turned each head outward;
   which way the Order itself painted them is not settled;
   the page cites p.295 for the colours only and the Equinox's plates for
   the upright option; image profile v3, magick-components 0.9.1.
+- The tablets' own pages ([plan 100](100-tablet-pages-and-images.md)),
+  26 November 2026: `/enochian/tablets/earth`, `/air`, `/water`, `/fire`
+  and `/union`, each with its lede and note, its names linked to the
+  dictionary, the difference counts and its sources, and two images
+  (flat, and as pyramids with their symbols outward, in the Golden
+  Dawn's version) published as PNG and SVG under the page, in the
+  sitemap, structured data and its own social card. `/api/render`'s
+  tablet images are now `noindex` in every version. TODO: the pages'
+  `Sources` link through magick-data's `sourceUrl` rather than the
+  works registry's `<Cite>` (AGENTS.md, reference work, rule 4), as the
+  hub's do; move both together.
 - The export controls ([plan 097](097-export-controls.md)), 23 November
   2026, on `gate/export-controls`: one row per format under every
   drawing (SVG and PNG, each with Save, Copy and Link), image links

@@ -266,3 +266,36 @@ Checked in the browser at 375, 768 and 1,440 px, light and dark.
 - Other versions' or switches' images, and Hebrew editions of the pages.
 - Moving the tool to per-tablet URLs (`?tablet=` stays).
 - The 3D view (its own plan).
+
+## As built (26 November 2026)
+
+Built by Opus 5.5 (high) on `gate/095-tablets-image-search`; the plan was
+reviewed for value by Opus 5.5 (high) and for correctness by Fable 5.2
+(high), and the code by a fresh Opus 5.5 (high) reviewer, which found no
+blockers or majors; its minors were fixed before landing.
+
+| Commit | What |
+| --- | --- |
+| 902d8ed4 | This plan, as agreed. |
+| 471744db | The twenty files and their route; `indexed: false` on both tablet contracts; the tool's export link moved to `exportLink.ts` so the files' test holds each query to it. |
+| 3641d0d9 | The five pages (`TabletPage`, 193 lines, and the client `TabletFigures`), the hub's links, titles and descriptions, cards, sitemap, the search adapter, Hebrew translations and the embeddings (17 records, 2,361 tokens, about $0.025; then 3 more, 579 tokens, about $0.021, after the rebase onto the symbols' correction). |
+
+Where the build departs from the text above:
+
+- The lede's templated sentence is rendered in `TabletFigures` too, since
+  its element word is translated.
+- The files are ordered flat PNG, pyramids PNG, flat SVG, pyramids SVG,
+  so the sitemap lists the PNGs first.
+- The Union's counts are left out, since every version that has it reads
+  it alike.
+- Each figure offers its SVG as a download; the PNG is the image shown.
+- The pyramids' caption follows main's correction of the symbols'
+  facing (01844766, 26 November 2026), which landed during the build:
+  p.295 for the colours only, and Regardie's drawings, pp.294 and 296,
+  for each symbol standing on its side's outer edge. The published
+  pyramids files are drawn by the corrected contract (image profile
+  v3), as the route draws whatever the contract draws.
+
+Checked in the browser at 375, 768, 1,024 and 1,440 px, light and dark:
+no sideways scroll, the names' roles beside their names, the images
+scaled within the column.
