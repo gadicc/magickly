@@ -873,6 +873,18 @@ new entry, `enochian/pyramidMarks`, with the marks, for drawing one
 square large. Without `pyramidSymbols` a tablet draws exactly as
 before. It depends on magick-data 0.5.0, as 0.8.0 did.
 
+0.9.1 fixes which way `pyramidSymbols="outward"` turns the symbols:
+0.9.0 put each symbol's head on its side's outer edge, the reverse of
+Regardie's drawings (*The Golden Dawn*, vol. 4 (1940), pp.294 and 296),
+which stand it on that edge with its head toward the top; 0.9.1 draws
+them so (see [A tablet as pyramids](#a-tablet-as-pyramids)), and
+`enochian/pyramidMarks` exports the turns as `PYRAMID_SYMBOL_TURNS`.
+`"upright"`, and every tablet without `pyramidSymbols`, draws exactly
+as before. 0.9.0 was not published to npm, so 0.9.1 is the first
+published release with `pyramidSymbols` and `enochian/pyramidMarks`;
+0.9.0's note above describes the turned symbols as first built. It
+depends on magick-data 0.5.0, as 0.9.0 did.
+
 ## Requirements
 
 React 19 and an ES module environment: Node 22 or later (`engines`
