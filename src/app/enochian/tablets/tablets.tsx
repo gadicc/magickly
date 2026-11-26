@@ -499,7 +499,8 @@ export default function Tablets({
   // version that has them, and remembered across Dee's and Raphael's,
   // whose URL drops it, so that it returns with the Golden Dawn's.
   const [pyramidsWanted, setPyramidsWanted] = React.useState(false);
-  // Their sides' symbols, facing out unless stood upright: the URL's
+  // Their sides' symbols, each on its side's outer edge unless stood
+  // upright on the page: the URL's
   // while their switch shows, and remembered while it does not, as the
   // pyramids are.
   const [symbolsWanted, setSymbolsWanted] = React.useState(false);
@@ -576,8 +577,9 @@ export default function Tablets({
   const [focusPyramid, setFocusPyramid] = React.useState(false);
   const [announcePyramid, setAnnouncePyramid] = React.useState(false);
   const pyramidFocused = React.useCallback(() => setFocusPyramid(false), []);
-  // The large pyramid's symbols facing outward, as the Order painted
-  // them, or upright: the page's for the session, across squares and
+  // The large pyramid's symbols on their sides' outer edges, as
+  // Regardie's drawings (vol. 4) have them, or upright: the page's for
+  // the session, across squares and
   // tabs, and apart from the whole tablet's, which the URL keeps.
   const [squareUpright, setSquareUpright] = React.useState(false);
   // The Names tab: a chosen name and one previewed, by id, which is the

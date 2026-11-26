@@ -730,23 +730,42 @@ describe("/enochian/tablets' pyramid symbols", () => {
   const orientation = (container: HTMLElement) =>
     container.querySelector("[data-orientation] p")?.textContent;
 
-  it("faces them outward, and stands them upright for the session", () => {
+  it("stands them on their sides' outer edges, and upright for the session", () => {
     window.history.replaceState(null, "", `${PAGE}?tab=squares&square=3,1`);
     const { container } = render(<Tablets links={LINKS} />);
     const svg = () => container.querySelector("[data-pyramid]");
     expect(svg()?.getAttribute("data-symbols")).toBe("outward");
-    expect(turns(container)).toEqual(["-90", "0", "90", "180"]);
+    // Feet on the outer edge, head toward the top (vol. 4, pp.294, 296).
+    expect(turns(container)).toEqual(["90", "180", "-90", "0"]);
     expect(orientation(container)).toBe(
-      "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, a.",
+      "Each symbol stands on its side's outer edge, to be read, as we take it, from outside the pyramid, as in Regardie's drawings (vol. 4). The Equinox's plates stand them all upright; which way the Order itself painted them, these two witnesses do not settle.",
     );
-    // Cited to the page that says so.
-    expect(
-      within(container.querySelector("[data-orientation]") as HTMLElement)
-        .getByRole("link", { name: "p.295" })
-        .getAttribute("href"),
-    ).toBe(
+    expect(container.querySelector("[data-colours] p")?.textContent).toBe(
+      "Each side is drawn in its element's colour, with its symbol in the complementary colour. The top holds the square's letter, a.",
+    );
+    // The colours cited to the page that gives them, and the facing to
+    // the drawings that show it.
+    const link = (box: string, name: string) =>
+      within(container.querySelector(box) as HTMLElement)
+        .getByRole("link", { name })
+        .getAttribute("href");
+    expect(link("[data-colours]", "p.295")).toBe(
       "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol4-1940/page/n287/mode/1up",
     );
+    expect(link("[data-orientation]", "p.294")).toBe(
+      "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol4-1940/page/n286/mode/1up",
+    );
+    expect(link("[data-orientation]", "p.296")).toBe(
+      "https://archive.org/details/IsraelRegardie-TheGoldenDawn-Vol4-1940/page/n288/mode/1up",
+    );
+    expect(link("[data-orientation]", "Plate IV")).toMatch(
+      /^https:\/\/archive\.org\/details\/crowley-equinox_202110\/.*\/page\/n242\/mode\/1up$/,
+    );
+    expect(
+      within(
+        container.querySelector("[data-orientation]") as HTMLElement,
+      ).queryByRole("link", { name: "p.295" }),
+    ).toBeNull();
     // A switch, by keyboard as by pointer, named apart from the whole
     // tablet's, which the URL keeps.
     const upright = () =>
@@ -758,7 +777,7 @@ describe("/enochian/tablets' pyramid symbols", () => {
     expect(svg()?.getAttribute("data-symbols")).toBe("upright");
     expect(turns(container)).toEqual(["0", "0", "0", "0"]);
     expect(orientation(container)).toBe(
-      "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, a.",
+      "Each symbol stands upright so that it can be read, as the Equinox's plates draw them. Regardie's drawings (vol. 4) stand each on its side's outer edge, to be read, as we take it, from outside the pyramid; which way the Order itself painted them, these two witnesses do not settle.",
     );
     expect(window.location.search).not.toMatch(/upright/);
     // Kept for another square, and across the tabs.

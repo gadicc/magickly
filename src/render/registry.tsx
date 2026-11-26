@@ -90,10 +90,14 @@ export const KAMEA_SIGIL_IMAGE_PROFILE = "magickli-kamea-sigil-image-v3";
  * (`TABLET_PYRAMIDS_INPUTS`). The `symbols` key came under v1: every
  * image without it draws as before, which its digest pin holds. v2
  * (24 November 2026): coordinates rounded to `OUTLINE_PRECISION` of the
- * drawing (`roundOutlinedPaths`).
+ * drawing (`roundOutlinedPaths`). v3 (26 November 2026): `symbols=outward`
+ * stands each symbol on its side's outer edge, head toward the top, as
+ * Regardie's drawings have them (vol. 4, pp.294 and 296), where v1 and v2
+ * turned each head to the outer edge (plan 095, "Symbols on the sides");
+ * every other image's bytes are v2's.
  */
 export const TABLET_PYRAMIDS_IMAGE_PROFILE =
-  "magickli-tablet-pyramids-image-v2";
+  "magickli-tablet-pyramids-image-v3";
 
 export { ANGEL_SIGIL_IMAGE_PROFILE };
 

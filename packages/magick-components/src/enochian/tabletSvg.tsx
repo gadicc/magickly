@@ -18,6 +18,7 @@ import enochianTablets, {
   tabletVersion,
 } from "magick-data/enochian/tablets";
 import React, { type CSSProperties, type ReactNode } from "react";
+import { PYRAMID_SYMBOL_TURNS } from "./pyramidSymbolTurns.ts";
 import { EquinoxSigils, Sigils, VERSION_NAMES } from "./tabletSigils.tsx";
 
 /** A tablet's page, as its `<svg>`'s viewBox: x, y, width, height. */
@@ -813,15 +814,13 @@ const unit = (value: number) => Math.round(value * 1000) / 1000;
 interface SymbolPlan {
   /** A side's mark, centred on 0, 0 in a box of about 34 units. */
   markOf: (side: TabletPyramidSide) => ReactNode;
-  /** Each turned to face out from the top, as the Order painted them. */
+  /**
+   * Each stood on its side's outer edge, head toward the top, as
+   * Regardie's drawings (vol. 4) have them (`PYRAMID_SYMBOL_TURNS`),
+   * rather than all upright on the page.
+   */
   outward: boolean;
 }
-
-/**
- * How each side's symbol is turned to face out from the top: side 1's
- * foot on the left, 2's at the top, 3's on the right, 4's at the bottom.
- */
-const OUTWARD_TURNS = [-90, 0, 90, 180] as const;
 
 /**
  * How much of a side's depth, from the square's edge to its top's, its
@@ -895,7 +894,9 @@ function PyramidSides({
             [SQUARE / 2, SQUARE - middle],
           ][index] ?? [0, 0];
           const scale = unit((near * SYMBOL_FILL) / MARK_BOX);
-          const turn = symbols.outward ? OUTWARD_TURNS[index] : undefined;
+          const turn = symbols.outward
+            ? PYRAMID_SYMBOL_TURNS[index]
+            : undefined;
           return (
             <g
               key={`s-${side.side}`}
@@ -1414,9 +1415,13 @@ export interface TabletProps {
    * Draw each side's symbol on it (default none), in the side's
    * complementary colour with a thin outline: its sign, Sephirah's
    * number, planet, Hebrew letter or geomantic figure, else its element's
-   * mark (`enochian/pyramidMarks`). `outward` turns each to face out from
-   * the top, as the Order painted them (Regardie, vol. 4, p.295);
-   * `upright` stands them all up to be read. With `pyramids` only.
+   * mark (`enochian/pyramidMarks`). `outward` stands each on its side's
+   * outer edge, head toward the top, as Regardie's drawings have them
+   * (vol. 4, pp.294 and 296; `PYRAMID_SYMBOL_TURNS`), which we take to
+   * be read from outside the pyramid; `upright` stands them all upright
+   * on the page, as the Equinox I(7)'s plates draw them. Which way the
+   * Order itself painted them, these two witnesses do not settle. With
+   * `pyramids` only.
    */
   pyramidSymbols?: "outward" | "upright";
 }

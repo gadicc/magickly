@@ -4,7 +4,8 @@
  * symbol a side shows, its inks, and its mark, drawn centred on 0, 0 in a
  * box of about 34 units. `enochian/Tablet` draws them on every square
  * with `pyramidSymbols`; a page may draw one square large with them, as
- * magick.ly's tablets page does.
+ * magick.ly's tablets page does, turning each by `PYRAMID_SYMBOL_TURNS`
+ * to stand on its side's outer edge.
  */
 
 import planets from "magick-data/astrology/planets";
@@ -13,6 +14,8 @@ import type { TabletPyramidSide } from "magick-data/enochian/tabletPyramids";
 import tetragrams from "magick-data/geomancy/tetragrams";
 import hebrewLetters from "magick-data/hebrewLetters";
 import sephirot from "magick-data/kabbalah/sephirot";
+
+export { PYRAMID_SYMBOL_TURNS } from "./pyramidSymbolTurns.ts";
 
 /** An element of a side: the four and Spirit. */
 export type SideElement = "fire" | "water" | "air" | "earth" | "spirit";

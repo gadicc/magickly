@@ -263,7 +263,7 @@ describe("/enochian/tablets with the pyramids' symbols (plan 095, Symbols on the
     screen.queryByRole("switch", { name: "Symbols on the sides" });
   const uprightSwitch = () =>
     screen.queryByRole("switch", { name: "Stand the symbols upright" });
-  /** The tablet's marks, and how many face out (turned). */
+  /** The tablet's marks, and how many are turned outward (`rotate(`). */
   const marks = (container: HTMLElement) => {
     const all = [
       ...container.querySelectorAll("[data-pyramids] [data-symbol]"),
@@ -281,7 +281,7 @@ describe("/enochian/tablets with the pyramids' symbols (plan 095, Symbols on the
       .querySelector("[data-pyramids] [data-top]")
       ?.getAttribute("width");
 
-  it("draws each side's symbol facing out, or upright, and says so in the URL and the image", async () => {
+  it("draws each side's symbol outward, or upright, and says so in the URL and the image", async () => {
     const { container } = render(<Tablets />);
     expect(symbolsSwitch()).toBeNull();
     fireEvent.click(pyramidsSwitch() as HTMLElement);

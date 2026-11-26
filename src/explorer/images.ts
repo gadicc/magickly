@@ -94,7 +94,8 @@ export function componentImage(name: string, props: Props): string | null {
           ? viaContract("enochian-tablet-pyramids", {
               id: text(props.tablet),
               version: text(props.version),
-              // The symbols facing out or upright, or none.
+              // The symbols outward (on their sides' outer edges) or
+              // upright, or none.
               symbols: text(props.pyramidSymbols),
             })
           : null;

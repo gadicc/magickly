@@ -17,27 +17,27 @@ export default function TabletsText() {
         <i>Draw as pyramids</i> draws every square as its pyramid, each side in
         its element&apos;s colour, with a key to the colours;{" "}
         <i>Symbols on the sides</i> then paints each side&apos;s symbol on it,
-        facing out from the top, and <i>Stand the symbols upright</i> turns them
-        all to be read. Beside the tablet, or under it on a phone, are three
-        tabs. <i>Names</i> lists the names read off the tablet, grouped as it is
-        built: the three holy names, the King and the six Seniors on the Great
-        Cross, then each quarter&apos;s names, and in the Golden Dawn&apos;s
-        versions its Kerubic archangel and servient angels, which put a letter
-        of the Tablet of Union before their names. The Tablet of Union is a
-        tablet of its own here, with its four lines and its first column; Dee
-        and Raphael have none. Choose a name to see its squares on the tablet,
-        from its first, with how the other versions and the sources spell it,
-        where it is read and its dictionary entry; tap a square to find the
-        names through it, or turn on <i>Show the regions</i> to tint the crosses
-        and the top rows. <i>Differences</i> marks every square where the
-        versions disagree: tap one to see what each version and source has
-        there, and why. <i>Squares</i> shows a square as the Golden Dawn&apos;s
-        truncated pyramid: tap a square, or choose its row and square, or follow
-        a square from a name&apos;s detail. Each version comes with its sources
-        and page references, and with how it differs from the others. Download
-        the tablet as SVG or PNG as it is shown, and use the share button at the
-        top of the page to send a link with the tablet, version, tab and square
-        you chose.
+        standing on the square&apos;s edge, and <i>Stand the symbols upright</i>{" "}
+        turns them all to be read. Beside the tablet, or under it on a phone,
+        are three tabs. <i>Names</i> lists the names read off the tablet,
+        grouped as it is built: the three holy names, the King and the six
+        Seniors on the Great Cross, then each quarter&apos;s names, and in the
+        Golden Dawn&apos;s versions its Kerubic archangel and servient angels,
+        which put a letter of the Tablet of Union before their names. The Tablet
+        of Union is a tablet of its own here, with its four lines and its first
+        column; Dee and Raphael have none. Choose a name to see its squares on
+        the tablet, from its first, with how the other versions and the sources
+        spell it, where it is read and its dictionary entry; tap a square to
+        find the names through it, or turn on <i>Show the regions</i> to tint
+        the crosses and the top rows. <i>Differences</i> marks every square
+        where the versions disagree: tap one to see what each version and source
+        has there, and why. <i>Squares</i> shows a square as the Golden
+        Dawn&apos;s truncated pyramid: tap a square, or choose its row and
+        square, or follow a square from a name&apos;s detail. Each version comes
+        with its sources and page references, and with how it differs from the
+        others. Download the tablet as SVG or PNG as it is shown, and use the
+        share button at the top of the page to send a link with the tablet,
+        version, tab and square you chose.
       </p>
       <H2 id="tablets-pyramids">The squares as pyramids</H2>
       <p>
@@ -53,24 +53,40 @@ export default function TabletsText() {
         below the cross bars, whose column and rank each take a letter of the
         Name; and the Tablet of Union. The sides are painted in the elements'
         colours, Fire red, Water blue, Air yellow, Earth black and Spirit white,
-        with each symbol in the complementary colour. On a servient square, the
-        mix of elements on its four sides gives it one of fifteen Egyptian gods,
-        and their Kerubs give it a sphinx, both used in skrying the square. The
-        rules are in Regardie&apos;s <i>The Golden Dawn</i>, vol. 4 (1940), and
-        in &ldquo;Liber Chanokh&rdquo; in <i>The Equinox</i> I(7) (1912), whose
-        plates draw every square as a pyramid.
+        with each symbol in the complementary colour (Regardie,{" "}
+        <i>The Golden Dawn</i>, vol. 4, p.
+        <Cite work="regardie1940" leaf={287} plain rel="noreferrer">
+          295
+        </Cite>
+        ). On a servient square, the mix of elements on its four sides gives it
+        one of fifteen Egyptian gods, and their Kerubs give it a sphinx, both
+        used in skrying the square. The rules are in Regardie&apos;s{" "}
+        <i>The Golden Dawn</i>, vol. 4 (1940), and in &ldquo;Liber
+        Chanokh&rdquo; in <i>The Equinox</i> I(7) (1912), whose plates draw
+        every square as a pyramid.
       </p>
       <p>
         Everything in the Squares tab is computed from those rules and tested
         against the squares, tables and plates the sources print, and every rule
         is shown with the pages it comes from. The drawing is ours: the Order
         painted the tablets flat and made a pyramid of card for one square at a
-        time, and it painted the symbols facing outward, away from the top (vol.
-        4, p.
-        <Cite work="regardie1940" leaf={287} plain rel="noreferrer">
-          295
+        time. Regardie&apos;s drawings in vol. 4 stand each symbol on its
+        side&apos;s outer edge, so that the top side&apos;s is upside down on
+        the page (pp.
+        <Cite work="regardie1940" leaf={286} plain rel="noreferrer">
+          294
+        </Cite>{" "}
+        and{" "}
+        <Cite work="regardie1940" leaf={288} plain rel="noreferrer">
+          296
         </Cite>
-        ), as ours face unless you stand them upright. So is a whole tablet
+        ); we take them to be read from outside the pyramid, and ours stand so.
+        The Equinox&apos;s plates stand them all upright on the page (
+        <Cite work="equinoxI7" leaf={242} plain rel="noreferrer">
+          Plate IV
+        </Cite>
+        ), as <i>Stand the symbols upright</i> does; which way the Order itself
+        painted them, these two witnesses do not settle. So is a whole tablet
         drawn in pyramids, after the Order&apos;s rule for one square: the sides
         in their elements&apos; colours, and the letter on a flat top half as
         wide as the square, or a third with the symbols on the sides. The

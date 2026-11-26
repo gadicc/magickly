@@ -2638,13 +2638,18 @@ msgstr "ארבע הצלעות שלה"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/PyramidDetail.tsx
-msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, {letter}."
-msgstr "כל צלע מצוירת בצבע היסוד שלה, והסמל שלה בצבע המשלים, זקוף כדי שאפשר יהיה לקרוא אותו; המסדר צייר את הסמלים פונים החוצה. הפסגה נושאת את אות המשבצת, {letter}."
+msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour. The top holds the square's letter, {letter}."
+msgstr "כל צלע מצוירת בצבע היסוד שלה, והסמל שלה בצבע המשלים. הפסגה נושאת את אות המשבצת, {letter}."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/PyramidDetail.tsx
-msgid "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, {letter}."
-msgstr "כל צלע מצוירת בצבע היסוד שלה, והסמל שלה בצבע המשלים, פונה החוצה, כפי שהמסדר צייר אותם. הפסגה נושאת את אות המשבצת, {letter}."
+msgid "Each symbol stands upright so that it can be read, as the Equinox's plates draw them. Regardie's drawings (vol. 4) stand each on its side's outer edge, to be read, as we take it, from outside the pyramid; which way the Order itself painted them, these two witnesses do not settle."
+msgstr "כל סמל עומד זקוף כדי שאפשר יהיה לקרוא אותו, כפי שלוחות האיורים של האקווינוקס מציירים אותם. בשרטוטים של רגרדי (כרך 4) כל סמל עומד על השפה החיצונית של הצלע שלו, כדי שייקרא, כפי שאנו מבינים זאת, מחוץ לפירמידה; לאיזה כיוון צייר אותם המסדר עצמו, שני העדים האלה אינם מכריעים."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/PyramidDetail.tsx
+msgid "Each symbol stands on its side's outer edge, to be read, as we take it, from outside the pyramid, as in Regardie's drawings (vol. 4). The Equinox's plates stand them all upright; which way the Order itself painted them, these two witnesses do not settle."
+msgstr "כל סמל עומד על השפה החיצונית של הצלע שלו, כדי שייקרא, כפי שאנו מבינים זאת, מחוץ לפירמידה, כמו בשרטוטים של רגרדי (כרך 4). לוחות האיורים של האקווינוקס מעמידים את כולם זקופים; לאיזה כיוון צייר אותם המסדר עצמו, שני העדים האלה אינם מכריעים."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/PyramidDetail.tsx

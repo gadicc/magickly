@@ -625,7 +625,7 @@ describe("component image contracts", () => {
       expect(name(query)).toBe(
         `${CONTRACTS["enochian-tablet"].filename(parse("enochian-tablet", query))}-pyramids`,
       );
-    // Then the symbols, facing out or upright.
+    // Then the symbols, outward (on their sides' outer edges) or upright.
     expect(name("symbols=none")).toBe("enochian-earth-tablet-pyramids");
     expect(name("id=air&symbols=outward")).toBe(
       "enochian-air-tablet-pyramids-symbols",

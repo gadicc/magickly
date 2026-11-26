@@ -1,5 +1,6 @@
 import {
   inksOf,
+  PYRAMID_SYMBOL_TURNS,
   SideMark,
   sideSymbol,
 } from "magick-components/enochian/pyramidMarks";
@@ -10,10 +11,11 @@ import type { TabletPyramid } from "magick-data/enochian/tabletPyramids";
  * One square of a tablet drawn large as the Golden Dawn's truncated
  * pyramid (plan 095, decision 3): four sides round a white flat top that
  * holds the square's letter, each side in its element's colour with its
- * symbol in the complementary colour (Regardie, vol. 4, pp.293–296). The
- * symbols face out from the top, as the Order painted them (p.295),
- * unless `upright` stands each to be read. The app's own
- * drawing of one square; its marks are magick-components', which the
+ * symbol in the complementary colour (Regardie, vol. 4, pp.293–296). Each
+ * symbol stands on its side's outer edge, head toward the top, as
+ * Regardie's drawings have them (pp.294 and 296; `PYRAMID_SYMBOL_TURNS`), unless `upright` stands them all upright
+ * on the page, as the Equinox's plates do. The app's own drawing of one
+ * square; its marks are magick-components', which the
  * whole tablet draws with `pyramidSymbols`, here at their large outlines.
  * Its words are in the list beside it, so the drawing is hidden from
  * screen readers.
@@ -24,27 +26,23 @@ const SIZE = 240;
 const LOW = SIZE / 3;
 const HIGH = (SIZE * 2) / 3;
 
-/** Each side's outline, and where its symbol sits, turned to face out. */
+/** Each side's outline, and where its symbol sits. */
 const SIDES = [
   {
     points: `0,0 ${LOW},${LOW} ${LOW},${HIGH} 0,${SIZE}`,
     at: [LOW / 2 - 2, SIZE / 2],
-    turn: -90,
   },
   {
     points: `0,0 ${SIZE},0 ${HIGH},${LOW} ${LOW},${LOW}`,
     at: [SIZE / 2, LOW / 2 - 2],
-    turn: 0,
   },
   {
     points: `${SIZE},0 ${SIZE},${SIZE} ${HIGH},${HIGH} ${HIGH},${LOW}`,
     at: [SIZE - LOW / 2 + 2, SIZE / 2],
-    turn: 90,
   },
   {
     points: `0,${SIZE} ${LOW},${HIGH} ${HIGH},${HIGH} ${SIZE},${SIZE}`,
     at: [SIZE / 2, SIZE - LOW / 2 + 2],
-    turn: 180,
   },
 ] as const;
 
@@ -56,7 +54,10 @@ export default function PyramidDrawing({
   pyramid: TabletPyramid;
   /** The square's letter in the chosen version, for the flat top. */
   letter: string;
-  /** Stand each symbol upright, to be read, rather than facing out. */
+  /**
+   * Stand each symbol upright on the page, as the Equinox's plates do,
+   * rather than on its side's outer edge.
+   */
   upright?: boolean;
 }) {
   return (
@@ -74,7 +75,7 @@ export default function PyramidDrawing({
             (side.elementId as keyof typeof PYRAMID_COLOURS | undefined) ??
               "none"
           ];
-        const { points, at, turn } = SIDES[index];
+        const { points, at } = SIDES[index];
         return (
           <g key={side.side} data-side={side.side}>
             <polygon
@@ -82,7 +83,7 @@ export default function PyramidDrawing({
               style={{ fill, stroke: "#777", strokeWidth: 1.5 }}
             />
             <g
-              transform={`translate(${at[0]} ${at[1]})${upright ? "" : ` rotate(${turn})`}`}
+              transform={`translate(${at[0]} ${at[1]})${upright ? "" : ` rotate(${PYRAMID_SYMBOL_TURNS[index]})`}`}
             >
               <SideMark symbol={sideSymbol(side)} {...inksOf(side)} />
             </g>

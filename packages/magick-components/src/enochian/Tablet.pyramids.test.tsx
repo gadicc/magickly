@@ -12,6 +12,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   PYRAMID_SYMBOL_INKS,
+  PYRAMID_SYMBOL_TURNS,
   type SideElement,
   sideSymbol,
 } from "./pyramidMarks.tsx";
@@ -191,6 +192,22 @@ describe("Tablet's pyramids (plan 095, decision 4)", () => {
     ).toEqual([]);
   });
 
+  it("keeps the symbols' turns, which the drawing imports, free of imports", () => {
+    // `tabletSvg.tsx` reads `PYRAMID_SYMBOL_TURNS` from its own module so
+    // that the halls' art loads none of the marks' data; an import there
+    // would bring some back.
+    const turns = readFileSync(
+      path.resolve(
+        "packages/magick-components/src/enochian/pyramidSymbolTurns.ts",
+      ),
+      "utf8",
+    );
+    expect(turns).toContain("export const PYRAMID_SYMBOL_TURNS");
+    expect(turns).not.toMatch(/^\s*import\b/m);
+    expect(turns).not.toMatch(/\bimport\s*\(|\brequire\s*\(/);
+    expect(turns).not.toMatch(/^\s*export\s[^;]*\bfrom\s/m);
+  });
+
   it("tints the regions over pyramids, and keeps a chosen name's marks", () => {
     const { page } = drawn({
       tablet: "fire",
@@ -284,7 +301,7 @@ describe("Tablet's pyramids with their symbols (plan 095, Symbols on the sides)"
       }
   });
 
-  it("puts each in the middle of its band, facing out unless upright", () => {
+  it("puts each in the middle of its band, on its outer edge unless upright", () => {
     const transforms = (pyramidSymbols: "outward" | "upright") =>
       marks(drawn({ tablet: "air", pyramids: true, pyramidSymbols }).page)
         .slice(0, 4)
@@ -293,10 +310,10 @@ describe("Tablet's pyramids with their symbols (plan 095, Symbols on the sides)"
     // from the square's edge (2, 2 on the grid), the mark's 34 units
     // scaled to 78% of it.
     expect(transforms("outward")).toEqual([
-      "translate(5.333 12) scale(0.153) rotate(-90)",
-      "translate(12 5.333) scale(0.153) rotate(0)",
-      "translate(18.667 12) scale(0.153) rotate(90)",
-      "translate(12 18.667) scale(0.153) rotate(180)",
+      "translate(5.333 12) scale(0.153) rotate(90)",
+      "translate(12 5.333) scale(0.153) rotate(180)",
+      "translate(18.667 12) scale(0.153) rotate(-90)",
+      "translate(12 18.667) scale(0.153) rotate(0)",
     ]);
     expect(transforms("upright")).toEqual([
       "translate(5.333 12) scale(0.153)",
@@ -304,6 +321,62 @@ describe("Tablet's pyramids with their symbols (plan 095, Symbols on the sides)"
       "translate(18.667 12) scale(0.153)",
       "translate(12 18.667) scale(0.153)",
     ]);
+  });
+
+  // Regardie's drawings stand each symbol on its side's outer edge, its
+  // head toward the flat top (vol. 4, pp.294 and 296, leaves n286 and
+  // n288): the mark's up, (0, -1), turned as SVG turns it in its y-down
+  // frame, must point from the mark toward the square's centre.
+  it("stands each outward mark on its side's outer edge, head toward the top", () => {
+    expect(Object.isFrozen(PYRAMID_SYMBOL_TURNS)).toBe(true);
+    expect(PYRAMID_SYMBOL_TURNS).toEqual([90, 180, -90, 0]);
+    /** An upright mark's up, (0, -1), as `rotate(degrees)` turns it. */
+    const head = (degrees: number) => {
+      const r = (degrees * Math.PI) / 180;
+      // rotate(a) maps (x, y) to (x cos a - y sin a, x sin a + y cos a).
+      // `|| 0` folds -0 into 0, which toEqual tells apart.
+      return [Math.round(Math.sin(r)) || 0, Math.round(-Math.cos(r)) || 0];
+    };
+    const { page } = drawn({
+      tablet: "air",
+      pyramids: true,
+      pyramidSymbols: "outward",
+    });
+    const squares = [...page.querySelectorAll("[data-pyramid]")];
+    expect(squares).toHaveLength(156);
+    for (const square of squares) {
+      const sides = [...square.querySelectorAll("[data-side]")];
+      // The square's centre, from its four corners' outlines.
+      const corners = sides.flatMap((side) =>
+        (side.getAttribute("points") ?? "")
+          .split(" ")
+          .map((point) => point.split(",").map(Number)),
+      );
+      const xs = corners.map(([x]) => x);
+      const ys = corners.map(([, y]) => y);
+      const centre = [
+        (Math.min(...xs) + Math.max(...xs)) / 2,
+        (Math.min(...ys) + Math.max(...ys)) / 2,
+      ];
+      const marks = [...square.querySelectorAll("[data-symbol]")];
+      expect(marks).toHaveLength(4);
+      marks.forEach((mark, index) => {
+        const transform = mark.getAttribute("transform") ?? "";
+        const [, x, y] =
+          /translate\((-?[\d.]+) (-?[\d.]+)\)/.exec(transform)?.map(Number) ??
+          [];
+        const turn = Number(/rotate\((-?\d+)\)/.exec(transform)?.[1]);
+        expect(turn).toBe(PYRAMID_SYMBOL_TURNS[index]);
+        const toCentre = [
+          Math.sign(Math.round((centre[0] - x) * 1000)) || 0,
+          Math.sign(Math.round((centre[1] - y) * 1000)) || 0,
+        ];
+        expect(
+          head(turn),
+          `${square.getAttribute("data-pyramid")} side ${index + 1}`,
+        ).toEqual(toCentre);
+      });
+    }
   });
 
   it("draws them over the sides and under the tops, borders and letters", () => {

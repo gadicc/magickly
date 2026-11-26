@@ -48,7 +48,7 @@ const tabletSideMark = (side: TabletPyramidSide) => (
  * Dawn's versions draw every square as a truncated pyramid in its sides'
  * elemental colours instead (plan 095), its letter on a flat top the size
  * `pyramidTop` gives, and no second letters; with `pyramidSymbols`, each
- * side's symbol on it too, facing out or upright. A key the data does not
+ * side's symbol on it too, outward or upright. A key the data does not
  * have draws an empty page; a tablet the version does not have, its page
  * saying so. It is an image named by `tabletName` (an `aria-label`, which
  * shows no tooltip over the squares as a `<title>` would) unless `label`

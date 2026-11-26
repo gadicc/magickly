@@ -56,8 +56,8 @@ export interface TabletChoice {
    */
   pyramids?: boolean;
   /**
-   * Each side's symbol drawn on the pyramids (`symbols=1`), facing out
-   * from the top. Only with `pyramids`.
+   * Each side's symbol drawn on the pyramids (`symbols=1`), standing on
+   * its side's outer edge. Only with `pyramids`.
    */
   symbols?: boolean;
   /** The symbols stood upright (`upright=1`). Only with `symbols`. */

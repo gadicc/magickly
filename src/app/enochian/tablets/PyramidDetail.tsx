@@ -133,9 +133,21 @@ function Heading({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Where vol. 4 gives the sides' colours and the symbols' facing. */
+/** Where vol. 4 gives the sides' colours and their symbols'. */
 const PAINTED: readonly TabletSource[] = [
   { work: "regardie1940", page: 295, leaf: 287 },
+];
+
+/**
+ * Where the symbols' facing is drawn: vol. 4's pyramids, each symbol on
+ * its side's outer edge (p.294's three of the Air tablet, p.296's two
+ * worked squares), and the first of the Equinox's pyramid plates, which stand
+ * them all upright (plan 095, the correction of 26 November 2026).
+ */
+const FACING: readonly TabletSource[] = [
+  { work: "regardie1940", page: 294, leaf: 286 },
+  { work: "regardie1940", page: 296, leaf: 288 },
+  { work: "equinox1912", plate: "IV", leaf: 242 },
 ];
 
 /** A Sephirah by its name and number: "Gevurah (5)". */
@@ -348,7 +360,10 @@ export default function PyramidDetail({
   letter: string;
   /** The detail's heading, which a choice made by keyboard focuses. */
   heading: React.RefObject<HTMLHeadingElement | null>;
-  /** Whether the symbols stand upright, rather than facing outward. */
+  /**
+   * Whether the symbols stand upright on the page, rather than on their
+   * sides' outer edges.
+   */
   upright: boolean;
   setUpright: (upright: boolean) => void;
 }) {
@@ -413,19 +428,26 @@ export default function PyramidDetail({
           <li key={side.side}>{sideInWords(side, t, list)}</li>
         ))}
       </Typography>
+      <Box sx={{ mt: 0.5 }} data-colours="">
+        <Typography variant="body2">
+          {t(
+            /*i18n*/ "Each side is drawn in its element's colour, with its symbol in the complementary colour. The top holds the square's letter, {letter}.",
+            { letter },
+          )}
+        </Typography>
+        <Cited sources={PAINTED} t={t} />
+      </Box>
       <Box sx={{ mt: 0.5 }} data-orientation="">
         <Typography variant="body2">
           {upright
             ? t(
-                /*i18n*/ "Each side is drawn in its element's colour, with its symbol in the complementary colour, upright so that it can be read; the Order painted the symbols facing outward. The top holds the square's letter, {letter}.",
-                { letter },
+                /*i18n*/ "Each symbol stands upright so that it can be read, as the Equinox's plates draw them. Regardie's drawings (vol. 4) stand each on its side's outer edge, to be read, as we take it, from outside the pyramid; which way the Order itself painted them, these two witnesses do not settle.",
               )
             : t(
-                /*i18n*/ "Each side is drawn in its element's colour, with its symbol in the complementary colour, facing outward, as the Order painted them. The top holds the square's letter, {letter}.",
-                { letter },
+                /*i18n*/ "Each symbol stands on its side's outer edge, to be read, as we take it, from outside the pyramid, as in Regardie's drawings (vol. 4). The Equinox's plates stand them all upright; which way the Order itself painted them, these two witnesses do not settle.",
               )}
         </Typography>
-        <Cited sources={PAINTED} t={t} />
+        <Cited sources={FACING} t={t} />
       </Box>
       {pyramid.region === "calvaryCross" && (
         <CalvarySephirah

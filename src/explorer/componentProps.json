@@ -438,7 +438,7 @@
     ]
   },
   "Tablet": {
-    "description": "An Enochian tablet in a version (`version`, the Golden Dawn's by\ndefault): a Watchtower's sigil above its grid on a 210 × 297 page, or\nthe Tablet of Union's grid on a page of its own (`tabletViewBox`). The\nversion's reversed letters are mirrored unless `mirrorReversed` is\nfalse, and a Watchtower's second letters drawn small in each square's\ncorner when `showSecondLetters` is true. With `pyramids`, the Golden\nDawn's versions draw every square as a truncated pyramid in its sides'\nelemental colours instead (plan 095), its letter on a flat top the size\n`pyramidTop` gives, and no second letters; with `pyramidSymbols`, each\nside's symbol on it too, facing out or upright. A key the data does not\nhave draws an empty page; a tablet the version does not have, its page\nsaying so. It is an image named by `tabletName` (an `aria-label`, which\nshows no tooltip over the squares as a `<title>` would) unless `label`\nnames it otherwise or is false, as for a tablet drawn inside a larger\ndrawing that names itself.",
+    "description": "An Enochian tablet in a version (`version`, the Golden Dawn's by\ndefault): a Watchtower's sigil above its grid on a 210 × 297 page, or\nthe Tablet of Union's grid on a page of its own (`tabletViewBox`). The\nversion's reversed letters are mirrored unless `mirrorReversed` is\nfalse, and a Watchtower's second letters drawn small in each square's\ncorner when `showSecondLetters` is true. With `pyramids`, the Golden\nDawn's versions draw every square as a truncated pyramid in its sides'\nelemental colours instead (plan 095), its letter on a flat top the size\n`pyramidTop` gives, and no second letters; with `pyramidSymbols`, each\nside's symbol on it too, outward or upright. A key the data does not\nhave draws an empty page; a tablet the version does not have, its page\nsaying so. It is an image named by `tabletName` (an `aria-label`, which\nshows no tooltip over the squares as a `<title>` would) unless `label`\nnames it otherwise or is false, as for a tablet drawn inside a larger\ndrawing that names itself.",
     "props": [
       {
         "name": "tablet",
@@ -493,7 +493,7 @@
         "name": "pyramidSymbols",
         "type": "\"upright\" | \"outward\"",
         "required": false,
-        "description": "Draw each side's symbol on it (default none), in the side's\ncomplementary colour with a thin outline: its sign, Sephirah's\nnumber, planet, Hebrew letter or geomantic figure, else its element's\nmark (`enochian/pyramidMarks`). `outward` turns each to face out from\nthe top, as the Order painted them (Regardie, vol. 4, p.295);\n`upright` stands them all up to be read. With `pyramids` only.",
+        "description": "Draw each side's symbol on it (default none), in the side's\ncomplementary colour with a thin outline: its sign, Sephirah's\nnumber, planet, Hebrew letter or geomantic figure, else its element's\nmark (`enochian/pyramidMarks`). `outward` stands each on its side's\nouter edge, head toward the top, as Regardie's drawings have them\n(vol. 4, pp.294 and 296; `PYRAMID_SYMBOL_TURNS`), which we take to\nbe read from outside the pyramid; `upright` stands them all upright\non the page, as the Equinox I(7)'s plates draw them. Which way the\nOrder itself painted them, these two witnesses do not settle. With\n`pyramids` only.",
         "control": { "kind": "choice", "options": ["upright", "outward"] }
       },
       {

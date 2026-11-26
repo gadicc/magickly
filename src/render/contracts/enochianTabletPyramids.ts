@@ -38,8 +38,9 @@ export const isTabletPyramidImageVersion = (
   (TABLET_PYRAMID_IMAGE_VERSIONS as readonly string[]).includes(version);
 
 /**
- * The symbols on the pyramids' sides: none (the default), facing out from
- * the top as the Order painted them, or upright.
+ * The symbols on the pyramids' sides: none (the default), each on its
+ * side's outer edge as Regardie's drawings (vol. 4) have them
+ * (`outward`), or all upright.
  */
 export const TABLET_PYRAMID_SYMBOLS = ["none", "outward", "upright"] as const;
 
@@ -53,7 +54,7 @@ export interface EnochianTabletPyramidsProps extends ImageDimensions {
   /** Whose letters: the Golden Dawn's when absent from the query. */
   version: TabletPyramidImageVersion;
   /**
-   * Each side's symbol drawn on it, facing out or upright, on a top a
+   * Each side's symbol drawn on it, outward or upright, on a top a
    * third of the square; none, on a top half the square, when absent.
    */
   symbols: TabletPyramidSymbols;
@@ -77,7 +78,7 @@ export const tabletPyramidsSuffix = (symbols: TabletPyramidSymbols) =>
  * A tablet drawn as the Golden Dawn's truncated pyramids (plan 095,
  * decision 5): each square's four sides in their elements' colours round
  * a white top, half the square, with the letter; with `symbols`, each
- * side's symbol on it, facing out (`outward`) or upright, round a top a
+ * side's symbol on it, on its outer edge (`outward`) or upright, round a top a
  * third of the square. A slug of its own, so
  * that the flat tablets' images keep their identity and a change to the
  * pyramids' drawing moves only these. The same pages and raster sizes as
@@ -123,7 +124,7 @@ export const enochianTabletPyramids: ComponentImageContract<EnochianTabletPyrami
     },
     // The flat image's name with `-pyramids` after it, as the tablets
     // page names its downloads of the same drawing, and the symbols after
-    // that: "-symbols", facing out, or "-symbols-upright".
+    // that: "-symbols", outward, or "-symbols-upright".
     filename: (props) =>
       `${enochianTablet.filename(props)}${tabletPyramidsSuffix(props.symbols)}`,
   };

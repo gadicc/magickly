@@ -88,7 +88,7 @@ describe("component image registry", () => {
       TABLET_PYRAMIDS_IMAGE_PROFILE,
     );
     expect(TABLET_PYRAMIDS_IMAGE_PROFILE).toBe(
-      "magickli-tablet-pyramids-image-v2",
+      "magickli-tablet-pyramids-image-v3",
     );
     // The other components still publish under the shared profile, so
     // their identities did not move with the sigil's.
@@ -993,7 +993,54 @@ describe("component image registry", () => {
         "158c10abcc067c78bb98a96618c4359dee9953336ab0a3c5fa32dd9a9b025e2d",
       ],
     ],
+    // The outward symbols stood on their sides' outer edges, head toward
+    // the top, as Regardie's drawings have them (vol. 4, pp.294 and 296;
+    // 26 November 2026), reviewed as rasterised. Only `symbols=outward`
+    // moved, and only its turns: the same byte count, since each side's
+    // turn changed by half a turn and their digits' count did not; the
+    // rest are v2's bytes, which the test below holds.
+    "magickli-tablet-pyramids-image-v3": [
+      [
+        "id=air",
+        246_374,
+        "5b75566aacb3fa661bb29af36cf1545129a4c5930c257b815ddde048fe3fe6cb",
+      ],
+      [
+        "id=air&font=enochian",
+        312_844,
+        "47583452b3e0423792759cb85af937248e64ebcc1e459fe27dde2a24ac8a07a4",
+      ],
+      [
+        "id=union",
+        25_210,
+        "1b045b10630a83fd356fcc656a9a6dd5b908cd7c5a5f52e1c041b7a1d3957004",
+      ],
+      [
+        "id=fire&symbols=outward",
+        1_020_768,
+        "cb730849a3cfdb114fb40d1d0390548958fb13f248507359815903f7a9af32f4",
+      ],
+      [
+        "id=union&symbols=upright",
+        155_690,
+        "158c10abcc067c78bb98a96618c4359dee9953336ab0a3c5fa32dd9a9b025e2d",
+      ],
+    ],
   };
+
+  it("moved only the outward symbols' bytes from v2 to v3", () => {
+    const v2 = new Map(
+      TABLET_PYRAMIDS_PINS["magickli-tablet-pyramids-image-v2"].map(
+        ([query, ...pin]) => [query, pin],
+      ),
+    );
+    const v3 = TABLET_PYRAMIDS_PINS["magickli-tablet-pyramids-image-v3"];
+    expect(v3.map(([query]) => query)).toEqual([...v2.keys()]);
+    for (const [query, ...pin] of v3)
+      if (query.includes("symbols=outward"))
+        expect(pin, query).not.toEqual(v2.get(query));
+      else expect(pin, query).toEqual(v2.get(query));
+  });
 
   it("pins the tablets' pyramids' reviewed bytes under their image profile", async () => {
     const pins = TABLET_PYRAMIDS_PINS[TABLET_PYRAMIDS_IMAGE_PROFILE];
@@ -1024,6 +1071,10 @@ describe("component image registry", () => {
     // Coordinates rounded to OUTLINE_PRECISION (24 November 2026), drawing unchanged.
     "magickli-tablet-pyramids-image-v2":
       "c9e913c0848356d6041ba5e2c76be3da06fe0a357260355c899c3e84bfd16946",
+    // The outward symbols stood on their bases (26 November 2026): no
+    // drawing without symbols moved.
+    "magickli-tablet-pyramids-image-v3":
+      "c9e913c0848356d6041ba5e2c76be3da06fe0a357260355c899c3e84bfd16946",
   };
 
   it("pins a digest of every tablet's pyramids in every version under their image profile", async () => {
@@ -1051,7 +1102,7 @@ describe("component image registry", () => {
   }, 60_000);
 
   // The same over the drawings with symbols (plan 095, "Symbols on the
-  // sides"), facing out and upright, which came under the same profile:
+  // sides"), outward and upright, which came under the same profile:
   // the digest above holds every drawing without them unmoved.
   const TABLET_PYRAMIDS_SYMBOLS_DIGESTS: Record<string, string> = {
     "magickli-tablet-pyramids-image-v1":
@@ -1059,11 +1110,22 @@ describe("component image registry", () => {
     // Coordinates rounded to OUTLINE_PRECISION (24 November 2026), drawing unchanged.
     "magickli-tablet-pyramids-image-v2":
       "59057dbbb22c9cd431c4aba876ba5b84234c879f7a1ff32a77a45d0d9202b229",
+    // The outward symbols stood on their sides' outer edges, head toward
+    // the top (26 November 2026); the upright drawings' own digest, below,
+    // held.
+    "magickli-tablet-pyramids-image-v3":
+      "a22a0188054fa9f1fb4de6c17c3024eeec577e10c2f7ee495afea0664934f669",
   };
+
+  // The upright drawings alone, which standing the outward symbols on
+  // their bases (v3) must not move: v2's, and v3's.
+  const TABLET_PYRAMIDS_UPRIGHT_DIGEST =
+    "c6b2cce3bb432627819ac6a983220c8f6741529d8c833698a6f49333b408d715";
 
   it("pins a digest of every tablet's pyramids with their symbols under their image profile", async () => {
     const registration = COMPONENT_IMAGE_REGISTRY["enochian-tablet-pyramids"];
     const drawings: string[] = [];
+    const upright: string[] = [];
     for (const symbols of ["outward", "upright"])
       for (const version of TABLET_PYRAMID_IMAGE_VERSIONS)
         for (const id of TABLET_IDS) {
@@ -1075,9 +1137,15 @@ describe("component image registry", () => {
               ),
             )) as ReactElement,
           );
-          drawings.push(`${query}\n${registration.source?.(markup) ?? markup}`);
+          const drawing = `${query}\n${registration.source?.(markup) ?? markup}`;
+          drawings.push(drawing);
+          if (symbols === "upright") upright.push(drawing);
         }
     expect(drawings).toHaveLength(30);
+    expect(
+      createHash("sha256").update(upright.join("\n\n")).digest("hex"),
+      "the upright symbols draw otherwise than they did under v2",
+    ).toBe(TABLET_PYRAMIDS_UPRIGHT_DIGEST);
     expect(
       createHash("sha256").update(drawings.join("\n\n")).digest("hex"),
       `the tablets' pyramids with their symbols draw otherwise than ${TABLET_PYRAMIDS_IMAGE_PROFILE} was reviewed with. ` +

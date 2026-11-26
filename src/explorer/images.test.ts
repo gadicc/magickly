@@ -122,7 +122,7 @@ describe("componentImage", () => {
         pyramids: true,
       }),
     ).toBe("/api/render/enochian-tablet-pyramids?id=union&version=equinox");
-    // With their symbols, facing out or upright.
+    // With their symbols, outward (on their sides' outer edges) or upright.
     expect(
       componentImage("Tablet", {
         tablet: "water",
