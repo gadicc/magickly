@@ -1,4 +1,6 @@
+import type { TabletPageId } from "@/app/enochian/tablets/tabletPages";
 import type { ComponentImageSlug } from "@/render/contracts";
+import { TABLET_IDS } from "@/render/contracts/enochianTablet";
 import { KAMEA_IMAGE_PLANETS } from "@/render/contracts/kamea";
 import type { SocialImage } from "./pages";
 
@@ -99,6 +101,24 @@ const KAMEA_SECTIONS = KAMEA_IMAGE_PLANETS.map(
   ],
 );
 
+/**
+ * A tablet's card art: its own drawing in the Golden Dawn's version (plan
+ * 100), drawn through the `enochian-tablet` contract as the page's static
+ * files are; Earth's query is the contract's default, as the hub's is.
+ */
+const tabletCardArt = (id: TabletPageId): CardArt => ({
+  kind: "diagram",
+  slug: "enochian-tablet",
+  ...(id === "earth" ? {} : { query: `id=${id}` }),
+});
+
+/** Each tablet page's prefix and its drawing, as the sections list them. */
+const TABLET_SECTIONS = TABLET_IDS.map((id): [string, string, CardArt] => [
+  `/enochian/tablets/${id}`,
+  "Enochian Magick",
+  tabletCardArt(id),
+]);
+
 /** A temple hall's card art: its own drawing (plan 062). */
 export const hallCardArt = (slug: string): CardArt => ({
   kind: "diagram",
@@ -119,6 +139,7 @@ const SECTIONS: [prefix: string, section: string, art: CardArt][] = [
   ["/books", "Books", ART.kabbalah],
   ["/chat", "MagickGPT", ART.chat],
   ["/enochian/keys", "Enochian Magick", ART.enochianKey],
+  ...TABLET_SECTIONS,
   ["/enochian/tablets", "Enochian Magick", ART.tablet],
   ["/enochian", "Enochian Magick", ART.enochian],
   ["/doc", "Golden Dawn Rituals", ART.robes],

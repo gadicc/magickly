@@ -629,6 +629,37 @@ msgid "Enochian Tablets"
 msgstr "הלוחות החנוכיים"
 
 #. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+#: src/app/pathnames.ts
+msgid "Earth Tablet"
+msgstr "לוח הארץ"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+#: src/app/pathnames.ts
+msgid "Air Tablet"
+msgstr "לוח האוויר"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+#: src/app/pathnames.ts
+msgid "Water Tablet"
+msgstr "לוח המים"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+#: src/app/pathnames.ts
+msgid "Fire Tablet"
+msgstr "לוח האש"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+#: src/app/enochian/tablets/tablets.tsx
+#: src/app/pathnames.ts
+msgid "Tablet of Union"
+msgstr "לוח האיחוד"
+
+#. js-lingui-explicit-id
 #: src/app/pathnames.ts
 msgid "Enochian Translator"
 msgstr "מתרגם חנוכית"
@@ -1897,6 +1928,7 @@ msgstr "רגרדי מציג גם דרך לשרטט שמות על ריבועי ה
 
 #. js-lingui-explicit-id
 #: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+#: src/app/enochian/tablets/TabletPage.tsx
 #: src/app/gd/sigils/SigilsText.tsx
 msgid "Sources"
 msgstr "מקורות"
@@ -2442,7 +2474,38 @@ msgid "No tendency is stated: two of its sides are active and two passive."
 msgstr "לא נאמרת נטייה: שתיים מצלעותיו פעילות ושתיים סבילות."
 
 #. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+msgid "The Enochian {element} tablet in the Golden Dawn's version: its sigil above a grid of thirteen rows of twelve letters"
+msgstr "לוח ה{element} החנוכי בגרסת השחר הזהוב: הסיגיל שלו מעל רשת של שלוש־עשרה שורות בנות שתים־עשרה אותיות"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+msgid "The Enochian Tablet of Union in the Golden Dawn's version: four rows of five letters, {first}, {second}, {third} and {fourth}"
+msgstr "לוח האיחוד החנוכי בגרסת השחר הזהוב: ארבע שורות בנות חמש אותיות, {first}, {second}, {third} ו־{fourth}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+msgid "The Enochian {element} tablet in the Golden Dawn's version with every square drawn as a truncated pyramid, its sides in their elements' colours with their symbols, round a white top with the square's letter"
+msgstr "לוח ה{element} החנוכי בגרסת השחר הזהוב, שכל משבצת בו מצוירת כפירמידה קטומה: צלעותיה בצבעי היסודות שלהן ועליהן הסמלים שלהן, סביב ראש לבן ועליו אות המשבצת"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+msgid "The Enochian Tablet of Union in the Golden Dawn's version with every square drawn as a truncated pyramid, its sides in their elements' colours with their symbols, round a white top with the square's letter"
+msgstr "לוח האיחוד החנוכי בגרסת השחר הזהוב, שכל משבצת בו מצוירת כפירמידה קטומה: צלעותיה בצבעי היסודות שלהן ועליהן הסמלים שלהן, סביב ראש לבן ועליו אות המשבצת"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+msgid "The {element} tablet is one of the four Watchtowers of Enochian magic. Its three holy names are {first}, {second} and {third}, and its King is {king}."
+msgstr "לוח ה{element} הוא אחד מארבעת מגדלי השמירה של המאגיה החנוכית. שלושת שמותיו הקדושים הם {first}, {second} ו־{third}, והמלך שלו הוא {king}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+msgid "The Tablet of Union joins the four Watchtowers of Enochian magic. Its four lines are {first}, {second}, {third} and {fourth}."
+msgstr "לוח האיחוד מחבר את ארבעת מגדלי השמירה של המאגיה החנוכית. ארבע השורות שלו הן {first}, {second}, {third} ו־{fourth}."
+
+#. js-lingui-explicit-id
 #: src/app/enochian/tablets/NamesPanel.tsx
+#: src/app/enochian/tablets/TabletPage.tsx
 msgid "Names on the tablet"
 msgstr "השמות שעל הלוח"
 
@@ -2733,6 +2796,46 @@ msgid "{square}: {region}"
 msgstr "{square}: {region}"
 
 #. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletFigures.tsx
+msgid "The Enochian tablets"
+msgstr "הלוחות החנוכיים"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "The tablet in the Golden Dawn's version, the default. <0>Open it in the tablets tool</0> for the other versions, the Enochian letters, the names on the tablet and their squares."
+msgstr "הלוח בגרסת השחר הזהוב, ברירת המחדל. <0>פתחו אותו בכלי הלוחות</0> לגרסאות האחרות, לאותיות החנוכיות, לשמות שעל הלוח ולמשבצות שלהם."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "Download the tablet as SVG"
+msgstr "הורדת הלוח כ־SVG"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "How many of its {count} squares each other version reads otherwise, by a letter, u for v or a square left empty, case aside; the tool's <0>Differences</0> show each one:"
+msgstr "בכמה מתוך {count} המשבצות שלו כל גרסה אחרת קוראת אחרת, באות, ב־u במקום v או במשבצת ריקה, בלי להתחשב באותיות רישיות; לשונית <0>ההבדלים</0> בכלי מראה כל אחת:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "The names read off the tablet in the Golden Dawn's version, grouped as it is built, each linked to its dictionary entry where it has one. <0>Choose a name in the tablets tool</0> to see its squares and how the other versions spell it."
+msgstr "השמות הנקראים מן הלוח בגרסת השחר הזהוב, מקובצים כפי שהוא בנוי, וכל אחד מקושר לערך שלו במילון היכן שיש לו ערך. <0>בחרו שם בכלי הלוחות</0> כדי לראות את המשבצות שלו ואיך הגרסאות האחרות מאייתות אותו."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "The tablet as pyramids"
+msgstr "הלוח כפירמידות"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "Every square drawn as the Golden Dawn's truncated pyramid, its sides in their elements' colours (<0>The Golden Dawn</0>, vol. 4, p. <1>295</1>), each symbol standing on its side's outer edge, as Regardie's drawings have them (pp. <2>294</2> and <3>296</3>). <4>How the pyramids are read</4>, and <5>the same drawing in the tablets tool</5>."
+msgstr "כל משבצת מצוירת כפירמידה הקטומה של השחר הזהוב, צלעותיה בצבעי היסודות שלהן (<0>The Golden Dawn</0>, כרך 4, עמ׳ <1>295</1>), וכל סמל עומד על השפה החיצונית של הצלע שלו, כמו בשרטוטים של רגרדי (עמ׳ <2>294</2> ו־<3>296</3>). <4>איך קוראים את הפירמידות</4>, ו<5>אותו ציור בכלי הלוחות</5>."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "Download the pyramids as SVG"
+msgstr "הורדת הפירמידות כ־SVG"
+
+#. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
 msgid "The Tablet of Union is the same in both."
 msgstr "לוח האיחוד זהה בשתיהן."
@@ -2761,11 +2864,6 @@ msgstr "אין קישור לתמונה כשמוצגת משבצת."
 #: src/app/enochian/tablets/tablets.tsx
 msgid "No image link with second letters shown or reversed letters plain."
 msgstr "אין קישור לתמונה כשמוצגות אותיות שניות או כשהאותיות ההפוכות מוצגות רגילות."
-
-#. js-lingui-explicit-id
-#: src/app/enochian/tablets/tablets.tsx
-msgid "Tablet of Union"
-msgstr "לוח האיחוד"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx

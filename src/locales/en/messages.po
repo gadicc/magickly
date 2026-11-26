@@ -629,6 +629,37 @@ msgid "Enochian Tablets"
 msgstr "Enochian Tablets"
 
 #. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+#: src/app/pathnames.ts
+msgid "Earth Tablet"
+msgstr "Earth Tablet"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+#: src/app/pathnames.ts
+msgid "Air Tablet"
+msgstr "Air Tablet"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+#: src/app/pathnames.ts
+msgid "Water Tablet"
+msgstr "Water Tablet"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+#: src/app/pathnames.ts
+msgid "Fire Tablet"
+msgstr "Fire Tablet"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+#: src/app/enochian/tablets/tablets.tsx
+#: src/app/pathnames.ts
+msgid "Tablet of Union"
+msgstr "Tablet of Union"
+
+#. js-lingui-explicit-id
 #: src/app/pathnames.ts
 msgid "Enochian Translator"
 msgstr "Enochian Translator"
@@ -1897,6 +1928,7 @@ msgstr "Regardie also sets out a way of tracing names on the planets' magic squa
 
 #. js-lingui-explicit-id
 #: src/app/astrology/kamea/sigils/KameaSigilsText.tsx
+#: src/app/enochian/tablets/TabletPage.tsx
 #: src/app/gd/sigils/SigilsText.tsx
 msgid "Sources"
 msgstr "Sources"
@@ -2442,7 +2474,38 @@ msgid "No tendency is stated: two of its sides are active and two passive."
 msgstr "No tendency is stated: two of its sides are active and two passive."
 
 #. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+msgid "The Enochian {element} tablet in the Golden Dawn's version: its sigil above a grid of thirteen rows of twelve letters"
+msgstr "The Enochian {element} tablet in the Golden Dawn's version: its sigil above a grid of thirteen rows of twelve letters"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+msgid "The Enochian Tablet of Union in the Golden Dawn's version: four rows of five letters, {first}, {second}, {third} and {fourth}"
+msgstr "The Enochian Tablet of Union in the Golden Dawn's version: four rows of five letters, {first}, {second}, {third} and {fourth}"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+msgid "The Enochian {element} tablet in the Golden Dawn's version with every square drawn as a truncated pyramid, its sides in their elements' colours with their symbols, round a white top with the square's letter"
+msgstr "The Enochian {element} tablet in the Golden Dawn's version with every square drawn as a truncated pyramid, its sides in their elements' colours with their symbols, round a white top with the square's letter"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+msgid "The Enochian Tablet of Union in the Golden Dawn's version with every square drawn as a truncated pyramid, its sides in their elements' colours with their symbols, round a white top with the square's letter"
+msgstr "The Enochian Tablet of Union in the Golden Dawn's version with every square drawn as a truncated pyramid, its sides in their elements' colours with their symbols, round a white top with the square's letter"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+msgid "The {element} tablet is one of the four Watchtowers of Enochian magic. Its three holy names are {first}, {second} and {third}, and its King is {king}."
+msgstr "The {element} tablet is one of the four Watchtowers of Enochian magic. Its three holy names are {first}, {second} and {third}, and its King is {king}."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tabletPages.ts
+msgid "The Tablet of Union joins the four Watchtowers of Enochian magic. Its four lines are {first}, {second}, {third} and {fourth}."
+msgstr "The Tablet of Union joins the four Watchtowers of Enochian magic. Its four lines are {first}, {second}, {third} and {fourth}."
+
+#. js-lingui-explicit-id
 #: src/app/enochian/tablets/NamesPanel.tsx
+#: src/app/enochian/tablets/TabletPage.tsx
 msgid "Names on the tablet"
 msgstr "Names on the tablet"
 
@@ -2733,6 +2796,46 @@ msgid "{square}: {region}"
 msgstr "{square}: {region}"
 
 #. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletFigures.tsx
+msgid "The Enochian tablets"
+msgstr "The Enochian tablets"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "The tablet in the Golden Dawn's version, the default. <0>Open it in the tablets tool</0> for the other versions, the Enochian letters, the names on the tablet and their squares."
+msgstr "The tablet in the Golden Dawn's version, the default. <0>Open it in the tablets tool</0> for the other versions, the Enochian letters, the names on the tablet and their squares."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "Download the tablet as SVG"
+msgstr "Download the tablet as SVG"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "How many of its {count} squares each other version reads otherwise, by a letter, u for v or a square left empty, case aside; the tool's <0>Differences</0> show each one:"
+msgstr "How many of its {count} squares each other version reads otherwise, by a letter, u for v or a square left empty, case aside; the tool's <0>Differences</0> show each one:"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "The names read off the tablet in the Golden Dawn's version, grouped as it is built, each linked to its dictionary entry where it has one. <0>Choose a name in the tablets tool</0> to see its squares and how the other versions spell it."
+msgstr "The names read off the tablet in the Golden Dawn's version, grouped as it is built, each linked to its dictionary entry where it has one. <0>Choose a name in the tablets tool</0> to see its squares and how the other versions spell it."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "The tablet as pyramids"
+msgstr "The tablet as pyramids"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "Every square drawn as the Golden Dawn's truncated pyramid, its sides in their elements' colours (<0>The Golden Dawn</0>, vol. 4, p. <1>295</1>), each symbol standing on its side's outer edge, as Regardie's drawings have them (pp. <2>294</2> and <3>296</3>). <4>How the pyramids are read</4>, and <5>the same drawing in the tablets tool</5>."
+msgstr "Every square drawn as the Golden Dawn's truncated pyramid, its sides in their elements' colours (<0>The Golden Dawn</0>, vol. 4, p. <1>295</1>), each symbol standing on its side's outer edge, as Regardie's drawings have them (pp. <2>294</2> and <3>296</3>). <4>How the pyramids are read</4>, and <5>the same drawing in the tablets tool</5>."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/TabletPage.tsx
+msgid "Download the pyramids as SVG"
+msgstr "Download the pyramids as SVG"
+
+#. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
 msgid "The Tablet of Union is the same in both."
 msgstr "The Tablet of Union is the same in both."
@@ -2761,11 +2864,6 @@ msgstr "No image link while a square is shown."
 #: src/app/enochian/tablets/tablets.tsx
 msgid "No image link with second letters shown or reversed letters plain."
 msgstr "No image link with second letters shown or reversed letters plain."
-
-#. js-lingui-explicit-id
-#: src/app/enochian/tablets/tablets.tsx
-msgid "Tablet of Union"
-msgstr "Tablet of Union"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx

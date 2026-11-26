@@ -23,6 +23,17 @@ export type Translate = (
 /** Whose names: the Golden Dawn's versions, or Dee's record. */
 export type Tradition = "gd" | "dee";
 
+/** A group of the list: the Great Cross, a quarter, or the Tablet of Union. */
+export type GroupKey = "cross" | "union" | TabletQuarter;
+
+/** The group a name is listed in, as the tablet is built. */
+export const groupOf = (
+  name: Pick<TabletName, "kind" | "quarter">,
+): GroupKey =>
+  name.kind === "union" || name.kind === "unionColumn"
+    ? "union"
+    : (name.quarter ?? "cross");
+
 /** A name as the list shows it: "Bataivah", "Oba?i". */
 export const displayName = (spelling: string) =>
   spelling.charAt(0).toUpperCase() + spelling.slice(1).toLowerCase();
@@ -104,12 +115,16 @@ const KIND_LABELS: Readonly<
 };
 
 /** A line of the Tablet of Union's element, in words. */
-const lineElement = (name: TabletName, t: Translate) =>
+const lineElement = (name: Pick<TabletName, "attribution">, t: Translate) =>
   t(ELEMENT_WORDS[name.attribution?.element ?? ""] ?? "");
 
-/** A name's label in the list: its role, or in Dee's versions its place. */
+/**
+ * A name's label in the list: its role, or in Dee's versions its place.
+ * Only the name's id, kind and attribution are read, so a page may pass
+ * those alone.
+ */
 export function nameLabel(
-  name: TabletName,
+  name: Pick<TabletName, "id" | "kind" | "attribution">,
   tradition: Tradition,
   t: Translate,
 ): string {

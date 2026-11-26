@@ -1,13 +1,25 @@
+import { setupI18n } from "@lingui/core";
+import tabletNotes, { sourceUrl } from "magick-data/enochian/tabletNotes";
+import {
+  drawingSources,
+  tabletLedeValues,
+} from "@/app/enochian/tablets/tabletPageData";
 import {
   TABLET_PAGE_IDS,
+  TABLET_PAGE_LABELS,
   type TabletPageId,
+  tabletAlt,
   tabletPath,
 } from "@/app/enochian/tablets/tabletPages";
+import { messages as english } from "@/locales/en/messages.js";
 import {
   type ComponentImageLink,
   componentImageQuery,
 } from "@/render/componentImageUrl";
 import { TABLET_RASTER_DEFAULTS } from "@/render/contracts/enochianTablet";
+import { GD_HALL_LICENCE } from "@/render/contracts/gdHall";
+import type { SocialImage } from "./pages";
+import { SITE_ORGANIZATION, SITE_URL } from "./site";
 
 /**
  * The Enochian tablets' static images (plan 100): each of the five
@@ -97,7 +109,7 @@ export function allTabletFiles(): { tablet: TabletPageId; file: TabletFile }[] {
 /**
  * The image a file is drawn from, as the tool links it: the tablet in the
  * Golden Dawn's version in Latin letters, and as pyramids with the
- * symbols facing out, as *Symbols on the sides* draws them.
+ * symbols outward, as *Symbols on the sides* draws them.
  */
 export function tabletFileLink(
   id: TabletPageId,
@@ -125,4 +137,90 @@ export function tabletFileQuery(id: TabletPageId, file: TabletFile) {
   return componentImageQuery(tabletFileLink(id, file.drawing), {
     format: file.format,
   });
+}
+
+// The English catalog, never activated: the caption must read exactly as
+// the English page's alt text does.
+const englishI18n = setupI18n({ locale: "en", messages: { en: english } });
+const englishT = (message: string, values?: Record<string, string | number>) =>
+  englishI18n._(message, values);
+
+/** A drawing's alt text in English, as the structured data's caption. */
+export const tabletAltEnglish = (id: TabletPageId, drawing: TabletDrawing) =>
+  tabletAlt(id, drawing, tabletLedeValues(id), englishT);
+
+/**
+ * The flat tablet's PNG as a tablet page's second Open Graph image, after
+ * the page's card, as the kameas and the temple halls add theirs.
+ */
+export function tabletSocialImage(id: TabletPageId): SocialImage {
+  const { png } = tabletFiles(id).flat;
+  return {
+    url: png.path,
+    width: png.width,
+    height: png.height,
+    alt: tabletAltEnglish(id, "flat"),
+  };
+}
+
+/**
+ * The Regardie pages the Golden Dawn's drawing follows, each as its book
+ * with the page and leaf in its description, as the halls cite theirs.
+ */
+function drawingBooks(id: TabletPageId) {
+  return drawingSources(id).map((source) => {
+    const work = tabletNotes.works[source.work];
+    return {
+      "@type": "Book",
+      name: work.title,
+      author: { "@type": "Person", name: "Israel Regardie" },
+      ...(work.year && { datePublished: String(work.year) }),
+      description: `p.${source.page}, archive.org leaf n${source.leaf}`,
+      url: sourceUrl(source),
+    } as const;
+  });
+}
+
+/**
+ * A tablet page's images as structured data: an `ImageObject` for each of
+ * its four files, the flat tablet's PNG first, each `contentUrl` exactly
+ * the URL the page shows it at, each PNG with its SVG as associated
+ * media, based on the Regardie pages the drawing follows. The licence,
+ * credit and notice are those the site states for every image a
+ * component draws (CC BY 4.0, credited to Magick.ly, drawn by
+ * magick-components, MIT), as the kameas and the halls state them. The
+ * page's trail is its own script (`PageBreadcrumbs`).
+ */
+export function tabletJsonLd(id: TabletPageId) {
+  const files = tabletFiles(id);
+  const page = `${SITE_URL}${tabletPath(id)}`;
+  const L = GD_HALL_LICENCE;
+  const label = `Enochian ${englishT(TABLET_PAGE_LABELS[id])}`;
+  const isBasedOn = drawingBooks(id);
+  const image = (file: TabletFile) => ({
+    "@type": "ImageObject",
+    "@id": `${page}#${file.drawing}-${file.format}`,
+    contentUrl: `${SITE_URL}${file.path}`,
+    url: page,
+    name: file.drawing === "flat" ? label : `${label} as pyramids`,
+    caption: tabletAltEnglish(id, file.drawing),
+    encodingFormat: file.format === "png" ? "image/png" : "image/svg+xml",
+    ...(file.width && { width: file.width, height: file.height }),
+    license: L.url,
+    acquireLicensePage: L.acquireLicensePage,
+    creator: SITE_ORGANIZATION,
+    creditText: L.creditText,
+    copyrightNotice: L.copyrightNotice,
+    isBasedOn,
+  });
+  return {
+    "@context": "https://schema.org",
+    "@graph": (["flat", "pyramids"] as const).flatMap((drawing) => {
+      const { png, svg } = files[drawing];
+      return [
+        { ...image(png), associatedMedia: { "@id": image(svg)["@id"] } },
+        image(svg),
+      ];
+    }),
+  };
 }

@@ -166,6 +166,36 @@ export const PUBLIC_PAGES = {
       "the Golden Dawn's Tablet of Union: holy names, Kings, Seniors, " +
       "archangels, and differences.",
   },
+  "/enochian/tablets/earth": {
+    title: "Enochian Earth Tablet: Watchtower of the North",
+    description:
+      "MOR DIAL HCTGA, the three holy names of the Enochian Earth tablet, with " +
+      "its King Iczhihal, its Seniors, every name read off it, and its images.",
+  },
+  "/enochian/tablets/air": {
+    title: "Enochian Air Tablet: Watchtower of the East",
+    description:
+      "ORO IBAH AOZPI, the three holy names of the Enochian Air tablet, with " +
+      "its King Bataivah, its Seniors, every name read off it, and its images.",
+  },
+  "/enochian/tablets/water": {
+    title: "Enochian Water Tablet: Watchtower of the West",
+    description:
+      "MPH ARSL GAIOL, the three holy names of the Enochian Water tablet, with " +
+      "its King Raagiosl, its Seniors, every name read off it, and its images.",
+  },
+  "/enochian/tablets/fire": {
+    title: "Enochian Fire Tablet: Watchtower of the South",
+    description:
+      "OIP TEAA PDOCE, the three holy names of the Enochian Fire tablet, with " +
+      "its King Edlprnaa, its Seniors, every name read off it, and its images.",
+  },
+  "/enochian/tablets/union": {
+    title: "Enochian Tablet of Union",
+    description:
+      "EXARP, HCOMA, NANTA and BITOM, the four lines of the Enochian " +
+      "Tablet of Union, which joins the four Watchtowers, with its names and its images.",
+  },
   "/gd": {
     title: "Golden Dawn",
     description:

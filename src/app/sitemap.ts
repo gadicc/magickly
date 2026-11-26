@@ -10,6 +10,7 @@ import { lenainPages } from "@/seo/lenain";
 import { PUBLIC_PAGES } from "@/seo/pages";
 import { allPlanetaryNameSigilFiles } from "@/seo/planetaryNames";
 import { SITE_URL } from "@/seo/site";
+import { allTabletFiles } from "@/seo/tablets";
 
 /**
  * Registry pages, then data rows, spelled exactly like their canonicals.
@@ -21,10 +22,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // as the halls' below: the band's, then every other style's (plan 096,
   // decision 4). Next writes them unescaped, so the URLs carry no query.
   // Each kamea's page with its square's two files likewise, and each
-  // planetary intelligence's and spirit's with its sigil's (plan 093, K4).
+  // planetary intelligence's and spirit's with its sigil's (plan 093, K4);
+  // each tablet's with its four, the PNGs first (plan 100).
   const images = new Map<string, string[]>();
   for (const { file } of [
     ...allKameaFiles(),
+    ...allTabletFiles(),
     ...allAngelSigilStyleFiles(),
     ...allPlanetaryNameSigilFiles(),
   ]) {

@@ -50,7 +50,16 @@ const pathnames: Pathnames = {
     dictionary: /*i18n*/ "Enochian Dictionary",
     keys: /*i18n*/ "Enochian Keys",
     oration: /*i18n*/ "Oration to God",
-    tablets: /*i18n*/ "Enochian Tablets",
+    // A section, so that each tablet's page has the others in its title's
+    // menu (plan 100).
+    tablets: {
+      "/": /*i18n*/ "Enochian Tablets",
+      earth: /*i18n*/ "Earth Tablet",
+      air: /*i18n*/ "Air Tablet",
+      water: /*i18n*/ "Water Tablet",
+      fire: /*i18n*/ "Fire Tablet",
+      union: /*i18n*/ "Tablet of Union",
+    },
     translate: /*i18n*/ "Enochian Translator",
   },
   gd: {

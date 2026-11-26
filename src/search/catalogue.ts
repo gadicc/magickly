@@ -58,6 +58,17 @@ import {
   PLANETARY_NAME_WITNESSES,
   WITNESS_LABELS,
 } from "@/app/astrology/kamea/witnesses";
+import {
+  tabletLedeValues,
+  tabletNote,
+} from "@/app/enochian/tablets/tabletPageData";
+import {
+  TABLET_LEDE,
+  TABLET_PAGE_LABELS,
+  type TabletPageId,
+  tabletPath,
+  WATCHTOWER_QUARTERS,
+} from "@/app/enochian/tablets/tabletPages";
 import { COMPONENT_EXAMPLES, EXPLORER_COMPONENTS } from "@/explorer/components";
 import { PROPS } from "@/explorer/props";
 import { angelSlug } from "@/lib/angelSlugs";
@@ -185,8 +196,9 @@ const QUARTER_ELEMENTS = {
 
 /**
  * The Golden Dawn's names of each Watchtower and of the Tablet of Union,
- * which the tablets page reads off the letters in code and site search
- * cannot find in its JSX (plan 090, decision 9): "Holy names: Mor Dial
+ * which the tablets' pages read off the letters in code and site search
+ * cannot find in their JSX (plan 090, decision 9; plan 100 moved them
+ * from the hub to each tablet's page): "Holy names: Mor Dial
  * Hctga. King: Iczhihal. Seniors: … Air of Earth: …; with the Union's
  * letters: Nboza …", and "Lines: Exarp Hcoma Nanta Bitom. First column:
  * Ehnb.", spelled as the page lists them.
@@ -536,15 +548,39 @@ export async function buildSearchCatalogue(): Promise<SearchCatalogue> {
         )
         .join(", "),
     );
-  for (const [id, text] of tabletNamesText())
+  // Each tablet's own page (plan 100), which builds its text from the
+  // data, so that a name finds the tablet it is read off: the lede and
+  // the tablet's note, then its names in the Golden Dawn's version. The
+  // hub keeps the tool's own prose.
+  for (const [id, text] of tabletNamesText()) {
+    const tablet = id as TabletPageId;
+    const path = tabletPath(tablet);
+    const element = ELEMENTS[id] ?? "";
+    documents
+      .get(path)!
+      .aliases.push(
+        ...(tablet === "union"
+          ? ["Tablet of Union", "Enochian Tablet of Union"]
+          : [
+              `${element} Watchtower`,
+              `Watchtower of the ${WATCHTOWER_QUARTERS[tablet]}`,
+              `Enochian ${element} tablet`,
+            ]),
+      );
     add(
-      "/enochian/tablets",
-      `names-${id}`,
-      id === "union"
-        ? "The Tablet of Union's names"
-        : `The ${ELEMENTS[id]} tablet's names`,
-      text,
+      path,
+      "tablet",
+      englishText(TABLET_PAGE_LABELS[tablet]),
+      [
+        englishText(
+          tablet === "union" ? TABLET_LEDE.union : TABLET_LEDE.watchtower,
+          { ...tabletLedeValues(tablet), element },
+        ),
+        tabletNote(tablet).text,
+      ].join(" "),
     );
+    add(path, "names", "Names on the tablet", text, `${path}#names`);
+  }
   for (const [word, entry] of Object.entries(dictionary))
     add("/enochian/dictionary", word, word, words(entry.meanings));
 

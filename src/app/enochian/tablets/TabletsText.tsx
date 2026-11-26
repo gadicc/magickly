@@ -116,6 +116,15 @@ export default function TabletsText() {
       <H2>Related</H2>
       <List>
         <li>
+          Each tablet on a page of its own, with its names and its images in the
+          Golden Dawn&apos;s version: the{" "}
+          <Link href="/enochian/tablets/earth">Earth</Link>,{" "}
+          <Link href="/enochian/tablets/air">Air</Link>,{" "}
+          <Link href="/enochian/tablets/water">Water</Link> and{" "}
+          <Link href="/enochian/tablets/fire">Fire</Link> tablets, and the{" "}
+          <Link href="/enochian/tablets/union">Tablet of Union</Link>
+        </li>
+        <li>
           <Link href="/enochian/keys">The Enochian Keys</Link> and{" "}
           <Link href="/enochian/dictionary">dictionary</Link>
         </li>

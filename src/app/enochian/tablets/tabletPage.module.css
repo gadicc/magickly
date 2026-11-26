@@ -1,0 +1,115 @@
+/* The tablets' own pages (plan 100). */
+
+/* Running text in the site's reading column, about 70 characters a line. */
+.prose {
+  max-inline-size: 32rem;
+}
+
+.figure {
+  margin: 0.5em 0 1em;
+}
+
+/* A Watchtower's portrait page, and the Union's landscape one, each scaled
+   to the column and never past its file's own size. */
+.watchtower,
+.union {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  margin: 0 auto 0.5em;
+}
+
+.watchtower {
+  max-inline-size: 28rem;
+}
+
+.union {
+  max-inline-size: 31rem;
+}
+
+.figure figcaption {
+  max-inline-size: 32rem;
+  font-size: 0.92rem;
+}
+
+.downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 1.4em;
+  margin: 0.4em 0 0;
+}
+
+.counts {
+  max-inline-size: 32rem;
+  padding-inline-start: 1.2em;
+  margin: 0.25em 0 1em;
+}
+
+/* The names' groups: as many columns as fit, one on a phone. */
+.groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0 1.5rem;
+}
+
+.groups h3 {
+  font-size: 0.98rem;
+  margin: 1.2em 0 0.3em;
+}
+
+.names {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  container-type: inline-size;
+}
+
+/* A name and its role side by side, the role wrapping in its own column,
+   so a long role ("A servient angel with its Union letter") never falls
+   under the name. */
+.names li {
+  display: grid;
+  grid-template-columns: 6.5em minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 0.6em;
+}
+
+/* One column only where the role would be cramped beside the name. */
+@container (max-width: 15rem) {
+  .names li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.name {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+  font-weight: 600;
+}
+
+/* Each linked name a target of its own on a touch screen. */
+@media (pointer: coarse) {
+  .name {
+    min-block-size: 44px;
+  }
+}
+
+.role {
+  font-size: 0.85em;
+  color: var(--mui-palette-text-secondary);
+}
+
+/* The downloads set apart as targets of their own; links inside a
+   sentence are exempt, as inline targets. */
+.downloads a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+}
+
+@media (pointer: coarse) {
+  .downloads a {
+    min-block-size: 44px;
+  }
+}

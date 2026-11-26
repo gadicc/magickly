@@ -21,7 +21,6 @@ import {
   TABLET_QUARTERS,
   type TabletName,
   type TabletNameId,
-  type TabletQuarter,
   tabletNameVariants,
 } from "magick-data/enochian/tabletNames";
 import tabletNotes, {
@@ -44,7 +43,9 @@ import {
 } from "./dictionaryLinks";
 import {
   displayName,
+  type GroupKey,
   groupLabel,
+  groupOf,
   nameInWords,
   nameLabel,
   shownName,
@@ -55,14 +56,6 @@ import {
 import { Sources, versionTitle } from "./Sources";
 import styles from "./tablets.module.css";
 import { tabletQuery } from "./urlState";
-
-/** A group of the list: the Great Cross, a quarter, or the Tablet of Union. */
-type GroupKey = "cross" | "union" | TabletQuarter;
-
-const groupOf = (name: TabletName): GroupKey =>
-  name.kind === "union" || name.kind === "unionColumn"
-    ? "union"
-    : (name.quarter ?? "cross");
 
 const sameSquare = (a: TabletSquare, b: TabletSquare) =>
   a.row === b.row && a.column === b.column;

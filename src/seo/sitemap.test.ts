@@ -58,7 +58,7 @@ describe("sitemap", () => {
   it("claims no change frequency, priority or modification date", () => {
     for (const entry of sitemap())
       expect(Object.keys(entry)).toEqual(
-        /\/gd\/halls\/(?!editor$)[^/]+$|\/kabbalah\/angel\/[^/]+$|\/astrology\/kamea\/(?!sigils$)[^/]+$|\/astrology\/(?:intelligence|spirit)\/[^/]+$/.test(
+        /\/gd\/halls\/(?!editor$)[^/]+$|\/kabbalah\/angel\/[^/]+$|\/astrology\/kamea\/(?!sigils$)[^/]+$|\/astrology\/(?:intelligence|spirit)\/[^/]+$|\/enochian\/tablets\/[^/]+$/.test(
           entry.url,
         )
           ? ["url", "images"]
@@ -122,7 +122,7 @@ describe("sitemap", () => {
         );
     }
     expect(sitemap().filter((entry) => entry.images)).toHaveLength(
-      14 + 72 + 7 + 16,
+      14 + 72 + 7 + 16 + 5,
     );
   });
 
@@ -147,6 +147,36 @@ describe("sitemap", () => {
       expect(
         sitemap().find((entry) => entry.url === `https://magick.ly${path}`),
       ).toEqual({ url: `https://magick.ly${path}` });
+  });
+
+  it("lists each tablet's four images, the PNGs first (plan 100)", () => {
+    const tablets = sitemap().filter((entry) =>
+      /\/enochian\/tablets\/[^/]+$/.test(entry.url),
+    );
+    expect(tablets.map((entry) => entry.url)).toEqual(
+      ["earth", "air", "water", "fire", "union"].map(
+        (id) => `https://magick.ly/enochian/tablets/${id}`,
+      ),
+    );
+    const page = "https://magick.ly/enochian/tablets/fire";
+    expect(tablets[3]).toEqual({
+      url: page,
+      images: [
+        `${page}/enochian-fire-tablet.png`,
+        `${page}/enochian-fire-tablet-pyramids.png`,
+        `${page}/enochian-fire-tablet.svg`,
+        `${page}/enochian-fire-tablet-pyramids.svg`,
+      ],
+    });
+    expect(tablets[4]?.images?.[0]).toBe(
+      "https://magick.ly/enochian/tablets/union/enochian-tablet-of-union.png",
+    );
+    // The tool has no image files of its own.
+    expect(
+      sitemap().find(
+        (entry) => entry.url === "https://magick.ly/enochian/tablets",
+      ),
+    ).toEqual({ url: "https://magick.ly/enochian/tablets" });
   });
 
   it("lists each planetary name's sigil, the PNG then the SVG (plan 093, K4)", () => {
@@ -174,19 +204,23 @@ describe("sitemap", () => {
       "http://www.google.com/schemas/sitemap-image/1.1",
       "loc",
     );
-    // The kameas' come first, with the public pages; then the angels' and
-    // the planetary names', with the entity pages; then the halls'.
-    expect(images).toHaveLength(14 + 576 + 32 + 28);
+    // The kameas' and the tablets' come first, with the public pages; then
+    // the angels' and the planetary names', with the entity pages; then
+    // the halls'.
+    expect(images).toHaveLength(14 + 20 + 576 + 32 + 28);
     expect(images[0].textContent).toBe(
       "https://magick.ly/astrology/kamea/saturn/kamea-of-saturn-magic-square.png",
     );
     expect(images[14].textContent).toBe(
+      "https://magick.ly/enochian/tablets/earth/enochian-earth-tablet.png",
+    );
+    expect(images[14 + 20].textContent).toBe(
       "https://magick.ly/kabbalah/angel/vehuiah/vehuiah-rose-cross-sigil-band.png",
     );
-    expect(images[14 + 576].textContent).toBe(
+    expect(images[14 + 20 + 576].textContent).toBe(
       "https://magick.ly/astrology/intelligence/agiel/sigil-of-agiel.png",
     );
-    expect(images[14 + 576 + 32].textContent).toBe(
+    expect(images[14 + 20 + 576 + 32].textContent).toBe(
       "https://magick.ly/gd/halls/neophyte/golden-dawn-neophyte-temple.png",
     );
   });

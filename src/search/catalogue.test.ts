@@ -202,7 +202,7 @@ describe("the real public search catalogue", () => {
     expect(ids.includes("aethyrs")).toBe(aethyrs.length > 0);
   });
 
-  it("indexes the Golden Dawn's names of the four Watchtowers and the Union on the tablets page", () => {
+  it("indexes each tablet's names and lede on its own page, not the hub (plan 100)", () => {
     const text = Object.fromEntries(tabletNamesText());
     expect(Object.keys(text).sort()).toEqual([
       "air",
@@ -217,31 +217,46 @@ describe("the real public search catalogue", () => {
     expect(text.union).toBe(
       "Lines: Exarp Hcoma Nanta Bitom. First column: Ehnb.",
     );
-    const page = catalogue.documents.find(
-      (each) => each.path === "/enochian/tablets",
-    )!;
+    const documentAt = (path: string) =>
+      catalogue.documents.find((each) => each.path === path)!;
+    // Each page its own document: its lede and note, then its names.
+    for (const [id, names] of tabletNamesText()) {
+      const page = documentAt(`/enochian/tablets/${id}`);
+      expect(
+        page.sections.map((section) => section.id.replace(/:\d+$/, "")),
+        id,
+      ).toEqual(["tablet", "names"]);
+      expect(page.sections[1]).toMatchObject({
+        title: "Names on the tablet",
+        text: names,
+        href: `/enochian/tablets/${id}#names`,
+      });
+    }
+    expect(documentAt("/enochian/tablets/earth").sections[0]?.text).toMatch(
+      /^The Earth tablet is one of the four Watchtowers of Enochian magic\. Its three holy names are Mor, Dial and Hctga, and its King is Iczhihal\. The Watchtower of the North, Earth,/,
+    );
+    expect(documentAt("/enochian/tablets/union").sections[0]?.text).toMatch(
+      /^The Tablet of Union joins the four Watchtowers of Enochian magic\. Its four lines are Exarp, Hcoma, Nanta and Bitom\./,
+    );
+    expect(documentAt("/enochian/tablets/fire").aliases).toEqual(
+      expect.arrayContaining(["Fire Watchtower", "Watchtower of the South"]),
+    );
+    // The hub files the tool's prose, no longer the tablets' names.
+    const hub = documentAt("/enochian/tablets");
     expect(
-      page.sections
-        .filter((section) => section.id.startsWith("names-"))
-        .map((section) => section.title),
-    ).toEqual([
-      ...tabletNamesText().map(([id]) =>
-        id === "union"
-          ? "The Tablet of Union's names"
-          : `The ${id[0]?.toUpperCase()}${id.slice(1)} tablet's names`,
-      ),
-    ]);
-    for (const name of [
-      "Laidrom",
-      "Bataivah",
-      "Boza",
-      "Edlprnaa",
-      "Nboza",
-      "Exarp",
+      hub.sections.some((section) => section.text.includes("Laidrom")),
+    ).toBe(false);
+    for (const [name, id] of [
+      ["Laidrom", "earth"],
+      ["Bataivah", "air"],
+      ["Boza", "earth"],
+      ["Edlprnaa", "fire"],
+      ["Nboza", "earth"],
+      ["Exarp", "union"],
     ])
       expect(
         engine.search(name).map((result) => result.path),
         name,
-      ).toContain("/enochian/tablets");
+      ).toContain(`/enochian/tablets/${id}`);
   });
 });
