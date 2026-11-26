@@ -87,7 +87,12 @@ export interface EnochianTabletProps extends ImageDimensions {
   version?: (typeof TABLET_IMAGE_VERSIONS)[number];
 }
 
-/** The grid letters are transliterations; the Enochian font maps them to glyphs. */
+/**
+ * The grid letters are transliterations; the Enochian font maps them to
+ * glyphs. Not indexed: each tablet's page publishes its Golden Dawn
+ * drawing as static files, the copies to index (plan 100), and the other
+ * versions differ from it in a few squares at most.
+ */
 export const enochianTablet: ComponentImageContract<EnochianTabletProps> = {
   slug: "enochian-tablet",
   viewBox: TABLET_VIEWBOX,
@@ -96,6 +101,7 @@ export const enochianTablet: ComponentImageContract<EnochianTabletProps> = {
   rasterDefaultOf: (props) => TABLET_RASTER_DEFAULTS[props.id],
   keys: ["id", "font", "version"],
   personal: false,
+  indexed: false,
   parse(searchParams) {
     const id = choice(searchParams.get("id") || "earth", TABLET_IDS);
     return {

@@ -168,6 +168,28 @@ describe("component image responses", () => {
     expect(tree.headers.get("x-robots-tag")).toBeNull();
   });
 
+  it("keeps the tablets' route copies out of the index, every version's", async () => {
+    // Their canonical copies are the static files under each tablet's page
+    // (plan 100); the tool's links and downloads still work.
+    for (const url of [
+      "enochian-tablet?id=fire",
+      "enochian-tablet?id=air&version=dee",
+      "enochian-tablet-pyramids?fmt=png&id=union&symbols=outward",
+    ]) {
+      const [slug, query] = url.split("?") as [string, string];
+      const response = await componentImageResponse(
+        slug,
+        new Request(`https://magick.ly/api/render/${url}`),
+      );
+      expect(response.status, url).toBe(200);
+      expect(response.headers.get("x-robots-tag"), url).toBe("noindex");
+      expect(mocks.render).toHaveBeenLastCalledWith(
+        slug,
+        new URLSearchParams(query),
+      );
+    }
+  });
+
   it("gives the attachment URL the inline URL's ETag, bytes and 304", async () => {
     const inline = await componentImageResponse(
       "tree-of-life",

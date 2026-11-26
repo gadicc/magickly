@@ -45,14 +45,10 @@ import { PLATE_X, PlateXCitation } from "@/drawings/sigilSources";
 import ExportControls from "@/export/ExportControls";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
 import OpenSource from "@/OpenSource";
-import { componentImageFilename } from "@/render/componentImageUrl";
 import { TABLET_IDS } from "@/render/contracts/enochianTablet";
-import {
-  isTabletPyramidImageVersion,
-  tabletPyramidsSuffix,
-} from "@/render/contracts/enochianTabletPyramids";
 import useEnochianFont, { EnochianFont } from "../useEnochianFont";
 import type { TabletNameLinks } from "./dictionaryLinks";
+import { tabletExportLink } from "./exportLink";
 import NamesPanel, { namesToChoose } from "./NamesPanel";
 import PyramidKey from "./PyramidKey";
 import { Sources, versionTitle } from "./Sources";
@@ -616,32 +612,13 @@ export default function Tablets({
   const layout = React.useRef<HTMLDivElement>(null);
   useLayoutWidth(layout);
   const font = enochianFont ? ("enochian" as const) : ("latin" as const);
-  const flatLink = {
-    slug: "enochian-tablet" as const,
-    props: { id, font, version },
-  };
-  // Pyramids have an image of their own (plan 095, decision 5), in the
-  // versions that have them, which are the only ones they are drawn in.
-  // A version drawn with pyramids that the image does not take (none
-  // today: a test holds the image's versions to magick-data's) has its
-  // link withheld below, never the flat image's in its place; its
-  // downloads are named as the image would be.
-  const pyramidsUnlinked = pyramids && !isTabletPyramidImageVersion(version);
-  const link =
-    pyramids && isTabletPyramidImageVersion(version)
-      ? {
-          slug: "enochian-tablet-pyramids" as const,
-          props: {
-            id,
-            font,
-            version,
-            symbols: pyramidSymbols ?? ("none" as const),
-          },
-        }
-      : flatLink;
-  const imageName = pyramidsUnlinked
-    ? `${componentImageFilename(flatLink)}${tabletPyramidsSuffix(pyramidSymbols ?? "none")}`
-    : componentImageFilename(link);
+  const { link, imageName, pyramidsUnlinked } = tabletExportLink({
+    id,
+    font,
+    version,
+    pyramids,
+    symbols: pyramidSymbols,
+  });
   const marked = React.useMemo(() => differingSquares(id), [id]);
   const names = view ? tabletNames(view) : [];
   const tradition = TABLET_NAME_TRADITIONS[version];

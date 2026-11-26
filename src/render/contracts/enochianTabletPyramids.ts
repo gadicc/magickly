@@ -87,7 +87,9 @@ export const tabletPyramidsSuffix = (symbols: TabletPyramidSymbols) =>
  *
  * Every key is omitted at its default, so `symbols`, which came later
  * and whose default draws what was drawn before it, left every existing
- * query, and so every existing image, as it was.
+ * query, and so every existing image, as it was. Not indexed: each
+ * tablet's page publishes its pyramids with their symbols as static
+ * files, the copies to index (plan 100).
  */
 export const enochianTabletPyramids: ComponentImageContract<EnochianTabletPyramidsProps> =
   {
@@ -98,6 +100,7 @@ export const enochianTabletPyramids: ComponentImageContract<EnochianTabletPyrami
     rasterDefaultOf: (props) => TABLET_RASTER_DEFAULTS[props.id],
     keys: ["id", "font", "version", "symbols"],
     personal: false,
+    indexed: false,
     parse(searchParams) {
       const id = choice(searchParams.get("id") || "earth", TABLET_IDS);
       return {

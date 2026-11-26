@@ -479,6 +479,14 @@ describe("component image contracts", () => {
     ).toBe("enochian-union-tablet-equinox-glyphs");
   });
 
+  it("keeps the tablets' route copies out of the index (plan 100)", () => {
+    // Each tablet's page publishes its drawings as static files.
+    expect(CONTRACTS["enochian-tablet"].indexed).toBe(false);
+    expect(CONTRACTS["enochian-tablet-pyramids"].indexed).toBe(false);
+    expect(CONTRACTS["enochian-tablet"].personal).toBe(false);
+    expect(CONTRACTS["enochian-tablet-pyramids"].personal).toBe(false);
+  });
+
   it("offers the tablets' versions, the Golden Dawn's by default", () => {
     expect([...TABLET_IMAGE_VERSIONS]).toEqual([...TABLET_VERSIONS]);
     expect(parse("enochian-tablet", "").version).toBe("gd");
