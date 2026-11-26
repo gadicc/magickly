@@ -6,7 +6,11 @@ the square's detail, the mock-up and the whole tablet drawn as
 pyramids, released as magick-components 0.8.0 on magick-data 0.5.0;
 stage 5, the image route (`enochian-tablet-pyramids`), on 24 November
 2026, and the follow-up "Symbols on the sides" the same day, released
-as magick-components 0.9.0. The other follow-ups remain. Drafted
+as magick-components 0.9.0. On 26 November 2026 the symbols' facing
+was corrected: "outward" had turned each symbol's head to the outer
+edge, where Regardie's drawings stand it on its feet there (see
+[Symbols on the sides](#follow-ups-not-in-this-plan)), released as
+magick-components 0.9.1. The other follow-ups remain. Drafted
 23 November 2026, before any code; Gadi answered its first open
 questions the same day; amended the same day after a Fable 5.2 review
 (see [Review](#review-23-november-2026)), which reversed one answer and
@@ -62,7 +66,9 @@ and by the review; the facts below are ours, nothing is quoted.
   domain. The rules in words by side (upper, lower, left, right), without
   the Kerubic squares' left and right sides, gods or sphinxes; and the
   plates, which draw every square's four sides with their symbols and the
-  Calvary crosses' Sephirah numbers. Not mirrored in `public/sources/`
+  Calvary crosses' Sephirah numbers. The plates draw every symbol
+  upright on the page, the side triangles' too, and the text gives no
+  rule for which way they face (added 26 November 2026). Not mirrored in `public/sources/`
   until the plates' draughtsman is established (`src/sources/works.ts`
   holds Plate X back for the same reason).
 - **Regardie, vol. 1 (1937)**, the Ten Squares badge of the 27th Path,
@@ -86,6 +92,7 @@ and by the review; the facts below are ours, nothing is quoted.
 | A whole lesser angle worked: the Earth angle of the Water tablet (diagram) | 290 | n282 | Plate V |
 | The Tablet of Union: the Aces in the first column, then Prince, Queen, Princess and King, each line its suit (table); its sides | 290, 296 | n282, n288 | p.238; Plate VIII |
 | The triangles numbered (1 left, 2 top, 3 right, 4 bottom); each region's rule; colours (Fire red, Water blue, Air yellow, Earth black, Spirit white; a planet by the element it rules: Sun and Jupiter Fire, Saturn and Mercury Air, Venus and the Moon Earth, Mars Water); the alternative in the signs' and planets' own colours; symbols painted in the side's complementary colour | 293–296 | n285–n288 | pp.237–238 (sides only, no colours) |
+| Which way the symbols face (added 26 November 2026): vol. 4's drawings stand each symbol on its side's outer edge, its head toward the flat top, so that the top side's symbol is upside down on the page (that a face is to be read from outside the pyramid is our reading; no source states it): p.294, the three ORO pyramids of the Air tablet ("5/6/7 Swords" with their baselines on the outer edge; Venus and Mercury on the right side with their crosses toward it); p.296, the two worked squares (Lovers and Chariot upside down on the top side; the element triangles, read with up toward the centre, give the elements p.295's rules assign; a geomantic figure read from the centre outward gives Albus, the other way Rubeus). p.295 has no drawing and no rule for the facing, only the sides' attributions and the complementary colours | 294, 296 | n286, n288 | Plates IV–VIII draw every symbol upright on the page; pp.236–238 give no rule |
 | The table of attributions by Hebrew letter: column and rank letters, trump, symbol and geomantic figure, including the four elements' figures (Air Fortuna Minor, Water Via, Fire Cauda Draconis, Earth as Saturn Caput Draconis) and the six Calvary planets | 298 | n290 | — |
 | Worked squares: ORO on Air's row 7; Earth of Earth, column and rank Vau; Water tablet, Air angle, column He, rank Yod; the A of EXARP, the H of MPH, the O of OMEBB, the M of AISMT, the R of BRAP | 294, 296–297, 301–303 | n286, n288–n289, n293–n295 | — |
 | The sphinx and the god of a square, the god "especially" for the 16 servient squares; which side gives the sphinx's head, body and limbs; which Kerubs are winged; the tendency | 310–312 | n302–n304 | — |
@@ -212,7 +219,10 @@ identity risk, so it ships first.
   colour (p.295, the p.296 squares, which also show a white top), and in
   words for screen readers; the rule it follows, cited; and on a servient
   square its angel and great angel, its god (with the Coptic name and the
-  Neophyte station) and its sphinx.
+  Neophyte station) and its sphinx. [Corrected 26 November 2026: the
+  colours are p.295; the facing is Regardie's drawings on pp.294 and
+  296, each symbol on its side's outer edge; see the follow-up "Symbols
+  on the sides".]
 - **The sphinx is shown as the source gives it.** Side 2 gives the head
   and neck, sides 1 and 3 together the body and forelimbs, side 4 the
   lower limbs and tail (p.311); the Eagle and the Man are winged. The
@@ -342,7 +352,9 @@ Settled after the review: the Calvary bar, per version (decision 2).
    (`pyramidWords.ts`, whole Lingui messages with Hebrew). Gadi chose, on
    seeing it, the symbols upright by default with a switch to face them
    outward as the Order painted them (page state, kept across squares and
-   tabs). Each symbol has an outline so it reads at 3:1 or better against
+   tabs). [Corrected 26 November 2026: "outward" then turned each head to
+   the outer edge; Regardie's drawings (vol. 4) stand each symbol's feet there.
+   See the follow-up "Symbols on the sides".] Each symbol has an outline so it reads at 3:1 or better against
    its side (the complementary colours alone are 1.2–1.4:1 on Water and
    Fire). Which symbol a side shows when it carries several (the sign,
    else the Sephirah's number, else the planet, else the Hebrew letter; a
@@ -659,7 +671,11 @@ table and by rule), and read the Equinox's plates and vol. 1's badge.
   Spirit's wheel. Gadi chose **the top at a third, the symbols facing
   out from the top by default**, as the Order painted them (vol. 4,
   p.295) and as the 3D view (stretch goal above) will want them, **with
-  a toggle to turn them upright**. Asked then whether the Squares
+  a toggle to turn them upright**. [Corrected 26 November 2026: p.295
+  gives the colours, not the facing; Regardie's drawings (vol. 4, pp.294
+  and 296) stand each symbol on its side's outer edge, head toward the
+  top, which is what a face of the 3D view will want; the build below
+  drew the opposite. See the correction at the end of this item.] Asked then whether the Squares
   tab's large pyramid, upright by default, should face out by default
   too, so that both drawings start alike, Gadi chose to face it out
   (24 November 2026; see below).
@@ -677,7 +693,8 @@ table and by rule), and read the Equinox's plates and vol. 1's badge.
   `pyramidSymbols` (`"outward" | "upright"`, with `pyramids` only):
   each mark in the middle of its band, its box scaled to 78% of the
   band's depth, turned −90°, 0°, 90° and 180° on sides 1 to 4 unless
-  upright, drawn after the sides and before the tops, borders, tints
+  upright [which put each head on the outer edge; corrected to 90°,
+  180°, −90° and 0° on 26 November 2026, below], drawn after the sides and before the tops, borders, tints
   and letters, on a top a third of the square by default
   (`PYRAMID_TOP_SYMBOLS`, exported; `pyramidTop` still overrides). The
   entry passes the marks in as it passes the rules, so the halls' art
@@ -723,6 +740,79 @@ table and by rule), and read the Equinox's plates and vol. 1's badge.
   two do not move each other. `PyramidDrawing` takes `upright` for
   `outward`; its digest of every square, both ways, is unchanged. The
   page's text says both drawings face out unless stood upright.
+  **Correction: the symbols stand on their bases (26 November 2026,
+  Gadi approved the fix).** What was wrong: "outward" turned each
+  symbol with its head on the side's outer edge (`rotate(-90)` turns an
+  upright glyph's top to the left, side 1's outer edge, in SVG's y-down
+  frame), the comment beside the turns described the opposite, and the
+  page cited the facing to p.295, which gives the colours and no rule
+  for the facing. The evidence: Regardie's drawings stand each symbol
+  with its feet on the outer edge and its head toward the flat top, and
+  on the page the top side's symbol is upside down (we take a face to be
+  read from outside the pyramid; no source states that as a rule): p.296 (leaf n288), the two worked
+  squares, Lovers and Chariot upside down on the top side, the element
+  triangles read with up toward the centre giving exactly the elements
+  p.295's rules assign, and a geomantic figure read from the centre
+  outward giving Albus (the other way, Rubeus); p.294 (leaf n286), the
+  three ORO pyramids of the Air tablet, "5/6/7 Swords" with their
+  baselines on the outer (left) edge and Venus and Mercury on the right
+  side lying with their crosses toward the outer edge. The Equinox
+  I(7)'s Plates IV–VIII (leaves n242–n246) draw every symbol upright on
+  the page, even on the side triangles, and its text (pp.236–238,
+  leaves n248–n250) gives no rule. Which way the Order itself painted
+  them, these two witnesses do not settle; a manuscript or a surviving
+  painted pyramid would. Who read what: a research agent (Opus 5.5, a
+  general-purpose subagent) read vol. 4 pp.293, 294, 295 and 296 and the
+  Equinox's Plates IV, the Water plate (n243) and VIII and pp.236–238;
+  it was told both hypotheses and the earlier reading note, so its
+  reading was not blind. The orchestrator (Opus 5.5) looked at the
+  p.296 crop (both worked squares: Lovers upside down on the top side)
+  and at the fixed drawings in a browser. No owner reading yet. What changed: one table
+  of turns, `PYRAMID_SYMBOL_TURNS` (90°, 180°, −90°, 0° on sides 1 to
+  4), defined in its own module, `pyramidSymbolTurns.ts`, which loads no
+  data so the halls' art can share it, and exported from
+  `enochian/pyramidMarks`; `tabletSvg.tsx` and the Squares tab's
+  `PyramidDrawing.tsx` both read it, so no second copy remains, and a
+  later 3D view lifts the same turns onto its faces. The prop keeps its
+  name, `pyramidSymbols="outward" | "upright"`: `outward` now means feet
+  on the outer edge, as Regardie's drawings have them (read, as we take
+  it, from outside the pyramid), and `upright` is how the Equinox's
+  plates draw them. The page says so, citing pp.294 and
+  296 for the facing, p.295 for the colours, and the Equinox's Plate IV
+  (`<Cite work="equinoxI7" leaf={242}>`, an outside link); the Squares
+  tab's detail gives the colours (p.295) and the facing (pp.294, 296,
+  Plate IV) as two notes, in English and Hebrew. Tests: the turns'
+  head direction, (0, −1) turned by each, points from every outward
+  mark toward its square's centre, on the whole tablet and the large
+  pyramid. The new pins, each checked to move by the turns alone (the
+  outward markup with its turns mapped back gives the old digests
+  exactly): `PyramidDrawing.test.tsx`'s one digest split in two, upright
+  `bb3e7bd1…` (unchanged, as before the fix) and outward `8dbb30c5…`
+  (was part of `82c4348b…`); the image route's profile bumped to
+  `magickli-tablet-pyramids-image-v3`, its Fire outward bytes
+  `cb730849…` (1,020,768 bytes, the same count as v2's, since only the
+  turns' signs and digits swapped), its other four byte pins, its
+  15-drawing digest (`c9e913c0…`) and a new upright-only digest
+  (`c6b2cce3…`) all v2's, and the 30-drawing symbols digest
+  `a22a0188…`; the Fire image was reviewed as rasterised. Built in
+  `01844766`, released as magick-components 0.9.1, a fix (`cfe3d726`).
+  Its embeddings were republished with it (8 records, 1,813 tokens,
+  estimated $0.0238), and again after a review's rewording, which says
+  whose drawings these are and labels the outside reading as ours (6
+  records, 1,273 tokens, estimated $0.0227). The README's Provenance row
+  for the symbols keeps its sign-off date, 2026-11-24, since the column
+  takes only a date and an empty one would hold the release; its Source
+  cell says the correction awaits the owner's sign-off. Checked in the
+  browser on 26 November by the orchestrator, on the branch's dev
+  server at 375 px light, 768 px dark and 1,440 px dark: Fire and Earth
+  with pyramids and symbols; the Squares tab's row 1, square 1 (the
+  top Fire triangle with its apex toward the centre, the bottom Air
+  triangle upright, the left Air triangle's apex toward the centre);
+  the two notes with their citations (colours p.295; facing p.294,
+  p.296, Plate IV); no sideways scroll (scrollWidth within the
+  viewport). The tablets page has no Hebrew edition
+  (`/he/enochian/tablets` is 404), so there was no Hebrew page to
+  check.
 - **The top's size as a choice.** Gadi asked whether readers should
   pick it, perhaps among advanced options. Recommended on 23 November
   2026, and held there: no picker yet. The page has seven controls with

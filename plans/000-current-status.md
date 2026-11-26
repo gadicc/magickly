@@ -288,13 +288,19 @@ Follow-ups are separate from the completed migration work:
   (`enochian-tablet-pyramids`), linked from the page and the component
   explorer, the flat tablets' images unmoved. On 24 November:
   *Symbols on the sides* draws each side's
-  symbol on the whole tablet, facing out from a top a third of the
-  square, with a switch to stand them upright, in the URL, the
+  symbol on the whole tablet, outward (on its side's outer edge, as
+  corrected below) round a top a third of the square, with a switch to stand them upright, in the URL, the
   downloads and the image (`symbols` on the same slug and profile),
   released as magick-components 0.9.0 (`Tablet`'s `pyramidSymbols`,
-  `enochian/pyramidMarks`). TODO: whether the Squares tab's large
-  pyramid faces its symbols out by default too (Gadi); the follow-ups (the
-  tablets in image search, the tablet in 3D).
+  `enochian/pyramidMarks`). The Squares tab's large pyramid starts
+  outward too (Gadi, 24 November). TODO: the follow-ups (the tablets in
+  image search, the tablet in 3D).
+  Corrected 26 November 2026: "outward" now stands each symbol on its
+  side's outer edge, head toward the top, as Regardie's drawings (vol.
+  4, pp.294 and 296) have them, where it had turned each head outward;
+  which way the Order itself painted them is not settled;
+  the page cites p.295 for the colours only and the Equinox's plates for
+  the upright option; image profile v3, magick-components 0.9.1.
 - The export controls ([plan 097](097-export-controls.md)), 23 November
   2026, on `gate/export-controls`: one row per format under every
   drawing (SVG and PNG, each with Save, Copy and Link), image links
