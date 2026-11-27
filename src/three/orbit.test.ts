@@ -28,13 +28,17 @@ function setUp(aspect = 2) {
   return { element, camera, changed, clicked, controls };
 }
 
+/**
+ * A pointer event; a release is followed by the click a browser fires
+ * after it, unless `click` is false, as after a tap that stops a scroll.
+ */
 const pointer = (
   element: Element,
   type: string,
   x: number,
   y: number,
-  { pointerType = "mouse", pointerId = 1, button = 0 } = {},
-) =>
+  { pointerType = "mouse", pointerId = 1, button = 0, click = true } = {},
+) => {
   element.dispatchEvent(
     new PointerEvent(type, {
       clientX: x,
@@ -45,6 +49,11 @@ const pointer = (
       bubbles: true,
     }),
   );
+  if (type === "pointerup" && click)
+    element.dispatchEvent(
+      new MouseEvent("click", { clientX: x, clientY: y, bubbles: true }),
+    );
+};
 
 const wheel = (element: Element, init: WheelEventInit) => {
   const event = new WheelEvent("wheel", { cancelable: true, ...init });
@@ -105,6 +114,17 @@ describe("orbit (plan 101)", () => {
     pointer(element, "pointerup", 20, 90, { pointerType: "touch" });
     expect(clicked).toHaveBeenCalledTimes(2);
     expect(changed).not.toHaveBeenCalled();
+    // A tap that stops a momentum scroll: the browser fires no click.
+    pointer(element, "pointerdown", 20, 30, { pointerType: "touch" });
+    pointer(element, "pointerup", 20, 30, {
+      pointerType: "touch",
+      click: false,
+    });
+    expect(clicked).toHaveBeenCalledTimes(2);
+    // The next tap starts afresh.
+    pointer(element, "pointerdown", 20, 30, { pointerType: "touch" });
+    pointer(element, "pointerup", 20, 30, { pointerType: "touch" });
+    expect(clicked).toHaveBeenCalledTimes(3);
   });
 
   it("tells a click from a drag by a threshold", () => {
@@ -115,6 +135,17 @@ describe("orbit (plan 101)", () => {
     expect(controls.view).toEqual(HOME);
     expect(changed).not.toHaveBeenCalled();
     expect(clicked).toHaveBeenCalledWith(50 + DRAG_THRESHOLD - 1, 50);
+  });
+
+  it("takes no release past the threshold for a click, moves or none", () => {
+    const { element, clicked } = setUp();
+    pointer(element, "pointerdown", 50, 50);
+    pointer(element, "pointerup", 50 + DRAG_THRESHOLD, 50);
+    pointer(element, "pointerdown", 50, 50, { pointerType: "touch" });
+    pointer(element, "pointerup", 50, 50 + DRAG_THRESHOLD, {
+      pointerType: "touch",
+    });
+    expect(clicked).not.toHaveBeenCalled();
   });
 
   it("turns about the point by a drag, one move a frame", () => {

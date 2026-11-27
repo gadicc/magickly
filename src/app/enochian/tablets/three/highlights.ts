@@ -3,25 +3,33 @@
  * flat drawing outlines, rings or veils, as a tint over each pyramid, and
  * which squares a click may choose. No three.js here.
  */
-import type {
-  TabletHighlights,
-  TabletSquare,
+import {
+  HIGHLIGHT_INK,
+  HIGHLIGHT_OUTLINE,
+  HIGHLIGHT_RING,
+  type TabletHighlights,
+  type TabletSquare,
 } from "magick-components/enochian/Tablet";
 import { srgbToLinear, type Tablet3DModel } from "./model";
 
-const tint = (hex: string, amount: number) => [...srgbToLinear(hex), amount];
+/** A colour (`#rgb` or `#rrggbb`) and how much of it is mixed over. */
+const tint = (hex: string, amount: number) => [
+  ...srgbToLinear(hex.replace(/^#(.)(.)(.)$/, "#$1$1$2$2$3$3")),
+  amount,
+];
 
 /**
  * Each highlight as a colour mixed over a pyramid, and how much: the flat
- * drawing's colours (`tabletSvg.tsx`), the outlined squares' violet, the
- * selected one's stronger, a previewed name's ring, a chosen name's dark
- * violet, and its white veil over every other square.
+ * drawing's colours, the outlined squares' violet, the selected one's
+ * ring stronger, a previewed name's ring, a chosen name's dark violet,
+ * and its white veil over every other square. The amounts are tuned by
+ * eye in stage 6 (plan 101).
  */
 export const TINTS = {
-  selected: tint("#cc00ff", 0.5),
-  preview: tint("#cc00ff", 0.3),
-  squares: tint("#ee00ff", 0.25),
-  name: tint("#4a0072", 0.15),
+  selected: tint(HIGHLIGHT_RING, 0.5),
+  preview: tint(HIGHLIGHT_RING, 0.3),
+  squares: tint(HIGHLIGHT_OUTLINE, 0.25),
+  name: tint(HIGHLIGHT_INK, 0.15),
   dimmed: tint("#ffffff", 0.72),
   none: [0, 0, 0, 0],
 } as const;

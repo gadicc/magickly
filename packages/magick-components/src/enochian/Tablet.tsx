@@ -11,6 +11,9 @@ import {
 import { type TabletProps, TabletSvg, tabletName } from "./tabletSvg.tsx";
 
 export {
+  HIGHLIGHT_INK,
+  HIGHLIGHT_OUTLINE,
+  HIGHLIGHT_RING,
   PYRAMID_COLOURS,
   PYRAMID_TOP,
   PYRAMID_TOP_SYMBOLS,

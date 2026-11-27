@@ -263,9 +263,11 @@ export function regionFromPosition(
 }
 
 /** The highlights' ink: a chosen name's outline, flag and numbers. */
-const HIGHLIGHT_INK = "#4a0072";
-/** A previewed name's ring. */
-const HIGHLIGHT_RING = "#c0f";
+export const HIGHLIGHT_INK = "#4a0072";
+/** A previewed name's ring, and the selected square's outline. */
+export const HIGHLIGHT_RING = "#c0f";
+/** The outlined squares' outline. */
+export const HIGHLIGHT_OUTLINE = "#e0f";
 /** The regions' tints, under the letters on the crosses' white squares. */
 export const REGION_TINTS = Object.freeze({
   greatCross: { fill: "#ffd54a", opacity: 0.55 },
@@ -747,7 +749,7 @@ function OutlinedSquares({
         height={SQUARE - 2}
         style={{
           fill: "transparent",
-          stroke: chosen ? "#c0f" : "#e0f",
+          stroke: chosen ? HIGHLIGHT_RING : HIGHLIGHT_OUTLINE,
           strokeWidth: chosen ? 3 : 1.6,
           strokeDasharray: chosen ? undefined : "3 2",
         }}

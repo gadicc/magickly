@@ -8,8 +8,9 @@ import {
   waitFor,
 } from "@testing-library/react";
 import enochianTablets, { tabletVersion } from "magick-data/enochian/tablets";
-import type { PerspectiveCamera, Scene } from "three";
+import { type PerspectiveCamera, type Scene, Vector3 } from "three";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { PYRAMID_HEIGHT } from "./pyramidGeometry";
 import Tablet3D from "./Tablet3D";
 
 // A viewer without a GPU where a test asks for one; jsdom has no WebGL, so
@@ -57,11 +58,35 @@ vi.mock("./tabletObject", async (original) => ({
   },
 }));
 
-const view = (tablet: "fire" | "earth") => {
+const view = (tablet: "fire" | "earth" | "union") => {
   const each = tabletVersion(enochianTablets[tablet], "gd");
   if (!each) throw new Error(`no ${tablet} tablet`);
   return each;
 };
+
+/** A point in the scene where it lands in a 200 px box, as a client point. */
+const onScreen = (point: Vector3) => {
+  const at = point.project(stub.camera as PerspectiveCamera);
+  return { x: ((at.x + 1) / 2) * 200, y: ((1 - at.y) / 2) * 200 };
+};
+
+/** A mouse's press, release and click at a client point in the box. */
+function clickAt(box: HTMLElement, { x, y }: { x: number; y: number }) {
+  const canvas = box.querySelector("canvas") as HTMLCanvasElement;
+  const at = { pointerType: "mouse", pointerId: 1, button: 0, bubbles: true };
+  fireEvent(
+    canvas,
+    new PointerEvent("pointerdown", { ...at, clientX: x, clientY: y }),
+  );
+  fireEvent(
+    canvas,
+    new PointerEvent("pointerup", { ...at, clientX: x, clientY: y }),
+  );
+  fireEvent(
+    canvas,
+    new MouseEvent("click", { bubbles: true, clientX: x, clientY: y }),
+  );
+}
 
 afterEach(() => {
   cleanup();
@@ -106,39 +131,31 @@ describe("the 3D view (plan 101)", () => {
     const box = screen.getByRole("group");
     box.getBoundingClientRect = () =>
       ({ left: 0, top: 0, width: 200, height: 200 }) as DOMRect;
-    const canvas = box.querySelector("canvas") as HTMLCanvasElement;
-    const click = () => {
-      const at = {
-        pointerType: "mouse",
-        pointerId: 1,
-        button: 0,
-        bubbles: true,
-      };
-      fireEvent(
-        canvas,
-        new PointerEvent("pointerdown", { ...at, clientX: 100, clientY: 100 }),
-      );
-      fireEvent(
-        canvas,
-        new PointerEvent("pointerup", { ...at, clientX: 100, clientY: 100 }),
-      );
-    };
+    // Straight above the middle of a square's top.
+    const over = ({ row, column }: { row: number; column: number }) =>
+      onScreen(new Vector3(column + 0.5 - 6, PYRAMID_HEIGHT, row + 0.5 - 6.5));
     // The Differences tab's way: an unoutlined square is not chosen.
-    click();
+    clickAt(box, over({ row: 6, column: 6 }));
     expect(onSelect).not.toHaveBeenCalled();
-    // The Names tab's: any square is, the one under the middle of the view.
+    // The Names tab's: any square is, the one under the click, near each
+    // corner too, so that a flipped axis would choose the wrong one.
     rerender(
       <Tablet3D
         {...props}
         highlights={{ squares: [], anySquare: true, onSelect }}
       />,
     );
-    click();
-    expect(onSelect).toHaveBeenCalledTimes(1);
-    const [square] = onSelect.mock.calls[0];
-    expect(Object.keys(square).sort()).toEqual(["column", "row"]);
-    expect(Math.abs(square.row - 6.5)).toBeLessThan(1);
-    expect(Math.abs(square.column - 5.5)).toBeLessThan(1);
+    for (const square of [
+      { row: 6, column: 6 },
+      { row: 0, column: 0 },
+      { row: 0, column: 11 },
+      { row: 12, column: 0 },
+      { row: 12, column: 11 },
+    ]) {
+      clickAt(box, over(square));
+      expect(onSelect).toHaveBeenLastCalledWith(square);
+    }
+    const square = { row: 6, column: 6 };
     // Its highlight is a change, and draws; the same again does not.
     stub.invalidate.mockClear();
     rerender(
@@ -155,6 +172,42 @@ describe("the 3D view (plan 101)", () => {
       />,
     );
     expect(stub.invalidate).toHaveBeenCalledTimes(1);
+  });
+
+  it("chooses on the Tablet of Union, its 5 by 4 squares", async () => {
+    stub.on = true;
+    const onSelect = vi.fn();
+    render(
+      <Tablet3D
+        view={view("union")}
+        mirrorReversed
+        label="The Tablet of Union as pyramids, in 3D"
+        unavailable={vi.fn()}
+        highlights={{ squares: [], anySquare: true, onSelect }}
+      />,
+    );
+    await waitFor(() =>
+      expect(screen.queryByText("Loading the 3D view…")).toBeNull(),
+    );
+    const box = screen.getByRole("group");
+    box.getBoundingClientRect = () =>
+      ({ left: 0, top: 0, width: 200, height: 200 }) as DOMRect;
+    for (const square of [
+      { row: 0, column: 4 },
+      { row: 3, column: 0 },
+    ]) {
+      clickAt(
+        box,
+        onScreen(
+          new Vector3(
+            square.column + 0.5 - 2.5,
+            PYRAMID_HEIGHT,
+            square.row + 0.5 - 2,
+          ),
+        ),
+      );
+      expect(onSelect).toHaveBeenLastCalledWith(square);
+    }
   });
 
   it("draws the tablet in one renderer, a focusable view with a name", async () => {

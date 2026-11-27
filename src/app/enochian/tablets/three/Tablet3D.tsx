@@ -181,6 +181,9 @@ export default function Tablet3D({
       gone = true;
       tablet?.object.removeFromParent();
       tablet?.dispose();
+      // Nothing tints or picks a tablet that is gone.
+      if (live.current.tablet === tablet)
+        live.current.tablet = live.current.model = undefined;
     };
   }, [view, mirrorReversed, scene, camera]);
 

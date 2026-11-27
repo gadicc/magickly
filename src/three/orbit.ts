@@ -109,7 +109,9 @@ export function orbit(
   };
 
   // The mouse turns; a touch or a pen only taps, and a pen counts as a
-  // touch, which the page may take for a scroll mid-turn.
+  // touch, which the page may take for a scroll mid-turn. A click is the
+  // browser's own, which it withholds from a tap that stops a scroll,
+  // after a press that moved less than the threshold.
   let press: {
     id: number;
     x: number;
@@ -118,7 +120,9 @@ export function orbit(
     turns: boolean;
   } | null = null;
   let dragging = false;
+  let tapped = false;
   const down = (event: PointerEvent) => {
+    tapped = false;
     if (event.button !== 0) return;
     const turns = event.pointerType === "mouse";
     press = {
@@ -149,8 +153,14 @@ export function orbit(
   };
   const up = (event: PointerEvent) => {
     if (!press || event.pointerId !== press.id) return;
-    if (!dragging) clicked?.(event.clientX, event.clientY);
+    // Measured again: a drag may reach here without a move between.
+    const moved = Math.hypot(event.clientX - press.x, event.clientY - press.y);
+    tapped = !dragging && moved < DRAG_THRESHOLD;
     cancel();
+  };
+  const click = (event: MouseEvent) => {
+    if (tapped) clicked?.(event.clientX, event.clientY);
+    tapped = false;
   };
   function cancel() {
     press = null;
@@ -181,6 +191,7 @@ export function orbit(
     ["pointermove", move as EventListener],
     ["pointerup", up as EventListener],
     ["pointercancel", cancel],
+    ["click", click as EventListener],
     ["wheel", wheel as EventListener, { passive: false }],
     ["gesturestart", gesture],
     ["gesturechange", gesture],
