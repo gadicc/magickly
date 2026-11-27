@@ -65,7 +65,18 @@ export interface FacePaint {
   readonly outline: LinearRgb;
 }
 
-/** One side of a pyramid in 3D: its paint and its mark's cell in the sheet. */
+/**
+ * One side of a pyramid in 3D: its paint and its mark's cell in the sheet.
+ *
+ * Where a side's mark is outlined in its own ink (Earth's white, Spirit's
+ * and a Calvary square's black: `PYRAMID_SYMBOL_INKS`), the outline is
+ * painted in the side's own colour instead. The flat drawing's outline
+ * there is thin and all but invisible; the 3D view's is the Squares tab's
+ * thicker one (`MARK_OUTLINES`), which in the ink's colour would fatten
+ * the mark and fill its gaps (a wheel's spokes, a figure's dots, a
+ * letter's counters). In the side's colour the ink keeps its own edge,
+ * antialiased against the side (Gadi, 27 November 2026).
+ */
 export interface PyramidSide3D extends FacePaint {
   readonly cell: number;
 }
@@ -146,10 +157,12 @@ export function tabletModel(
         const element = (side.elementId ??
           "none") as keyof typeof PYRAMID_COLOURS;
         const inks = inksOf(side);
+        const colour = PYRAMID_COLOURS[element];
+        const own = inks.outline.toLowerCase() === inks.ink.toLowerCase();
         return {
-          colour: srgbToLinear(PYRAMID_COLOURS[element]),
+          colour: srgbToLinear(colour),
           ink: srgbToLinear(inks.ink),
-          outline: srgbToLinear(inks.outline),
+          outline: srgbToLinear(own ? colour : inks.outline),
           cell: cellOf(sheet.marks, markKey(sideSymbol(side))),
         };
       }) as unknown as Pyramid3D["sides"],

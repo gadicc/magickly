@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import {
+  MARK_OUTLINES,
   SideMark,
-  TABLET_MARK_OUTLINES,
 } from "magick-components/enochian/pyramidMarks";
 import Tablet from "magick-components/enochian/Tablet";
 import { createElement } from "react";
@@ -25,7 +25,7 @@ import { MARKS_SHEET, MARKS_SHEET_SVG } from "./marksSheet.generated";
 const INKS = {
   ink: "#ff0000",
   outline: "#00ff00",
-  outlines: TABLET_MARK_OUTLINES,
+  outlines: MARK_OUTLINES,
 };
 
 /** Every subpath of an SVG's paths, moved to start at 0, 0. */

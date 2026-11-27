@@ -1,3 +1,6 @@
+import { inksOf } from "magick-components/enochian/pyramidMarks";
+import { PYRAMID_COLOURS } from "magick-components/enochian/Tablet";
+import { tabletPyramids } from "magick-data/enochian/tabletPyramids";
 import enochianTablets, {
   type TabletView,
   tabletVersion,
@@ -79,6 +82,36 @@ describe("tabletModel", () => {
     };
     const [first] = tabletModel(holed, MARKS_SHEET).pyramids;
     expect(first).toMatchObject({ letter: null, letterCell: -1 });
+  });
+
+  it("outlines a mark in its side's colour where its source outlines it in its own ink", () => {
+    let own = 0;
+    let other = 0;
+    for (const version of ["gd", "regardie", "equinox"])
+      for (const tablet of Object.keys(
+        enochianTablets,
+      ) as (keyof typeof enochianTablets)[]) {
+        const each = view(tablet, version);
+        const sources = tabletPyramids(each);
+        tabletModel(each, MARKS_SHEET).pyramids.forEach((pyramid, index) =>
+          pyramid.sides.forEach((side, at) => {
+            const source = sources[index].sides[at];
+            const { ink, outline } = inksOf(source);
+            const ground =
+              PYRAMID_COLOURS[
+                (source.elementId ?? "none") as keyof typeof PYRAMID_COLOURS
+              ];
+            if (outline === ink) own += 1;
+            else other += 1;
+            expect(side.outline).toEqual(
+              srgbToLinear(outline === ink ? ground : outline),
+            );
+          }),
+        );
+      }
+    // Both kinds are there: Earth's and Spirit's, and the coloured inks'.
+    expect(own).toBeGreaterThan(0);
+    expect(other).toBeGreaterThan(0);
   });
 
   it("fails on a sheet that lacks a mark", () => {

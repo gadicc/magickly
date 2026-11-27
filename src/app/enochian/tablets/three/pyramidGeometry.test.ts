@@ -333,14 +333,16 @@ describe("the 3D tablet's geometry", () => {
             fail(`${key} side ${sideNumber}: normal not out and up`);
           // Its paint, from the sources and as the flat drawing fills it.
           const side = source.sides[face];
+          const { ink, outline } = inksOf(side);
+          const ground =
+            PYRAMID_COLOURS[
+              (side.elementId ?? "none") as keyof typeof PYRAMID_COLOURS
+            ];
           const paint = {
-            colours: srgbToLinear(
-              PYRAMID_COLOURS[
-                (side.elementId ?? "none") as keyof typeof PYRAMID_COLOURS
-              ],
-            ),
-            inks: srgbToLinear(inksOf(side).ink),
-            outlines: srgbToLinear(inksOf(side).outline),
+            colours: srgbToLinear(ground),
+            inks: srgbToLinear(ink),
+            // An outline in the ink's own colour is the side's (model.ts).
+            outlines: srgbToLinear(outline === ink ? ground : outline),
           };
           for (const [name, expected] of Object.entries(paint))
             for (let at = 0; at < 4; at += 1) {

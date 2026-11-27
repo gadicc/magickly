@@ -2,8 +2,10 @@
  * Draws the 3D tablet's mark sheet (plan 101) into
  * `src/app/enochian/tablets/three/marksSheet.generated.ts`: every mark a
  * side of any tablet's pyramids shows, in any version, drawn by `SideMark`
- * at the flat tablet's outline widths, and every top's letter, as the flat
- * drawing sets it. The text is outlined to paths by the image route's
+ * at the Squares tab's outline widths (`MARK_OUTLINES`, thicker than the
+ * flat tablet's, for the larger faces: Gadi's choice from stage 3's
+ * frames, 27 November 2026), and every top's letter, as the flat drawing
+ * sets it. The text is outlined to paths by the image route's
  * `outlineComponentImage` with its pinned fonts, so the browser rasterises
  * the sheet without fonts. `marksSheet.test.ts` fails when the committed
  * module differs from a fresh draw; run `pnpm tablet3d:sheet` after a
@@ -20,10 +22,10 @@ import { writeFileSync } from "node:fs";
 import { registerHooks } from "node:module";
 import { fileURLToPath } from "node:url";
 import {
+  MARK_OUTLINES,
   SideMark,
   type SideSymbol,
   sideSymbol,
-  TABLET_MARK_OUTLINES,
 } from "magick-components/enochian/pyramidMarks";
 import { tabletPyramids } from "magick-data/enochian/tabletPyramids";
 import enochianTablets, {
@@ -122,7 +124,7 @@ export async function drawSheet(): Promise<{ svg: string; sheet: MarksSheet }> {
         symbol,
         ink: INK,
         outline: OUTLINE,
-        outlines: TABLET_MARK_OUTLINES,
+        outlines: MARK_OUTLINES,
       }),
     ),
     // No family, as the flat tablet's image sets its letters: the image
