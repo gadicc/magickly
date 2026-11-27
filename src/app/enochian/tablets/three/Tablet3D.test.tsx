@@ -23,6 +23,8 @@ const stub = vi.hoisted(() => ({
   scene: null as Scene | null,
   camera: null as PerspectiveCamera | null,
   canvas: null as HTMLCanvasElement | null,
+  // When the mark sheet comes: at once, unless a test holds it back.
+  sheet: Promise.resolve() as Promise<unknown>,
   invalidate: vi.fn(),
   dispose: vi.fn(),
 }));
@@ -61,6 +63,7 @@ vi.mock("./tabletObject", async (original) => ({
   ...(await original<typeof import("./tabletObject")>()),
   rasteriseSheet: async () => {
     stub.rasters += 1;
+    await stub.sheet;
     return document.createElement("canvas");
   },
 }));
@@ -100,6 +103,7 @@ afterEach(() => {
   stub.on = false;
   stub.made = 0;
   stub.rasters = 0;
+  stub.sheet = Promise.resolve();
   stub.invalidate.mockClear();
   stub.dispose.mockClear();
   vi.restoreAllMocks();
@@ -300,7 +304,58 @@ describe("the 3D view (plan 101)", () => {
         expect(screen.queryByText("Loading the 3D view…")).toBeNull(),
       );
     };
-    const dialog = () => screen.queryByRole("dialog");
+    const dialog = () => screen.queryByRole("dialog", { name: props.label });
+    /** The history entry a Back or a Forward lands on. */
+    const land = (state: object) =>
+      act(() => {
+        window.history.replaceState(state, "", "/");
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      });
+    /** A touch, on the canvas, from one point to another. */
+    const touch = (
+      canvas: HTMLCanvasElement,
+      from: [number, number],
+      to: [number, number],
+    ) => {
+      const at = {
+        pointerType: "touch",
+        pointerId: 7,
+        button: 0,
+        bubbles: true,
+      };
+      fireEvent(
+        canvas,
+        new PointerEvent("pointerdown", {
+          ...at,
+          clientX: from[0],
+          clientY: from[1],
+        }),
+      );
+      fireEvent(
+        canvas,
+        new PointerEvent("pointermove", {
+          ...at,
+          clientX: to[0],
+          clientY: to[1],
+        }),
+      );
+      fireEvent(
+        canvas,
+        new PointerEvent("pointerup", {
+          ...at,
+          clientX: to[0],
+          clientY: to[1],
+        }),
+      );
+      fireEvent(
+        canvas,
+        new MouseEvent("click", {
+          bubbles: true,
+          clientX: to[0],
+          clientY: to[1],
+        }),
+      );
+    };
     afterEach(() => window.history.replaceState(null, "", "/"));
 
     it("opens with a history entry, takes the canvas, and goes back to close", async () => {
@@ -324,7 +379,10 @@ describe("the 3D view (plan 101)", () => {
       expect(window3d.querySelectorAll("canvas")).toHaveLength(1);
       expect(window3d.querySelector("canvas")).toBe(canvas);
       expect(stub.made).toBe(1);
-      expect(window3d.contains(document.activeElement)).toBe(true);
+      // Focus is on the view itself, so its keys work at once.
+      expect(document.activeElement).toBe(
+        within(window3d).getByRole("group", { name: props.label }),
+      );
       // Its touch turns the tablet there, and the page does not scroll.
       expect((canvas as HTMLCanvasElement).style.touchAction).toBe("none");
       // Close goes back; Back closes it, and the canvas returns.
@@ -351,16 +409,74 @@ describe("the 3D view (plan 101)", () => {
         .mockImplementation(() => {});
       fireEvent.keyDown(dialog() as HTMLElement, { key: "Escape" });
       expect(back).toHaveBeenCalledTimes(1);
-      act(() => {
-        window.history.replaceState({}, "", "/");
-        window.dispatchEvent(new PopStateEvent("popstate"));
-      });
+      land({});
       await waitFor(() => expect(dialog()).toBeNull());
-      act(() => {
-        window.history.replaceState({ tablet3dFull: true }, "", "/");
-        window.dispatchEvent(new PopStateEvent("popstate"));
+      // Focus is back on the button, as Safari would not leave it.
+      expect(document.activeElement).toBe(
+        screen.getByRole("button", { name: "Full window" }),
+      );
+      // Forward: the canvas moves in again, and turns by touch there.
+      land({ tablet3dFull: true });
+      expect(dialog()?.querySelector("canvas")).toBe(stub.canvas);
+      expect(stub.canvas?.style.touchAction).toBe("none");
+    });
+
+    it("goes back once, however often it is closed before Back lands", async () => {
+      stub.on = true;
+      await drawn();
+      fireEvent.click(screen.getByRole("button", { name: "Full window" }));
+      const back = vi
+        .spyOn(window.history, "back")
+        .mockImplementation(() => {});
+      const closeButton = within(dialog() as HTMLElement).getByRole("button", {
+        name: "Close",
       });
-      expect(dialog()).not.toBeNull();
+      fireEvent.click(closeButton);
+      fireEvent.click(closeButton);
+      fireEvent.keyDown(dialog() as HTMLElement, { key: "Escape" });
+      expect(back).toHaveBeenCalledTimes(1);
+      land({});
+      await waitFor(() => expect(dialog()).toBeNull());
+      // Opened again, it closes again.
+      fireEvent.click(screen.getByRole("button", { name: "Full window" }));
+      fireEvent.click(
+        within(dialog() as HTMLElement).getByRole("button", { name: "Close" }),
+      );
+      expect(back).toHaveBeenCalledTimes(2);
+    });
+
+    it("turns by touch in a window opened before the sheet came, and picks nothing", async () => {
+      stub.on = true;
+      let release = () => {};
+      stub.sheet = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      const onSelect = vi.fn();
+      render(
+        <Tablet3D
+          view={view("fire")}
+          {...props}
+          highlights={{ squares: [], anySquare: true, onSelect }}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button", { name: "Full window" }));
+      const window3d = dialog() as HTMLElement;
+      await act(async () => release());
+      await waitFor(() =>
+        expect(screen.queryByText("Loading the 3D view…")).toBeNull(),
+      );
+      const canvas = stub.canvas as HTMLCanvasElement;
+      expect(canvas.parentElement?.closest("[role=dialog]")).toBe(window3d);
+      expect(canvas.style.touchAction).toBe("none");
+      (canvas.parentElement as HTMLElement).getBoundingClientRect = () =>
+        ({ left: 0, top: 0, width: 200, height: 200 }) as DOMRect;
+      const camera = stub.camera as PerspectiveCamera;
+      const from = camera.position.clone();
+      touch(canvas, [50, 100], [150, 100]);
+      expect(camera.position.distanceTo(from)).toBeGreaterThan(0.1);
+      touch(canvas, [100, 100], [100, 100]);
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(window.history.state).toMatchObject({ tablet3dFull: true });
     });
 
     it("lets go of an entry a reload left open", async () => {

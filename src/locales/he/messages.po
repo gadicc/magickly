@@ -2989,8 +2989,8 @@ msgstr "חלון מלא"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/three/Tablet3D.tsx
-msgid "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and Esc leaves the full window."
-msgstr "מקשי החיצים מסובבים את הלוח, + ו־− מקרבים ומרחיקים, 0 מאפס את התצוגה, ו־Esc יוצא מהחלון המלא."
+msgid "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and in the full window Esc leaves it."
+msgstr "מקשי החיצים מסובבים את הלוח, + ו־− מקרבים ומרחיקים, 0 מאפס את התצוגה, ובחלון המלא Esc יוצא ממנו."
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx

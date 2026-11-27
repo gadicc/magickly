@@ -168,13 +168,16 @@ export default function Tablet3D({
         Object.assign(live.current, { tablet, model });
         scene.add(tablet.object);
         if (live.current.orbit) live.current.orbit.fit(tablet.bounds);
-        else
+        else {
           live.current.orbit = orbit(element, camera, {
             home: HOME_VIEW,
             bounds: tablet.bounds,
             changed: viewer.invalidate,
             clicked: (x, y) => clickedRef.current(x, y),
           });
+          // The window may have opened before the sheet came.
+          live.current.orbit.setFull(fullRef.current);
+        }
         viewer.invalidate();
         setDrawn(true);
       },
@@ -207,31 +210,52 @@ export default function Tablet3D({
   // closes it, merged with the page's own state (`tabletsTab`); Close and
   // Esc go back. The canvas moves into it and back: one context.
   const [full, setFull] = React.useState(false);
+  const fullRef = React.useRef(false);
+  const closing = React.useRef(false);
+  const fullButton = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
     const isFull = () => Boolean(window.history.state?.[FULL]);
-    // A reload keeps an open window's entry, but not the window.
-    if (isFull())
+    // An entry left open by a reload, or by the view closing under it,
+    // is neutralised rather than navigated away from.
+    const neutralise = () =>
+      isFull() &&
       window.history.replaceState(
         { ...window.history.state, [FULL]: false },
         "",
       );
-    const popped = () => setFull(isFull());
+    neutralise();
+    const popped = () => {
+      closing.current = false;
+      setFull(isFull());
+    };
     window.addEventListener("popstate", popped);
-    return () => window.removeEventListener("popstate", popped);
+    return () => {
+      window.removeEventListener("popstate", popped);
+      neutralise();
+    };
   }, []);
   const open = () => {
     window.history.pushState({ ...window.history.state, [FULL]: true }, "");
     setFull(true);
   };
-  const close = () => window.history.back();
+  // Back once, however often Close or Esc is pressed before it lands.
+  const close = () => {
+    if (!window.history.state?.[FULL]) setFull(false);
+    else if (!closing.current) {
+      closing.current = true;
+      window.history.back();
+    }
+  };
   const fullBox = React.useCallback((node: HTMLDivElement | null) => {
+    fullRef.current = Boolean(node);
     const { viewer, orbit: controls } = live.current;
     const into = node ?? box.current;
     if (!viewer || !into) return;
     viewer.moveTo(into);
     controls?.setFull(Boolean(node));
-    // Into the window, so that its keys work at once.
-    node?.focus();
+    // Into the window, so that its keys work at once, and back to its
+    // button, which Safari does not focus when it is clicked.
+    (node ?? fullButton.current)?.focus();
   }, []);
   const keyed = (event: React.KeyboardEvent) => {
     if (live.current.orbit?.key(event.nativeEvent)) event.preventDefault();
@@ -269,10 +293,15 @@ export default function Tablet3D({
           </p>
         )}
         <div className={styles.view3dButtons}>
-          <Button size="small" variant="contained" onClick={reset}>
+          <Button size="small" variant="outlined" onClick={reset}>
             {t(/*i18n*/ "Reset")}
           </Button>
-          <Button size="small" variant="contained" onClick={open}>
+          <Button
+            ref={fullButton}
+            size="small"
+            variant="outlined"
+            onClick={open}
+          >
             {t(/*i18n*/ "Full window")}
           </Button>
         </div>
@@ -280,7 +309,7 @@ export default function Tablet3D({
       {!full && <p className={styles.view3dHint}>{hint}</p>}
       <span id={keysId} hidden>
         {t(
-          /*i18n*/ "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and Esc leaves the full window.",
+          /*i18n*/ "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and in the full window Esc leaves it.",
         )}
       </span>
       <Dialog
@@ -288,7 +317,8 @@ export default function Tablet3D({
         open={full}
         onClose={close}
         transitionDuration={0}
-        aria-label={label}
+        // The name on the dialog itself, not on MUI's presentation root.
+        slotProps={{ paper: { "aria-label": label } }}
       >
         <div
           ref={fullBox}
@@ -296,10 +326,10 @@ export default function Tablet3D({
           {...viewProps}
         >
           <div className={styles.view3dButtons}>
-            <Button size="small" variant="contained" onClick={reset}>
+            <Button size="small" variant="outlined" onClick={reset}>
               {t(/*i18n*/ "Reset")}
             </Button>
-            <Button size="small" variant="contained" onClick={close}>
+            <Button size="small" variant="outlined" onClick={close}>
               {t(/*i18n*/ "Close")}
             </Button>
           </div>

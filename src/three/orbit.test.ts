@@ -323,8 +323,9 @@ describe("orbit (plan 101)", () => {
       controls.key(new KeyboardEvent("keydown", { key, ...init }));
     expect(key("ArrowRight")).toBe(true);
     expect(controls.view.azimuth).toBeCloseTo(-Math.PI / 12);
+    // As a drag that way: up lowers the camera, as dragging up does.
     expect(key("ArrowUp")).toBe(true);
-    expect(controls.view.elevation).toBeCloseTo(Math.PI / 4 + Math.PI / 12);
+    expect(controls.view.elevation).toBeCloseTo(Math.PI / 4 - Math.PI / 12);
     expect(key("ArrowLeft") && key("ArrowDown")).toBe(true);
     expect(key("+") && key("=")).toBe(true);
     expect(controls.view.zoom).toBeCloseTo(1 / 1.25 ** 2);
@@ -341,5 +342,32 @@ describe("orbit (plan 101)", () => {
     expect(key("+", { metaKey: true })).toBe(false);
     expect(key("0", { altKey: true })).toBe(false);
     expect(changed).not.toHaveBeenCalled();
+  });
+
+  it("takes a second finger mid-drag for a pinch, and goes on when a third lifts", () => {
+    const { element, controls } = setUp();
+    controls.setFull(true);
+    const finger = (id: number) => ({ pointerType: "touch", pointerId: id });
+    pointer(element, "pointerdown", 50, 50, finger(1));
+    pointer(element, "pointermove", 100, 50, finger(1));
+    const turned = controls.view.azimuth;
+    expect(turned).not.toBe(0);
+    // The second finger stops the turn and starts a pinch.
+    pointer(element, "pointerdown", 150, 50, finger(2));
+    pointer(element, "pointermove", 200, 50, finger(2));
+    expect(controls.view.azimuth).toBe(turned);
+    expect(controls.view.zoom).toBeCloseTo(0.5);
+    // A third, then one of the first two lifted: no jump, and the pinch
+    // goes on from the two left.
+    pointer(element, "pointerdown", 20, 20, finger(3));
+    pointer(element, "pointermove", 300, 50, finger(2));
+    expect(controls.view.zoom).toBeCloseTo(0.5);
+    pointer(element, "pointerup", 100, 50, finger(1));
+    expect(controls.view.zoom).toBeCloseTo(0.5);
+    pointer(element, "pointermove", 20, 20, finger(3));
+    expect(controls.view.zoom).toBeCloseTo(0.5);
+    // Their spread doubled from there, the zoom halves again.
+    pointer(element, "pointermove", 580, 50, finger(2));
+    expect(controls.view.zoom).toBeCloseTo(0.25);
   });
 });

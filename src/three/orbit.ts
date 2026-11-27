@@ -59,12 +59,15 @@ export interface Orbit {
   dispose(): void;
 }
 
-/** A key's turn, round and up, a twelfth of a half turn a press. */
+/**
+ * A key's turn, round and up, a twelfth of a half turn a press: each
+ * arrow does what a drag that way does.
+ */
 const KEY_TURNS: Record<string, readonly [number, number]> = {
   ArrowLeft: [Math.PI / 12, 0],
   ArrowRight: [-Math.PI / 12, 0],
-  ArrowUp: [0, Math.PI / 12],
-  ArrowDown: [0, -Math.PI / 12],
+  ArrowUp: [0, -Math.PI / 12],
+  ArrowDown: [0, Math.PI / 12],
 };
 
 /** A movement under this many pixels is a click, not a drag. */
@@ -201,7 +204,9 @@ export function orbit(
   };
   const lift = (event: PointerEvent) => {
     fingers.delete(event.pointerId);
-    if (fingers.size < 2) pinch = null;
+    // Two left of three: the pinch goes on from where they are.
+    pinch =
+      fingers.size < 2 ? null : pinch && { spread: spread(), zoom: view.zoom };
   };
   const click = (event: MouseEvent) => {
     if (tapped && !full) clicked?.(event.clientX, event.clientY);

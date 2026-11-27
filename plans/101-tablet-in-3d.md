@@ -380,14 +380,19 @@ deployment-tagged build pass without checking.
   chosen is out of sight (value review). Opening it pushes a history
   entry, its state merged with the page's own `tabletsTab` key; Next's
   patched `pushState` keeps custom keys. Back closes it, Close and Esc
-  call `history.back()`, and a stale entry left by a reload is cleared.
+  call `history.back()`, once however often they are pressed before Back
+  lands. An entry left open by a reload, or by the view closing while
+  the window is open, is neutralised (its key set false) rather than
+  removed, which would mean navigating on mount: the first Back from it
+  then does nothing visible, the price of never navigating unasked.
   Focus moves in and returns to the button. Safe areas are not used: the
   site's viewport sets no `viewport-fit=cover` (`Document.tsx`), so
   `env(safe-area-inset-*)` is 0 (correctness review).
 - **Buttons.** *Reset* and *Full window* on the view, 44 px on a touch
   screen, with one line of instructions for the input in use.
-- **Keyboard.** With the view focused, the arrows turn the tablet, +
-  (or =) and − zoom, and 0 resets.
+- **Keyboard.** With the view focused, the arrows turn the tablet, each
+  as a drag that way would (Up lowers the camera, as dragging up does),
+  + (or =) and − zoom, and 0 resets.
 - **For screen readers.** A focusable wrapper around the canvas carries
   `aria-roledescription` ("3D view"), the tablet's name ("The Fire tablet
   as pyramids, in 3D") and a description of the keys, rather than
