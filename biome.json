@@ -74,7 +74,10 @@
       "assist": { "enabled": false }
     },
     {
-      "includes": ["src/app/enochian/translate/reading/grammar.generated.ts"],
+      "includes": [
+        "src/app/enochian/translate/reading/grammar.generated.ts",
+        "src/app/enochian/tablets/three/marksSheet.generated.ts"
+      ],
       "formatter": { "enabled": false }
     },
     {

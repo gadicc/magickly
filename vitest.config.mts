@@ -307,6 +307,8 @@ export default defineConfig({
         "src/app/geomancy/tetragrams.ts",
         "src/app/enochian/keys/keyEntries.ts",
         "src/app/enochian/keys/keyPage.ts",
+        "src/app/enochian/tablets/three/model.ts",
+        "src/app/enochian/tablets/three/pyramidGeometry.ts",
         "packages/magick-data/src/assemble.ts",
         "packages/magick-data/src/duplicateKeys.ts",
         "packages/magick-data/src/integrity.ts",
