@@ -35,19 +35,12 @@ import {
   type Vec3,
 } from "./pyramidGeometry";
 
-/** The choices of look still open (plan 101, stage 3's frames). */
-export interface TabletLook {
-  /** How much darker a side is at its foot than at its top; 0 for none. */
-  valleys: number;
-  /** Lines along the ridges and round the tops, in pixels; 0 for none. */
-  edges: number;
-}
-
-/** The look until Gadi chooses from the frames: valleys, no lines. */
-export const DEFAULT_LOOK: Readonly<TabletLook> = Object.freeze({
-  valleys: 0.35,
-  edges: 0,
-});
+/**
+ * How much darker a side is at its foot than at its top, where pyramids
+ * meet: Gadi's choice from stage 3's frames (27 November 2026), without
+ * lines along the ridges.
+ */
+export const VALLEYS = 0.35;
 
 /** The scene's environment's strength, for the soft reflections of satin. */
 export const ENVIRONMENT_INTENSITY = 0.6;
@@ -61,7 +54,6 @@ export interface TabletObject {
   readonly bounds: readonly Vec3[];
   /** The square a ray in the object's parent's space meets first. */
   pick(ray: Ray): PickedSquare | null;
-  setLook(look: TabletLook): void;
   setGround(colour: ColorRepresentation): void;
   dispose(): void;
 }
@@ -95,28 +87,25 @@ export async function rasteriseSheet(
 
 // Each mark's coverage is sampled before the cell masks it, outside any
 // branch, so that the mipmap's derivatives stay whole. Red is the ink's
-// coverage and green the outline's (`marksSheet.generated.ts`). A top's
-// height is the same everywhere but for rounding, which a line must not
-// take for an edge.
+// coverage and green the outline's (`marksSheet.generated.ts`).
 const VERTEX = `#include <common>
 attribute vec2 markUv;
 attribute vec4 markCell;
 attribute vec3 markInk;
 attribute vec3 markOutline;
-attribute vec2 markEdge;
+attribute float markValley;
 varying vec2 vMarkUv;
 varying vec4 vMarkCell;
 varying vec3 vMarkInk;
 varying vec3 vMarkOutline;
-varying vec2 vMarkEdge;`;
+varying float vMarkValley;`;
 const VERTEX_MAIN = `#include <begin_vertex>
 vMarkUv = markUv; vMarkCell = markCell; vMarkInk = markInk;
-vMarkOutline = markOutline; vMarkEdge = markEdge;`;
+vMarkOutline = markOutline; vMarkValley = markValley;`;
 const FRAGMENT = VERTEX.replace(/attribute [^\n]*\n/g, "").concat(`
 uniform sampler2D markSheet;
 uniform float markBias;
-uniform float markValleys;
-uniform float markEdges;`);
+uniform float markValleys;`);
 const FRAGMENT_MAIN = `#include <color_fragment>
 vec2 cover = texture(markSheet, vMarkUv, markBias).rg;
 vec4 box = vMarkCell;
@@ -124,13 +113,8 @@ cover *= step(0.0, box.x) * step(box.x, vMarkUv.x) * step(vMarkUv.x, box.z)
   * step(box.y, vMarkUv.y) * step(vMarkUv.y, box.w);
 diffuseColor.rgb = diffuseColor.rgb * (1.0 - cover.r - cover.g)
   + vMarkInk * cover.r + vMarkOutline * cover.g;
-float foot = 1.0 - vMarkEdge.y;
-diffuseColor.rgb *= 1.0 - markValleys * foot * foot;
-vec2 width = fwidth(vMarkEdge);
-vec2 away = vec2(min(vMarkEdge.x, 1.0 - vMarkEdge.x), foot) / max(width, 1e-6);
-away.y = width.y > 1e-4 ? away.y : 1e6;
-diffuseColor.rgb *= 1.0 - 0.6 * step(0.5, markEdges)
-  * (1.0 - smoothstep(markEdges - 0.5, markEdges + 0.5, min(away.x, away.y)));`;
+float foot = 1.0 - vMarkValley;
+diffuseColor.rgb *= 1.0 - markValleys * foot * foot;`;
 
 /**
  * The rasterised sheet as a texture, filtered at up to `anisotropy`: made
@@ -158,19 +142,9 @@ export function tabletObject(
   model: Tablet3DModel,
   sheet: MarksSheet,
   texture: Texture,
-  {
-    look = DEFAULT_LOOK,
-    ground = "#8f8a80",
-  }: { look?: TabletLook; ground?: ColorRepresentation } = {},
+  { ground = "#8f8a80" }: { ground?: ColorRepresentation } = {},
 ): TabletObject {
   const arrays = pyramidGeometry(model, sheet);
-  // Across a side from one ridge to the other, and its height, for the
-  // lines; a top is in the middle and has none of its own.
-  const edge = new Float32Array(arrays.valleys.length * 2);
-  arrays.valleys.forEach((valley, vertex) => {
-    const top = Math.floor(vertex / 4) % 5 === 4;
-    edge.set([top ? 0.5 : [0, 1, 1, 0][vertex % 4], valley], vertex * 2);
-  });
   const geometry = new BufferGeometry();
   const attributes = {
     position: [arrays.positions, 3],
@@ -180,7 +154,7 @@ export function tabletObject(
     markCell: [arrays.cells, 4],
     markInk: [arrays.inks, 3],
     markOutline: [arrays.outlines, 3],
-    markEdge: [edge, 2],
+    markValley: [arrays.valleys, 1],
   } as const;
   for (const [name, [array, size]] of Object.entries(attributes))
     geometry.setAttribute(name, new BufferAttribute(array, size));
@@ -190,8 +164,7 @@ export function tabletObject(
     markSheet: { value: texture },
     // Sharper than the mipmap would choose, for the far rows.
     markBias: { value: -0.75 },
-    markValleys: { value: look.valleys },
-    markEdges: { value: look.edges },
+    markValleys: { value: VALLEYS },
   };
   const material = new MeshStandardMaterial({
     vertexColors: true,
@@ -211,7 +184,7 @@ export function tabletObject(
       FRAGMENT_MAIN,
     );
   };
-  material.customProgramCacheKey = () => "tablet3d-marks-v1";
+  material.customProgramCacheKey = () => "tablet3d-marks-v2";
 
   const groundGeometry = new PlaneGeometry(
     model.columns + 2 * MARGIN,
@@ -252,10 +225,6 @@ export function tabletObject(
         local.origin.toArray(),
         local.direction.toArray(),
       );
-    },
-    setLook({ valleys, edges }) {
-      uniforms.markValleys.value = valleys;
-      uniforms.markEdges.value = edges;
     },
     setGround: (colour) => groundMaterial.color.set(colour),
     dispose() {

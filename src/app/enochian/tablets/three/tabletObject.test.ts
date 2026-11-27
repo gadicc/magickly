@@ -19,11 +19,11 @@ import { MARKS_SHEET, MARKS_SHEET_MAX_CELL_PX } from "./marksSheet.generated";
 import { tabletModel } from "./model";
 import { PYRAMID_HEIGHT, pyramidGeometry } from "./pyramidGeometry";
 import {
-  DEFAULT_LOOK,
   rasteriseSheet,
   sheetCellPixels,
   sheetTexture,
   tabletObject,
+  VALLEYS,
 } from "./tabletObject";
 
 const fire = tabletVersion(enochianTablets.fire, "gd");
@@ -82,16 +82,8 @@ describe("the tablet's object (plan 101)", () => {
     expect(attributes.markInk.array).toStrictEqual(arrays.inks);
     expect(attributes.markOutline.array).toStrictEqual(arrays.outlines);
     expect(index?.array).toStrictEqual(arrays.index);
-    // Across a side from ridge to ridge, and up it; a top has neither.
-    const edge = attributes.markEdge;
-    expect([0, 1, 2, 3].map((vertex) => edge.getX(vertex))).toEqual([
-      0, 1, 1, 0,
-    ]);
-    expect([0, 1, 2, 3].map((vertex) => edge.getY(vertex))).toEqual(
-      [0, 1, 2, 3].map((vertex) => arrays.valleys[vertex]),
-    );
-    expect(edge.getX(16)).toBe(0.5);
-    expect(edge.getY(16)).toBe(1);
+    // 0 at a side's foot, 1 at its top edge and on the top.
+    expect(attributes.markValley.array).toStrictEqual(arrays.valleys);
     // The ground lies flat under the bases, a margin round the tablet.
     ground.geometry.computeBoundingBox();
     const box = ground.geometry.boundingBox;
@@ -134,7 +126,7 @@ describe("the tablet's object (plan 101)", () => {
       main.indexOf("step(0.0, box.x)"),
     );
     expect(main).not.toMatch(/\bif\s*\(/);
-    expect(pyramids.material.customProgramCacheKey()).toBe("tablet3d-marks-v1");
+    expect(pyramids.material.customProgramCacheKey()).toBe("tablet3d-marks-v2");
     // Each anchor kept, once, after the patch's own lines.
     for (const anchor of ["#include <common>", "#include <begin_vertex>"])
       expect(shader.vertexShader.split(anchor)).toHaveLength(2);
@@ -162,14 +154,13 @@ describe("the tablet's object (plan 101)", () => {
     ).toThrow("tablet3d: the shader has 2 #include <begin_vertex>");
   });
 
-  it("takes a look and a ground without rebuilding", () => {
+  it("darkens its valleys, and takes a ground without rebuilding", () => {
     const { tablet, pyramids, ground } = build();
     const shader = compiled(pyramids.material);
-    expect(shader.uniforms.markValleys.value).toBe(DEFAULT_LOOK.valleys);
-    expect(shader.uniforms.markEdges.value).toBe(DEFAULT_LOOK.edges);
-    tablet.setLook({ valleys: 0, edges: 1.5 });
-    expect(shader.uniforms.markValleys.value).toBe(0);
-    expect(shader.uniforms.markEdges.value).toBe(1.5);
+    expect(shader.uniforms.markValleys.value).toBe(VALLEYS);
+    expect(VALLEYS).toBe(0.35);
+    // No lines along the ridges (Gadi, 27 November 2026).
+    expect(shader.fragmentShader).not.toContain("fwidth");
     tablet.setGround("#ff0000");
     expect(ground.material.color.equals(new Color("#ff0000"))).toBe(true);
   });
