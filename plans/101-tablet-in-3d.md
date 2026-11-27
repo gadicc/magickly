@@ -392,9 +392,14 @@ deployment-tagged build pass without checking.
   the browser cannot show the 3D view. Nothing probes WebGL before the
   reader asks (invariant 3).
 
-The switch row grows to five switches. Before stage 4 Gadi gets a
+The switch row grows to six switches. Before stage 4 Gadi gets a
 mock-up at 320, 375 and 1,440 px of the row and the inline box, light and
 dark (value review).
+
+From the mock-up Gadi chose (27 November 2026) to put the switch, labelled
+*In 3D*, straight after *Draw as pyramids*, rather than at the end of the
+row: it sits by the switch it depends on, the resting symbols switches
+follow it, and at 375 px it shares the pyramids line.
 
 ### For WebXR later (fixed now, not built)
 
