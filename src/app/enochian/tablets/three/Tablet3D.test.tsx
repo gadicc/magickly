@@ -10,7 +10,7 @@ import {
 } from "@testing-library/react";
 import enochianTablets, { tabletVersion } from "magick-data/enochian/tablets";
 import { type PerspectiveCamera, type Scene, Vector3 } from "three";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
 import { PYRAMID_HEIGHT } from "./pyramidGeometry";
 import Tablet3D from "./Tablet3D";
 
@@ -526,10 +526,19 @@ describe("the 3D view (plan 101)", () => {
 
     describe("in the browser's full screen", () => {
       let screenElement: Element | null = null;
+      // As a browser does: the change comes after the call returns.
       const exit = vi.fn(async () => {
         screenElement = null;
-        document.dispatchEvent(new Event("fullscreenchange"));
+        queueMicrotask(() =>
+          document.dispatchEvent(new Event("fullscreenchange")),
+        );
       });
+      /** The browser leaving the full screen by itself. */
+      const leave = () =>
+        act(async () => {
+          screenElement = null;
+          document.dispatchEvent(new Event("fullscreenchange"));
+        });
       const request = vi.fn(async function (this: Element) {
         screenElement = this;
       });
@@ -560,6 +569,88 @@ describe("the 3D view (plan 101)", () => {
         exit.mockClear();
         request.mockClear();
         offer(false);
+      });
+      afterAll(() => {
+        for (const name of [
+          "fullscreenEnabled",
+          "fullscreenElement",
+          "exitFullscreen",
+        ])
+          Reflect.deleteProperty(document, name);
+        Reflect.deleteProperty(HTMLElement.prototype, "requestFullscreen");
+      });
+      /** Opened, with Back mocked to land nowhere until a test says so. */
+      const held = async () => {
+        offer(true);
+        stub.on = true;
+        await drawn();
+        fireEvent.click(screen.getByRole("button", { name: "Full screen" }));
+        return vi.spyOn(window.history, "back").mockImplementation(() => {});
+      };
+      const closeButton = () =>
+        within(dialog() as HTMLElement).getByRole("button", { name: "Close" });
+
+      it("asks for it within the click itself", async () => {
+        offer(true);
+        stub.on = true;
+        await drawn();
+        fireEvent.click(screen.getByRole("button", { name: "Full screen" }));
+        expect(request).toHaveBeenCalledTimes(1);
+      });
+
+      for (const [first, by] of [
+        ["Close", () => fireEvent.click(closeButton())],
+        [
+          "Esc",
+          () => fireEvent.keyDown(dialog() as HTMLElement, { key: "Escape" }),
+        ],
+      ] as const)
+        it(`goes back once when ${first} and the browser's leaving race`, async () => {
+          const back = await held();
+          by();
+          await leave();
+          land({});
+          await waitFor(() => expect(dialog()).toBeNull());
+          expect(back).toHaveBeenCalledTimes(1);
+        });
+
+      it("goes back once when the browser's leaving comes before Esc", async () => {
+        const back = await held();
+        await leave();
+        fireEvent.keyDown(dialog() as HTMLElement, { key: "Escape" });
+        land({});
+        await waitFor(() => expect(dialog()).toBeNull());
+        expect(back).toHaveBeenCalledTimes(1);
+      });
+
+      it("leaves it, and neutralises its entry, when the view goes", async () => {
+        await held();
+        cleanup();
+        expect(exit).toHaveBeenCalledTimes(1);
+        expect(window.history.state).toMatchObject({ tablet3dFull: false });
+      });
+
+      it("does not ask for it again when Forward reopens the window", async () => {
+        offer(true);
+        await opened();
+        land({});
+        await waitFor(() => expect(dialog()).toBeNull());
+        request.mockClear();
+        land({ tablet3dFull: true });
+        expect(dialog()).not.toBeNull();
+        expect(request).not.toHaveBeenCalled();
+      });
+
+      it("closes, and gives focus back, where it was refused", async () => {
+        offer(true, true);
+        const back = await opened();
+        await act(async () => {});
+        fireEvent.click(closeButton());
+        await waitFor(() => expect(dialog()).toBeNull());
+        expect(back).toHaveBeenCalledTimes(1);
+        expect(document.activeElement).toBe(
+          screen.getByRole("button", { name: "Full screen" }),
+        );
       });
 
       it("asks for it on the dialog in the same click", async () => {

@@ -279,7 +279,9 @@
   position: relative;
   width: 100%;
   aspect-ratio: var(--tablet-ratio, 1);
-  max-height: calc(100vh - var(--app-bar, 56px) - 32px);
+  /* Less the row of buttons under it, so that they are on the screen. */
+  --view3d-row: 40px;
+  max-height: calc(100vh - var(--app-bar, 56px) - 32px - var(--view3d-row));
   border-radius: 8px;
   overflow: hidden;
   background-color: #f3f1ec;
@@ -299,7 +301,7 @@
 }
 @supports (height: 100svh) {
   .view3d {
-    max-height: calc(100svh - var(--app-bar, 56px) - 32px);
+    max-height: calc(100svh - var(--app-bar, 56px) - 32px - var(--view3d-row));
   }
 }
 :global(.dark) .view3d {
@@ -360,6 +362,9 @@
   background-color: var(--mui-palette-background-paper);
 }
 @media (pointer: coarse) {
+  .view3d {
+    --view3d-row: 52px;
+  }
   .view3dButtons button,
   .view3dRow button {
     min-height: 44px;

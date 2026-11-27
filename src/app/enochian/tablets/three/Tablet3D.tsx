@@ -242,8 +242,9 @@ export default function Tablet3D({
     // Mounted at once, so that the full screen is asked for in the click.
     flushSync(() => setFull(true));
     const paper = fullNode.current?.parentElement;
+    // An older browser's request returns nothing.
     if (document.fullscreenEnabled && paper?.requestFullscreen)
-      paper.requestFullscreen().catch(() => {});
+      Promise.resolve(paper.requestFullscreen()).catch(() => {});
   };
   // Back once, however often Close or Esc is pressed before it lands.
   const close = React.useCallback(() => {
@@ -269,9 +270,11 @@ export default function Tablet3D({
     // the full screen, which leaves nothing else focusable. Closed by
     // Close, Esc or Back, the full screen goes too, and its change, the
     // window already gone, closes nothing more.
-    const focus = () => (node ?? fullButton.current)?.focus();
+    // The button only if the window has not opened again meanwhile.
+    const focus = () =>
+      (node ?? (fullRef.current ? null : fullButton.current))?.focus();
     if (!node && document.fullscreenElement)
-      document.exitFullscreen().then(focus, focus);
+      Promise.resolve(document.exitFullscreen()).then(focus, focus);
     else focus();
     const { viewer, orbit: controls } = live.current;
     const into = node ?? box.current;

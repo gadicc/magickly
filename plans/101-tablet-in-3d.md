@@ -383,7 +383,12 @@ deployment-tagged build pass without checking.
   Android's Back, the browser's own way out) closes the view through the
   same once-only `history.back()`, and closing the view by Close, Esc or
   Back leaves the full screen, whose change then closes nothing more.
-  One finger turns, two
+  Two things are unverified or left for later: on Android, Back in full
+  screen is expected to leave the full screen without navigating, which
+  no device here has confirmed (a browser that did both would go back
+  twice); and anything MUI portals to `body` (a Menu, Tooltip or
+  Snackbar) would sit under the full-screen Paper, so a later addition
+  there needs its `container` set to the Paper. One finger turns, two
   fingers zoom, and the plain wheel zooms. No picking there, so nothing
   chosen is out of sight (value review). Opening it pushes a history
   entry, its state merged with the page's own `tabletsTab` key; Next's
