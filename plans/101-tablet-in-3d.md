@@ -165,11 +165,11 @@ From stage 3's frames Gadi chose (27 November 2026):
 
 Enforced:
 
-| Budget | Ceiling | How | Spike |
-| --- | --- | --- | --- |
-| Lazy JS, gzip, three and the sheet included | ≤ 200 KB | the build check | about 165 KB |
-| Service worker precache of three or 3D chunks | 0 | the build check | 0 with `excludeChunks`; built with `exclude` (below) |
-| Production lines (TS/TSX under `src/three/`, `tablets/three/` and `scripts/tablet3d/`, not tests or generated files) | ≤ 1,500 | counted at review | about 740 (untidy) |
+| Budget | Ceiling | How | Spike | Built (stage 6) |
+| --- | --- | --- | --- | --- |
+| Lazy JS, gzip, three and the sheet included | ≤ 200 KB | the build check | about 165 KB | 172.4 KB, in four chunks |
+| Service worker precache of three or 3D chunks | 0 | the build check | 0 with `excludeChunks`; built with `exclude` (below) | 0 |
+| Production lines (TS/TSX under `src/three/`, `tablets/three/` and `scripts/tablet3d/`, not tests or generated files) | ≤ 1,500 | counted at review | about 740 (untidy) | 1,478 (non-blank, non-comment) |
 
 Accepted by hand before landing: the first frame within 1 s of the
 click at 4× CPU throttle on a GPU; 60 fps while turning on Gadi's phone;
@@ -179,6 +179,24 @@ about 24 MB for the sheet. (Value review: the
 sub-limit for the base were dropped as redundant or unenforceable.) The
 192 px is already in device pixels, so the density cap does not enter
 the sheet's figure; it bounds the canvas (correctness review).
+
+Measured by hand at stage 6 (27 November 2026), on a production build
+under `.env.ci`'s placeholders, in headless Chromium:
+
+- **First frame at 4× CPU throttle:** 1.32 s from the click on *In 3D*
+  with nothing cached, then 0.71 s and 0.64 s (the browser keeping its
+  compiled shaders), the network cache off each time. This is on
+  SwiftShader, Chromium's software renderer (no GPU here), so it bounds
+  the code's path, not a phone; the check on a GPU stays Gadi's.
+- **The first load's growth:** the tablets page's first-load JS, each
+  file gzipped and summed, is 438,826 bytes against 437,902 at stage 2's
+  head (`e458579b`, main's page with three installed but not imported):
+  +924 bytes, the loader, the switch and its URL state. Main's own build
+  was not to hand.
+- **Texture memory:** the sheet's cells are 186 px at density 2
+  (`MARKS_SHEET_MAX_CELL_PX`), 2,046 × 1,860 pixels, about 20 MB with
+  its mipmaps.
+- **60 fps while turning on Gadi's phone:** pending, Gadi's.
 
 Past any of these, cut scope (below, in order) before going on.
 
@@ -553,6 +571,32 @@ landing.
   results are recorded in this plan. There is no Safari device here:
   Safari ships on the platform rules (WebGL 2 since Safari 15), and the
   gap is stated in the landing note.
+
+  Recorded at stage 6 (27 November 2026), on the production build, with
+  touch emulated at the phone sizes:
+  - **No sideways scroll** at 375, 768 and 1,440 px, light and dark, nor
+    at 812 × 375 (a phone on its side), nor in the full screen.
+  - **Where things land.** Under 900 px the switch row comes first, then
+    the 3D view the column's width (343 px at 375, 720 at 768), then its
+    row of buttons from the inline start, the hint and the line. From
+    900 px the view is the drawing's column (634 px at 1,440) and the
+    panel is beside it.
+  - **Line length.** The hint and the line sit in a 28rem column, about
+    70 characters of their 14 px text (the line wrapped at 88 in the
+    drawing's column before, so it was narrowed at this stage).
+  - **Targets:** 44 px for the switches and, on a touch screen, the
+    buttons; 31 px with a mouse.
+  - **On a phone on its side** the view is capped less its row of
+    buttons, and *Full screen* is on screen with the view's top under
+    the app bar.
+  - **Full screen** opens as the browser's full screen at every size,
+    with no sideways scroll and its hint centred, and Close leaves it,
+    the canvas back inline and focus on the button.
+  - **The flat page** with pyramids and without 3D requests no 3D chunk
+    and has no canvas (invariant 3).
+  - **Right to left** (`dir` and `lang` forced, the page having no
+    Hebrew edition), at 375 px the row of buttons starts at the right
+    and the full screen's hint is centred.
 
 ## Risks
 
