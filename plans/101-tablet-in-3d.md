@@ -105,6 +105,25 @@ Gadi has not seen them (value review). Stage 3 sends him frames with and
 without each; shader lines alias on the far rows and cannot be unit
 tested, so the edge lines come in only if the frames earn them.
 
+From stage 3's frames Gadi chose (27 November 2026):
+
+- **The valleys, darkened to 0.35, and no edge lines.** The lines added
+  noise on the far rows and nothing near; their code was cut.
+- **The Squares tab's thicker `MARK_OUTLINES`**, not the flat tablet's
+  `TABLET_MARK_OUTLINES`: thin outlines vanish on the larger 3D faces.
+- **No outline in the mark's own colour** ("C" of four frames). Where a
+  side's outline is the same colour as its ink (Earth's white on black,
+  Spirit's and the blank sides' black on white), a thick outline only
+  fattened the mark, and open spokes, dots and counters filled in. Those
+  marks take the side's own `PYRAMID_COLOURS` ground as their outline,
+  so the outline vanishes and the mark keeps its drawn width. A grey
+  outline ("D") was tried and read as a halo. Coloured marks (Fire's,
+  Water's and Air's) keep their black outlines. `model.test.ts` checks
+  the rule on every side of every tablet in the three versions with
+  pyramids. One consequence, accepted: the moon's crescent, hollow in
+  the font, shows hollow in 3D, where the flat drawing's same-colour
+  outline nearly fills it.
+
 ## Invariants (signed off, 27 November 2026)
 
 1. **One source.** Every colour, ink, symbol, letter and top size comes
@@ -149,7 +168,7 @@ Enforced:
 | Budget | Ceiling | How | Spike |
 | --- | --- | --- | --- |
 | Lazy JS, gzip, three and the sheet included | ≤ 200 KB | the build check | about 165 KB |
-| Service worker precache of three or 3D chunks | 0 | the build check | 0 with `excludeChunks` |
+| Service worker precache of three or 3D chunks | 0 | the build check | 0 with `excludeChunks`; built with `exclude` (below) |
 | Production lines (TS/TSX under `src/three/`, `tablets/three/` and `scripts/tablet3d/`, not tests or generated files) | ≤ 1,500 | counted at review | about 740 (untidy) |
 
 Accepted by hand before landing: the first frame within 1 s of the
@@ -281,6 +300,17 @@ scanning chunk contents is fragile. Instead:
 - Whether `webpackChunkName` survives `next/dynamic` is unverified (the
   spike used a plain `import()`). The module-keyed check holds either
   way, and stage 3 settles which form `excludeChunks` needs.
+
+**Built with `exclude`, not `excludeChunks`** (stage 3). `excludeChunks`
+drops every file of the named group, and webpack put a chunk that MUI
+shares with the first load (3441) in the 3D group, so the page's own
+code fell out of the precache. `next.config.ts` instead passes Serwist
+`exclude: [/\.map$/, /^manifest.*\.js$/, isThreeAsset]`, Serwist's two
+defaults kept, with `isThreeAsset` matching the files
+`.next/three-chunks.json` lists. The build check gained a fourth rule:
+every first-load chunk that is not a 3D chunk is precached. It also
+reads chunk names with Vercel's `?dpl=` suffix removed, which had let a
+deployment-tagged build pass without checking.
 
 ### On the page
 
