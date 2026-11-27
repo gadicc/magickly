@@ -283,7 +283,19 @@
   border-radius: 8px;
   overflow: hidden;
   background-color: #f3f1ec;
-  cursor: grab;
+}
+/* While a drag turns it (`data-turning`, from orbit.ts). */
+.view3d[data-turning] {
+  user-select: none;
+  -webkit-user-select: none;
+}
+@media (pointer: fine) {
+  .view3d {
+    cursor: grab;
+  }
+  .view3d[data-turning] {
+    cursor: grabbing;
+  }
 }
 @supports (height: 100svh) {
   .view3d {

@@ -8,6 +8,7 @@ import {
   type MeshStandardMaterial,
   NoColorSpace,
   Ray,
+  ShaderLib,
   type Texture,
   Vector3,
   type WebGLProgramParametersWithUniforms,
@@ -21,6 +22,7 @@ import {
   DEFAULT_LOOK,
   rasteriseSheet,
   sheetCellPixels,
+  sheetTexture,
   tabletObject,
 } from "./tabletObject";
 
@@ -29,24 +31,32 @@ if (!fire) throw new Error("no Fire tablet in the Golden Dawn's version");
 const model = tabletModel(fire, MARKS_SHEET);
 
 function build() {
-  const image = document.createElement("canvas");
-  const tablet = tabletObject(model, MARKS_SHEET, image, { anisotropy: 4 });
+  const texture = sheetTexture(document.createElement("canvas"), 4);
+  const tablet = tabletObject(model, MARKS_SHEET, texture);
   const [pyramids, ground, light] = tablet.object.children as [
     Mesh<BufferGeometry, MeshStandardMaterial>,
     Mesh<BufferGeometry, MeshStandardMaterial>,
     DirectionalLight,
   ];
-  return { tablet, pyramids, ground, light };
+  return { tablet, pyramids, ground, light, texture };
 }
 
-/** The material's shader as three would hand it over, patched. */
-function compiled(material: MeshStandardMaterial) {
+/**
+ * The material's shader as three hands it over, patched: the standard
+ * material's, `ShaderLib.physical`'s text, so that a three upgrade that
+ * moves an anchor fails here.
+ */
+function compiled(
+  material: MeshStandardMaterial,
+  {
+    vertexShader,
+    fragmentShader,
+  }: { vertexShader: string; fragmentShader: string } = ShaderLib.physical,
+) {
   const shader = {
     uniforms: {},
-    vertexShader:
-      "#include <common>\nvoid main() {\n#include <begin_vertex>\n}",
-    fragmentShader:
-      "#include <common>\nvoid main() {\n#include <color_fragment>\n}",
+    vertexShader,
+    fragmentShader,
   } as unknown as WebGLProgramParametersWithUniforms;
   material.onBeforeCompile(shader, {} as WebGLRenderer);
   return shader;
@@ -125,6 +135,31 @@ describe("the tablet's object (plan 101)", () => {
     );
     expect(main).not.toMatch(/\bif\s*\(/);
     expect(pyramids.material.customProgramCacheKey()).toBe("tablet3d-marks-v1");
+    // Each anchor kept, once, after the patch's own lines.
+    for (const anchor of ["#include <common>", "#include <begin_vertex>"])
+      expect(shader.vertexShader.split(anchor)).toHaveLength(2);
+    for (const anchor of ["#include <common>", "#include <color_fragment>"])
+      expect(shader.fragmentShader.split(anchor)).toHaveLength(2);
+    expect(main.indexOf("#include <color_fragment>")).toBeLessThan(
+      main.indexOf("texture(markSheet"),
+    );
+  });
+
+  it("names an anchor the shader lacks or repeats", () => {
+    const { pyramids } = build();
+    const { vertexShader, fragmentShader } = ShaderLib.physical;
+    expect(() =>
+      compiled(pyramids.material, {
+        vertexShader,
+        fragmentShader: fragmentShader.replace("#include <color_fragment>", ""),
+      }),
+    ).toThrow("tablet3d: the shader has 0 #include <color_fragment>");
+    expect(() =>
+      compiled(pyramids.material, {
+        vertexShader: `${vertexShader}\n#include <begin_vertex>`,
+        fragmentShader,
+      }),
+    ).toThrow("tablet3d: the shader has 2 #include <begin_vertex>");
   });
 
   it("takes a look and a ground without rebuilding", () => {
@@ -174,22 +209,22 @@ describe("the tablet's object (plan 101)", () => {
     ).toBeNull();
   });
 
-  it("releases its geometry, materials and texture", () => {
-    const { tablet, pyramids, ground } = build();
-    const sheet = (
-      compiled(pyramids.material).uniforms.markSheet as {
-        value: Texture;
-      }
-    ).value;
+  it("releases its geometry and materials, and leaves the shared sheet", () => {
+    const { tablet, pyramids, ground, texture } = build();
+    expect(
+      (compiled(pyramids.material).uniforms.markSheet as { value: Texture })
+        .value,
+    ).toBe(texture);
     const spies = [
       pyramids.geometry,
       pyramids.material,
-      sheet,
       ground.geometry,
       ground.material,
     ].map((each) => vi.spyOn(each, "dispose"));
+    const sheet = vi.spyOn(texture, "dispose");
     tablet.dispose();
     for (const spy of spies) expect(spy).toHaveBeenCalled();
+    expect(sheet).not.toHaveBeenCalled();
   });
 });
 

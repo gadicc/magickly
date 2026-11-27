@@ -50,6 +50,7 @@ import useEnochianFont, { EnochianFont } from "../useEnochianFont";
 import type { TabletNameLinks } from "./dictionaryLinks";
 import { tabletExportLink } from "./exportLink";
 import NamesPanel, { namesToChoose } from "./NamesPanel";
+import { ELEMENT_WORDS } from "./nameWords";
 import PyramidKey from "./PyramidKey";
 import { Sources, versionTitle } from "./Sources";
 import SquaresPanel from "./SquaresPanel";
@@ -995,7 +996,7 @@ export default function Tablets({
                 union
                   ? t(/*i18n*/ "The Tablet of Union as pyramids, in 3D")
                   : t(/*i18n*/ "The {tablet} tablet as pyramids, in 3D", {
-                      tablet: TABLET_NAMES[id],
+                      tablet: t(ELEMENT_WORDS[id]),
                     })
               }
               unavailable={setThreeDUnavailable}
@@ -1016,15 +1017,22 @@ export default function Tablets({
           ) : (
             <NoTablet version={version} choose={choose} />
           )}
-          {threeDAsked && threeDUnavailable && (
-            <Typography variant="body2" role="status" sx={{ mt: 1 }}>
+          {/* There before its line, so that a screen reader says it. */}
+          {threeDAsked && (
+            <Typography
+              variant="body2"
+              role="status"
+              sx={{ mt: threeDUnavailable ? 1 : 0 }}
+            >
               {threeDUnavailable === "webgl"
                 ? t(
                     /*i18n*/ "This browser cannot show the 3D view, so the tablet is drawn flat.",
                   )
-                : t(
-                    /*i18n*/ "The 3D view could not be loaded, so the tablet is drawn flat.",
-                  )}
+                : threeDUnavailable === "load"
+                  ? t(
+                      /*i18n*/ "The 3D view could not be loaded, so the tablet is drawn flat.",
+                    )
+                  : null}
             </Typography>
           )}
         </Box>

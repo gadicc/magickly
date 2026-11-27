@@ -6,8 +6,8 @@
  * is; Ctrl with the wheel, or a trackpad's pinch (Ctrl and the wheel in
  * Chromium and Firefox, `gesturechange` in Safari), zooms; the plain
  * wheel scrolls the page. There is no damping or inertia: each event
- * moves the camera once and asks for one frame. Touch is left to the
- * page, which scrolls past; turning by touch is the full window's.
+ * moves the camera once and asks for one frame. Touch and pen are left
+ * to the page, which scrolls past; turning by them is the full window's.
  */
 import { type PerspectiveCamera, Vector3 } from "three";
 
@@ -38,8 +38,11 @@ export interface Orbit {
   set(view: Partial<OrbitView>): void;
   /** Back to the home view. */
   reset(): void;
-  /** Fits the scene again, after a resize. */
-  fit(): void;
+  /**
+   * Fits the scene again, after a resize or to new bounds, keeping the
+   * reader's turn and zoom.
+   */
+  fit(bounds?: OrbitOptions["bounds"]): void;
   dispose(): void;
 }
 
@@ -58,7 +61,7 @@ const clamp = (value: number, [low, high]: readonly [number, number]) =>
 export function orbit(
   element: HTMLElement,
   camera: PerspectiveCamera,
-  { home, bounds, changed, clicked }: OrbitOptions,
+  { home, bounds: initial, changed, clicked }: OrbitOptions,
 ): Orbit {
   const view: OrbitView = { ...home };
   let fitted = 1;
@@ -73,7 +76,9 @@ export function orbit(
    * it needs the distance to exceed z + |x| / tan(half the width's angle),
    * and the same for y.
    */
-  const fit = () => {
+  let bounds = initial;
+  const fit = (next = bounds) => {
+    bounds = next;
     const back = towards(home);
     const right = new Vector3(0, 1, 0).cross(back).normalize();
     const up = back.clone().cross(right);
@@ -102,12 +107,13 @@ export function orbit(
     changed();
   };
 
-  // Mouse and pen only: a touch scrolls the page.
+  // The mouse only: a touch or a pen scrolls the page.
   let press: { id: number; x: number; y: number; from: OrbitView } | null =
     null;
   let dragging = false;
   const down = (event: PointerEvent) => {
-    if (event.pointerType === "touch" || event.button !== 0) return;
+    // A pen as a touch, which the page may take for a scroll mid-turn.
+    if (event.pointerType !== "mouse" || event.button !== 0) return;
     press = {
       id: event.pointerId,
       x: event.clientX,
@@ -122,6 +128,8 @@ export function orbit(
     const [dx, dy] = [event.clientX - press.x, event.clientY - press.y];
     if (!dragging && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
     dragging = true;
+    // For the box's style: no selection, a grabbing hand.
+    element.dataset.turning = "";
     // The box's width turns the tablet half round, its height a quarter.
     const { width, height } = element.getBoundingClientRect();
     set({
@@ -132,11 +140,12 @@ export function orbit(
   const up = (event: PointerEvent) => {
     if (!press || event.pointerId !== press.id) return;
     if (!dragging) clicked?.(event.clientX, event.clientY);
-    press = null;
+    cancel();
   };
-  const cancel = () => {
+  function cancel() {
     press = null;
-  };
+    delete element.dataset.turning;
+  }
   // Not passive, so that a zoom can stop the page scrolling or zooming.
   const wheel = (event: WheelEvent) => {
     if (!event.ctrlKey) return;
@@ -174,7 +183,10 @@ export function orbit(
     view,
     set,
     reset: () => set(home),
-    fit,
+    fit: (next) => {
+      fit(next);
+      changed();
+    },
     dispose() {
       for (const [type, listener] of listeners)
         element.removeEventListener(type, listener);

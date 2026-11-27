@@ -1,5 +1,10 @@
 // @vitest-environment jsdom
-import { PerspectiveCamera, Scene, Texture, type WebGLRenderer } from "three";
+import {
+  PerspectiveCamera,
+  Scene,
+  type WebGLRenderer,
+  WebGLRenderTarget,
+} from "three";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createViewer, MAX_PIXEL_RATIO, roomEnvironment } from "./viewer";
 
@@ -13,7 +18,7 @@ vi.mock("three", async (original) => {
       pmrem.made += 1;
     }
     fromScene() {
-      return { texture: new three.Texture() };
+      return new three.WebGLRenderTarget();
     }
     dispose() {
       pmrem.disposed += 1;
@@ -51,6 +56,7 @@ function stubRenderer() {
     setSize: vi.fn(),
     render: vi.fn(),
     dispose: vi.fn(),
+    forceContextLoss: vi.fn(),
     setAnimationLoop: vi.fn((callback: (() => void) | null) => {
       loop = callback;
     }),
@@ -72,11 +78,11 @@ function setUp() {
   const scene = new Scene();
   const camera = new PerspectiveCamera();
   const stub = stubRenderer();
-  const textures: Texture[] = [];
+  const targets: WebGLRenderTarget[] = [];
   const environment = vi.fn(() => {
-    const texture = new Texture();
-    textures.push(texture);
-    return texture;
+    const target = new WebGLRenderTarget();
+    targets.push(target);
+    return target;
   });
   const resized = vi.fn();
   const viewer = createViewer(box, {
@@ -86,7 +92,7 @@ function setUp() {
     resized,
     renderer: stub.make,
   });
-  return { box, scene, camera, stub, textures, environment, resized, viewer };
+  return { box, scene, camera, stub, targets, environment, resized, viewer };
 }
 
 beforeEach(() => {
@@ -155,10 +161,38 @@ describe("the viewer (plan 101, invariant 5)", () => {
     expect(viewer.frames).toBe(1);
   });
 
+  it("draws again at a new density without a resize", () => {
+    const queries: { media: string; listeners: Set<() => void> }[] = [];
+    vi.stubGlobal("matchMedia", (media: string) => {
+      const query = { media, listeners: new Set<() => void>() };
+      queries.push(query);
+      return {
+        addEventListener: (_: string, run: () => void) =>
+          query.listeners.add(run),
+        removeEventListener: (_: string, run: () => void) =>
+          query.listeners.delete(run),
+      };
+    });
+    vi.stubGlobal("devicePixelRatio", 1);
+    const { stub, viewer } = setUp();
+    expect(queries.map(({ media }) => media)).toEqual(["(resolution: 1dppx)"]);
+    vi.stubGlobal("devicePixelRatio", 1.5);
+    for (const run of queries[0].listeners) run();
+    expect(stub.renderer.setPixelRatio).toHaveBeenLastCalledWith(1.5);
+    stub.tick();
+    expect(viewer.frames).toBe(1);
+    // Watching the new density, no longer the old.
+    expect(queries[0].listeners.size).toBe(0);
+    expect(queries[1].media).toBe("(resolution: 1.5dppx)");
+    expect(queries[1].listeners.size).toBe(1);
+    viewer.dispose();
+    expect(queries[1].listeners.size).toBe(0);
+  });
+
   it("keeps its state through a lost context and draws once restored", () => {
-    const { stub, viewer, scene, environment, textures } = setUp();
+    const { stub, viewer, scene, environment, targets } = setUp();
     expect(environment).toHaveBeenCalledTimes(1);
-    expect(scene.environment).toBe(textures[0]);
+    expect(scene.environment).toBe(targets[0].texture);
     const canvas = stub.renderer.domElement;
     viewer.invalidate();
     canvas.dispatchEvent(new Event("webglcontextlost"));
@@ -167,12 +201,13 @@ describe("the viewer (plan 101, invariant 5)", () => {
     viewer.invalidate();
     stub.tick();
     expect(viewer.frames).toBe(0);
-    const old = vi.spyOn(textures[0], "dispose");
+    // Its render target, not only its texture.
+    const old = vi.spyOn(targets[0], "dispose");
     canvas.dispatchEvent(new Event("webglcontextrestored"));
     // The environment map's render target came back empty: made again.
     expect(environment).toHaveBeenCalledTimes(2);
     expect(old).toHaveBeenCalled();
-    expect(scene.environment).toBe(textures[1]);
+    expect(scene.environment).toBe(targets[1].texture);
     stub.tick();
     expect(viewer.frames).toBe(1);
     stub.tick();
@@ -180,8 +215,8 @@ describe("the viewer (plan 101, invariant 5)", () => {
   });
 
   it("releases what it made when disposed", () => {
-    const { stub, viewer, scene, textures } = setUp();
-    const environment = vi.spyOn(textures[0], "dispose");
+    const { stub, viewer, scene, targets, environment: made } = setUp();
+    const environment = vi.spyOn(targets[0], "dispose");
     viewer.invalidate();
     viewer.dispose();
     expect(Observer.all[0].disconnected).toBe(true);
@@ -189,11 +224,18 @@ describe("the viewer (plan 101, invariant 5)", () => {
     expect(environment).toHaveBeenCalled();
     expect(scene.environment).toBeNull();
     expect(stub.renderer.dispose).toHaveBeenCalled();
+    // The context goes too, after the renderer, browsers allowing few.
+    expect(stub.renderer.forceContextLoss).toHaveBeenCalledTimes(1);
+    expect(
+      stub.renderer.forceContextLoss.mock.invocationCallOrder[0],
+    ).toBeGreaterThan(stub.renderer.dispose.mock.invocationCallOrder[0]);
     expect(stub.renderer.domElement.isConnected).toBe(false);
-    // A restore after it is gone draws nothing.
+    // Its loss, and any restore, are no longer heard.
+    stub.renderer.domElement.dispatchEvent(new Event("webglcontextlost"));
     stub.renderer.domElement.dispatchEvent(new Event("webglcontextrestored"));
     stub.tick();
     expect(viewer.frames).toBe(0);
+    expect(made).toHaveBeenCalledTimes(1);
   });
 
   it("needs no environment map", () => {
@@ -223,8 +265,8 @@ describe("the viewer (plan 101, invariant 5)", () => {
 describe("the room environment", () => {
   it("prefilters three's RoomEnvironment and lets the generator go", () => {
     const [made, disposed] = [pmrem.made, pmrem.disposed];
-    const texture = roomEnvironment({} as WebGLRenderer);
-    expect(texture).toBeInstanceOf(Texture);
+    const target = roomEnvironment({} as WebGLRenderer);
+    expect(target).toBeInstanceOf(WebGLRenderTarget);
     expect(pmrem.made).toBe(made + 1);
     expect(pmrem.disposed).toBe(disposed + 1);
   });

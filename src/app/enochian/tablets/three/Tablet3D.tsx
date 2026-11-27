@@ -7,7 +7,7 @@
 import { useColorScheme } from "@mui/material/styles";
 import type { TabletView } from "magick-data/enochian/tablets";
 import React from "react";
-import { PerspectiveCamera, Scene } from "three";
+import { PerspectiveCamera, Scene, type Texture } from "three";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
 import { type Orbit, type OrbitView, orbit } from "@/three/orbit";
 import {
@@ -23,6 +23,7 @@ import {
   ENVIRONMENT_INTENSITY,
   rasteriseSheet,
   sheetCellPixels,
+  sheetTexture,
   type TabletObject,
   tabletObject,
 } from "./tabletObject";
@@ -72,18 +73,19 @@ export default function Tablet3D({
     viewer?: Viewer;
     orbit?: Orbit;
     tablet?: TabletObject;
-    sheet?: Promise<HTMLCanvasElement>;
+    sheet?: Promise<Texture>;
   }>({});
   const [drawn, setDrawn] = React.useState(false);
   const latest = React.useRef({ ground, unavailable });
   latest.current = { ground, unavailable };
 
-  // The renderer, made once.
+  // The renderer and the mark sheet's texture, made once.
   React.useEffect(() => {
     const element = box.current;
     if (!element) return;
+    let viewer: Viewer;
     try {
-      live.current.viewer = createViewer(element, {
+      viewer = createViewer(element, {
         scene,
         camera,
         environment: roomEnvironment,
@@ -93,42 +95,49 @@ export default function Tablet3D({
       latest.current.unavailable("webgl");
       return;
     }
-    live.current.viewer.renderer.domElement.setAttribute("aria-hidden", "true");
-    return () => {
-      live.current.viewer?.dispose();
-      live.current.viewer = undefined;
-    };
-  }, [scene, camera]);
-
-  // The tablet, again for another tablet, version or mirroring.
-  React.useEffect(() => {
-    const { viewer } = live.current;
-    const element = box.current;
-    if (!viewer || !element) return;
-    let gone = false;
-    const sheet = (live.current.sheet ??= rasteriseSheet(
+    viewer.renderer.domElement.setAttribute("aria-hidden", "true");
+    const anisotropy = viewer.renderer.capabilities.getMaxAnisotropy();
+    const sheet = rasteriseSheet(
       MARKS_SHEET_SVG,
       MARKS_SHEET,
       sheetCellPixels(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO)),
-    ));
+    ).then((image) => sheetTexture(image, Math.min(8, anisotropy)));
+    live.current = { viewer, sheet };
+    return () => {
+      live.current.orbit?.dispose();
+      live.current = {};
+      sheet.then(
+        (texture) => texture.dispose(),
+        () => {},
+      );
+      viewer.dispose();
+    };
+  }, [scene, camera]);
+
+  // The tablet, again for another tablet, version or mirroring, in the
+  // same renderer, with the same sheet and the reader's turn kept.
+  React.useEffect(() => {
+    const { viewer, sheet } = live.current;
+    const element = box.current;
+    if (!viewer || !sheet || !element) return;
+    let tablet: TabletObject | undefined;
+    let gone = false;
     sheet.then(
-      (image) => {
+      (texture) => {
         if (gone) return;
         const model = tabletModel(view, MARKS_SHEET, { mirrorReversed });
-        const tablet = tabletObject(model, MARKS_SHEET, image, {
-          anisotropy: Math.min(
-            8,
-            viewer.renderer.capabilities.getMaxAnisotropy(),
-          ),
+        tablet = tabletObject(model, MARKS_SHEET, texture, {
           ground: latest.current.ground,
         });
         live.current.tablet = tablet;
         scene.add(tablet.object);
-        live.current.orbit = orbit(element, camera, {
-          home: HOME_VIEW,
-          bounds: tablet.bounds,
-          changed: viewer.invalidate,
-        });
+        if (live.current.orbit) live.current.orbit.fit(tablet.bounds);
+        else
+          live.current.orbit = orbit(element, camera, {
+            home: HOME_VIEW,
+            bounds: tablet.bounds,
+            changed: viewer.invalidate,
+          });
         viewer.invalidate();
         setDrawn(true);
       },
@@ -136,13 +145,8 @@ export default function Tablet3D({
     );
     return () => {
       gone = true;
-      const { tablet, orbit: controls } = live.current;
-      controls?.dispose();
-      if (tablet) {
-        tablet.object.removeFromParent();
-        tablet.dispose();
-      }
-      live.current.tablet = live.current.orbit = undefined;
+      tablet?.object.removeFromParent();
+      tablet?.dispose();
     };
   }, [view, mirrorReversed, scene, camera]);
 

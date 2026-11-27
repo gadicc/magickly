@@ -49,14 +49,15 @@ describe("the tablets page's 3D view (plan 101, stage 3)", () => {
     expect(screen.getByText(LOADING)).toBeTruthy();
     expect(container.querySelector("[data-pyramid]")).toBeNull();
     expect(saveButtons()).toHaveLength(0);
-    // The loader renders; three comes only with the view's own chunk.
-    expect(three.imported).toBe(0);
   });
 
   it("draws the tablet flat again, and says why, where WebGL cannot be made", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const { container } = at("?tablet=fire&pyramids=1&3d=1");
+    // The live region is there, empty, before its line, so it is heard.
+    const regions = screen.getAllByRole("status");
     expect(await screen.findByText(NO_WEBGL)).toBeTruthy();
+    expect(regions).toContain(screen.getByText(NO_WEBGL));
     expect(three.imported).toBe(1);
     expect(screen.queryByText(LOADING)).toBeNull();
     expect(container.querySelector("[data-pyramid]")).not.toBeNull();

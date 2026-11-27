@@ -11,8 +11,8 @@ import {
   PMREMGenerator,
   type Scene,
   SRGBColorSpace,
-  type Texture,
   WebGLRenderer,
+  type WebGLRenderTarget,
 } from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 
@@ -23,10 +23,10 @@ export interface ViewerOptions {
   scene: Scene;
   camera: PerspectiveCamera;
   /**
-   * The scene's environment map, made at the start and again after a
-   * restored context, whose render target comes back empty.
+   * The scene's environment map's render target, made at the start and
+   * again after a restored context, when it comes back empty.
    */
-  environment?: (renderer: WebGLRenderer) => Texture;
+  environment?: (renderer: WebGLRenderer) => WebGLRenderTarget;
   /** After a resize, before its frame: refit the camera. */
   resized?: () => void;
   /** Makes the renderer; a stub in tests. */
@@ -44,13 +44,13 @@ export interface Viewer {
 }
 
 /** three's `RoomEnvironment`, prefiltered for soft reflections. */
-export function roomEnvironment(renderer: WebGLRenderer): Texture {
+export function roomEnvironment(renderer: WebGLRenderer): WebGLRenderTarget {
   const pmrem = new PMREMGenerator(renderer);
   const room = new RoomEnvironment();
-  const texture = pmrem.fromScene(room, 0.04).texture;
+  const target = pmrem.fromScene(room, 0.04);
   room.dispose();
   pmrem.dispose();
-  return texture;
+  return target;
 }
 
 /**
@@ -78,10 +78,12 @@ export function createViewer(
   canvas.style.height = "100%";
   box.append(canvas);
 
+  let map: WebGLRenderTarget | undefined;
   const makeEnvironment = () => {
     if (!environment) return;
-    scene.environment?.dispose();
-    scene.environment = environment(renderer);
+    map?.dispose();
+    map = environment(renderer);
+    scene.environment = map.texture;
   };
   makeEnvironment();
 
@@ -114,6 +116,21 @@ export function createViewer(
   };
   const observer = new ResizeObserver(resize);
   observer.observe(box);
+  // A change of density without a resize (a window moved to another
+  // screen, or the page zoomed): its query matches only the old density.
+  let density: MediaQueryList | undefined;
+  const watchDensity = () => {
+    density?.removeEventListener("change", onDensity);
+    density = window.matchMedia?.(
+      `(resolution: ${window.devicePixelRatio}dppx)`,
+    );
+    density?.addEventListener("change", onDensity);
+  };
+  const onDensity = () => {
+    watchDensity();
+    resize();
+  };
+  watchDensity();
 
   // three re-uploads buffers and textures by itself after a restore.
   const onLost = () => {
@@ -137,12 +154,16 @@ export function createViewer(
     invalidate,
     dispose() {
       observer.disconnect();
+      density?.removeEventListener("change", onDensity);
       renderer.setAnimationLoop(null);
       canvas.removeEventListener("webglcontextlost", onLost);
       canvas.removeEventListener("webglcontextrestored", onRestored);
-      scene.environment?.dispose();
+      map?.dispose();
       scene.environment = null;
       renderer.dispose();
+      // dispose() keeps the context, and a browser allows few: let it go,
+      // the listeners gone so that its loss restores nothing.
+      renderer.forceContextLoss();
       canvas.remove();
     },
   };

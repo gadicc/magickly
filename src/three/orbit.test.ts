@@ -79,12 +79,14 @@ describe("orbit (plan 101)", () => {
     }
   });
 
-  it("leaves a touch to the page, which scrolls by one finger", () => {
+  it("leaves a touch or a pen to the page, which scrolls by one finger", () => {
     const { element, changed, clicked, controls } = setUp();
     expect(element.style.touchAction).toBe("pan-y pinch-zoom");
-    pointer(element, "pointerdown", 10, 10, { pointerType: "touch" });
-    pointer(element, "pointermove", 90, 10, { pointerType: "touch" });
-    pointer(element, "pointerup", 90, 10, { pointerType: "touch" });
+    for (const pointerType of ["touch", "pen"]) {
+      pointer(element, "pointerdown", 10, 10, { pointerType });
+      pointer(element, "pointermove", 90, 10, { pointerType });
+      pointer(element, "pointerup", 90, 10, { pointerType });
+    }
     expect(controls.view).toEqual(HOME);
     expect(changed).not.toHaveBeenCalled();
     expect(clicked).not.toHaveBeenCalled();
@@ -110,15 +112,19 @@ describe("orbit (plan 101)", () => {
     expect(changed).not.toHaveBeenCalled();
     // Half the box's width turns a quarter round; a quarter of its height
     // raises the camera by an eighth of a turn.
+    expect(element.dataset.turning).toBeUndefined();
     pointer(element, "pointermove", 150, 50);
     pointer(element, "pointermove", 150, 75);
     expect(changed).toHaveBeenCalledTimes(2);
+    // Marked while turning, for the box's cursor and selection.
+    expect(element.dataset.turning).toBe("");
     expect(controls.view.azimuth).toBeCloseTo(-Math.PI / 2);
     expect(controls.view.elevation).toBeCloseTo(Math.PI / 4 + Math.PI / 8);
     expect(camera.position.length()).toBeCloseTo(distance);
     expect(camera.position.x).toBeLessThan(0);
     pointer(element, "pointerup", 150, 75);
     expect(clicked).not.toHaveBeenCalled();
+    expect(element.dataset.turning).toBeUndefined();
     // Released, the pointer moves nothing.
     pointer(element, "pointermove", 10, 10);
     expect(changed).toHaveBeenCalledTimes(2);
@@ -199,6 +205,26 @@ describe("orbit (plan 101)", () => {
     camera.aspect = 0.5;
     controls.fit();
     expect(camera.position.length()).toBeGreaterThan(wide);
+  });
+
+  it("fits new bounds, keeping the reader's turn and zoom", () => {
+    const { camera, changed, controls } = setUp(1);
+    controls.set({ azimuth: 0.5, zoom: 0.8 });
+    const watchtower = camera.position.length();
+    changed.mockClear();
+    // The Tablet of Union's 5 by 4.
+    controls.fit(
+      [-2.5, 2.5].flatMap((x) =>
+        [-2, 2].map((z): [number, number, number] => [x, 0, z]),
+      ),
+    );
+    expect(changed).toHaveBeenCalledTimes(1);
+    expect(controls.view).toEqual({ ...HOME, azimuth: 0.5, zoom: 0.8 });
+    expect(camera.position.length()).toBeLessThan(watchtower / 2);
+    // A later resize keeps the new bounds.
+    const union = camera.position.length();
+    controls.fit();
+    expect(camera.position.length()).toBeCloseTo(union);
   });
 
   it("stops listening when disposed", () => {

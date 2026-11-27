@@ -20,6 +20,7 @@ import {
   NoColorSpace,
   PlaneGeometry,
   type Ray,
+  type Texture,
 } from "three";
 import {
   MARKS_SHEET_FLIP_Y,
@@ -132,22 +133,35 @@ diffuseColor.rgb *= 1.0 - 0.6 * step(0.5, markEdges)
   * (1.0 - smoothstep(markEdges - 0.5, markEdges + 0.5, min(away.x, away.y)));`;
 
 /**
- * The tablet's object, its sheet the rasterised `image`, its texture
- * filtered at up to `anisotropy`.
+ * The rasterised sheet as a texture, filtered at up to `anisotropy`: made
+ * once for the view, shared by every tablet drawn in it, and disposed of
+ * by the view, not by a tablet.
  */
+export const sheetTexture = (image: HTMLCanvasElement, anisotropy: number) =>
+  Object.assign(new CanvasTexture(image), {
+    colorSpace: NoColorSpace,
+    flipY: MARKS_SHEET_FLIP_Y,
+    minFilter: LinearMipmapLinearFilter,
+    anisotropy,
+  });
+
+/** `source` with its one `anchor` replaced; three moving it is an error. */
+function patch(source: string, anchor: string, text: string) {
+  const parts = source.split(anchor);
+  if (parts.length !== 2)
+    throw new Error(`tablet3d: the shader has ${parts.length - 1} ${anchor}`);
+  return parts.join(text);
+}
+
+/** The tablet's object, its marks painted from `texture` (`sheetTexture`). */
 export function tabletObject(
   model: Tablet3DModel,
   sheet: MarksSheet,
-  image: HTMLCanvasElement,
+  texture: Texture,
   {
-    anisotropy,
     look = DEFAULT_LOOK,
     ground = "#8f8a80",
-  }: {
-    anisotropy: number;
-    look?: TabletLook;
-    ground?: ColorRepresentation;
-  },
+  }: { look?: TabletLook; ground?: ColorRepresentation } = {},
 ): TabletObject {
   const arrays = pyramidGeometry(model, sheet);
   // Across a side from one ridge to the other, and its height, for the
@@ -172,12 +186,6 @@ export function tabletObject(
     geometry.setAttribute(name, new BufferAttribute(array, size));
   geometry.setIndex(new BufferAttribute(arrays.index, 1));
 
-  const texture = Object.assign(new CanvasTexture(image), {
-    colorSpace: NoColorSpace,
-    flipY: MARKS_SHEET_FLIP_Y,
-    minFilter: LinearMipmapLinearFilter,
-    anisotropy,
-  });
   const uniforms = {
     markSheet: { value: texture },
     // Sharper than the mipmap would choose, for the far rows.
@@ -192,12 +200,16 @@ export function tabletObject(
   });
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms);
-    shader.vertexShader = shader.vertexShader
-      .replace("#include <common>", VERTEX)
-      .replace("#include <begin_vertex>", VERTEX_MAIN);
-    shader.fragmentShader = shader.fragmentShader
-      .replace("#include <common>", FRAGMENT)
-      .replace("#include <color_fragment>", FRAGMENT_MAIN);
+    shader.vertexShader = patch(
+      patch(shader.vertexShader, "#include <common>", VERTEX),
+      "#include <begin_vertex>",
+      VERTEX_MAIN,
+    );
+    shader.fragmentShader = patch(
+      patch(shader.fragmentShader, "#include <common>", FRAGMENT),
+      "#include <color_fragment>",
+      FRAGMENT_MAIN,
+    );
   };
   material.customProgramCacheKey = () => "tablet3d-marks-v1";
 
@@ -247,13 +259,7 @@ export function tabletObject(
     },
     setGround: (colour) => groundMaterial.color.set(colour),
     dispose() {
-      for (const each of [
-        geometry,
-        material,
-        texture,
-        groundGeometry,
-        groundMaterial,
-      ])
+      for (const each of [geometry, material, groundGeometry, groundMaterial])
         each.dispose();
     },
   };
