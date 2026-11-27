@@ -2903,8 +2903,8 @@ msgstr "The {tablet} tablet as pyramids, in 3D"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
-msgid "The 3D view has no reading-order numbers, regions or sigil. Turn 3D off to export the drawing."
-msgstr "The 3D view has no reading-order numbers, regions or sigil. Turn 3D off to export the drawing."
+msgid "The 3D view has no reading-order numbers, regions or sigil, and the symbols, upright, Enochian font and regions switches rest while it is on. Turn 3D off to export the drawing."
+msgstr "The 3D view has no reading-order numbers, regions or sigil, and the symbols, upright, Enochian font and regions switches rest while it is on. Turn 3D off to export the drawing."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx

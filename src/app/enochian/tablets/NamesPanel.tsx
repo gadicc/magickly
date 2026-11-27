@@ -130,6 +130,7 @@ export default function NamesPanel({
   pyramids = false,
   symbols = false,
   upright = false,
+  threeD = false,
 }: {
   tablet: EnochianTabletID;
   version: TabletVersionId;
@@ -159,6 +160,11 @@ export default function NamesPanel({
   symbols?: boolean;
   /** The symbols upright, which a square's link keeps too. */
   upright?: boolean;
+  /**
+   * The pyramids in 3D (plan 101), which a square's link keeps, and which
+   * draws no regions, so their switch rests.
+   */
+  threeD?: boolean;
 }) {
   const { t } = useUiLanguage();
   const [expanded, setExpanded] = React.useState<ReadonlySet<GroupKey>>(
@@ -218,6 +224,7 @@ export default function NamesPanel({
       {/* The regions are a Watchtower's crosses and rows. */}
       {!union && (
         <FormControlLabel
+          disabled={threeD}
           control={
             <Switch
               checked={regions}
@@ -381,6 +388,7 @@ export default function NamesPanel({
                           pyramids={pyramids}
                           symbols={symbols}
                           upright={upright}
+                          threeD={threeD}
                           t={t}
                         />
                       )}
@@ -518,6 +526,7 @@ function NameDetail({
   pyramids,
   symbols,
   upright,
+  threeD,
   t,
 }: {
   name: TabletName;
@@ -531,6 +540,7 @@ function NameDetail({
   pyramids: boolean;
   symbols: boolean;
   upright: boolean;
+  threeD: boolean;
   t: Translate;
 }) {
   const variants = tabletNameVariants(tablets[tablet], name.id, version);
@@ -669,6 +679,7 @@ function NameDetail({
                     pyramids,
                     symbols,
                     upright,
+                    threeD,
                   })}
                   onClick={(event: React.MouseEvent) => {
                     if (event.metaKey || event.ctrlKey || event.shiftKey)

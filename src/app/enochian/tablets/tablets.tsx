@@ -508,6 +508,10 @@ export default function Tablets({
   // The pyramids in 3D (plan 101), the URL's while its switch shows and
   // remembered while it does not, as the symbols are.
   const [threeDWanted, setThreeDWanted] = React.useState(false);
+  // Why it could not be shown: where the browser cannot, its switch turns
+  // itself off and a line says why, until the reader asks for it again.
+  const [threeDUnavailable, setThreeDUnavailable] =
+    React.useState<Unavailable>();
   // Names by default, with nothing highlighted (plan 090, decision 2).
   const [tab, setTabShown] = React.useState<PanelTab>("names");
   const [selected, setSelected] = React.useState<TabletSquare>();
@@ -550,6 +554,8 @@ export default function Tablets({
       setPyramidsWanted(pyramidsInUrl);
       if (pyramidsInUrl) {
         setThreeDWanted(threeDInUrl);
+        // Asked for again (Back, Forward or a link): it tries again.
+        if (threeDInUrl) setThreeDUnavailable(undefined);
         setSymbolsWanted(symbolsInUrl);
         if (symbolsInUrl) setUprightWanted(uprightInUrl);
       }
@@ -615,12 +621,9 @@ export default function Tablets({
       ? ("upright" as const)
       : ("outward" as const)
     : undefined;
-  // The pyramids in 3D (plan 101), in the flat drawing's place. Where the
-  // browser cannot show it, its switch turns itself off and a line says
-  // why, until the reader tries again.
-  const [threeDUnavailable, setThreeDUnavailable] =
-    React.useState<Unavailable>();
   const threeD = threeDWanted && pyramids;
+  // Said only while the flat drawing of the pyramids stands in for it.
+  const failed = threeDUnavailable && !threeD && pyramids;
   const unavailable3D = React.useCallback(
     (why: Unavailable) => {
       setThreeDUnavailable(why);
@@ -1059,7 +1062,7 @@ export default function Tablets({
           {threeD && (
             <Typography variant="body2" sx={{ mt: 1 }}>
               {t(
-                /*i18n*/ "The 3D view has no reading-order numbers, regions or sigil. Turn 3D off to export the drawing.",
+                /*i18n*/ "The 3D view has no reading-order numbers, regions or sigil, and the symbols, upright, Enochian font and regions switches rest while it is on. Turn 3D off to export the drawing.",
               )}
             </Typography>
           )}
@@ -1068,17 +1071,17 @@ export default function Tablets({
             <Typography
               variant="body2"
               role="status"
-              sx={{ mt: threeDUnavailable ? 1 : 0 }}
+              sx={{ mt: failed ? 1 : 0 }}
             >
-              {threeDUnavailable === "webgl"
-                ? t(
-                    /*i18n*/ "This browser cannot show the 3D view, so the tablet is drawn flat.",
-                  )
-                : threeDUnavailable === "load"
+              {!failed
+                ? null
+                : threeDUnavailable === "webgl"
                   ? t(
-                      /*i18n*/ "The 3D view could not be loaded, so the tablet is drawn flat.",
+                      /*i18n*/ "This browser cannot show the 3D view, so the tablet is drawn flat.",
                     )
-                  : null}
+                  : t(
+                      /*i18n*/ "The 3D view could not be loaded, so the tablet is drawn flat.",
+                    )}
             </Typography>
           )}
         </Box>
@@ -1134,9 +1137,9 @@ export default function Tablets({
                   links={links}
                   revealed={revealed}
                   pyramids={pyramids}
-                  // As the 3D view draws them: on, facing out.
-                  symbols={symbols || threeD}
-                  upright={!threeD && symbols && uprightWanted}
+                  symbols={symbols}
+                  upright={symbols && uprightWanted}
+                  threeD={threeD}
                   openSquare={
                     hasPyramids(version)
                       ? (square) => choosePyramid(square, true, "names")

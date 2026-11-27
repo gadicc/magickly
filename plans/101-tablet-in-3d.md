@@ -207,6 +207,12 @@ is still patchy on phones and not needed here.
 - **One material:** `MeshStandardMaterial`, patched in `onBeforeCompile`
   to sample the mark sheet, paint each mark's ink and outline from it,
   and tint highlighted squares. No second pass, no post-processing.
+- **The highlights' tints** (stage 4). The page's highlights become a
+  colour and an amount for each square (`highlights.ts`), copied to
+  that square's vertices on the CPU in one `vec4` attribute, updated
+  in place, not by a per-square attribute and a lookup. The view
+  redraws only when a tint changed, so a page render with the same
+  highlights draws nothing (invariant 5).
 - **The mark sheet has two channels** (correctness review): red is the
   ink's coverage and green the outline's, on black, as the spike drew
   it. `inksOf` gives every mark both an ink and an outline
@@ -350,9 +356,12 @@ deployment-tagged build pass without checking.
   regions or the sigil above the grid, and a line under it says so. It
   keeps `mirrorReversed` (the sheet has the letters mirrored).
 - **What rests while 3D is on.** *Symbols on the sides*, *upright*,
-  *Second letters* and the Enochian font rest, as *Second letters* does
-  under pyramids today. NamesPanel is passed the symbols as on and facing
-  out, as the 3D view draws them. The export box is hidden: there is one
+  *Second letters*, the Enochian font and the Names tab's *Show the
+  regions* rest, as *Second letters* does under pyramids today, and the
+  line under the view names them. NamesPanel draws nothing with the
+  symbols and only builds links from them, so it keeps the reader's own
+  choice and gets `threeD` too: a square's link opens the same view in a
+  new tab as in this one (stage 4 review). The export box is hidden: there is one
   instance, keyed `export`, and `ExportControls` has no disabled state,
   only "Nothing to export yet." for a missing target, which would
   mislead. The line under the view says that turning 3D off exports the
@@ -465,7 +474,9 @@ landing.
    search embeddings republished by AGENTS.md's recipe, within its $2
    per-run and $12 daily ledger, with the changed `search-vectors/` rows
    and manifest committed. Then the browser checks below, and the size
-   table filled in with what was measured.
+   table filled in with what was measured. The highlights' strengths are
+   tuned by eye here: they mix in linear light, so the chosen name's
+   white veil at 0.72 reads about 0.86 against the flat drawing's.
 
 ## Tests
 
