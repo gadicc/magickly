@@ -376,6 +376,15 @@
   font-size: 0.875rem;
   color: var(--mui-palette-text-secondary);
 }
+/*
+ * The lines under the 3D view in a reading column (AGENTS.md, Layout 2):
+ * 28rem holds about 70 characters of the 14px body2 text, where the
+ * drawing's column is wide.
+ */
+.view3dHint,
+.view3dNote {
+  max-inline-size: 28rem;
+}
 /* Inside, since the dialog clips anything outside it. */
 .view3d.view3dFull:focus-visible {
   outline-offset: -2px;

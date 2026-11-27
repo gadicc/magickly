@@ -1060,7 +1060,11 @@ export default function Tablets({
             <NoTablet version={version} choose={choose} />
           )}
           {threeD && (
-            <Typography variant="body2" sx={{ mt: 1 }}>
+            <Typography
+              variant="body2"
+              className={styles.view3dNote}
+              sx={{ mt: 1 }}
+            >
               {t(
                 /*i18n*/ "The 3D view has no reading-order numbers, regions or sigil, and the symbols, upright, Enochian font and regions switches rest while it is on. Turn 3D off to export the drawing.",
               )}
@@ -1070,6 +1074,7 @@ export default function Tablets({
           {(threeD || threeDUnavailable) && (
             <Typography
               variant="body2"
+              className={styles.view3dNote}
               role="status"
               sx={{ mt: failed ? 1 : 0 }}
             >
