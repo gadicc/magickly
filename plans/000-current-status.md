@@ -312,10 +312,15 @@ Follow-ups are separate from the completed migration work:
   `Sources` link through magick-data's `sourceUrl` rather than the
   works registry's `<Cite>` (AGENTS.md, reference work, rule 4), as the
   hub's do; move both together.
-- The tablet in 3D ([plan 101](101-tablet-in-3d.md)), agreed 27 November
-  2026, building on `gate/101-tablet-3d`: the whole tablet as pyramids in
-  WebGL (three.js), a *3D* switch beside *Draw as pyramids*, a full
-  window for turning on a phone, nothing loaded until asked. Follow-ups,
+- The tablet in 3D ([plan 101](101-tablet-in-3d.md)), built 27 November
+  2026: the whole tablet as pyramids in WebGL (three.js 0.187), an
+  *In 3D* switch after *Draw as pyramids* (`3d=1`), highlights and
+  picking as on the flat drawing, a *Full screen* button (the browser's
+  full screen where it has one, a window-filling dialog on an iPhone)
+  for turning with a finger, keys, and nothing loaded or precached until
+  asked (172 KB gzip, checked at build by `checkThreeBuild.mts`). TODO:
+  the first frame on a GPU at 4× throttle, 60 fps on Gadi's phone, and
+  Safari and Android Back on a device. Follow-ups,
   each with its trigger, are in the plan's last section: the relief mode,
   WebXR (the tablets in their quarters, the Union on the altar), turning
   inline on touch, picking in the full window, links from the tablets'
