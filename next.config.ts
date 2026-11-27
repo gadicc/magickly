@@ -1,5 +1,10 @@
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync, realpathSync } from "node:fs";
+import {
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  writeFileSync,
+} from "node:fs";
 import path from "node:path";
 import type { NextConfig } from "next";
 import {
@@ -71,6 +76,117 @@ const ritualPublicationTraceFiles = [
   resvgWasmTraceFile,
   ...cssTreeDynamicDataTraceFiles,
 ];
+
+/**
+ * The 3D tablet's modules (plan 101): three.js, the base under
+ * `src/three/` and the tablet's under `tablets/three/`. Real paths, as
+ * webpack resolves pnpm's links to them.
+ */
+const THREE_MODULES =
+  /[\\/](node_modules[\\/]three|src[\\/]three|src[\\/]app[\\/]enochian[\\/]tablets[\\/]three)[\\/]/;
+
+/** What the 3D chunks' finders read of webpack's compilation. */
+interface ChunkGraphModule {
+  nameForCondition?(): string | null;
+  modules?: Iterable<ChunkGraphModule>;
+}
+interface ChunkGraphChunk {
+  id: string | number | null;
+  files: Iterable<string>;
+}
+interface ChunkGraphCompilation {
+  chunks: Iterable<ChunkGraphChunk>;
+  chunkGroups: Iterable<{ isInitial(): boolean; chunks: ChunkGraphChunk[] }>;
+  chunkGraph: { getChunkModules(chunk: ChunkGraphChunk): ChunkGraphModule[] };
+}
+
+/** A module's source files, those concatenated into it included. */
+const sourcesOf = (module: ChunkGraphModule): string[] =>
+  module.modules
+    ? [...module.modules].flatMap(sourcesOf)
+    : [module.nameForCondition?.() ?? ""];
+
+const threeChunksFound = new WeakMap<object, ChunkGraphChunk[]>();
+/**
+ * The client chunks holding a 3D module, by the modules themselves, since
+ * a chunk's name or contents are no guide: three is split across chunks,
+ * and only one says so.
+ */
+function threeChunksOf(compilation: ChunkGraphCompilation) {
+  let chunks = threeChunksFound.get(compilation);
+  if (!chunks) {
+    chunks = [...compilation.chunks].filter((chunk) =>
+      compilation.chunkGraph
+        .getChunkModules(chunk)
+        .some((module) =>
+          sourcesOf(module).some((source) => THREE_MODULES.test(source)),
+        ),
+    );
+    threeChunksFound.set(compilation, chunks);
+  }
+  return chunks;
+}
+
+/** Serwist's condition: a 3D chunk's file stays out of the precache. */
+const isThreeAsset = ({
+  asset,
+  compilation,
+}: {
+  asset: { name: string };
+  compilation: ChunkGraphCompilation;
+}) =>
+  threeChunksOf(compilation).some((chunk) =>
+    [...chunk.files].includes(asset.name),
+  );
+
+/**
+ * Writes `three-chunks.json` beside the client build for
+ * `scripts/checkThreeBuild.mts` (plan 101, invariant 3): the 3D chunks,
+ * and every file of the lazy chunk groups that load them.
+ */
+class ThreeChunks {
+  apply(compiler: {
+    outputPath: string;
+    hooks: {
+      afterEmit: {
+        tap(
+          name: string,
+          run: (compilation: ChunkGraphCompilation) => void,
+        ): void;
+      };
+    };
+  }) {
+    compiler.hooks.afterEmit.tap("ThreeChunks", (compilation) => {
+      const chunks = threeChunksOf(compilation);
+      const scripts = (list: Iterable<ChunkGraphChunk>) => [
+        ...new Set(
+          [...list]
+            .flatMap((chunk) => [...chunk.files])
+            .filter((file) => file.endsWith(".js")),
+        ),
+      ];
+      const lazy = [...compilation.chunkGroups].filter(
+        (group) =>
+          !group.isInitial() &&
+          group.chunks.some((chunk) => chunks.includes(chunk)),
+      );
+      writeFileSync(
+        path.join(compiler.outputPath, "three-chunks.json"),
+        `${JSON.stringify(
+          {
+            chunks: chunks.map((chunk) => ({
+              id: chunk.id,
+              files: scripts([chunk]),
+            })),
+            lazyFiles: scripts(lazy.flatMap((group) => group.chunks)),
+          },
+          null,
+          2,
+        )}\n`,
+      );
+    });
+  }
+}
 
 /** The temple halls' medium and small PNGs, which stay out of the index. */
 const HALL_SMALLER_IMAGES =
@@ -200,6 +316,8 @@ export default async function (phase: string): Promise<NextConfig> {
         use: ["@svgr/webpack"],
       });
 
+      if (!dev && !isServer) config.plugins.push(new ThreeChunks());
+
       return config;
     },
   };
@@ -236,6 +354,17 @@ export default async function (phase: string): Promise<NextConfig> {
       // https://serwist.pages.dev/docs/next/configuring/reload-on-online
       // Hopefully fixes issue where app reloads after phone lock/unlock on Android Chrome.
       reloadOnOnline: false,
+
+      // The 3D tablet's code, which only a reader who opens the 3D view
+      // needs (plan 101, invariant 3), with Serwist's own two defaults.
+      // Not `excludeChunks`: `webpackChunkName` does survive `next/dynamic`
+      // (the group is named "tablet3d", and so is its chunk), but the
+      // group takes in every chunk the view needs that the tablets page
+      // has not loaded, and so one of MUI's theme chunks, on the first load
+      // of other pages, which their readers would then lose offline (seen
+      // on 27 November 2026). This leaves out the chunks holding 3D
+      // modules, as `scripts/checkThreeBuild.mts` checks.
+      exclude: [/\.map$/, /^manifest.*\.js$/, isThreeAsset],
 
       // Handled in src/serwistStuff.tsx
       // https://serwist.pages.dev/docs/next/configuring/register
