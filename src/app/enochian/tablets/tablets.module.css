@@ -327,8 +327,9 @@
   scroll-margin-top: calc(var(--app-bar, 56px) + 8px);
 }
 /*
- * The 3D view's buttons over its top end, and its line of instructions
- * (plan 101): at least 44px on a touch screen and 24px with a mouse.
+ * The full window's buttons over its top end, and the 3D view's line of
+ * instructions (plan 101): at least 44px on a touch screen and 24px with
+ * a mouse.
  * The full window fills the screen (`100dvh`, no safe areas: the site's
  * viewport sets no `viewport-fit=cover`).
  */
@@ -340,14 +341,27 @@
   display: flex;
   gap: 8px;
 }
-/* Quiet over the tablet: outlined, on the page's own colour. */
+/*
+ * Under the inline view, from its inline start (Gadi's choice, placement
+ * B); over the full window's top end.
+ */
+.view3dRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-start: 8px;
+}
+/* Quiet: outlined, on the page's own colour. */
 .view3dButtons button,
-.view3dButtons button:hover {
+.view3dButtons button:hover,
+.view3dRow button,
+.view3dRow button:hover {
   min-height: 24px;
   background-color: var(--mui-palette-background-paper);
 }
 @media (pointer: coarse) {
-  .view3dButtons button {
+  .view3dButtons button,
+  .view3dRow button {
     min-height: 44px;
     min-width: 44px;
   }

@@ -388,8 +388,12 @@ deployment-tagged build pass without checking.
   Focus moves in and returns to the button. Safe areas are not used: the
   site's viewport sets no `viewport-fit=cover` (`Document.tsx`), so
   `env(safe-area-inset-*)` is 0 (correctness review).
-- **Buttons.** *Reset* and *Full window* on the view, 44 px on a touch
-  screen, with one line of instructions for the input in use.
+- **Buttons.** *Reset* and *Full window* in a row directly under the
+  inline view, from its inline start, above the line of instructions
+  (Gadi's choice, placement B, over the tablet's top end before); in the
+  full window *Reset* and *Close* stay over its top end. Outlined on the
+  page's colour, 44 px on a touch screen and at least 24 px with a
+  mouse, with one line of instructions for the input in use.
 - **Keyboard.** With the view focused, the arrows turn the tablet, each
   as a drag that way would (Up lowers the camera, as dragging up does),
   + (or =) and − zoom, and 0 resets.

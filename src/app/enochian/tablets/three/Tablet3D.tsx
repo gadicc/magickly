@@ -292,19 +292,15 @@ export default function Tablet3D({
             {t(/*i18n*/ "Loading the 3D view…")}
           </p>
         )}
-        <div className={styles.view3dButtons}>
-          <Button size="small" variant="outlined" onClick={reset}>
-            {t(/*i18n*/ "Reset")}
-          </Button>
-          <Button
-            ref={fullButton}
-            size="small"
-            variant="outlined"
-            onClick={open}
-          >
-            {t(/*i18n*/ "Full window")}
-          </Button>
-        </div>
+      </div>
+      {/* Under the view, not over the tablet (Gadi's choice). */}
+      <div className={styles.view3dRow}>
+        <Button size="small" variant="outlined" onClick={reset}>
+          {t(/*i18n*/ "Reset")}
+        </Button>
+        <Button ref={fullButton} size="small" variant="outlined" onClick={open}>
+          {t(/*i18n*/ "Full window")}
+        </Button>
       </div>
       {!full && <p className={styles.view3dHint}>{hint}</p>}
       <span id={keysId} hidden>
