@@ -4,7 +4,7 @@ import enochianTablets, {
 } from "magick-data/enochian/tablets";
 import { describe, expect, it } from "vitest";
 import { MARKS_SHEET } from "./marksSheet.generated";
-import { markKey, srgbToLinear, TOP_PAINT, tabletModel } from "./model";
+import { markKey, srgbToLinear, tabletModel } from "./model";
 
 const view = (tablet: keyof typeof enochianTablets, version: string) =>
   tabletVersion(
@@ -45,7 +45,6 @@ describe("tabletModel", () => {
     model.pyramids.forEach(({ row, column }, index) => {
       expect(model.squares[row * model.columns + column]).toBe(index);
     });
-    expect(TOP_PAINT.colour).toEqual([1, 1, 1]);
   });
 
   it("mirrors the version's reversed letters unless told not to", () => {

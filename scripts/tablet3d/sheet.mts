@@ -51,7 +51,9 @@ export const SHEET_TOP = 40;
 /**
  * A letter's size on its top, and its baseline below the top's middle,
  * as the flat drawing sets a top's letter: `(SQUARE − 2) × share` on a
- * top of `SQUARE × share`, the baseline a third of the size down.
+ * top of `SQUARE × share`, the baseline a third of the size down. A
+ * descender (g, p, y) reaches about a unit past the top, which the 3D
+ * top clips, where the flat drawing lets it spill onto the sides.
  */
 export const SHEET_LETTER_SIZE = (SHEET_TOP * 18) / 20;
 export const SHEET_LETTER_BASELINE = SHEET_LETTER_SIZE / 3;
@@ -82,6 +84,28 @@ export function sheetContents() {
     marks: [...marks].sort(([a], [b]) => order(a, b)),
     letters: [...letters].sort(order),
   };
+}
+
+/**
+ * An SVG drawn as the sheet is, its text outlined to paths with the image
+ * route's renderer and the pyramids' image's fonts: Frank Ruhl Libre for
+ * the Hebrew marks; the signs, planets and letters are in the base set.
+ */
+export async function outlineSheet(
+  source: string,
+  width: number,
+  height: number,
+): Promise<string> {
+  // Imported here, so that the script's resolve hook for `server-only`
+  // is registered before the module loads.
+  const { outlineComponentImage } = await import("@/render/outlineTreeImage");
+  const { bytes } = await outlineComponentImage(source, {
+    profile: "magickli-tablet3d-marks-sheet-v1",
+    inputsSha256: createHash("sha256").update(source).digest("hex"),
+    viewBox: [0, 0, width, height],
+    fonts: ["EnochianPlain.ttf", "FrankRuhlLibre-Bold-letters.ttf"],
+  });
+  return bytes.toString("utf8");
 }
 
 /** The sheet's outlined SVG and its layout. */
@@ -134,26 +158,18 @@ export async function drawSheet(): Promise<{ svg: string; sheet: MarksSheet }> {
       {
         xmlns: "http://www.w3.org/2000/svg",
         viewBox: `0 0 ${width} ${height}`,
+        // An intrinsic size, without which a browser may not draw it.
+        width,
+        height,
       },
       createElement("rect", { width, height, fill: "#000000" }),
       ...cells,
     ),
   );
-  // Imported here, so that the script's resolve hook for `server-only`
-  // is registered before the module loads.
-  const { outlineComponentImage } = await import("@/render/outlineTreeImage");
-  const { bytes } = await outlineComponentImage(source, {
-    profile: "magickli-tablet3d-marks-sheet-v1",
-    inputsSha256: createHash("sha256").update(source).digest("hex"),
-    viewBox: [0, 0, width, height],
-    // The pyramids' image's fonts: Frank Ruhl Libre for the Hebrew marks;
-    // the signs, planets and letters are in the base set.
-    fonts: ["EnochianPlain.ttf", "FrankRuhlLibre-Bold-letters.ttf"],
-  });
   const index = (keys: readonly string[], from: number) =>
     Object.fromEntries(keys.map((key, at) => [key, from + at]));
   return {
-    svg: bytes.toString("utf8"),
+    svg: await outlineSheet(source, width, height),
     sheet: {
       columns,
       rows,
@@ -181,6 +197,18 @@ export async function sheetModule(): Promise<string> {
     "",
     "/** The sheet, outlined: red the ink's coverage, green the outline's, on black. */",
     `export const MARKS_SHEET_SVG =\n  ${JSON.stringify(svg)};`,
+    "",
+    "/**",
+    " * The UVs run down from the sheet's top left: upload it with three's",
+    " * `flipY = false`, and as `NoColorSpace`, its channels being coverage.",
+    " */",
+    "export const MARKS_SHEET_FLIP_Y = false;",
+    "",
+    "/**",
+    " * The largest cell, in pixels, that keeps the sheet within the 2,048",
+    " * pixels a side WebGL 2 guarantees a texture: the view clamps to it.",
+    " */",
+    `export const MARKS_SHEET_MAX_CELL_PX = ${Math.floor(2048 / Math.max(sheet.columns, sheet.rows))};`,
     "",
   ].join("\n");
 }

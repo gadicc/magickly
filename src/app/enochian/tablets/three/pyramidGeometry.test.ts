@@ -71,15 +71,19 @@ function flatDrawing(tablet: string, version: string) {
     { at: number[]; scale: number; turn: number }
   >();
   const mirrored = new Set<string>();
+  // Every top's fill and every letter's, which follow the sides.
+  const [topFills, letterFills] = [new Set<string>(), new Set<string>()];
   let pyramid = "";
   let origin = [0, 0];
-  for (const [tag, name] of svg.matchAll(/<(g|polygon|text)\b[^>]*>/g)) {
+  for (const [tag, name] of svg.matchAll(/<(g|polygon|text|rect)\b[^>]*>/g)) {
     const a = attributes(tag);
+    const fill = /fill:([^;]+)/.exec(a.style ?? "")?.[1] ?? "";
+    if (name === "rect" && "data-top" in a) topFills.add(fill);
+    else if (name === "text" && topFills.size) letterFills.add(fill);
     if (a["data-pyramid"]) pyramid = a["data-pyramid"];
     else if (name === "polygon" && a["data-side"]) {
       const points = a.points.split(" ").map((p) => p.split(",").map(Number));
       if (pyramid === "0,0" && a["data-side"] === "1") origin = points[0];
-      const fill = /fill:([^;]+)/.exec(a.style)?.[1] ?? "";
       sides.set(`${pyramid},${a["data-side"]}`, { points, fill });
     } else if (a["data-symbol"]) {
       const [x, y, scale, turn] = (a.transform.match(/-?[\d.]+/g) ?? []).map(
@@ -98,7 +102,7 @@ function flatDrawing(tablet: string, version: string) {
       mirrored.add(`${row},${column}`);
     }
   }
-  return { sides, symbols, mirrored, origin };
+  return { sides, symbols, mirrored, origin, topFills, letterFills };
 }
 
 const vertexOf = (geometry: PyramidGeometry, vertex: number) => [
@@ -165,6 +169,12 @@ describe("the 3D tablet's geometry", () => {
       const model = tabletModel(view, MARKS_SHEET);
       const geometry = pyramidGeometry(model, MARKS_SHEET);
       const flat = flatDrawing(tablet, version);
+      // The flat drawing names its tops' and letters' colours.
+      const css = (fill: string) =>
+        ({ white: "#ffffff", black: "#000000" })[fill] ?? fill;
+      expect([flat.topFills.size, flat.letterFills.size]).toEqual([1, 1]);
+      const topColour = srgbToLinear(css([...flat.topFills][0]));
+      const letterInk = srgbToLinear(css([...flat.letterFills][0]));
       const errors: string[] = [];
       const fail = (message: string) =>
         errors.length < 20 && errors.push(message);
@@ -244,17 +254,17 @@ describe("the 3D tablet's geometry", () => {
             if (
               !near(
                 [...geometry.colours.subarray(first * 3, first * 3 + 3)],
-                [1, 1, 1],
+                topColour,
               )
             )
-              fail(`${key}: top not white`);
+              fail(`${key}: top's colour`);
             if (
               !near(
                 [...geometry.inks.subarray(first * 3, first * 3 + 3)],
-                [0, 0, 0],
+                letterInk,
               )
             )
-              fail(`${key}: letter not black`);
+              fail(`${key}: letter's ink`);
             const letterCell =
               MARKS_SHEET.letters[view.grid[pyramid.row][pyramid.column] ?? ""];
             const column = letterCell % MARKS_SHEET.columns;
@@ -579,6 +589,30 @@ describe("picking a square by a ray", () => {
       row: 6,
       column: model.columns - 1,
     });
+  });
+
+  it("picks nothing from below the ground, straight up or slanting", () => {
+    const [model] = models;
+    for (const { row, column } of model.pyramids) {
+      const [x, , z] = centreOf(model, row, column);
+      for (const direction of [
+        [0, 1, 0],
+        [0.4, 1, -0.3],
+        [-1, 0.2, 0.5],
+      ] as Vec3[])
+        expect(
+          pickSquare(
+            model,
+            // Up through the ground at the square's centre.
+            [
+              x - direction[0] / direction[1],
+              -1,
+              z - direction[2] / direction[1],
+            ],
+            direction,
+          ),
+        ).toBeNull();
+    }
   });
 
   it("picks nothing for a ray that meets no pyramid", () => {

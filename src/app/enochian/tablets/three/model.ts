@@ -100,12 +100,11 @@ export interface Tablet3DModel {
 /**
  * The flat top's paint: white, its letter black, as the flat drawing
  * paints them (`PyramidSquares` in `tabletSvg.tsx`). A letter has no
- * outline; the sheet draws none for it.
+ * outline.
  */
-export const TOP_PAINT: FacePaint = Object.freeze({
+export const TOP_PAINT: Pick<FacePaint, "colour" | "ink"> = Object.freeze({
   colour: srgbToLinear("#ffffff"),
   ink: srgbToLinear("#000000"),
-  outline: srgbToLinear("#000000"),
 });
 
 const cellOf = (cells: Readonly<Record<string, number>>, key: string) => {

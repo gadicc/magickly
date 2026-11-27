@@ -119,6 +119,8 @@ export function pyramidGeometry(
     outlines: array(3),
     squares: array(1),
     valleys: array(1),
+    // WebGL 2 always restarts primitives at index 0xffff, so 16 bits
+    // hold only indices below it.
     index:
       count > 0xffff
         ? new Uint32Array((count / 4) * 6)
@@ -222,7 +224,8 @@ export function pyramidGeometry(
         add(top, [-half, 0, -half]),
       ],
       [0, 1, 0],
-      TOP_PAINT,
+      // The sheet draws a letter without an outline; any colour will do.
+      { ...TOP_PAINT, outline: TOP_PAINT.ink },
       square,
       {
         cell: pyramid.letterCell,
@@ -287,13 +290,17 @@ const pyramidPlanes = (centre: Vec3): Plane[] => [
  * The square whose pyramid a ray in tablet-local space meets first, or
  * null. It walks the squares the ray crosses over the tablet, nearest
  * first, and tests each one's pyramid, so a low ray picks the raised face
- * it meets, not the square behind it that a ground hit would give.
+ * it meets, not the square behind it that a ground hit would give. A ray
+ * from below the tablet's ground (y < 0) picks nothing.
  */
 export function pickSquare(
   model: Tablet3DModel,
   origin: Vec3,
   direction: Vec3,
 ): PickedSquare | null {
+  // From under the ground, which is drawn beneath the tablet and hides
+  // it; and the mesh has no bases to pick.
+  if (origin[1] < 0) return null;
   const { columns, rows } = model;
   const box = enters(
     boxPlanes(
