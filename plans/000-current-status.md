@@ -293,8 +293,8 @@ Follow-ups are separate from the completed migration work:
   downloads and the image (`symbols` on the same slug and profile),
   released as magick-components 0.9.0 (`Tablet`'s `pyramidSymbols`,
   `enochian/pyramidMarks`). The Squares tab's large pyramid starts
-  outward too (Gadi, 24 November). TODO: the tablet in 3D (its own plan,
-  started in another session).
+  outward too (Gadi, 24 November). The tablet in 3D is
+  [plan 101](101-tablet-in-3d.md).
   Corrected 26 November 2026: "outward" now stands each symbol on its
   side's outer edge, head toward the top, as Regardie's drawings (vol.
   4, pp.294 and 296) have them, where it had turned each head outward;
@@ -312,6 +312,14 @@ Follow-ups are separate from the completed migration work:
   `Sources` link through magick-data's `sourceUrl` rather than the
   works registry's `<Cite>` (AGENTS.md, reference work, rule 4), as the
   hub's do; move both together.
+- The tablet in 3D ([plan 101](101-tablet-in-3d.md)), agreed 27 November
+  2026, building on `gate/101-tablet-3d`: the whole tablet as pyramids in
+  WebGL (three.js), a *3D* switch beside *Draw as pyramids*, a full
+  window for turning on a phone, nothing loaded until asked. Follow-ups,
+  each with its trigger, are in the plan's last section: the relief mode,
+  WebXR (the tablets in their quarters, the Union on the altar), turning
+  inline on touch, picking in the full window, links from the tablets'
+  own pages, a movable light, a move into magick-components.
 - The export controls ([plan 097](097-export-controls.md)), 23 November
   2026, on `gate/export-controls`: one row per format under every
   drawing (SVG and PNG, each with Save, Copy and Link), image links
