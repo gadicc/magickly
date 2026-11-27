@@ -2954,8 +2954,51 @@ msgstr "בלוחות של די מ־1584 אין לוח איחוד. לוח האי�
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/three/Tablet3D.tsx
+msgid "One finger turns the tablet, and two zoom."
+msgstr "אצבע אחת מסובבת את הלוח, ושתיים מקרבות ומרחיקות."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/three/Tablet3D.tsx
+msgid "Drag to turn the tablet, and use the wheel to zoom."
+msgstr "גררו כדי לסובב את הלוח, והשתמשו בגלגלת כדי לקרב ולהרחיק."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/three/Tablet3D.tsx
+msgid "Tap a square to choose it. To turn the tablet, open the full window."
+msgstr "הקישו על משבצת כדי לבחור בה. כדי לסובב את הלוח, פתחו את החלון המלא."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/three/Tablet3D.tsx
+msgid "Drag to turn the tablet, Ctrl and the wheel zoom, and a click chooses a square."
+msgstr "גררו כדי לסובב את הלוח, Ctrl והגלגלת מקרבים ומרחיקים, ולחיצה בוחרת משבצת."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/three/Tablet3D.tsx
 msgid "3D view"
 msgstr "תצוגה בתלת־ממד"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/three/Tablet3D.tsx
+msgid "Reset"
+msgstr "איפוס"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/three/Tablet3D.tsx
+msgid "Full window"
+msgstr "חלון מלא"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/three/Tablet3D.tsx
+msgid "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and Esc leaves the full window."
+msgstr "מקשי החיצים מסובבים את הלוח, + ו־− מקרבים ומרחיקים, 0 מאפס את התצוגה, ו־Esc יוצא מהחלון המלא."
+
+#. js-lingui-explicit-id
+#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
+#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
+#: src/app/doc/[_id]/HallViewer.tsx
+#: src/app/enochian/tablets/three/Tablet3D.tsx
+msgid "Close"
+msgstr "סגירה"
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/DocLoader.tsx
@@ -3053,13 +3096,6 @@ msgstr "איפוס התקריב"
 #: src/app/doc/[_id]/HallViewer.tsx
 msgid "Halls in this ritual"
 msgstr "אולמות בטקס הזה"
-
-#. js-lingui-explicit-id
-#: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
-#: src/app/doc/[_id]/edit/semantic/SemanticEditor.tsx
-#: src/app/doc/[_id]/HallViewer.tsx
-msgid "Close"
-msgstr "סגירה"
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/HallViewer.tsx

@@ -6,6 +6,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import enochianTablets, { tabletVersion } from "magick-data/enochian/tablets";
 import { type PerspectiveCamera, type Scene, Vector3 } from "three";
@@ -21,6 +22,7 @@ const stub = vi.hoisted(() => ({
   rasters: 0,
   scene: null as Scene | null,
   camera: null as PerspectiveCamera | null,
+  canvas: null as HTMLCanvasElement | null,
   invalidate: vi.fn(),
   dispose: vi.fn(),
 }));
@@ -37,7 +39,11 @@ vi.mock("@/three/viewer", async (original) => {
       stub.scene = options.scene;
       stub.camera = options.camera;
       const canvas = document.createElement("canvas");
+      // jsdom lays nothing out: the canvas fills its box.
+      canvas.getBoundingClientRect = () =>
+        (canvas.parentElement as HTMLElement).getBoundingClientRect();
       box.append(canvas);
+      stub.canvas = canvas;
       return {
         renderer: {
           domElement: canvas,
@@ -46,6 +52,7 @@ vi.mock("@/three/viewer", async (original) => {
         frames: 0,
         invalidate: stub.invalidate,
         dispose: stub.dispose,
+        moveTo: (into: HTMLElement) => into.append(canvas),
       };
     },
   };
@@ -279,5 +286,126 @@ describe("the 3D view (plan 101)", () => {
     unmount();
     expect(stub.dispose).toHaveBeenCalled();
     expect(stub.scene?.children).toHaveLength(0);
+  });
+
+  describe("the full window", () => {
+    const props = {
+      mirrorReversed: true,
+      label: "The Fire tablet as pyramids, in 3D",
+      unavailable: vi.fn(),
+    };
+    const drawn = async () => {
+      render(<Tablet3D view={view("fire")} {...props} />);
+      await waitFor(() =>
+        expect(screen.queryByText("Loading the 3D view…")).toBeNull(),
+      );
+    };
+    const dialog = () => screen.queryByRole("dialog");
+    afterEach(() => window.history.replaceState(null, "", "/"));
+
+    it("opens with a history entry, takes the canvas, and goes back to close", async () => {
+      stub.on = true;
+      window.history.replaceState({ tabletsTab: "squares" }, "", "/");
+      await drawn();
+      const canvas = stub.canvas;
+      const button = screen.getByRole("button", { name: "Full window" });
+      button.focus();
+      const push = vi.spyOn(window.history, "pushState");
+      fireEvent.click(button);
+      // Its entry keeps the page's own state.
+      expect(push).toHaveBeenCalledTimes(1);
+      expect(window.history.state).toMatchObject({
+        tabletsTab: "squares",
+        tablet3dFull: true,
+      });
+      const window3d = dialog() as HTMLElement;
+      expect(window3d).not.toBeNull();
+      // The same canvas, moved: one renderer, one context.
+      expect(window3d.querySelectorAll("canvas")).toHaveLength(1);
+      expect(window3d.querySelector("canvas")).toBe(canvas);
+      expect(stub.made).toBe(1);
+      expect(window3d.contains(document.activeElement)).toBe(true);
+      // Its touch turns the tablet there, and the page does not scroll.
+      expect((canvas as HTMLCanvasElement).style.touchAction).toBe("none");
+      // Close goes back; Back closes it, and the canvas returns.
+      const back = vi.spyOn(window.history, "back").mockImplementation(() => {
+        window.history.replaceState({ tabletsTab: "squares" }, "", "/");
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      });
+      fireEvent.click(within(window3d).getByRole("button", { name: "Close" }));
+      expect(back).toHaveBeenCalledTimes(1);
+      await waitFor(() => expect(dialog()).toBeNull());
+      const inline = screen.getByRole("group", { name: props.label });
+      expect(canvas?.parentElement).toBe(inline);
+      expect(canvas?.style.touchAction).toBe("pan-y pinch-zoom");
+      expect(document.activeElement).toBe(button);
+      expect(stub.made).toBe(1);
+    });
+
+    it("goes back on Esc, and opens again on Forward", async () => {
+      stub.on = true;
+      await drawn();
+      fireEvent.click(screen.getByRole("button", { name: "Full window" }));
+      const back = vi
+        .spyOn(window.history, "back")
+        .mockImplementation(() => {});
+      fireEvent.keyDown(dialog() as HTMLElement, { key: "Escape" });
+      expect(back).toHaveBeenCalledTimes(1);
+      act(() => {
+        window.history.replaceState({}, "", "/");
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      });
+      await waitFor(() => expect(dialog()).toBeNull());
+      act(() => {
+        window.history.replaceState({ tablet3dFull: true }, "", "/");
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      });
+      expect(dialog()).not.toBeNull();
+    });
+
+    it("lets go of an entry a reload left open", async () => {
+      stub.on = true;
+      window.history.replaceState(
+        { tabletsTab: "names", tablet3dFull: true },
+        "",
+        "/",
+      );
+      await drawn();
+      expect(dialog()).toBeNull();
+      expect(window.history.state).toMatchObject({
+        tabletsTab: "names",
+        tablet3dFull: false,
+      });
+    });
+
+    it("turns and zooms by key, one frame a key, leaving others alone", async () => {
+      stub.on = true;
+      await drawn();
+      const view3d = screen.getByRole("group", { name: props.label });
+      expect(
+        document.getElementById(
+          view3d.getAttribute("aria-describedby") as string,
+        )?.textContent,
+      ).toMatch(/arrow keys turn/);
+      const camera = stub.camera as PerspectiveCamera;
+      const from = camera.position.clone();
+      for (const key of ["ArrowLeft", "ArrowUp", "+", "=", "-", "0"]) {
+        stub.invalidate.mockClear();
+        const event = fireEvent.keyDown(view3d, { key });
+        expect(event).toBe(false);
+        expect(stub.invalidate).toHaveBeenCalledTimes(1);
+      }
+      // 0 brought it home.
+      expect(camera.position.distanceTo(from)).toBeLessThan(1e-9);
+      stub.invalidate.mockClear();
+      for (const init of [
+        { key: "Tab" },
+        { key: "ArrowLeft", ctrlKey: true },
+        { key: "+", metaKey: true },
+        { key: "0", altKey: true },
+      ])
+        expect(fireEvent.keyDown(view3d, init)).toBe(true);
+      expect(stub.invalidate).not.toHaveBeenCalled();
+    });
   });
 });

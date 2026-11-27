@@ -4,6 +4,7 @@
  * for as long as the view is open: another tablet, version or theme
  * changes what it draws, never the WebGL context.
  */
+import { Button, Dialog, useMediaQuery } from "@mui/material";
 import { useColorScheme } from "@mui/material/styles";
 import type { TabletHighlights } from "magick-components/enochian/Tablet";
 import type { TabletView } from "magick-data/enochian/tablets";
@@ -94,7 +95,8 @@ export default function Tablet3D({
   const clicked = (x: number, y: number) => {
     const { tablet } = live.current;
     const { highlights } = latest.current;
-    const rect = box.current?.getBoundingClientRect();
+    const rect =
+      live.current.viewer?.renderer.domElement.getBoundingClientRect();
     if (!tablet || !rect) return;
     const ray = new Raycaster();
     ray.setFromCamera(
@@ -150,8 +152,9 @@ export default function Tablet3D({
   // same renderer, with the same sheet and the reader's turn kept.
   React.useEffect(() => {
     const { viewer, sheet } = live.current;
-    const element = box.current;
-    if (!viewer || !sheet || !element) return;
+    if (!viewer || !sheet) return;
+    // On the canvas, which moves into the full window and back.
+    const element = viewer.renderer.domElement;
     let tablet: TabletObject | undefined;
     let gone = false;
     sheet.then(
@@ -200,20 +203,114 @@ export default function Tablet3D({
     live.current.viewer?.invalidate();
   }, [ground]);
 
+  // The full window (plan 101): its own history entry, so that Back
+  // closes it, merged with the page's own state (`tabletsTab`); Close and
+  // Esc go back. The canvas moves into it and back: one context.
+  const [full, setFull] = React.useState(false);
+  React.useEffect(() => {
+    const isFull = () => Boolean(window.history.state?.[FULL]);
+    // A reload keeps an open window's entry, but not the window.
+    if (isFull())
+      window.history.replaceState(
+        { ...window.history.state, [FULL]: false },
+        "",
+      );
+    const popped = () => setFull(isFull());
+    window.addEventListener("popstate", popped);
+    return () => window.removeEventListener("popstate", popped);
+  }, []);
+  const open = () => {
+    window.history.pushState({ ...window.history.state, [FULL]: true }, "");
+    setFull(true);
+  };
+  const close = () => window.history.back();
+  const fullBox = React.useCallback((node: HTMLDivElement | null) => {
+    const { viewer, orbit: controls } = live.current;
+    const into = node ?? box.current;
+    if (!viewer || !into) return;
+    viewer.moveTo(into);
+    controls?.setFull(Boolean(node));
+    // Into the window, so that its keys work at once.
+    node?.focus();
+  }, []);
+  const keyed = (event: React.KeyboardEvent) => {
+    if (live.current.orbit?.key(event.nativeEvent)) event.preventDefault();
+  };
+  const reset = () => live.current.orbit?.reset();
+  const coarse = useMediaQuery("(pointer: coarse)");
+  const keysId = React.useId();
+  const hint = full
+    ? coarse
+      ? t(/*i18n*/ "One finger turns the tablet, and two zoom.")
+      : t(/*i18n*/ "Drag to turn the tablet, and use the wheel to zoom.")
+    : coarse
+      ? t(
+          /*i18n*/ "Tap a square to choose it. To turn the tablet, open the full window.",
+        )
+      : t(
+          /*i18n*/ "Drag to turn the tablet, Ctrl and the wheel zoom, and a click chooses a square.",
+        );
+  // The view inline and in the window: focusable, named, its keys told.
+  const viewProps = {
+    role: "group",
+    tabIndex: 0,
+    "aria-roledescription": t(/*i18n*/ "3D view"),
+    "aria-label": label,
+    "aria-describedby": keysId,
+    onKeyDown: keyed,
+  };
+
   return (
-    <div
-      ref={box}
-      className={styles.view3d}
-      role="group"
-      tabIndex={0}
-      aria-roledescription={t(/*i18n*/ "3D view")}
-      aria-label={label}
-    >
-      {!drawn && (
-        <p className={styles.view3dStatus}>
-          {t(/*i18n*/ "Loading the 3D view…")}
-        </p>
-      )}
-    </div>
+    <>
+      <div ref={box} className={styles.view3d} {...viewProps}>
+        {!drawn && (
+          <p className={styles.view3dStatus}>
+            {t(/*i18n*/ "Loading the 3D view…")}
+          </p>
+        )}
+        <div className={styles.view3dButtons}>
+          <Button size="small" variant="contained" onClick={reset}>
+            {t(/*i18n*/ "Reset")}
+          </Button>
+          <Button size="small" variant="contained" onClick={open}>
+            {t(/*i18n*/ "Full window")}
+          </Button>
+        </div>
+      </div>
+      {!full && <p className={styles.view3dHint}>{hint}</p>}
+      <span id={keysId} hidden>
+        {t(
+          /*i18n*/ "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and Esc leaves the full window.",
+        )}
+      </span>
+      <Dialog
+        fullScreen
+        open={full}
+        onClose={close}
+        transitionDuration={0}
+        aria-label={label}
+      >
+        <div
+          ref={fullBox}
+          className={`${styles.view3d} ${styles.view3dFull}`}
+          {...viewProps}
+        >
+          <div className={styles.view3dButtons}>
+            <Button size="small" variant="contained" onClick={reset}>
+              {t(/*i18n*/ "Reset")}
+            </Button>
+            <Button size="small" variant="contained" onClick={close}>
+              {t(/*i18n*/ "Close")}
+            </Button>
+          </div>
+          <p className={`${styles.view3dHint} ${styles.view3dFullHint}`}>
+            {hint}
+          </p>
+        </div>
+      </Dialog>
+    </>
   );
 }
+
+/** The history state's key for an open full window. */
+const FULL = "tablet3dFull";

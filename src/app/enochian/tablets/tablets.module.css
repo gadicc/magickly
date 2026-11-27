@@ -284,16 +284,16 @@
   overflow: hidden;
   background-color: #f3f1ec;
 }
-/* While a drag turns it (`data-turning`, from orbit.ts). */
-.view3d[data-turning] {
+/* While a drag turns it (`data-turning` on its canvas, from orbit.ts). */
+.view3d:has(> canvas[data-turning]) {
   user-select: none;
   -webkit-user-select: none;
 }
 @media (pointer: fine) {
-  .view3d {
+  .view3d > canvas {
     cursor: grab;
   }
-  .view3d[data-turning] {
+  .view3d > canvas[data-turning] {
     cursor: grabbing;
   }
 }
@@ -325,4 +325,53 @@
  */
 .layout.threeDLayout .namesItem {
   scroll-margin-top: calc(var(--app-bar, 56px) + 8px);
+}
+/*
+ * The 3D view's buttons over its top end, and its line of instructions
+ * (plan 101): at least 44px on a touch screen and 24px with a mouse.
+ * The full window fills the screen (`100dvh`, no safe areas: the site's
+ * viewport sets no `viewport-fit=cover`).
+ */
+.view3dButtons {
+  position: absolute;
+  z-index: 1;
+  inset-block-start: 8px;
+  inset-inline-end: 8px;
+  display: flex;
+  gap: 8px;
+}
+.view3dButtons button {
+  min-height: 24px;
+}
+@media (pointer: coarse) {
+  .view3dButtons button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+.view3dHint {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+  color: var(--mui-palette-text-secondary);
+}
+.view3d.view3dFull {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  aspect-ratio: auto;
+  max-height: none;
+  border-radius: 0;
+}
+/* Over the tablet, on a card of the page's own colour, to be read. */
+.view3dFullHint {
+  position: absolute;
+  inset-block-end: 12px;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  padding: 4px 12px;
+  border-radius: 4px;
+  text-align: center;
+  pointer-events: none;
+  background-color: var(--mui-palette-background-paper);
 }
