@@ -2964,8 +2964,8 @@ msgstr "Drag to turn the tablet, and use the wheel to zoom."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/three/Tablet3D.tsx
-msgid "Tap a square to choose it. To turn the tablet, open the full window."
-msgstr "Tap a square to choose it. To turn the tablet, open the full window."
+msgid "Tap a square to choose it. To turn the tablet, view it full screen."
+msgstr "Tap a square to choose it. To turn the tablet, view it full screen."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/three/Tablet3D.tsx
@@ -2984,13 +2984,13 @@ msgstr "Reset"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/three/Tablet3D.tsx
-msgid "Full window"
-msgstr "Full window"
+msgid "Full screen"
+msgstr "Full screen"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/three/Tablet3D.tsx
-msgid "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and in the full window Esc leaves it."
-msgstr "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and in the full window Esc leaves it."
+msgid "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and in full screen Esc leaves it."
+msgstr "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and in full screen Esc leaves it."
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx

@@ -375,7 +375,15 @@ deployment-tagged build pass without checking.
 - **Touch, inline** (value review). A tap picks, and the page scrolls as
   usual. Turning on a touch screen is the full window's. One gesture
   grammar per place, and the Safari risk nobody here can test shrinks.
-- **Full window.** A fixed dialog (`100dvh`). One finger turns, two
+- **Full window**, named *Full screen* to the reader (Gadi, 27 November
+  2026). A fixed dialog (`100dvh`), which the same click that opens it
+  asks the browser to show full screen (the Fullscreen API, on the
+  dialog), where it can; where it cannot or refuses (an iPhone's Safari),
+  the dialog fills the window as before. Leaving the full screen (Esc,
+  Android's Back, the browser's own way out) closes the view through the
+  same once-only `history.back()`, and closing the view by Close, Esc or
+  Back leaves the full screen, whose change then closes nothing more.
+  One finger turns, two
   fingers zoom, and the plain wheel zooms. No picking there, so nothing
   chosen is out of sight (value review). Opening it pushes a history
   entry, its state merged with the page's own `tabletsTab` key; Next's
@@ -388,7 +396,7 @@ deployment-tagged build pass without checking.
   Focus moves in and returns to the button. Safe areas are not used: the
   site's viewport sets no `viewport-fit=cover` (`Document.tsx`), so
   `env(safe-area-inset-*)` is 0 (correctness review).
-- **Buttons.** *Reset* and *Full window* in a row directly under the
+- **Buttons.** *Reset* and *Full screen* in a row directly under the
   inline view, from its inline start, above the line of instructions
   (Gadi's choice, placement B, over the tablet's top end before); in the
   full window *Reset* and *Close* stay over its top end. Outlined on the

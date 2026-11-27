@@ -9,6 +9,7 @@ import { useColorScheme } from "@mui/material/styles";
 import type { TabletHighlights } from "magick-components/enochian/Tablet";
 import type { TabletView } from "magick-data/enochian/tablets";
 import React from "react";
+import { flushSync } from "react-dom";
 import {
   PerspectiveCamera,
   Raycaster,
@@ -206,9 +207,11 @@ export default function Tablet3D({
     live.current.viewer?.invalidate();
   }, [ground]);
 
-  // The full window (plan 101): its own history entry, so that Back
-  // closes it, merged with the page's own state (`tabletsTab`); Close and
-  // Esc go back. The canvas moves into it and back: one context.
+  // The full window, shown to the reader as Full screen (plan 101): the
+  // browser's full screen where it gives one, else a window-filling
+  // dialog. Its own history entry, so that Back closes it, merged with
+  // the page's own state (`tabletsTab`); Close, Esc and leaving the full
+  // screen go back. The canvas moves into it and back: one context.
   const [full, setFull] = React.useState(false);
   const fullRef = React.useRef(false);
   const closing = React.useRef(false);
@@ -236,26 +239,45 @@ export default function Tablet3D({
   }, []);
   const open = () => {
     window.history.pushState({ ...window.history.state, [FULL]: true }, "");
-    setFull(true);
+    // Mounted at once, so that the full screen is asked for in the click.
+    flushSync(() => setFull(true));
+    const paper = fullNode.current?.parentElement;
+    if (document.fullscreenEnabled && paper?.requestFullscreen)
+      paper.requestFullscreen().catch(() => {});
   };
   // Back once, however often Close or Esc is pressed before it lands.
-  const close = () => {
+  const close = React.useCallback(() => {
     if (!window.history.state?.[FULL]) setFull(false);
     else if (!closing.current) {
       closing.current = true;
       window.history.back();
     }
-  };
+  }, []);
+  // The full screen left by the browser (Esc, Android's Back): closed too.
+  React.useEffect(() => {
+    const left = () =>
+      !document.fullscreenElement && fullRef.current && close();
+    document.addEventListener("fullscreenchange", left);
+    return () => document.removeEventListener("fullscreenchange", left);
+  }, [close]);
+  const fullNode = React.useRef<HTMLDivElement | null>(null);
   const fullBox = React.useCallback((node: HTMLDivElement | null) => {
     fullRef.current = Boolean(node);
+    fullNode.current = node;
+    // Into the window, so that its keys work at once, and back to its
+    // button, which Safari does not focus when it is clicked: once out of
+    // the full screen, which leaves nothing else focusable. Closed by
+    // Close, Esc or Back, the full screen goes too, and its change, the
+    // window already gone, closes nothing more.
+    const focus = () => (node ?? fullButton.current)?.focus();
+    if (!node && document.fullscreenElement)
+      document.exitFullscreen().then(focus, focus);
+    else focus();
     const { viewer, orbit: controls } = live.current;
     const into = node ?? box.current;
     if (!viewer || !into) return;
     viewer.moveTo(into);
     controls?.setFull(Boolean(node));
-    // Into the window, so that its keys work at once, and back to its
-    // button, which Safari does not focus when it is clicked.
-    (node ?? fullButton.current)?.focus();
   }, []);
   const keyed = (event: React.KeyboardEvent) => {
     if (live.current.orbit?.key(event.nativeEvent)) event.preventDefault();
@@ -269,7 +291,7 @@ export default function Tablet3D({
       : t(/*i18n*/ "Drag to turn the tablet, and use the wheel to zoom.")
     : coarse
       ? t(
-          /*i18n*/ "Tap a square to choose it. To turn the tablet, open the full window.",
+          /*i18n*/ "Tap a square to choose it. To turn the tablet, view it full screen.",
         )
       : t(
           /*i18n*/ "Drag to turn the tablet, Ctrl and the wheel zoom, and a click chooses a square.",
@@ -299,13 +321,13 @@ export default function Tablet3D({
           {t(/*i18n*/ "Reset")}
         </Button>
         <Button ref={fullButton} size="small" variant="outlined" onClick={open}>
-          {t(/*i18n*/ "Full window")}
+          {t(/*i18n*/ "Full screen")}
         </Button>
       </div>
       {!full && <p className={styles.view3dHint}>{hint}</p>}
       <span id={keysId} hidden>
         {t(
-          /*i18n*/ "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and in the full window Esc leaves it.",
+          /*i18n*/ "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and in full screen Esc leaves it.",
         )}
       </span>
       <Dialog

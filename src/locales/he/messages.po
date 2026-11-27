@@ -2964,8 +2964,8 @@ msgstr "גררו כדי לסובב את הלוח, והשתמשו בגלגלת כ
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/three/Tablet3D.tsx
-msgid "Tap a square to choose it. To turn the tablet, open the full window."
-msgstr "הקישו על משבצת כדי לבחור בה. כדי לסובב את הלוח, פתחו את החלון המלא."
+msgid "Tap a square to choose it. To turn the tablet, view it full screen."
+msgstr "הקישו על משבצת כדי לבחור בה. כדי לסובב את הלוח, הציגו אותו במסך מלא."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/three/Tablet3D.tsx
@@ -2984,13 +2984,13 @@ msgstr "איפוס"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/three/Tablet3D.tsx
-msgid "Full window"
-msgstr "חלון מלא"
+msgid "Full screen"
+msgstr "מסך מלא"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/three/Tablet3D.tsx
-msgid "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and in the full window Esc leaves it."
-msgstr "מקשי החיצים מסובבים את הלוח, + ו־− מקרבים ומרחיקים, 0 מאפס את התצוגה, ובחלון המלא Esc יוצא ממנו."
+msgid "The arrow keys turn the tablet, + and − zoom, 0 resets the view, and in full screen Esc leaves it."
+msgstr "מקשי החיצים מסובבים את הלוח, + ו־− מקרבים ומרחיקים, 0 מאפס את התצוגה, ובמסך מלא Esc יוצא ממנו."
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/edit/semantic/RitualAccessDialog.tsx
