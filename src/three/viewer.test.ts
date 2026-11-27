@@ -35,8 +35,12 @@ class Observer {
   constructor(readonly callback: () => void) {
     Observer.all.push(this);
   }
+  unobserved: Element[] = [];
   observe(element: Element) {
     this.observed.push(element);
+  }
+  unobserve(element: Element) {
+    this.unobserved.push(element);
   }
   disconnect() {
     this.disconnected = true;
@@ -187,6 +191,22 @@ describe("the viewer (plan 101, invariant 5)", () => {
     expect(queries[1].listeners.size).toBe(1);
     viewer.dispose();
     expect(queries[1].listeners.size).toBe(0);
+  });
+
+  it("moves its one canvas into another box, and sizes it there", () => {
+    const { stub, viewer, box, camera } = setUp();
+    const other = document.createElement("div");
+    other.getBoundingClientRect = () =>
+      ({ width: 400, height: 100 }) as DOMRect;
+    viewer.moveTo(other);
+    expect(stub.renderer.domElement.parentElement).toBe(other);
+    expect(box.querySelector("canvas")).toBeNull();
+    expect(Observer.all[0].observed).toEqual([box, other]);
+    expect(Observer.all[0].unobserved).toEqual([box]);
+    expect(stub.renderer.setSize).toHaveBeenLastCalledWith(400, 100, false);
+    expect(camera.aspect).toBe(4);
+    stub.tick();
+    expect(viewer.frames).toBe(1);
   });
 
   it("keeps its state through a lost context and draws once restored", () => {

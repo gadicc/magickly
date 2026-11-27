@@ -39,6 +39,11 @@ export interface Viewer {
   readonly frames: number;
   /** Draws one frame soon; asks before it is drawn share it. */
   invalidate(): void;
+  /**
+   * Moves the canvas, its context and all, into another box (the full
+   * window and back), and sizes it there.
+   */
+  moveTo(box: HTMLElement): void;
   /** Stops drawing and releases the renderer, the canvas and the map. */
   dispose(): void;
 }
@@ -58,7 +63,7 @@ export function roomEnvironment(renderer: WebGLRenderer): WebGLRenderTarget {
  * does when the browser cannot make a WebGL 2 context.
  */
 export function createViewer(
-  box: HTMLElement,
+  first: HTMLElement,
   {
     scene,
     camera,
@@ -76,6 +81,7 @@ export function createViewer(
   canvas.style.display = "block";
   canvas.style.width = "100%";
   canvas.style.height = "100%";
+  let box = first;
   box.append(canvas);
 
   let map: WebGLRenderTarget | undefined;
@@ -152,6 +158,13 @@ export function createViewer(
       return frames;
     },
     invalidate,
+    moveTo(next) {
+      observer.unobserve(box);
+      box = next;
+      box.append(canvas);
+      observer.observe(box);
+      resize();
+    },
     dispose() {
       observer.disconnect();
       density?.removeEventListener("change", onDensity);

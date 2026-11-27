@@ -8,7 +8,9 @@
  * wheel scrolls the page. There is no damping or inertia: each event
  * moves the camera once and asks for one frame. A touch or a pen taps,
  * as a click does, and otherwise is left to the page, which scrolls
- * past; turning by them is the full window's.
+ * past. In the full window (`setFull`) one finger turns, two zoom, the
+ * plain wheel zooms and nothing is picked. The keys come through `key`
+ * from the focused view.
  */
 import { type PerspectiveCamera, Vector3 } from "three";
 
@@ -44,8 +46,26 @@ export interface Orbit {
    * reader's turn and zoom.
    */
   fit(bounds?: OrbitOptions["bounds"]): void;
+  /**
+   * The full window's way, or the page's: there one finger turns, two
+   * zoom, the plain wheel zooms and nothing is picked.
+   */
+  setFull(full: boolean): void;
+  /**
+   * A key with the view focused: the arrows turn, + (or =) and − zoom, 0
+   * resets. Whether it was one; a key with Ctrl, Alt or Meta never is.
+   */
+  key(event: KeyboardEvent): boolean;
   dispose(): void;
 }
+
+/** A key's turn, round and up, a twelfth of a half turn a press. */
+const KEY_TURNS: Record<string, readonly [number, number]> = {
+  ArrowLeft: [Math.PI / 12, 0],
+  ArrowRight: [-Math.PI / 12, 0],
+  ArrowUp: [0, Math.PI / 12],
+  ArrowDown: [0, -Math.PI / 12],
+};
 
 /** A movement under this many pixels is a click, not a drag. */
 export const DRAG_THRESHOLD = 4;
@@ -121,10 +141,26 @@ export function orbit(
   } | null = null;
   let dragging = false;
   let tapped = false;
+  let full = false;
+  // The full window's fingers, and a pinch's start.
+  const fingers = new Map<number, [number, number]>();
+  let pinch: { spread: number; zoom: number } | null = null;
+  const spread = () => {
+    const [[ax, ay], [bx, by]] = [...fingers.values()];
+    return Math.hypot(ax - bx, ay - by) || 1;
+  };
   const down = (event: PointerEvent) => {
     tapped = false;
     if (event.button !== 0) return;
-    const turns = event.pointerType === "mouse";
+    if (full && event.pointerType !== "mouse") {
+      fingers.set(event.pointerId, [event.clientX, event.clientY]);
+      if (fingers.size === 2) {
+        cancel();
+        pinch = { spread: spread(), zoom: view.zoom };
+        return;
+      }
+    }
+    const turns = full || event.pointerType === "mouse";
     press = {
       id: event.pointerId,
       x: event.clientX,
@@ -136,6 +172,10 @@ export function orbit(
     if (turns) element.setPointerCapture?.(event.pointerId);
   };
   const move = (event: PointerEvent) => {
+    if (fingers.has(event.pointerId))
+      fingers.set(event.pointerId, [event.clientX, event.clientY]);
+    if (pinch && fingers.size === 2)
+      return set({ zoom: (pinch.zoom * pinch.spread) / spread() });
     if (!press || event.pointerId !== press.id) return;
     const [dx, dy] = [event.clientX - press.x, event.clientY - press.y];
     if (!dragging && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
@@ -152,14 +192,19 @@ export function orbit(
     });
   };
   const up = (event: PointerEvent) => {
+    lift(event);
     if (!press || event.pointerId !== press.id) return;
     // Measured again: a drag may reach here without a move between.
     const moved = Math.hypot(event.clientX - press.x, event.clientY - press.y);
     tapped = !dragging && moved < DRAG_THRESHOLD;
     cancel();
   };
+  const lift = (event: PointerEvent) => {
+    fingers.delete(event.pointerId);
+    if (fingers.size < 2) pinch = null;
+  };
   const click = (event: MouseEvent) => {
-    if (tapped) clicked?.(event.clientX, event.clientY);
+    if (tapped && !full) clicked?.(event.clientX, event.clientY);
     tapped = false;
   };
   function cancel() {
@@ -168,7 +213,7 @@ export function orbit(
   }
   // Not passive, so that a zoom can stop the page scrolling or zooming.
   const wheel = (event: WheelEvent) => {
-    if (!event.ctrlKey) return;
+    if (!event.ctrlKey && !full) return;
     event.preventDefault();
     const delta = event.deltaMode === 1 ? event.deltaY * 33 : event.deltaY;
     set({ zoom: view.zoom * Math.exp(clamp(delta, [-50, 50]) / 100) });
@@ -190,7 +235,13 @@ export function orbit(
     ["pointerdown", down as EventListener],
     ["pointermove", move as EventListener],
     ["pointerup", up as EventListener],
-    ["pointercancel", cancel],
+    [
+      "pointercancel",
+      ((event: PointerEvent) => {
+        lift(event);
+        cancel();
+      }) as EventListener,
+    ],
     ["click", click as EventListener],
     ["wheel", wheel as EventListener, { passive: false }],
     ["gesturestart", gesture],
@@ -207,6 +258,26 @@ export function orbit(
     fit: (next) => {
       fit(next);
       changed();
+    },
+    setFull(on) {
+      full = on;
+      fingers.clear();
+      pinch = null;
+      element.style.touchAction = on ? "none" : "pan-y pinch-zoom";
+    },
+    key({ key, ctrlKey, altKey, metaKey }) {
+      if (ctrlKey || altKey || metaKey) return false;
+      const turn = KEY_TURNS[key];
+      if (turn)
+        set({
+          azimuth: view.azimuth + turn[0],
+          elevation: view.elevation + turn[1],
+        });
+      else if (key === "+" || key === "=") set({ zoom: view.zoom / 1.25 });
+      else if (key === "-" || key === "−") set({ zoom: view.zoom * 1.25 });
+      else if (key === "0") set(home);
+      else return false;
+      return true;
     },
     dispose() {
       for (const [type, listener] of listeners)

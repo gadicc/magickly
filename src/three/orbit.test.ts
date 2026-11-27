@@ -281,4 +281,65 @@ describe("orbit (plan 101)", () => {
     wheel(element, { deltaY: 10, ctrlKey: true });
     expect(changed).not.toHaveBeenCalled();
   });
+
+  it("turns by one finger and zooms by two in the full window, and picks nothing", () => {
+    const { element, changed, clicked, controls } = setUp();
+    controls.setFull(true);
+    expect(element.style.touchAction).toBe("none");
+    const touch = { pointerType: "touch" };
+    pointer(element, "pointerdown", 50, 50, touch);
+    pointer(element, "pointermove", 150, 50, touch);
+    expect(controls.view.azimuth).toBeCloseTo(-Math.PI / 2);
+    pointer(element, "pointerup", 150, 50, touch);
+    // A second finger: the two spread twice as far apart halve the zoom.
+    changed.mockClear();
+    pointer(element, "pointerdown", 40, 50, touch);
+    pointer(element, "pointerdown", 60, 50, { ...touch, pointerId: 2 });
+    pointer(element, "pointermove", 80, 50, { ...touch, pointerId: 2 });
+    expect(controls.view.zoom).toBeCloseTo(0.5);
+    expect(controls.view.azimuth).toBeCloseTo(-Math.PI / 2);
+    expect(changed).toHaveBeenCalledTimes(1);
+    pointer(element, "pointerup", 80, 50, { ...touch, pointerId: 2 });
+    pointer(element, "pointerup", 40, 50, touch);
+    // A tap picks nothing there; the plain wheel zooms.
+    pointer(element, "pointerdown", 40, 50, touch);
+    pointer(element, "pointerup", 40, 50, touch);
+    expect(clicked).not.toHaveBeenCalled();
+    expect(wheel(element, { deltaY: 20 }).defaultPrevented).toBe(true);
+    expect(controls.view.zoom).toBeCloseTo(0.5 * Math.exp(0.2));
+    // Back on the page, a touch turns nothing again.
+    controls.setFull(false);
+    expect(element.style.touchAction).toBe("pan-y pinch-zoom");
+    const turned = controls.view.azimuth;
+    pointer(element, "pointerdown", 50, 50, touch);
+    pointer(element, "pointermove", 150, 50, touch);
+    expect(controls.view.azimuth).toBe(turned);
+    expect(wheel(element, { deltaY: 20 }).defaultPrevented).toBe(false);
+  });
+
+  it("turns, zooms and resets by key, and leaves other keys alone", () => {
+    const { changed, controls } = setUp();
+    const key = (key: string, init: KeyboardEventInit = {}) =>
+      controls.key(new KeyboardEvent("keydown", { key, ...init }));
+    expect(key("ArrowRight")).toBe(true);
+    expect(controls.view.azimuth).toBeCloseTo(-Math.PI / 12);
+    expect(key("ArrowUp")).toBe(true);
+    expect(controls.view.elevation).toBeCloseTo(Math.PI / 4 + Math.PI / 12);
+    expect(key("ArrowLeft") && key("ArrowDown")).toBe(true);
+    expect(key("+") && key("=")).toBe(true);
+    expect(controls.view.zoom).toBeCloseTo(1 / 1.25 ** 2);
+    expect(key("-") && key("−")).toBe(true);
+    expect(controls.view.zoom).toBeCloseTo(1);
+    expect(changed).toHaveBeenCalledTimes(8);
+    controls.set({ azimuth: 1, zoom: 2 });
+    expect(key("0")).toBe(true);
+    expect(controls.view).toEqual(HOME);
+    changed.mockClear();
+    expect(key("Tab")).toBe(false);
+    expect(key("a")).toBe(false);
+    expect(key("ArrowLeft", { ctrlKey: true })).toBe(false);
+    expect(key("+", { metaKey: true })).toBe(false);
+    expect(key("0", { altKey: true })).toBe(false);
+    expect(changed).not.toHaveBeenCalled();
+  });
 });
