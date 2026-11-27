@@ -42,9 +42,13 @@ export interface ThreeBuild {
   vercel?: boolean;
 }
 
-/** A chunk as one name, whether written `/_next/static/…` or `static/…`. */
+/**
+ * A chunk as one name, whether written `/_next/static/…` or `static/…`,
+ * URI-encoded (as Next writes a manifest's chunks and Serwist its URLs)
+ * or not, and with a query (`?dpl=`, a deployment's id) or without.
+ */
 const normal = (file: string) =>
-  file.replace(/^\/?(_next\/)?/, "").replace(/\?.*$/, "");
+  decodeURI(file.replace(/^\/?(_next\/)?/, "").replace(/\?.*$/, ""));
 
 /** The URLs Serwist injected into the worker's precache manifest. */
 export const precacheUrls = (worker: string) =>
@@ -71,11 +75,12 @@ export function threeBuildProblems(build: ThreeBuild): {
   // files in turn.
   const firstLoad = new Set<string>();
   const onFirstLoad = (where: string, files: Iterable<unknown>) => {
-    for (const file of files) {
-      if (typeof file !== "string" || !file.endsWith(".js")) continue;
-      firstLoad.add(normal(file));
-      if (listed.has(normal(file)))
-        problems.push(`${normal(file)} is on the first load of ${where}`);
+    for (const each of files) {
+      const file = typeof each === "string" ? normal(each) : "";
+      if (!file.endsWith(".js")) continue;
+      firstLoad.add(file);
+      if (listed.has(file))
+        problems.push(`${file} is on the first load of ${where}`);
     }
   };
   onFirstLoad(

@@ -83,6 +83,28 @@ describe("checkThreeBuild (plan 101, invariant 3)", () => {
     );
   });
 
+  it("reads chunks Next writes with a deployment's query, or encoded", () => {
+    // Vercel sets NEXT_DEPLOYMENT_ID, and Next then writes every client
+    // manifest chunk as `encodeURIPath(file)?dpl=<id>`.
+    const dpl = (file: string) => `/_next/${encodeURI(file)}?dpl=dpl_abc`;
+    const build = good();
+    delete build.clientManifests["/_not-found/page"];
+    build.clientManifests["/enochian/tablets/page"].clientModules = {
+      loader: { chunks: ["1506", dpl(VIEW)] },
+      theme: { chunks: ["3441", dpl(SHARED)] },
+      app: { chunks: ["77", dpl("static/chunks/app/[tablet]/page-1.js")] },
+    };
+    build.serviceWorker = worker(
+      MAIN,
+      PAGE,
+      "static/chunks/app/%5Btablet%5D/page-1.js",
+    );
+    expect(threeBuildProblems(build).problems).toEqual([
+      `${VIEW} is on the first load of /enochian/tablets/page`,
+      `${SHARED} is on a first load but not precached`,
+    ]);
+  });
+
   it("fails when a 3D chunk is precached", () => {
     const build = good();
     build.serviceWorker = worker(MAIN, PAGE, SHARED, THREE);
