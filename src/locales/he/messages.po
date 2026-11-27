@@ -2796,6 +2796,12 @@ msgid "{square}: {region}"
 msgstr "{square}: {region}"
 
 #. js-lingui-explicit-id
+#: src/app/enochian/tablets/Tablet3DLoader.tsx
+#: src/app/enochian/tablets/three/Tablet3D.tsx
+msgid "Loading the 3D view…"
+msgstr "טוענים את התצוגה בתלת־ממד…"
+
+#. js-lingui-explicit-id
 #: src/app/enochian/tablets/TabletFigures.tsx
 msgid "The Enochian tablets"
 msgstr "הלוחות החנוכיים"
@@ -2882,6 +2888,26 @@ msgstr "העמדת הסמלים זקופים"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
+msgid "The Tablet of Union as pyramids, in 3D"
+msgstr "לוח האיחוד כפירמידות, בתלת־ממד"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "The {tablet} tablet as pyramids, in 3D"
+msgstr "לוח ה{tablet} כפירמידות, בתלת־ממד"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "This browser cannot show the 3D view, so the tablet is drawn flat."
+msgstr "הדפדפן הזה אינו יכול להציג את התצוגה בתלת־ממד, ולכן הלוח מצויר שטוח."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "The 3D view could not be loaded, so the tablet is drawn flat."
+msgstr "לא הצלחנו לטעון את התצוגה בתלת־ממד, ולכן הלוח מצויר שטוח."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
 msgid "What the panel shows"
 msgstr "מה מוצג בחלונית"
 
@@ -2915,6 +2941,11 @@ msgstr "בלוח של רפאל מ־1587 אין לוח איחוד. לוח האי�
 #: src/app/enochian/tablets/tablets.tsx
 msgid "Dee's tables of 1584 have no Tablet of Union. The Tablet of Union is the Golden Dawn's: it sets out the letters of Dee's Black Cross, which binds his four tables together and is not yet drawn here."
 msgstr "בלוחות של די מ־1584 אין לוח איחוד. לוח האיחוד הוא של השחר הזהוב: הוא מציג את אותיות הצלב השחור של די, המחבר את ארבעת לוחותיו יחד ועדיין אינו משורטט כאן."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/three/Tablet3D.tsx
+msgid "3D view"
+msgstr "תצוגה בתלת־ממד"
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/DocLoader.tsx

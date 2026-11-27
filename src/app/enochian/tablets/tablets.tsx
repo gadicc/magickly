@@ -61,7 +61,9 @@ import {
   versionLetter,
   viewOf,
 } from "./squareReadings";
+import Tablet3DLoader, { tablet3DRatio } from "./Tablet3DLoader";
 import styles from "./tablets.module.css";
+import type { Unavailable } from "./three/Tablet3D";
 import {
   hasPyramids,
   type PanelTab,
@@ -485,6 +487,7 @@ export default function Tablets({
       pyramids: pyramidsInUrl = false,
       symbols: symbolsInUrl = false,
       upright: uprightInUrl = false,
+      threeD: threeDInUrl = false,
     },
     setChoice,
     pushChoice,
@@ -606,6 +609,13 @@ export default function Tablets({
       ? ("upright" as const)
       : ("outward" as const)
     : undefined;
+  // The pyramids in 3D (plan 101), in the flat drawing's place, from the
+  // URL until the switch comes (stage 4); flat again, with a line saying
+  // why, where the browser cannot show it.
+  const [threeDUnavailable, setThreeDUnavailable] =
+    React.useState<Unavailable>();
+  const threeDAsked = threeDInUrl && pyramids;
+  const threeD = threeDAsked && !threeDUnavailable;
   // Measured again when a drawing replaces the note of a version with no
   // Tablet of Union.
   const squarePixels = useSquarePixels(ref, view ? squareShare(id) : 0);
@@ -822,7 +832,9 @@ export default function Tablets({
         className={`${styles.layout} ${(onNames || pyramidsShown) && view ? styles.namesOpen : ""} ${union ? styles.union : ""}`}
         style={
           {
-            "--tablet-ratio": viewWidth / viewHeight,
+            "--tablet-ratio": threeD
+              ? tablet3DRatio(union)
+              : viewWidth / viewHeight,
           } as React.CSSProperties
         }
       >
@@ -957,7 +969,11 @@ export default function Tablets({
         <Box
           // The tablet, its sigil and the note in a sigil's place are drawn
           // on white paper: a light card behind them in dark.
-          className={`${plateClass} ${styles.tablet}`}
+          className={
+            threeD
+              ? `${styles.tablet} ${styles.threeD}`
+              : `${plateClass} ${styles.tablet}`
+          }
           sx={{
             "& [data-square]": { cursor: "pointer" },
             // Any square chooses its names in the Names tab: a
@@ -971,7 +987,20 @@ export default function Tablets({
             "& > svg": { maxWidth: "100%", height: "auto" },
           }}
         >
-          {view ? (
+          {view && threeD ? (
+            <Tablet3DLoader
+              view={view}
+              mirrorReversed={reversed}
+              label={
+                union
+                  ? t(/*i18n*/ "The Tablet of Union as pyramids, in 3D")
+                  : t(/*i18n*/ "The {tablet} tablet as pyramids, in 3D", {
+                      tablet: TABLET_NAMES[id],
+                    })
+              }
+              unavailable={setThreeDUnavailable}
+            />
+          ) : view ? (
             <Tablet
               tablet={id}
               version={version}
@@ -986,6 +1015,17 @@ export default function Tablets({
             />
           ) : (
             <NoTablet version={version} choose={choose} />
+          )}
+          {threeDAsked && threeDUnavailable && (
+            <Typography variant="body2" role="status" sx={{ mt: 1 }}>
+              {threeDUnavailable === "webgl"
+                ? t(
+                    /*i18n*/ "This browser cannot show the 3D view, so the tablet is drawn flat.",
+                  )
+                : t(
+                    /*i18n*/ "The 3D view could not be loaded, so the tablet is drawn flat.",
+                  )}
+            </Typography>
           )}
         </Box>
 
@@ -1080,7 +1120,8 @@ export default function Tablets({
           )}
           {/* Beside the tablet the downloads come first; on a phone,
               under the tablet, the second letters it draws. */}
-          {wide && view && exportControls}
+          {/* None in 3D: the downloads draw the flat drawing. */}
+          {wide && view && !threeD && exportControls}
           {altShown && (
             <Typography component="details" variant="body2" sx={{ mt: 1 }}>
               <summary>Second letters in {squares(seconds.length)}</summary>
@@ -1093,7 +1134,7 @@ export default function Tablets({
               </Box>
             </Typography>
           )}
-          {!wide && view && exportControls}
+          {!wide && view && !threeD && exportControls}
           <div style={{ textAlign: "center", fontSize: "90%" }}>
             Enochian Font:{" "}
             <a href="https://fonts2u.com/enochian-plain.font">enochian-plain</a>

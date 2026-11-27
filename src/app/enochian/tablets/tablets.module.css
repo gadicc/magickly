@@ -258,3 +258,52 @@
   padding-block: 12px;
   cursor: pointer;
 }
+
+/*
+ * The 3D view (plan 101) in the tablet's box: as wide as the box, its
+ * height from `--tablet-ratio` (the page sets the 3D view's, from the
+ * tablet's grid) and at most the screen's less the app bar and the
+ * container's padding. It neither sticks nor slides its top under the
+ * app bar, as the flat drawing does by its sigil: a turned tablet has no
+ * fixed top edge to keep in view.
+ */
+.layout .tablet.threeD {
+  position: relative;
+  top: auto;
+  width: 100%;
+  z-index: auto;
+  transition: none;
+  background-color: transparent;
+}
+.view3d {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--tablet-ratio, 1);
+  max-height: calc(100vh - var(--app-bar, 56px) - 32px);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #f3f1ec;
+  cursor: grab;
+}
+@supports (height: 100svh) {
+  .view3d {
+    max-height: calc(100svh - var(--app-bar, 56px) - 32px);
+  }
+}
+:global(.dark) .view3d {
+  background-color: #161d29;
+}
+.view3d:focus-visible {
+  outline: 2px solid var(--mui-palette-primary-main);
+  outline-offset: 2px;
+}
+.view3dStatus {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 16px;
+  text-align: center;
+  color: var(--mui-palette-text-secondary);
+}

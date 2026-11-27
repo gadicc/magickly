@@ -312,3 +312,29 @@ describe("the pyramids' symbols in the tablets page's URL (plan 095, Symbols on 
     ).toBe("?tablet=air&version=raphael");
   });
 });
+
+describe("the 3D view in the tablets page's URL (plan 101)", () => {
+  it("reads 3d=1 with pyramids only", () => {
+    expect(parseTabletQuery("?pyramids=1&3d=1")).toEqual({
+      ...DEFAULT_CHOICE,
+      pyramids: true,
+      threeD: true,
+    });
+    expect(parseTabletQuery("?3d=1")).toEqual(DEFAULT_CHOICE);
+    expect(parseTabletQuery("?version=raphael&pyramids=1&3d=1")).toEqual({
+      ...DEFAULT_CHOICE,
+      version: "raphael",
+    });
+    for (const value of ["0", "true", ""])
+      expect(parseTabletQuery(`?pyramids=1&3d=${value}`)).toEqual({
+        ...DEFAULT_CHOICE,
+        pyramids: true,
+      });
+  });
+
+  it("does not write it yet: the switch that does comes with stage 4", () => {
+    expect(
+      tabletQuery({ ...DEFAULT_CHOICE, pyramids: true, threeD: true }),
+    ).toBe("?pyramids=1");
+  });
+});

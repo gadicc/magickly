@@ -2796,6 +2796,12 @@ msgid "{square}: {region}"
 msgstr "{square}: {region}"
 
 #. js-lingui-explicit-id
+#: src/app/enochian/tablets/Tablet3DLoader.tsx
+#: src/app/enochian/tablets/three/Tablet3D.tsx
+msgid "Loading the 3D view…"
+msgstr "Loading the 3D view…"
+
+#. js-lingui-explicit-id
 #: src/app/enochian/tablets/TabletFigures.tsx
 msgid "The Enochian tablets"
 msgstr "The Enochian tablets"
@@ -2882,6 +2888,26 @@ msgstr "Stand the symbols upright"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
+msgid "The Tablet of Union as pyramids, in 3D"
+msgstr "The Tablet of Union as pyramids, in 3D"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "The {tablet} tablet as pyramids, in 3D"
+msgstr "The {tablet} tablet as pyramids, in 3D"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "This browser cannot show the 3D view, so the tablet is drawn flat."
+msgstr "This browser cannot show the 3D view, so the tablet is drawn flat."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "The 3D view could not be loaded, so the tablet is drawn flat."
+msgstr "The 3D view could not be loaded, so the tablet is drawn flat."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
 msgid "What the panel shows"
 msgstr "What the panel shows"
 
@@ -2915,6 +2941,11 @@ msgstr "Raphael's table of 1587 has no Tablet of Union. The Tablet of Union is t
 #: src/app/enochian/tablets/tablets.tsx
 msgid "Dee's tables of 1584 have no Tablet of Union. The Tablet of Union is the Golden Dawn's: it sets out the letters of Dee's Black Cross, which binds his four tables together and is not yet drawn here."
 msgstr "Dee's tables of 1584 have no Tablet of Union. The Tablet of Union is the Golden Dawn's: it sets out the letters of Dee's Black Cross, which binds his four tables together and is not yet drawn here."
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/three/Tablet3D.tsx
+msgid "3D view"
+msgstr "3D view"
 
 #. js-lingui-explicit-id
 #: src/app/doc/[_id]/DocLoader.tsx

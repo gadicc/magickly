@@ -62,6 +62,12 @@ export interface TabletChoice {
   symbols?: boolean;
   /** The symbols stood upright (`upright=1`). Only with `symbols`. */
   upright?: boolean;
+  /**
+   * The pyramids in 3D (`3d=1`, plan 101). Only with `pyramids`. Read
+   * here; the switch that writes it comes with stage 4, and until then
+   * the URL keeps it as an unknown param.
+   */
+  threeD?: boolean;
 }
 
 /** The view a URL without choices shows: Earth, the default version. */
@@ -122,8 +128,8 @@ function squareOf(
  * The choices in a query string ("?tablet=air&version=dee"); a missing
  * or unknown tablet or version is the default's, and a missing or unknown
  * tab or square is left out, as is a square off the Squares tab, a
- * square or pyramids in Dee's or Raphael's version, symbols without
- * pyramids and upright without symbols.
+ * square or pyramids in Dee's or Raphael's version, symbols or 3D
+ * without pyramids and upright without symbols.
  */
 export function parseTabletQuery(search: string): TabletChoice {
   const params = new URLSearchParams(search);
@@ -136,6 +142,7 @@ export function parseTabletQuery(search: string): TabletChoice {
   const pyramids = params.get("pyramids") === "1" && hasPyramids(version);
   const symbols = pyramids && params.get("symbols") === "1";
   const upright = symbols && params.get("upright") === "1";
+  const threeD = pyramids && params.get("3d") === "1";
   return {
     tablet,
     version,
@@ -144,6 +151,7 @@ export function parseTabletQuery(search: string): TabletChoice {
     ...(pyramids ? { pyramids } : {}),
     ...(symbols ? { symbols } : {}),
     ...(upright ? { upright } : {}),
+    ...(threeD ? { threeD } : {}),
   };
 }
 
