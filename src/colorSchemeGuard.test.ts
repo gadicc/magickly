@@ -21,12 +21,15 @@ const PALETTE_MODE_ALLOWED: ReadonlySet<string> = new Set(["src/theme.ts"]);
  * src/doc/RitualSourceEditor.tsx (step 5), which mounts on the client, the
  * drawer's Light / System / Dark switch, which selects nothing until
  * mounted, and the `theme-color` effect for an explicit choice (step 6),
- * which renders nothing.
+ * which renders nothing. Plan 101 adds the 3D tablet's ground colour,
+ * which is drawn in WebGL, not CSS, and mounts only on the client
+ * (`next/dynamic` with `ssr: false`), as the CodeMirror theme does.
  */
 const USE_COLOR_SCHEME_ALLOWED: ReadonlySet<string> = new Set([
   "src/doc/RitualSourceEditor.tsx",
   "src/app/ThemeSwitch.tsx",
   "src/app/ThemeColorMeta.tsx",
+  "src/app/enochian/tablets/three/Tablet3D.tsx",
 ]);
 
 /** `palette.mode`, `palette?.mode`, `palette["mode"]`, `{ mode } = …palette`. */
