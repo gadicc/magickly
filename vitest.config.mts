@@ -309,6 +309,7 @@ export default defineConfig({
         "src/app/enochian/keys/keyPage.ts",
         "src/app/enochian/tablets/three/model.ts",
         "src/app/enochian/tablets/three/pyramidGeometry.ts",
+        "src/app/enochian/tablets/three/tabletObject.ts",
         "src/three/viewer.ts",
         "src/three/orbit.ts",
         "packages/magick-data/src/assemble.ts",
