@@ -31,10 +31,26 @@ function Loading() {
   );
 }
 
-/** In the view's place when its code fails to load: the page draws flat. */
-function NotLoaded({ unavailable }: Tablet3DProps) {
-  React.useEffect(() => unavailable("load"), [unavailable]);
-  return null;
+/**
+ * In the view's place once its code has failed to load. `next/dynamic`
+ * keeps that result, so each time the reader asks again this tries a
+ * fresh `import()` (webpack fetches a failed chunk again), shows the
+ * view if it comes, and otherwise tells the page, which draws flat.
+ */
+function NotLoaded(props: Tablet3DProps) {
+  const [View, setView] = React.useState<React.ComponentType<Tablet3DProps>>();
+  const { unavailable } = props;
+  React.useEffect(() => {
+    let live = true;
+    import(/* webpackChunkName: "tablet3d" */ "./three/Tablet3D").then(
+      (loaded) => live && setView(() => loaded.default),
+      () => live && unavailable("load"),
+    );
+    return () => {
+      live = false;
+    };
+  }, [unavailable]);
+  return View ? <View {...props} /> : <Loading />;
 }
 
 /*

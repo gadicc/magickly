@@ -2878,6 +2878,11 @@ msgstr "ציור כפירמידות"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
+msgid "In 3D"
+msgstr "בתלת־ממד"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
 msgid "Symbols on the sides"
 msgstr "סמלים על הצלעות"
 
@@ -2895,6 +2900,11 @@ msgstr "לוח האיחוד כפירמידות, בתלת־ממד"
 #: src/app/enochian/tablets/tablets.tsx
 msgid "The {tablet} tablet as pyramids, in 3D"
 msgstr "לוח ה{tablet} כפירמידות, בתלת־ממד"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "The 3D view has no reading-order numbers, regions or sigil. Turn 3D off to export the drawing."
+msgstr "בתצוגה בתלת־ממד אין מספרי סדר קריאה, אזורים או סיגיל. כדי לייצא את הציור, כבו את התלת־ממד."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx

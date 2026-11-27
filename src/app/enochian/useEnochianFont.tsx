@@ -5,13 +5,17 @@ import EnochianFont from "@/fonts/enochian";
 function EnochianFontToggleBase({
   enochianFont,
   setEnochianFont,
+  disabled,
 }: {
   enochianFont: boolean;
   setEnochianFont: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Resting, where nothing on the page draws in the font. */
+  disabled?: boolean;
 }) {
   return (
     <ToggleButtonGroup
       exclusive
+      disabled={disabled}
       value={enochianFont}
       sx={{ m: 1 }}
       size="small"
@@ -34,10 +38,11 @@ function EnochianFontToggleBase({
 export default function useEnochianFont() {
   const [enochianFont, setEnochianFont] = React.useState<boolean>(false);
 
-  const EnochianFontToggle = () =>
+  const EnochianFontToggle = ({ disabled }: { disabled?: boolean }) =>
     React.createElement(EnochianFontToggleBase, {
       enochianFont,
       setEnochianFont,
+      disabled,
     });
 
   return { enochianFont, EnochianFontToggle };

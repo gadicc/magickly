@@ -332,9 +332,25 @@ describe("the 3D view in the tablets page's URL (plan 101)", () => {
       });
   });
 
-  it("does not write it yet: the switch that does comes with stage 4", () => {
+  it("writes it while its switch shows, after the pyramids", () => {
     expect(
-      tabletQuery({ ...DEFAULT_CHOICE, pyramids: true, threeD: true }),
-    ).toBe("?pyramids=1");
+      tabletQuery({
+        ...DEFAULT_CHOICE,
+        pyramids: true,
+        threeD: true,
+        symbols: true,
+      }),
+    ).toBe("?pyramids=1&3d=1&symbols=1");
+    expect(tabletQuery({ ...DEFAULT_CHOICE, threeD: true })).toBe("");
+    expect(
+      tabletQuery({
+        ...DEFAULT_CHOICE,
+        version: "dee",
+        pyramids: true,
+        threeD: true,
+      }),
+    ).toBe("?version=dee");
+    const choice = { ...DEFAULT_CHOICE, pyramids: true, threeD: true };
+    expect(parseTabletQuery(tabletQuery(choice))).toEqual(choice);
   });
 });

@@ -62,11 +62,7 @@ export interface TabletChoice {
   symbols?: boolean;
   /** The symbols stood upright (`upright=1`). Only with `symbols`. */
   upright?: boolean;
-  /**
-   * The pyramids in 3D (`3d=1`, plan 101). Only with `pyramids`. Read
-   * here; the switch that writes it comes with stage 4, and until then
-   * the URL keeps it as an unknown param.
-   */
+  /** The pyramids in 3D (`3d=1`, plan 101). Only with `pyramids`. */
   threeD?: boolean;
 }
 
@@ -157,8 +153,8 @@ export function parseTabletQuery(search: string): TabletChoice {
 
 /** The choices' own params, the defaults left out. */
 function choiceParams(choice: TabletChoice): Record<string, string | null> {
-  // Each switch is written only while it shows: symbols with pyramids,
-  // upright with symbols.
+  // Each switch is written only while it shows: 3D and symbols with
+  // pyramids, upright with symbols.
   const pyramids = Boolean(choice.pyramids) && hasPyramids(choice.version);
   const symbols = pyramids && Boolean(choice.symbols);
   return {
@@ -170,6 +166,7 @@ function choiceParams(choice: TabletChoice): Record<string, string | null> {
         ? `${choice.square.row + 1},${choice.square.column + 1}`
         : null,
     pyramids: pyramids ? "1" : null,
+    "3d": pyramids && choice.threeD ? "1" : null,
     symbols: symbols ? "1" : null,
     upright: symbols && choice.upright ? "1" : null,
   };

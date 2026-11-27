@@ -319,3 +319,10 @@
   text-align: center;
   color: var(--mui-palette-text-secondary);
 }
+/*
+ * In 3D the box neither sticks nor slides under the app bar, so a name
+ * brought into view stops below the bar alone, as elsewhere.
+ */
+.layout.threeDLayout .namesItem {
+  scroll-margin-top: calc(var(--app-bar, 56px) + 8px);
+}

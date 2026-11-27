@@ -505,6 +505,9 @@ export default function Tablets({
   // pyramids are.
   const [symbolsWanted, setSymbolsWanted] = React.useState(false);
   const [uprightWanted, setUprightWanted] = React.useState(false);
+  // The pyramids in 3D (plan 101), the URL's while its switch shows and
+  // remembered while it does not, as the symbols are.
+  const [threeDWanted, setThreeDWanted] = React.useState(false);
   // Names by default, with nothing highlighted (plan 090, decision 2).
   const [tab, setTabShown] = React.useState<PanelTab>("names");
   const [selected, setSelected] = React.useState<TabletSquare>();
@@ -533,9 +536,9 @@ export default function Tablets({
   // across a version without; so with their symbols, while the pyramids
   // are drawn, and their standing upright, while the symbols are. The
   // first key seen is the default URL's.
-  const urlKey = `${tabInUrl ?? ""} ${squareInUrl ? `${squareInUrl.row},${squareInUrl.column}` : ""} ${version} ${pyramidsInUrl} ${symbolsInUrl} ${uprightInUrl}`;
+  const urlKey = `${tabInUrl ?? ""} ${squareInUrl ? `${squareInUrl.row},${squareInUrl.column}` : ""} ${version} ${pyramidsInUrl} ${symbolsInUrl} ${uprightInUrl} ${threeDInUrl}`;
   const [urlSeen, setUrlSeen] = React.useState(
-    `  ${DEFAULT_TABLET_VERSION} false false false`,
+    `  ${DEFAULT_TABLET_VERSION} false false false false`,
   );
   if (urlSeen !== urlKey) {
     setUrlSeen(urlKey);
@@ -546,6 +549,7 @@ export default function Tablets({
     if (hasPyramids(version)) {
       setPyramidsWanted(pyramidsInUrl);
       if (pyramidsInUrl) {
+        setThreeDWanted(threeDInUrl);
         setSymbolsWanted(symbolsInUrl);
         if (symbolsInUrl) setUprightWanted(uprightInUrl);
       }
@@ -559,6 +563,7 @@ export default function Tablets({
     setChoice({
       tab,
       pyramids: pyramidsWanted,
+      threeD: threeDWanted,
       symbols: symbolsWanted,
       upright: uprightWanted,
       ...(change.tablet && change.tablet !== id
@@ -610,13 +615,20 @@ export default function Tablets({
       ? ("upright" as const)
       : ("outward" as const)
     : undefined;
-  // The pyramids in 3D (plan 101), in the flat drawing's place, from the
-  // URL until the switch comes (stage 4); flat again, with a line saying
-  // why, where the browser cannot show it.
+  // The pyramids in 3D (plan 101), in the flat drawing's place. Where the
+  // browser cannot show it, its switch turns itself off and a line says
+  // why, until the reader tries again.
   const [threeDUnavailable, setThreeDUnavailable] =
     React.useState<Unavailable>();
-  const threeDAsked = threeDInUrl && pyramids;
-  const threeD = threeDAsked && !threeDUnavailable;
+  const threeD = threeDWanted && pyramids;
+  const unavailable3D = React.useCallback(
+    (why: Unavailable) => {
+      setThreeDUnavailable(why);
+      setThreeDWanted(false);
+      setChoice({ threeD: false });
+    },
+    [setChoice],
+  );
   // Measured again when a drawing replaces the note of a version with no
   // Tablet of Union.
   const squarePixels = useSquarePixels(ref, view ? squareShare(id) : 0);
@@ -830,7 +842,7 @@ export default function Tablets({
     <Container sx={{ p: 2 }}>
       <div
         ref={layout}
-        className={`${styles.layout} ${(onNames || pyramidsShown) && view ? styles.namesOpen : ""} ${union ? styles.union : ""}`}
+        className={`${styles.layout} ${(onNames || pyramidsShown) && view ? styles.namesOpen : ""} ${union ? styles.union : ""} ${threeD ? styles.threeDLayout : ""}`}
         style={
           {
             "--tablet-ratio": threeD
@@ -885,7 +897,8 @@ export default function Tablets({
                 ))}
               </Select>
             </FormControl>
-            <EnochianFontToggle />
+            {/* The 3D view draws its letters in Latin. */}
+            <EnochianFontToggle disabled={threeD} />
           </Box>
           <Box sx={{ display: "flex", flexWrap: "wrap", columnGap: 1 }}>
             <FormControlLabel
@@ -918,9 +931,10 @@ export default function Tablets({
                     checked={pyramids}
                     onChange={(event) => {
                       setPyramidsWanted(event.target.checked);
-                      // The symbols return with the pyramids.
+                      // 3D and the symbols return with the pyramids.
                       setChoice({
                         pyramids: event.target.checked,
+                        threeD: threeDWanted,
                         symbols: symbolsWanted,
                         upright: uprightWanted,
                       });
@@ -933,6 +947,29 @@ export default function Tablets({
             {pyramids && (
               <FormControlLabel
                 className={styles.touchable}
+                control={
+                  <Switch
+                    checked={threeD}
+                    onChange={(event) => {
+                      // Turned on again, it tries again.
+                      setThreeDUnavailable(undefined);
+                      setThreeDWanted(event.target.checked);
+                      setChoice({
+                        threeD: event.target.checked,
+                        symbols: symbolsWanted,
+                        upright: uprightWanted,
+                      });
+                    }}
+                  />
+                }
+                label={t(/*i18n*/ "In 3D")}
+              />
+            )}
+            {pyramids && (
+              <FormControlLabel
+                className={styles.touchable}
+                // The 3D view always draws them, facing out: it rests.
+                disabled={threeD}
                 control={
                   <Switch
                     checked={symbols}
@@ -951,6 +988,7 @@ export default function Tablets({
             {symbols && (
               <FormControlLabel
                 className={styles.touchable}
+                disabled={threeD}
                 control={
                   <Switch
                     checked={uprightWanted}
@@ -999,7 +1037,8 @@ export default function Tablets({
                       tablet: t(ELEMENT_WORDS[id]),
                     })
               }
-              unavailable={setThreeDUnavailable}
+              unavailable={unavailable3D}
+              highlights={highlights}
             />
           ) : view ? (
             <Tablet
@@ -1017,8 +1056,15 @@ export default function Tablets({
           ) : (
             <NoTablet version={version} choose={choose} />
           )}
+          {threeD && (
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              {t(
+                /*i18n*/ "The 3D view has no reading-order numbers, regions or sigil. Turn 3D off to export the drawing.",
+              )}
+            </Typography>
+          )}
           {/* There before its line, so that a screen reader says it. */}
-          {threeDAsked && (
+          {(threeD || threeDUnavailable) && (
             <Typography
               variant="body2"
               role="status"
@@ -1088,8 +1134,9 @@ export default function Tablets({
                   links={links}
                   revealed={revealed}
                   pyramids={pyramids}
-                  symbols={symbols}
-                  upright={symbols && uprightWanted}
+                  // As the 3D view draws them: on, facing out.
+                  symbols={symbols || threeD}
+                  upright={!threeD && symbols && uprightWanted}
                   openSquare={
                     hasPyramids(version)
                       ? (square) => choosePyramid(square, true, "names")

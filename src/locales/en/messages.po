@@ -2878,6 +2878,11 @@ msgstr "Draw as pyramids"
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
+msgid "In 3D"
+msgstr "In 3D"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
 msgid "Symbols on the sides"
 msgstr "Symbols on the sides"
 
@@ -2895,6 +2900,11 @@ msgstr "The Tablet of Union as pyramids, in 3D"
 #: src/app/enochian/tablets/tablets.tsx
 msgid "The {tablet} tablet as pyramids, in 3D"
 msgstr "The {tablet} tablet as pyramids, in 3D"
+
+#. js-lingui-explicit-id
+#: src/app/enochian/tablets/tablets.tsx
+msgid "The 3D view has no reading-order numbers, regions or sigil. Turn 3D off to export the drawing."
+msgstr "The 3D view has no reading-order numbers, regions or sigil. Turn 3D off to export the drawing."
 
 #. js-lingui-explicit-id
 #: src/app/enochian/tablets/tablets.tsx
