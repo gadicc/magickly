@@ -88,6 +88,75 @@ describe("the 3D view (plan 101)", () => {
     expect(unavailable).toHaveBeenCalledWith("webgl");
   });
 
+  it("chooses the square a click lands on, as the highlights allow, and tints it", async () => {
+    stub.on = true;
+    const onSelect = vi.fn();
+    const props = {
+      view: view("fire"),
+      mirrorReversed: true,
+      label: "The Fire tablet as pyramids, in 3D",
+      unavailable: vi.fn(),
+    };
+    const { rerender } = render(
+      <Tablet3D {...props} highlights={{ squares: [], onSelect }} />,
+    );
+    await waitFor(() =>
+      expect(screen.queryByText("Loading the 3D view…")).toBeNull(),
+    );
+    const box = screen.getByRole("group");
+    box.getBoundingClientRect = () =>
+      ({ left: 0, top: 0, width: 200, height: 200 }) as DOMRect;
+    const canvas = box.querySelector("canvas") as HTMLCanvasElement;
+    const click = () => {
+      const at = {
+        pointerType: "mouse",
+        pointerId: 1,
+        button: 0,
+        bubbles: true,
+      };
+      fireEvent(
+        canvas,
+        new PointerEvent("pointerdown", { ...at, clientX: 100, clientY: 100 }),
+      );
+      fireEvent(
+        canvas,
+        new PointerEvent("pointerup", { ...at, clientX: 100, clientY: 100 }),
+      );
+    };
+    // The Differences tab's way: an unoutlined square is not chosen.
+    click();
+    expect(onSelect).not.toHaveBeenCalled();
+    // The Names tab's: any square is, the one under the middle of the view.
+    rerender(
+      <Tablet3D
+        {...props}
+        highlights={{ squares: [], anySquare: true, onSelect }}
+      />,
+    );
+    click();
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    const [square] = onSelect.mock.calls[0];
+    expect(Object.keys(square).sort()).toEqual(["column", "row"]);
+    expect(Math.abs(square.row - 6.5)).toBeLessThan(1);
+    expect(Math.abs(square.column - 5.5)).toBeLessThan(1);
+    // Its highlight is a change, and draws; the same again does not.
+    stub.invalidate.mockClear();
+    rerender(
+      <Tablet3D
+        {...props}
+        highlights={{ squares: [square], selected: square, onSelect }}
+      />,
+    );
+    expect(stub.invalidate).toHaveBeenCalledTimes(1);
+    rerender(
+      <Tablet3D
+        {...props}
+        highlights={{ squares: [square], selected: square, onSelect }}
+      />,
+    );
+    expect(stub.invalidate).toHaveBeenCalledTimes(1);
+  });
+
   it("draws the tablet in one renderer, a focusable view with a name", async () => {
     stub.on = true;
     const props = {

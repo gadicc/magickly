@@ -5,9 +5,16 @@
  * changes what it draws, never the WebGL context.
  */
 import { useColorScheme } from "@mui/material/styles";
+import type { TabletHighlights } from "magick-components/enochian/Tablet";
 import type { TabletView } from "magick-data/enochian/tablets";
 import React from "react";
-import { PerspectiveCamera, Scene, type Texture } from "three";
+import {
+  PerspectiveCamera,
+  Raycaster,
+  Scene,
+  type Texture,
+  Vector2,
+} from "three";
 import { useUiLanguage } from "@/i18n/LocaleProvider";
 import { type Orbit, type OrbitView, orbit } from "@/three/orbit";
 import {
@@ -17,8 +24,9 @@ import {
   type Viewer,
 } from "@/three/viewer";
 import styles from "../tablets.module.css";
+import { chosenBy, squareTints } from "./highlights";
 import { MARKS_SHEET, MARKS_SHEET_SVG } from "./marksSheet.generated";
-import { tabletModel } from "./model";
+import { type Tablet3DModel, tabletModel } from "./model";
 import {
   ENVIRONMENT_INTENSITY,
   rasteriseSheet,
@@ -39,6 +47,8 @@ export interface Tablet3DProps {
   label: string;
   /** Called when the view cannot be shown, so the page draws it flat. */
   unavailable: (why: Unavailable) => void;
+  /** The flat drawing's highlights: tinted, and a click chooses by them. */
+  highlights?: TabletHighlights;
 }
 
 /** From the tablet's near edge, 55° up. */
@@ -56,6 +66,7 @@ export default function Tablet3D({
   mirrorReversed,
   label,
   unavailable,
+  highlights,
 }: Tablet3DProps) {
   const { t } = useUiLanguage();
   // The scheme is read here, as by the ritual source editor, because the
@@ -73,11 +84,32 @@ export default function Tablet3D({
     viewer?: Viewer;
     orbit?: Orbit;
     tablet?: TabletObject;
+    model?: Tablet3DModel;
     sheet?: Promise<Texture>;
   }>({});
   const [drawn, setDrawn] = React.useState(false);
-  const latest = React.useRef({ ground, unavailable });
-  latest.current = { ground, unavailable };
+  const latest = React.useRef({ ground, unavailable, highlights });
+  latest.current = { ground, unavailable, highlights };
+  /** A click or tap at a client point: the square under it, if it may. */
+  const clicked = (x: number, y: number) => {
+    const { tablet } = live.current;
+    const { highlights } = latest.current;
+    const rect = box.current?.getBoundingClientRect();
+    if (!tablet || !rect) return;
+    const ray = new Raycaster();
+    ray.setFromCamera(
+      new Vector2(
+        ((x - rect.left) / rect.width) * 2 - 1,
+        ((rect.top - y) / rect.height) * 2 + 1,
+      ),
+      camera,
+    );
+    const hit = tablet.pick(ray.ray);
+    const square = hit && chosenBy(highlights, hit);
+    if (square) highlights?.onSelect?.(square);
+  };
+  const clickedRef = React.useRef(clicked);
+  clickedRef.current = clicked;
 
   // The renderer and the mark sheet's texture, made once.
   React.useEffect(() => {
@@ -129,7 +161,8 @@ export default function Tablet3D({
         tablet = tabletObject(model, MARKS_SHEET, texture, {
           ground: latest.current.ground,
         });
-        live.current.tablet = tablet;
+        tablet.setTints(squareTints(model, latest.current.highlights));
+        Object.assign(live.current, { tablet, model });
         scene.add(tablet.object);
         if (live.current.orbit) live.current.orbit.fit(tablet.bounds);
         else
@@ -137,6 +170,7 @@ export default function Tablet3D({
             home: HOME_VIEW,
             bounds: tablet.bounds,
             changed: viewer.invalidate,
+            clicked: (x, y) => clickedRef.current(x, y),
           });
         viewer.invalidate();
         setDrawn(true);
@@ -149,6 +183,13 @@ export default function Tablet3D({
       tablet?.dispose();
     };
   }, [view, mirrorReversed, scene, camera]);
+
+  // The highlights, drawn only when they change what is tinted.
+  React.useEffect(() => {
+    const { tablet, model, viewer } = live.current;
+    if (tablet && model && tablet.setTints(squareTints(model, highlights)))
+      viewer?.invalidate();
+  }, [highlights]);
 
   // The theme.
   React.useEffect(() => {

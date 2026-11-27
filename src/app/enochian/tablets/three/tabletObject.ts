@@ -54,6 +54,11 @@ export interface TabletObject {
   readonly bounds: readonly Vec3[];
   /** The square a ray in the object's parent's space meets first. */
   pick(ray: Ray): PickedSquare | null;
+  /**
+   * Each pyramid's tint (`squareTints`), in place; whether it changed, so
+   * that only a change is drawn.
+   */
+  setTints(tints: Float32Array): boolean;
   setGround(colour: ColorRepresentation): void;
   dispose(): void;
 }
@@ -94,14 +99,16 @@ attribute vec4 markCell;
 attribute vec3 markInk;
 attribute vec3 markOutline;
 attribute float markValley;
+attribute vec4 markTint;
 varying vec2 vMarkUv;
 varying vec4 vMarkCell;
 varying vec3 vMarkInk;
 varying vec3 vMarkOutline;
-varying float vMarkValley;`;
+varying float vMarkValley;
+varying vec4 vMarkTint;`;
 const VERTEX_MAIN = `#include <begin_vertex>
 vMarkUv = markUv; vMarkCell = markCell; vMarkInk = markInk;
-vMarkOutline = markOutline; vMarkValley = markValley;`;
+vMarkOutline = markOutline; vMarkValley = markValley; vMarkTint = markTint;`;
 const FRAGMENT = VERTEX.replace(/attribute [^\n]*\n/g, "").concat(`
 uniform sampler2D markSheet;
 uniform float markBias;
@@ -113,6 +120,7 @@ cover *= step(0.0, box.x) * step(box.x, vMarkUv.x) * step(vMarkUv.x, box.z)
   * step(box.y, vMarkUv.y) * step(vMarkUv.y, box.w);
 diffuseColor.rgb = diffuseColor.rgb * (1.0 - cover.r - cover.g)
   + vMarkInk * cover.r + vMarkOutline * cover.g;
+diffuseColor.rgb = mix(diffuseColor.rgb, vMarkTint.rgb, vMarkTint.a);
 float foot = 1.0 - vMarkValley;
 diffuseColor.rgb *= 1.0 - markValleys * foot * foot;`;
 
@@ -155,6 +163,7 @@ export function tabletObject(
     markInk: [arrays.inks, 3],
     markOutline: [arrays.outlines, 3],
     markValley: [arrays.valleys, 1],
+    markTint: [new Float32Array(arrays.squares.length * 4), 4],
   } as const;
   for (const [name, [array, size]] of Object.entries(attributes))
     geometry.setAttribute(name, new BufferAttribute(array, size));
@@ -184,7 +193,7 @@ export function tabletObject(
       FRAGMENT_MAIN,
     );
   };
-  material.customProgramCacheKey = () => "tablet3d-marks-v2";
+  material.customProgramCacheKey = () => "tablet3d-marks-v3";
 
   const groundGeometry = new PlaneGeometry(
     model.columns + 2 * MARGIN,
@@ -225,6 +234,19 @@ export function tabletObject(
         local.origin.toArray(),
         local.direction.toArray(),
       );
+    },
+    setTints(tints) {
+      const { array } = geometry.attributes.markTint;
+      let changed = false;
+      arrays.squares.forEach((square, vertex) => {
+        for (let at = 0; at < 4; at += 1)
+          if (array[vertex * 4 + at] !== tints[square * 4 + at]) {
+            array[vertex * 4 + at] = tints[square * 4 + at];
+            changed = true;
+          }
+      });
+      if (changed) geometry.attributes.markTint.needsUpdate = true;
+      return changed;
     },
     setGround: (colour) => groundMaterial.color.set(colour),
     dispose() {

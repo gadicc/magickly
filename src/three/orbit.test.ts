@@ -92,6 +92,21 @@ describe("orbit (plan 101)", () => {
     expect(clicked).not.toHaveBeenCalled();
   });
 
+  it("takes a tap of a touch or a pen as a click", () => {
+    const { element, changed, clicked } = setUp();
+    for (const pointerType of ["touch", "pen"]) {
+      pointer(element, "pointerdown", 20, 30, { pointerType });
+      pointer(element, "pointerup", 21, 30, { pointerType });
+    }
+    expect(clicked).toHaveBeenCalledTimes(2);
+    // A touch that moves is a scroll: no click, no turn.
+    pointer(element, "pointerdown", 20, 30, { pointerType: "touch" });
+    pointer(element, "pointermove", 20, 90, { pointerType: "touch" });
+    pointer(element, "pointerup", 20, 90, { pointerType: "touch" });
+    expect(clicked).toHaveBeenCalledTimes(2);
+    expect(changed).not.toHaveBeenCalled();
+  });
+
   it("tells a click from a drag by a threshold", () => {
     const { element, changed, clicked, controls } = setUp();
     pointer(element, "pointerdown", 50, 50);

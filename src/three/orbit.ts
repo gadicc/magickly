@@ -6,8 +6,9 @@
  * is; Ctrl with the wheel, or a trackpad's pinch (Ctrl and the wheel in
  * Chromium and Firefox, `gesturechange` in Safari), zooms; the plain
  * wheel scrolls the page. There is no damping or inertia: each event
- * moves the camera once and asks for one frame. Touch and pen are left
- * to the page, which scrolls past; turning by them is the full window's.
+ * moves the camera once and asks for one frame. A touch or a pen taps,
+ * as a click does, and otherwise is left to the page, which scrolls
+ * past; turning by them is the full window's.
  */
 import { type PerspectiveCamera, Vector3 } from "three";
 
@@ -107,26 +108,35 @@ export function orbit(
     changed();
   };
 
-  // The mouse only: a touch or a pen scrolls the page.
-  let press: { id: number; x: number; y: number; from: OrbitView } | null =
-    null;
+  // The mouse turns; a touch or a pen only taps, and a pen counts as a
+  // touch, which the page may take for a scroll mid-turn.
+  let press: {
+    id: number;
+    x: number;
+    y: number;
+    from: OrbitView;
+    turns: boolean;
+  } | null = null;
   let dragging = false;
   const down = (event: PointerEvent) => {
-    // A pen as a touch, which the page may take for a scroll mid-turn.
-    if (event.pointerType !== "mouse" || event.button !== 0) return;
+    if (event.button !== 0) return;
+    const turns = event.pointerType === "mouse";
     press = {
       id: event.pointerId,
       x: event.clientX,
       y: event.clientY,
       from: { ...view },
+      turns,
     };
     dragging = false;
-    element.setPointerCapture?.(event.pointerId);
+    if (turns) element.setPointerCapture?.(event.pointerId);
   };
   const move = (event: PointerEvent) => {
     if (!press || event.pointerId !== press.id) return;
     const [dx, dy] = [event.clientX - press.x, event.clientY - press.y];
     if (!dragging && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+    // A touch that moves is the page's scroll, not a tap.
+    if (!press.turns) return cancel();
     dragging = true;
     // For the box's style: no selection, a grabbing hand.
     element.dataset.turning = "";

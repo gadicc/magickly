@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import enochianTablets, { tabletVersion } from "magick-data/enochian/tablets";
 import {
+  type BufferAttribute,
   type BufferGeometry,
   Color,
   DirectionalLight,
@@ -126,7 +127,7 @@ describe("the tablet's object (plan 101)", () => {
       main.indexOf("step(0.0, box.x)"),
     );
     expect(main).not.toMatch(/\bif\s*\(/);
-    expect(pyramids.material.customProgramCacheKey()).toBe("tablet3d-marks-v2");
+    expect(pyramids.material.customProgramCacheKey()).toBe("tablet3d-marks-v3");
     // Each anchor kept, once, after the patch's own lines.
     for (const anchor of ["#include <common>", "#include <begin_vertex>"])
       expect(shader.vertexShader.split(anchor)).toHaveLength(2);
@@ -163,6 +164,31 @@ describe("the tablet's object (plan 101)", () => {
     expect(shader.fragmentShader).not.toContain("fwidth");
     tablet.setGround("#ff0000");
     expect(ground.material.color.equals(new Color("#ff0000"))).toBe(true);
+  });
+
+  it("tints each pyramid in place, and says when anything changed", () => {
+    const { tablet, pyramids } = build();
+    const shader = compiled(pyramids.material);
+    expect(shader.vertexShader).toContain("attribute vec4 markTint;");
+    expect(shader.fragmentShader).toContain(
+      "mix(diffuseColor.rgb, vMarkTint.rgb, vMarkTint.a)",
+    );
+    const attribute = pyramids.geometry.attributes.markTint as BufferAttribute;
+    const tints = new Float32Array(model.pyramids.length * 4);
+    tints.set([1, 0, 1, 0.5], 3 * 4);
+    const version = attribute.version;
+    expect(tablet.setTints(tints)).toBe(true);
+    expect(attribute.version).toBe(version + 1);
+    // Every vertex of pyramid 3, and no other, carries its tint.
+    const squares = pyramidGeometry(model, MARKS_SHEET).squares;
+    squares.forEach((square, vertex) =>
+      expect([...attribute.array.slice(vertex * 4, vertex * 4 + 4)]).toEqual(
+        square === 3 ? [1, 0, 1, 0.5] : [0, 0, 0, 0],
+      ),
+    );
+    // The same again changes nothing, and is not drawn.
+    expect(tablet.setTints(tints.slice())).toBe(false);
+    expect(attribute.version).toBe(version + 1);
   });
 
   it("gives the corners of the tablet and its ground to fit a camera to", () => {
