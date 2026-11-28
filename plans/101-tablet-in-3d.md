@@ -1,6 +1,8 @@
 # The tablet in 3D — 26 November 2026
 
-Status: draft, 26 November 2026. Plan 095's stretch goal (Gadi,
+Status: built, 27 November 2026, in six stages on
+`gate/101-tablet-3d`; landing next. Drafted 26 November 2026, as plan
+095's stretch goal (Gadi,
 23 November 2026). Gadi accepted the invariants in principle and chose
 the look from the spike's frames (26 November 2026, below). A value
 review (Fable 5.2, high, 26 November) reshaped the draft; its changes
@@ -8,8 +10,9 @@ are marked "(value review)". Gadi signed off the invariants and the
 size ceiling as revised (27 November 2026). A correctness review (fresh
 Opus 5.5, high, 27 November) found two blockers, the sheet's outline ink
 and how the build check finds three, and a set of fixes, all taken and
-marked "(correctness review)". Next: the build on `gate/101-tablet-3d`,
-with a phone-width mock-up of the switches before stage 4. Read
+marked "(correctness review)". Gadi's choices while it was built (the
+look, the outlines, the switch's place, one Full screen button) are
+recorded where they apply. Read
 [current status](000-current-status.md) and
 [plan 095](095-tablet-pyramids.md) first. The number was free on every
 branch when drafted.
@@ -97,7 +100,8 @@ Gadi chose the recommendation:
 - one directional light 60° above the tablet, fixed to it, so turning the
   view never changes which faces are lit;
 - no cast shadows;
-- sheet cells of 128–192 px, and pixel density capped at 2.
+- sheet cells of 128–192 px (built 128–186, the most a 2,048 px
+  texture holds), and pixel density capped at 2.
 
 The recommendation also had darker valleys where pyramids meet and thin
 lines along the ridges and round the tops. The spike drew neither, so
@@ -193,7 +197,7 @@ under `.env.ci`'s placeholders, in headless Chromium:
   head (`e458579b`, main's page with three installed but not imported):
   +924 bytes, the loader, the switch and its URL state. Main's own build
   was not to hand.
-- **Texture memory:** the sheet's cells are 186 px at density 2
+- **Texture memory** (the 192 px above, as built): the sheet's cells are 186 px at density 2
   (`MARKS_SHEET_MAX_CELL_PX`), 2,046 × 1,860 pixels, about 20 MB with
   its mipmaps.
 - **60 fps while turning on Gadi's phone:** pending, Gadi's.
@@ -217,8 +221,10 @@ is still patchy on phones and not needed here.
 
 - **One merged mesh** for the whole tablet, from typed arrays: each
   square's four sides and top, with per-vertex colour, the mark's sheet
-  cell, its ink and its outline colour, a highlight attribute per square
-  (below), and, if the frames earn it, a valley-darkening factor. The
+  cell, its ink and its outline colour, a highlight tint (below), and
+  each vertex's height up its side for the valleys' darkening, built at
+  0.35 with no edge lines (Gadi's choice from stage 3's frames, above).
+  The
   ground under the tablet is the second draw call. `PYRAMID_COLOURS` and
   the inks are sRGB hex; they are converted to linear once, in `model.ts`,
   and the tests compare after that conversion (correctness review).
@@ -237,10 +243,10 @@ is still patchy on phones and not needed here.
   (`pyramidMarks.tsx`), and Fire's, Water's and Air's black outlines are
   what give their green, orange and violet marks their contrast, so a
   one-channel mask tinted by the ink alone would lose them. The texture
-  is uploaded as `NoColorSpace`, so coverage is not gamma-decoded. The
-  marks use `TABLET_MARK_OUTLINES`, the flat tablet's widths, and stage
-  3's frames show whether the larger 3D faces want the Squares tab's
-  `MARK_OUTLINES` instead.
+  is uploaded as `NoColorSpace`, so coverage is not gamma-decoded. Built
+  with the Squares tab's thicker `MARK_OUTLINES`, and a mark outlined in
+  its own ink takes its side's colour as its outline (Gadi's choices from
+  stage 3's frames, above).
 - **The sheet is drawn once by a committed script**, from the same
   `SideMark` and letters the flat drawing uses. The script outlines text
   to paths with the image route's `outlineComponentImage`
@@ -284,20 +290,27 @@ src/app/enochian/tablets/three/
   marksSheet.generated.ts         the committed sheet (SVG string, cell map)
   tabletObject.ts                 mesh and material in tablet-local axes;
                                   pick(ray) → square
+  highlights.ts                   the page's highlights as tints, and which
+                                  square a click may choose; no three import
   Tablet3D.tsx                    the view, inline and in the full window
 src/app/enochian/tablets/
   Tablet3DLoader.tsx              dynamic(..., { ssr: false }); on first load,
                                   so outside three/ (correctness review)
 scripts/tablet3d/sheet.mts        draws marksSheet.generated.ts
+scripts/threeChunks.ts            the 3D chunks by their modules: Serwist's
+                                  exclusion and the plugin writing
+                                  three-chunks.json, both imported by
+                                  next.config.ts
 scripts/checkThreeBuild.mts       after next build: invariant 3, the JS ceiling
 ```
 
-`next.config.ts` excludes the 3D chunk groups from Serwist's precache
-(`excludeChunks`, by `webpackChunkName`, which takes in the split-out
-three.js chunks). That match is by name. It breaks silently when another
-feature shares three's chunks, and Serwist ignores an unknown name
-without a warning, so the build check cannot trust names (value review,
-correctness review).
+As drafted, `next.config.ts` was to exclude the 3D chunk groups from
+Serwist's precache by name (`excludeChunks`, by `webpackChunkName`). That
+match breaks silently when another feature shares three's chunks, and
+Serwist ignores an unknown name without a warning, so the build check
+cannot trust names (value review, correctness review). As built, both
+the exclusion and the check find the chunks by their modules
+(`scripts/threeChunks.ts`; "Built with `exclude`", below).
 
 **How the build check finds three** (correctness review). Next 16's
 webpack build writes no `app-build-manifest.json`, and the client
@@ -372,7 +385,9 @@ deployment-tagged build pass without checking.
   the Differences tab relies on, and a chosen name dims the other squares
   (correctness review). The view does not draw reading-order numbers,
   regions or the sigil above the grid, and a line under it says so. It
-  keeps `mirrorReversed` (the sheet has the letters mirrored).
+  keeps `mirrorReversed`: the sheet has one cell per letter, and
+  `pyramidGeometry` mirrors a reversed letter by flipping the right
+  vector of its top's UVs.
 - **What rests while 3D is on.** *Symbols on the sides*, *upright*,
   *Second letters*, the Enochian font and the Names tab's *Show the
   regions* rest, as *Second letters* does under pyramids today, and the
@@ -594,6 +609,10 @@ landing.
     the canvas back inline and focus on the button.
   - **The flat page** with pyramids and without 3D requests no 3D chunk
     and has no canvas (invariant 3).
+  - **A drag turns, and idle draws nothing**, on the built code: a drag
+    turned the tablet one frame a move (10 for 10 mouse moves inline at
+    stage 3, 6 for 6 touch moves in the full screen at stage 5), and
+    the idle checks drew no frame (5 s at stage 3, 3 s at stages 4 to 6).
   - **Right to left** (`dir` and `lang` forced, the page having no
     Hebrew edition), at 375 px the row of buttons starts at the right
     and the full screen's hint is centred.
@@ -604,9 +623,18 @@ landing.
   SwiftShader; a phone GPU should be far quicker, but shader compilation
   on a cold phone is the unknown. A loading state shows at once. The
   environment map's generation is timed on the phone too.
-- **Graphics memory on small phones.** Density 2 and 192 px cells keep
-  the sheet near 24 MB and the full-window canvas near 45 MB. Below
-  192 px, the letters soften first.
+- **Graphics memory on small phones.** Density 2 and 186 px cells (the
+  most a 2,048 px texture holds) keep the sheet near 20 MB and the
+  full-window canvas near 45 MB. Below 186 px, the letters soften first.
+- **`router.refresh()`** replaces the history entry's state, and so can
+  wipe the full screen's key: the window then stays open until Close,
+  and one extra Back is spent.
+- **On Vercel** the build check's per-page first-load rule is skipped
+  when the build leaves no client manifests to read; the shared first
+  load and the precache are still checked.
+- **3D code outside the counted ceiling:** `Tablet3DLoader.tsx`,
+  `scripts/threeChunks.ts` and `scripts/checkThreeBuild.mts`, about 250
+  lines, are on the page or in the build rather than in the view.
 - **three's churn.** Minor three.js releases often break things; it is
   pinned exactly and upgraded on purpose.
 
