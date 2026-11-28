@@ -25,6 +25,8 @@ const stub = vi.hoisted(() => ({
   canvas: null as HTMLCanvasElement | null,
   // When the mark sheet comes: at once, unless a test holds it back.
   sheet: Promise.resolve() as Promise<unknown>,
+  // A renderer made, whose use then throws.
+  brokenAfterContext: false,
   invalidate: vi.fn(),
   dispose: vi.fn(),
 }));
@@ -49,7 +51,12 @@ vi.mock("@/three/viewer", async (original) => {
       return {
         renderer: {
           domElement: canvas,
-          capabilities: { getMaxAnisotropy: () => 16 },
+          capabilities: {
+            getMaxAnisotropy: () => {
+              if (stub.brokenAfterContext) throw new Error("lost already");
+              return 16;
+            },
+          },
         },
         frames: 0,
         invalidate: stub.invalidate,
@@ -104,6 +111,7 @@ afterEach(() => {
   stub.made = 0;
   stub.rasters = 0;
   stub.sheet = Promise.resolve();
+  stub.brokenAfterContext = false;
   stub.invalidate.mockClear();
   stub.dispose.mockClear();
   vi.restoreAllMocks();
@@ -122,6 +130,44 @@ describe("the 3D view (plan 101)", () => {
       />,
     );
     expect(unavailable).toHaveBeenCalledWith("webgl");
+  });
+
+  it("lets go of a renderer it made when setting it up fails", () => {
+    stub.on = true;
+    stub.brokenAfterContext = true;
+    const unavailable = vi.fn();
+    render(
+      <Tablet3D
+        view={view("fire")}
+        mirrorReversed
+        label="The Fire tablet as pyramids, in 3D"
+        unavailable={unavailable}
+      />,
+    );
+    expect(stub.dispose).toHaveBeenCalledTimes(1);
+    expect(unavailable).toHaveBeenCalledWith("webgl");
+  });
+
+  it("draws flat, rather than loading for ever, when building the tablet fails", async () => {
+    stub.on = true;
+    const fire = view("fire");
+    // A letter the sheet has no cell for: the model throws.
+    const broken = {
+      ...fire,
+      grid: fire.grid.map((row, at) =>
+        at === 0 ? ["Q", ...row.slice(1)] : row,
+      ),
+    };
+    const unavailable = vi.fn();
+    render(
+      <Tablet3D
+        view={broken}
+        mirrorReversed
+        label="The Fire tablet as pyramids, in 3D"
+        unavailable={unavailable}
+      />,
+    );
+    await waitFor(() => expect(unavailable).toHaveBeenCalledWith("load"));
   });
 
   it("chooses the square a click lands on, as the highlights allow, and tints it", async () => {
@@ -248,7 +294,7 @@ describe("the 3D view (plan 101)", () => {
     // from the same sheet, turned as it was.
     const canvas = box.querySelector("canvas") as HTMLCanvasElement;
     box.getBoundingClientRect = () => ({ width: 200, height: 100 }) as DOMRect;
-    const press = { pointerType: "mouse", pointerId: 1, button: 0 };
+    const press = { pointerType: "mouse", pointerId: 1, button: 0, buttons: 1 };
     fireEvent(
       canvas,
       new PointerEvent("pointerdown", {

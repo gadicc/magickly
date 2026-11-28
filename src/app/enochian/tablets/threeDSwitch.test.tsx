@@ -188,4 +188,42 @@ describe("the tablets page's In 3D switch (plan 101, stage 4)", () => {
     // The reader chose no symbols; the link opens none.
     expect(href.has("symbols")).toBe(false);
   });
+
+  it("numbers a chosen name's squares again on the flat drawing after 3D", () => {
+    // Squares big enough to number while the drawing is on the page, and
+    // a drawing taken off it measured 0, as a browser's ResizeObserver
+    // reports it.
+    vi.spyOn(
+      SVGSVGElement.prototype,
+      "getBoundingClientRect",
+    ).mockImplementation(function (this: SVGSVGElement) {
+      return { width: this.isConnected ? 600 : 0 } as DOMRect;
+    });
+    const observed: (() => void)[] = [];
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(readonly callback: () => void) {
+          observed.push(callback);
+        }
+        observe() {}
+        disconnect() {}
+      },
+    );
+    const { container } = at("?pyramids=1");
+    const laidrom = () =>
+      screen
+        .getAllByRole("button", { name: /^Laidrom/ })
+        .filter((button) => button.dataset.nameId)[0] as HTMLElement;
+    fireEvent.click(laidrom());
+    const numbers = () => container.querySelectorAll("[data-order]").length;
+    expect(numbers()).toBe(7);
+    fireEvent.click(toggle("In 3D") as HTMLInputElement);
+    act(() => {
+      for (const each of observed) each();
+    });
+    fireEvent.click(toggle("In 3D") as HTMLInputElement);
+    expect(numbers()).toBe(7);
+    vi.unstubAllGlobals();
+  });
 });

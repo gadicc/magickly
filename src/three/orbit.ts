@@ -179,11 +179,13 @@ export function orbit(
       fingers.set(event.pointerId, [event.clientX, event.clientY]);
     if (pinch && fingers.size === 2)
       return set({ zoom: (pinch.zoom * pinch.spread) / spread() });
-    if (!press || event.pointerId !== press.id) return;
+    // A touch or pen that does not turn is the page's, and its tap the
+    // browser's to judge; a mouse released where the page never saw it
+    // turns nothing more.
+    if (!press?.turns || event.pointerId !== press.id) return;
+    if (event.pointerType === "mouse" && event.buttons === 0) return cancel();
     const [dx, dy] = [event.clientX - press.x, event.clientY - press.y];
     if (!dragging && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
-    // A touch that moves is the page's scroll, not a tap.
-    if (!press.turns) return cancel();
     dragging = true;
     // For the box's style: no selection, a grabbing hand.
     element.dataset.turning = "";
@@ -199,7 +201,7 @@ export function orbit(
     if (!press || event.pointerId !== press.id) return;
     // Measured again: a drag may reach here without a move between.
     const moved = Math.hypot(event.clientX - press.x, event.clientY - press.y);
-    tapped = !dragging && moved < DRAG_THRESHOLD;
+    tapped = !press.turns || (!dragging && moved < DRAG_THRESHOLD);
     cancel();
   };
   const lift = (event: PointerEvent) => {

@@ -118,7 +118,8 @@ export default function Tablet3D({
   React.useEffect(() => {
     const element = box.current;
     if (!element) return;
-    let viewer: Viewer;
+    let viewer: Viewer | undefined;
+    let anisotropy: number;
     try {
       viewer = createViewer(element, {
         scene,
@@ -126,12 +127,14 @@ export default function Tablet3D({
         environment: roomEnvironment,
         resized: () => live.current.orbit?.fit(),
       });
+      viewer.renderer.domElement.setAttribute("aria-hidden", "true");
+      anisotropy = viewer.renderer.capabilities.getMaxAnisotropy();
     } catch {
+      // Its context let go before the page draws flat.
+      viewer?.dispose();
       latest.current.unavailable("webgl");
       return;
     }
-    viewer.renderer.domElement.setAttribute("aria-hidden", "true");
-    const anisotropy = viewer.renderer.capabilities.getMaxAnisotropy();
     const sheet = rasteriseSheet(
       MARKS_SHEET_SVG,
       MARKS_SHEET,
@@ -158,8 +161,9 @@ export default function Tablet3D({
     const element = viewer.renderer.domElement;
     let tablet: TabletObject | undefined;
     let gone = false;
-    sheet.then(
-      (texture) => {
+    // Any failure, the sheet's or in building the tablet, draws it flat.
+    sheet
+      .then((texture) => {
         if (gone) return;
         const model = tabletModel(view, MARKS_SHEET, { mirrorReversed });
         tablet = tabletObject(model, MARKS_SHEET, texture, {
@@ -181,9 +185,8 @@ export default function Tablet3D({
         }
         viewer.invalidate();
         setDrawn(true);
-      },
-      () => !gone && latest.current.unavailable("load"),
-    );
+      })
+      .catch(() => !gone && latest.current.unavailable("load"));
     return () => {
       gone = true;
       tablet?.object.removeFromParent();

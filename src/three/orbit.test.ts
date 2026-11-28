@@ -37,7 +37,14 @@ const pointer = (
   type: string,
   x: number,
   y: number,
-  { pointerType = "mouse", pointerId = 1, button = 0, click = true } = {},
+  {
+    pointerType = "mouse",
+    pointerId = 1,
+    button = 0,
+    click = true,
+    // Held down while it moves, as a drag is.
+    buttons = type === "pointerup" ? 0 : 1,
+  } = {},
 ) => {
   element.dispatchEvent(
     new PointerEvent(type, {
@@ -46,6 +53,7 @@ const pointer = (
       pointerType,
       pointerId,
       button,
+      buttons,
       bubbles: true,
     }),
   );
@@ -91,10 +99,11 @@ describe("orbit (plan 101)", () => {
   it("leaves a touch or a pen to the page, which scrolls by one finger", () => {
     const { element, changed, clicked, controls } = setUp();
     expect(element.style.touchAction).toBe("pan-y pinch-zoom");
+    // A drag of a finger is the page's scroll, which gives no click.
     for (const pointerType of ["touch", "pen"]) {
       pointer(element, "pointerdown", 10, 10, { pointerType });
       pointer(element, "pointermove", 90, 10, { pointerType });
-      pointer(element, "pointerup", 90, 10, { pointerType });
+      pointer(element, "pointerup", 90, 10, { pointerType, click: false });
     }
     expect(controls.view).toEqual(HOME);
     expect(changed).not.toHaveBeenCalled();
@@ -108,10 +117,14 @@ describe("orbit (plan 101)", () => {
       pointer(element, "pointerup", 21, 30, { pointerType });
     }
     expect(clicked).toHaveBeenCalledTimes(2);
-    // A touch that moves is a scroll: no click, no turn.
+    // A touch that moves is a scroll, which the browser gives no click:
+    // no click, no turn.
     pointer(element, "pointerdown", 20, 30, { pointerType: "touch" });
     pointer(element, "pointermove", 20, 90, { pointerType: "touch" });
-    pointer(element, "pointerup", 20, 90, { pointerType: "touch" });
+    pointer(element, "pointerup", 20, 90, {
+      pointerType: "touch",
+      click: false,
+    });
     expect(clicked).toHaveBeenCalledTimes(2);
     expect(changed).not.toHaveBeenCalled();
     // A tap that stops a momentum scroll: the browser fires no click.
@@ -137,15 +150,36 @@ describe("orbit (plan 101)", () => {
     expect(clicked).toHaveBeenCalledWith(50 + DRAG_THRESHOLD - 1, 50);
   });
 
-  it("takes no release past the threshold for a click, moves or none", () => {
+  it("takes no mouse release past the threshold for a click, moves or none", () => {
     const { element, clicked } = setUp();
     pointer(element, "pointerdown", 50, 50);
     pointer(element, "pointerup", 50 + DRAG_THRESHOLD, 50);
-    pointer(element, "pointerdown", 50, 50, { pointerType: "touch" });
-    pointer(element, "pointerup", 50, 50 + DRAG_THRESHOLD, {
-      pointerType: "touch",
-    });
     expect(clicked).not.toHaveBeenCalled();
+  });
+
+  it("leaves a touch's or a pen's tap to the browser's own click", () => {
+    const { element, clicked } = setUp();
+    // Further than the mouse's threshold, but within the browser's slop:
+    // its click says it was a tap.
+    for (const pointerType of ["touch", "pen"]) {
+      pointer(element, "pointerdown", 50, 50, { pointerType });
+      pointer(element, "pointermove", 50, 58, { pointerType });
+      pointer(element, "pointerup", 50, 58, { pointerType });
+    }
+    expect(clicked).toHaveBeenCalledTimes(2);
+  });
+
+  it("turns nothing on hover after a release the page never saw", () => {
+    const { element, changed, controls } = setUp();
+    pointer(element, "pointerdown", 50, 50);
+    pointer(element, "pointermove", 100, 50);
+    expect(changed).toHaveBeenCalledTimes(1);
+    const turned = controls.view.azimuth;
+    // Released outside the window: the next move has no button held.
+    pointer(element, "pointermove", 150, 50, { buttons: 0 });
+    pointer(element, "pointermove", 180, 50);
+    expect(controls.view.azimuth).toBe(turned);
+    expect(element.dataset.turning).toBeUndefined();
   });
 
   it("turns about the point by a drag, one move a frame", () => {

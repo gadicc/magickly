@@ -271,6 +271,24 @@ describe("the viewer (plan 101, invariant 5)", () => {
     expect(scene.environment).toBeNull();
   });
 
+  it("lets go of a renderer, context and all, when setting it up throws", () => {
+    const box = document.createElement("div");
+    const stub = stubRenderer();
+    expect(() =>
+      createViewer(box, {
+        scene: new Scene(),
+        camera: new PerspectiveCamera(),
+        environment: () => {
+          throw new Error("no environment");
+        },
+        renderer: stub.make,
+      }),
+    ).toThrow("no environment");
+    expect(stub.renderer.dispose).toHaveBeenCalled();
+    expect(stub.renderer.forceContextLoss).toHaveBeenCalled();
+    expect(box.querySelector("canvas")).toBeNull();
+  });
+
   it("throws as three does where WebGL 2 cannot be made", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() =>

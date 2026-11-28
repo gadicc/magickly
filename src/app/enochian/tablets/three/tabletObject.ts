@@ -80,9 +80,13 @@ export async function rasteriseSheet(
   if (!context) throw new Error("No 2D canvas for the mark sheet");
   const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
   try {
-    const image = new Image();
-    image.src = url;
-    await image.decode();
+    // Its load, not decode(), which some WebKit rejects for an SVG.
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const each = new Image();
+      each.onload = () => resolve(each);
+      each.onerror = () => reject(new Error("The mark sheet did not load"));
+      each.src = url;
+    });
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
   } finally {
     URL.revokeObjectURL(url);

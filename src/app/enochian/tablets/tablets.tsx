@@ -139,12 +139,18 @@ const squareShare = (id: TabletId) =>
  */
 export const NUMBERED_SQUARE_PX = 30;
 
-/** How big the drawn squares are, in pixels; 0 until measured. */
+/**
+ * How big the drawn squares are, in pixels; 0 until measured. Measured
+ * again on the drawing that `drawing` names, as when the 3D view gives
+ * way to a new flat drawing: the old one is gone, and measured 0.
+ */
 function useSquarePixels(
   ref: React.RefObject<SVGSVGElement | null>,
   share: number,
+  drawing: unknown,
 ) {
   const [pixels, setPixels] = React.useState(0);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: measured again on a new drawing behind the same ref
   React.useEffect(() => {
     const svg = ref.current;
     if (!svg) return;
@@ -154,7 +160,7 @@ function useSquarePixels(
     const observer = new ResizeObserver(measure);
     observer.observe(svg);
     return () => observer.disconnect();
-  }, [ref, share]);
+  }, [ref, share, drawing]);
   return pixels;
 }
 
@@ -634,7 +640,7 @@ export default function Tablets({
   );
   // Measured again when a drawing replaces the note of a version with no
   // Tablet of Union.
-  const squarePixels = useSquarePixels(ref, view ? squareShare(id) : 0);
+  const squarePixels = useSquarePixels(ref, view ? squareShare(id) : 0, threeD);
   const layout = React.useRef<HTMLDivElement>(null);
   useLayoutWidth(layout);
   const font = enochianFont ? ("enochian" as const) : ("latin" as const);

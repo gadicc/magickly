@@ -73,111 +73,125 @@ export function createViewer(
   }: ViewerOptions,
 ): Viewer {
   const renderer = make();
-  renderer.outputColorSpace = SRGBColorSpace;
-  renderer.toneMapping = NeutralToneMapping;
-  // Transparent: the box's own background shows, and follows the theme.
-  renderer.setClearColor(0x000000, 0);
-  const canvas = renderer.domElement;
-  canvas.style.display = "block";
-  canvas.style.width = "100%";
-  canvas.style.height = "100%";
-  let box = first;
-  box.append(canvas);
+  try {
+    return start(renderer);
+  } catch (error) {
+    // Made but not started: its context goes, as dispose() lets it go.
+    renderer.dispose();
+    renderer.forceContextLoss();
+    renderer.domElement.remove();
+    throw error;
+  }
 
-  let map: WebGLRenderTarget | undefined;
-  const makeEnvironment = () => {
-    if (!environment) return;
-    map?.dispose();
-    map = environment(renderer);
-    scene.environment = map.texture;
-  };
-  makeEnvironment();
+  function start(renderer: WebGLRenderer): Viewer {
+    renderer.outputColorSpace = SRGBColorSpace;
+    renderer.toneMapping = NeutralToneMapping;
+    // Transparent: the box's own background shows, and follows the theme.
+    renderer.setClearColor(0x000000, 0);
+    const canvas = renderer.domElement;
+    canvas.style.display = "block";
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    let box = first;
+    box.append(canvas);
 
-  let frames = 0;
-  let pending = false;
-  let lost = false;
-  // One frame through the animation loop, which is cleared as it runs, so
-  // that nothing is drawn while idle; the loop is what WebXR drives.
-  const draw = () => {
-    renderer.setAnimationLoop(null);
-    pending = false;
-    renderer.render(scene, camera);
-    frames += 1;
-  };
-  const invalidate = () => {
-    if (pending || lost) return;
-    pending = true;
-    renderer.setAnimationLoop(draw);
-  };
-
-  const resize = () => {
-    const { width, height } = box.getBoundingClientRect();
-    if (!width || !height) return;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO));
-    renderer.setSize(width, height, false);
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-    resized?.();
-    invalidate();
-  };
-  const observer = new ResizeObserver(resize);
-  observer.observe(box);
-  // A change of density without a resize (a window moved to another
-  // screen, or the page zoomed): its query matches only the old density.
-  let density: MediaQueryList | undefined;
-  const watchDensity = () => {
-    density?.removeEventListener("change", onDensity);
-    density = window.matchMedia?.(
-      `(resolution: ${window.devicePixelRatio}dppx)`,
-    );
-    density?.addEventListener("change", onDensity);
-  };
-  const onDensity = () => {
-    watchDensity();
-    resize();
-  };
-  watchDensity();
-
-  // three re-uploads buffers and textures by itself after a restore.
-  const onLost = () => {
-    lost = true;
-    pending = false;
-    renderer.setAnimationLoop(null);
-  };
-  const onRestored = () => {
-    lost = false;
-    makeEnvironment();
-    invalidate();
-  };
-  canvas.addEventListener("webglcontextlost", onLost);
-  canvas.addEventListener("webglcontextrestored", onRestored);
-
-  return {
-    renderer,
-    get frames() {
-      return frames;
-    },
-    invalidate,
-    moveTo(next) {
-      observer.unobserve(box);
-      box = next;
-      box.append(canvas);
-      observer.observe(box);
-      resize();
-    },
-    dispose() {
-      observer.disconnect();
-      density?.removeEventListener("change", onDensity);
-      renderer.setAnimationLoop(null);
-      canvas.removeEventListener("webglcontextlost", onLost);
-      canvas.removeEventListener("webglcontextrestored", onRestored);
+    let map: WebGLRenderTarget | undefined;
+    const makeEnvironment = () => {
+      if (!environment) return;
       map?.dispose();
-      scene.environment = null;
-      renderer.dispose();
-      // dispose() keeps the context, and a browser allows few: let it go,
-      // the listeners gone so that its loss restores nothing.
-      renderer.forceContextLoss();
-      canvas.remove();
-    },
-  };
+      map = environment(renderer);
+      scene.environment = map.texture;
+    };
+    makeEnvironment();
+
+    let frames = 0;
+    let pending = false;
+    let lost = false;
+    // One frame through the animation loop, which is cleared as it runs, so
+    // that nothing is drawn while idle; the loop is what WebXR drives.
+    const draw = () => {
+      renderer.setAnimationLoop(null);
+      pending = false;
+      renderer.render(scene, camera);
+      frames += 1;
+    };
+    const invalidate = () => {
+      if (pending || lost) return;
+      pending = true;
+      renderer.setAnimationLoop(draw);
+    };
+
+    const resize = () => {
+      const { width, height } = box.getBoundingClientRect();
+      if (!width || !height) return;
+      renderer.setPixelRatio(
+        Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO),
+      );
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      resized?.();
+      invalidate();
+    };
+    const observer = new ResizeObserver(resize);
+    observer.observe(box);
+    // A change of density without a resize (a window moved to another
+    // screen, or the page zoomed): its query matches only the old density.
+    let density: MediaQueryList | undefined;
+    const watchDensity = () => {
+      density?.removeEventListener("change", onDensity);
+      density = window.matchMedia?.(
+        `(resolution: ${window.devicePixelRatio}dppx)`,
+      );
+      density?.addEventListener("change", onDensity);
+    };
+    const onDensity = () => {
+      watchDensity();
+      resize();
+    };
+    watchDensity();
+
+    // three re-uploads buffers and textures by itself after a restore.
+    const onLost = () => {
+      lost = true;
+      pending = false;
+      renderer.setAnimationLoop(null);
+    };
+    const onRestored = () => {
+      lost = false;
+      makeEnvironment();
+      invalidate();
+    };
+    canvas.addEventListener("webglcontextlost", onLost);
+    canvas.addEventListener("webglcontextrestored", onRestored);
+
+    return {
+      renderer,
+      get frames() {
+        return frames;
+      },
+      invalidate,
+      moveTo(next) {
+        observer.unobserve(box);
+        box = next;
+        box.append(canvas);
+        observer.observe(box);
+        resize();
+      },
+      dispose() {
+        observer.disconnect();
+        density?.removeEventListener("change", onDensity);
+        renderer.setAnimationLoop(null);
+        canvas.removeEventListener("webglcontextlost", onLost);
+        canvas.removeEventListener("webglcontextrestored", onRestored);
+        map?.dispose();
+        scene.environment = null;
+        renderer.dispose();
+        // dispose() keeps the context, and a browser allows few: let it go,
+        // the listeners gone so that its loss restores nothing.
+        renderer.forceContextLoss();
+        canvas.remove();
+      },
+    };
+  }
 }

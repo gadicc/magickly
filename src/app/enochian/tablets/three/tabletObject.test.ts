@@ -253,8 +253,11 @@ describe("the mark sheet's raster", () => {
     expect(sheetCellPixels(3)).toBe(MARKS_SHEET_MAX_CELL_PX);
   });
 
-  /** An image that decodes, or fails to, and a 2D context to draw it in. */
-  function stubImage(decodes: boolean) {
+  /**
+   * An image that loads, or fails to, and a 2D context to draw it in. Its
+   * decode() always rejects, as some WebKit's does for an SVG.
+   */
+  function stubImage(loads: boolean) {
     const drawImage = vi.fn();
     vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
       drawImage,
@@ -270,15 +273,23 @@ describe("the mark sheet's raster", () => {
     vi.stubGlobal(
       "Image",
       class {
-        src = "";
-        decode = () =>
-          decodes ? Promise.resolve() : Promise.reject(new Error("bad SVG"));
+        onload: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        decode = () => Promise.reject(new Error("EncodingError"));
+        #src = "";
+        get src() {
+          return this.#src;
+        }
+        set src(url: string) {
+          this.#src = url;
+          queueMicrotask(() => (loads ? this.onload : this.onerror)?.());
+        }
       },
     );
     return { drawImage, urls };
   }
 
-  it("draws the SVG over the whole canvas, a cell's pixels a cell", async () => {
+  it("draws the SVG over the whole canvas, a cell's pixels a cell, by its load", async () => {
     const { drawImage, urls } = stubImage(true);
     const canvas = await rasteriseSheet("<svg/>", MARKS_SHEET, 128);
     expect(canvas.width).toBe(MARKS_SHEET.columns * 128);
@@ -294,10 +305,10 @@ describe("the mark sheet's raster", () => {
     expect(urls.revoked).toEqual(["blob:sheet"]);
   });
 
-  it("lets its URL go when the SVG does not decode", async () => {
+  it("lets its URL go when the SVG does not load", async () => {
     const { urls } = stubImage(false);
     await expect(rasteriseSheet("<svg/>", MARKS_SHEET, 128)).rejects.toThrow(
-      "bad SVG",
+      "The mark sheet did not load",
     );
     expect(urls.revoked).toEqual(["blob:sheet"]);
   });
